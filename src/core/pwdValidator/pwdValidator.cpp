@@ -53,7 +53,8 @@ bool PwdChecker::isWeakPwd(const std::string &password) {
     auto it = cacheMap.find(password);
     if (it != cacheMap.end()) {
         std::cout << "Password is already checked...";
-        order.splice(order.end(), order, it->second);
+        order.splice(order.end(), order, it->second); /* splice is used for moving an element from one place to another, while
+            it->second point to the value of map in key-value pair , which has further an itertor pointing to the same password in the list*/
         return true;
     }
 
@@ -61,7 +62,7 @@ bool PwdChecker::isWeakPwd(const std::string &password) {
 
     if (result) {
         order.push_back(password);
-        cacheMap[password] = std::prev(order.end());
+        cacheMap[password] = std::prev(order.end()); /*std::prev returns the element before end(), here we are add iterator in map that points to the last inserted password at the end in the list*/
 
         if (cacheMap.size() > MAX_CACHE_SIZE) {
             std::string oldestPwd = order.front();
