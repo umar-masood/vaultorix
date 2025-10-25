@@ -13,6 +13,11 @@ void lower(std::string &str) {
     for (auto &c : str) c = std::tolower(static_cast<unsigned char>(c));
 }
 
+void loadMails() {
+    QNetworkAccessManager *manager = new QNetworkAccessManager;
+    QNetworkRequest request(QUrl(""));
+}
+
 bool checkDisposableEmail(std::string email) {
     std::ifstream file("C:/Users/umara/Downloads/tempMails.conf");
     if (!file.is_open()) {
