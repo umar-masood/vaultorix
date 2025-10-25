@@ -1,5 +1,8 @@
 #include <QCoreApplication>
-#include <QtNetwork>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QByteArray>
 
 #include <string>
 #include <fstream>
