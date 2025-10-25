@@ -1,8 +1,9 @@
 #pragma once
 #include "../components/TextField.h" 
-#include "../pwdValidator/pwdValidator.h"
+#include "../pwdRulesWidget/pwdRulesWidget.h"
 #include "../components/CheckBox.h"
 #include "../components/Button.h"
+#include <QLabel>
 
 class CustomTextField : public TextField
 {
@@ -77,7 +78,7 @@ private:
    QWidget *LabeledField(const QString labelName = "", CustomTextField *currField = nullptr);
    QFont font(const QString &family = "Segoe UI", int fontSize = 10, QFont::Weight weight = QFont::Medium);
 
-   PwdValidator *pwdValidator = nullptr;
+   PwdRulesWidget *pwdValidator = nullptr;
    CheckWithBtn *agreement = nullptr;
    Button *createAccBtn = nullptr;
 

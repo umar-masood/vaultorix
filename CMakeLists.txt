@@ -37,7 +37,7 @@ add_executable(Vaultorix
     src/ui/dialogs/dialogsUtils.cpp
 
     # Pwd Validator
-    src/ui/pwdValidator/pwdValidator.cpp
+    src/ui/pwdRulesWidget/pwdRulesWidget.cpp
     
     # UI Components
     src/ui/components/Button.cpp
@@ -59,6 +59,10 @@ add_executable(Vaultorix
     src/ui/components/ToolTip.cpp
     src/ui/components/Seperator.cpp
 
+    # Core
+    src/core/emailValidator
+    src/core/pwdValidator
+    
     # Entry Point of App
     src/main.cpp
 

@@ -8,56 +8,110 @@
 #include <QDir>
 #include <QDateTime>
 #include <QFileInfo>
+#include <QApplication>
+#include <QWidget>
 
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <unordered_set>
 #include <unordered_map>
+#include <list>
 #include <string>
+#include <memory.h>
 
-class MailChecker {
+#include "ui/pwdRulesWidget/pwdRulesWidget.h"
+
+class PwdChecker {
 public:
-    explicit MailChecker() {
+    explicit PwdChecker() {
         if (downloadList()) 
             std::cout << "List downloaded successfully.\n";
         else 
             std::cerr << "Using local file or failed to download.\n";
         
-        loadMailsFromFile();
+        loadPwdsFromFile();
     }
 
-    bool checkDisposableEmail(std::string email) {
-        size_t pos = email.find('@');
-        if (pos == std::string::npos) return false;
+    bool checkStrongPwd(std::string password)
+    {
+        QByteArray pwdBytes = QByteArray::fromStdString(password);
+        cleanupMemory(password);
+        
+        bool hasLength = pwdBytes.size() >= 8;
+        bool hasUpper = false;
+        bool hasLower = false;
+        bool hasDigit = false;
+        bool hasSpecial = false;
 
-        std::string domain = email.substr(pos + 1);
-        lower(domain);
-
-        return isDisposableEmail(domain);
-    }
-
-    bool isDisposableEmail(const std::string &domain) {
-        static std::unordered_map<std::string, bool> cache;
-        if (cache.find(domain) != cache.end()) {
-            std::cout << "Domain is already checked...";
-            return cache[domain];
+        for (char ch : pwdBytes)
+        {
+            unsigned char c = static_cast<unsigned char>(ch);
+            if (c >= 'A' && c <= 'Z')
+                hasUpper = true;
+            else if (c >= 'a' && c <= 'z')
+                hasLower = true;
+            else if (c >= '0' && c <= '9')
+                hasDigit = true;
+            else
+                hasSpecial = true;
         }
 
-        bool result = false;
-        if (tempMails.find(domain) != tempMails.end()) result = true;
-        cache[domain] = result;
+
+        hasLength ? pwdRules.atLeastEight()->setChecked() : pwdRules.atLeastEight()->setUnchecked();
+        hasUpper ? pwdRules.oneUpperCase()->setChecked() : pwdRules.oneUpperCase()->setUnchecked();
+        hasLower ? pwdRules.oneLowerCase()->setChecked() : pwdRules.oneLowerCase()->setUnchecked();
+        hasDigit ? pwdRules.oneDigit()->setChecked() : pwdRules.oneDigit()->setUnchecked();
+        hasSpecial ? pwdRules.oneSpecialChar()->setChecked() : pwdRules.oneSpecialChar()->setUnchecked();
+
+        for (int i = 0; i < pwdBytes.size(); i++) 
+            pwdBytes[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(pwdBytes[i])));
+
+        bool notWeak = !isWeakPwd(pwdBytes.toStdString());
+        bool isStrongPwd = hasLength && hasUpper && hasLower && hasDigit && hasSpecial && notWeak;
+        isStrongPwd ? pwdRules.strongPwd()->setChecked() : pwdRules.strongPwd()->setUnchecked();
+
+        cleanupMemory(pwdBytes);
+
+        return isStrongPwd;
+    }
+
+    bool isWeakPwd(const std::string &password) {  // LRU Caching is used here
+        auto it = cacheMap.find(password);
+        if (it != cacheMap.end()) {
+            std::cout << "Password is already checked...";
+            order.splice(order.end(), order, it->second); /* splice is used for moving an element from one place to another, while
+            it->second point to the value of map in key-value pair , which has further an itertor pointing to the same password in the list*/
+            return true;
+        }
+
+        bool result = weakPwds.find(password) != weakPwds.end();
+
+        if (result) {
+            order.push_back(password);
+            cacheMap[password] = std::prev(order.end()); /*std::prev returns the element before end(), here we are add iterator in map that points to the last inserted password at the end in the list*/
+
+            if (cacheMap.size() > MAX_CACHE_SIZE) {
+                std::string oldestPwd = order.front();
+                cacheMap.erase(oldestPwd);
+                order.pop_front();
+            }
+        }
 
         return result;
     }
 
 private:
-    std::unordered_set<std::string> tempMails;
+    std::unordered_set<std::string> weakPwds;
+    std::list<std::string> order;
+    std::unordered_map<std::string, std::list<std::string>::iterator> cacheMap;
+    const size_t MAX_CACHE_SIZE = 1000;
+    PwdRulesWidget pwdRules;
 
     std::string getFilePath() {
         QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/config";
         QDir().mkpath(path);
-        return path.toStdString() + "/tempMails.config";
+        return path.toStdString() + "/weakPwds.config";
     }
 
     static void lower(std::string &str) {
@@ -77,7 +131,7 @@ private:
         if (!isOlderList()) return true;
 
         QNetworkAccessManager manager;
-        QNetworkRequest request(QUrl("https://raw.githubusercontent.com/umar-masood/Disposable-Emails-List/refs/heads/main/tempMails.conf"));
+        QNetworkRequest request(QUrl("https://raw.githubusercontent.com/umar-masood/Weak-Passwords/refs/heads/main/weakPwds.config"));
         QNetworkReply *reply = manager.get(request);
 
         QEventLoop loop;
@@ -106,33 +160,54 @@ private:
         return true;
     }
 
-    void loadMailsFromFile() {
+    void loadPwdsFromFile() {
         std::ifstream file(getFilePath());
         if (!file.is_open()) {
-            std::cerr << "Could not open mail list file.\n";
+            std::cerr << "Could not open weak pwd list file.\n";
             return;
         }
 
-        tempMails.reserve(72000);
+        weakPwds.reserve(10500);
         std::string line;
         while (std::getline(file, line)) {
             if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
                 line.pop_back();
             lower(line);
             if (!line.empty())
-                tempMails.insert(line);
+                weakPwds.insert(line);
         }
         file.close();
-        std::cout << "Loaded " << tempMails.size() << " domains.\n";
+        std::cout << "Loaded " << weakPwds.size() << " weak passwords.\n";
+    }
+
+    void cleanupMemory(std::string &str) {
+        if (str.empty()) return;
+        volatile char *p = str.data();
+        for (size_t i = 0; i < str.size(); i++) {
+            p[i] = 0;
+        }
+    }
+
+    void cleanupMemory(QByteArray &bytes) {
+        if (bytes.isEmpty()) return;
+        volatile char *p = bytes.data();
+        for (size_t i = 0; i < bytes.size(); i++) {
+            bytes[i] = 0;
+        }
+        bytes.clear();
     }
 };
 
 
 int main(int argc, char *argv[]) {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-    MailChecker mc;
-    std::cout << std::boolalpha << mc.checkDisposableEmail("345sasdwqd@zuiquandaohang.xyz") << "\n";
+    PwdChecker pc;
+    std::cout << std::boolalpha << pc.checkStrongPwd("h&403jI01") << "\n";
 
-    return 0;
+    
+    QWidget w;
+    w.show();
+    
+    return app.exec();
 }

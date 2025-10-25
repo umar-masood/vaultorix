@@ -120,7 +120,7 @@ AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent)
    fieldsWidgets = {_NAME, _USERNAME, _EMAIL, _PWD};
 
    // Validator
-   pwdValidator = new PwdValidator;
+   pwdValidator = new PwdRulesWidget;
 
    // Agreement
    agreement = new CheckWithBtn;
