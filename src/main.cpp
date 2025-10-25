@@ -1,4 +1,6 @@
 #include <QCoreApplication>
+#include <QtNetwork>
+
 #include <string>
 #include <fstream>
 #include <iostream>

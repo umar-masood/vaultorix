@@ -67,5 +67,5 @@ add_executable(Vaultorix
 )
 
 # Link Qt libraries
-target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt::Network Qt6::Gui Qt6::Svg Qt6::Widgets dwmapi user32)
+target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt6::Network Qt6::Gui Qt6::Svg Qt6::Widgets dwmapi user32)
 set_target_properties(Vaultorix PROPERTIES WIN32_EXECUTABLE TRUE)
