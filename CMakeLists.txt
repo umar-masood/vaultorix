@@ -60,8 +60,8 @@ add_executable(Vaultorix
     src/ui/components/Seperator.cpp
 
     # Core
-    src/core/emailValidator
-    src/core/pwdValidator
+    src/core/emailValidator/emailValidator.cpp
+    src/core/pwdValidator/pwdValidator.cpp
     
     # Entry Point of App
     src/main.cpp

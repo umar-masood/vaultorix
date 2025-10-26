@@ -19,11 +19,11 @@
 #include <list>
 #include <string>
 
-#include "ui/pwdRulesWidget/pwdRulesWidget.h"
+#include "../../ui/pwdRulesWidget/pwdRulesWidget.h"
 
-class PwdChecker {
+class PwdValidator {
 public:
-    explicit PwdChecker();
+    explicit PwdValidator();
 
     bool checkStrongPwd(std::string password);
     bool isWeakPwd(const std::string &password);

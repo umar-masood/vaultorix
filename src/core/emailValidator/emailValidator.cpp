@@ -14,7 +14,7 @@
 #include <filesystem>
 #include <cctype>
 
-MailChecker::MailChecker() {
+EmailValidator::EmailValidator() {
     if (downloadList()) 
         std::cout << "List downloaded successfully.\n";
     else 
@@ -23,9 +23,9 @@ MailChecker::MailChecker() {
     loadMailsFromFile();
 }
 
-bool MailChecker::checkDisposableEmail(const std::string &email) {
+bool EmailValidator::checkDisposableEmail(const std::string &email) {
     size_t pos = email.find('@');
-    if (pos == std::string::npos) return false;
+    if (pos == std::string::npos) return true;
 
     std::string domain = email.substr(pos + 1);
     lower(domain);
@@ -33,7 +33,7 @@ bool MailChecker::checkDisposableEmail(const std::string &email) {
     return isDisposableEmail(domain);
 }
 
-bool MailChecker::isDisposableEmail(const std::string &domain) {
+bool EmailValidator::isDisposableEmail(const std::string &domain) {
     auto it = cacheMap.find(domain);
     if (it != cacheMap.end()){
         std::cout << "domain is already checked...";
@@ -55,17 +55,17 @@ bool MailChecker::isDisposableEmail(const std::string &domain) {
     return result;
 }
 
-std::string MailChecker::getFilePath() const {
+std::string EmailValidator::getFilePath() const {
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/config";
     QDir().mkpath(path);
     return path.toStdString() + "/tempMails.config";
 }
 
-void MailChecker::lower(std::string &str) {
+void EmailValidator::lower(std::string &str) {
     for (auto &c : str) c = std::tolower(static_cast<unsigned char>(c));
 }
 
-bool MailChecker::isOlderList() const {
+bool EmailValidator::isOlderList() const {
     if (std::filesystem::exists(getFilePath())) {
         QFileInfo info(QString::fromStdString(getFilePath()));
         QDateTime modified = info.lastModified();
@@ -74,7 +74,7 @@ bool MailChecker::isOlderList() const {
     return true;
 }
 
-bool MailChecker::downloadList() {
+bool EmailValidator::downloadList() {
     if (!isOlderList()) return true;
 
     QNetworkAccessManager manager;
@@ -107,7 +107,7 @@ bool MailChecker::downloadList() {
     return true;
 }
 
-void MailChecker::loadMailsFromFile() {
+void EmailValidator::loadMailsFromFile() {
     std::ifstream file(getFilePath());
     if (!file.is_open()) {
         std::cerr << "Could not open mail list file.\n";

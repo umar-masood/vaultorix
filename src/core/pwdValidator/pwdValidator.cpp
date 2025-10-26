@@ -1,6 +1,6 @@
 #include "pwdValidator.h"
 
-PwdChecker::PwdChecker() {
+PwdValidator::PwdValidator() {
     if (downloadList()) 
         std::cout << "List downloaded successfully.\n";
     else 
@@ -9,7 +9,7 @@ PwdChecker::PwdChecker() {
     loadPwdsFromFile();
 }
 
-bool PwdChecker::checkStrongPwd(std::string password) {
+bool PwdValidator::checkStrongPwd(std::string password) {
     QByteArray pwdBytes = QByteArray::fromStdString(password);
     cleanupMemory(password);
     
@@ -49,7 +49,7 @@ bool PwdChecker::checkStrongPwd(std::string password) {
     return isStrongPwd;
 }
 
-bool PwdChecker::isWeakPwd(const std::string &password) {
+bool PwdValidator::isWeakPwd(const std::string &password) {
     auto it = cacheMap.find(password);
     if (it != cacheMap.end()) {
         std::cout << "Password is already checked...";
@@ -74,17 +74,17 @@ bool PwdChecker::isWeakPwd(const std::string &password) {
     return result;
 }
 
-std::string PwdChecker::getFilePath() {
+std::string PwdValidator::getFilePath() {
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/config";
     QDir().mkpath(path);
     return path.toStdString() + "/weakPwds.config";
 }
 
-void PwdChecker::lower(std::string &str) {
+void PwdValidator::lower(std::string &str) {
     for (auto &c : str) c = std::tolower(static_cast<unsigned char>(c));
 }
 
-bool PwdChecker::isOlderList() {
+bool PwdValidator::isOlderList() {
     if (std::filesystem::exists(getFilePath())) {
         QFileInfo info(QString::fromStdString(getFilePath()));
         QDateTime modified = info.lastModified();
@@ -93,7 +93,7 @@ bool PwdChecker::isOlderList() {
     return true;
 }
 
-bool PwdChecker::downloadList() {
+bool PwdValidator::downloadList() {
     if (!isOlderList()) return true;
 
     QNetworkAccessManager manager;
@@ -126,7 +126,7 @@ bool PwdChecker::downloadList() {
     return true;
 }
 
-void PwdChecker::loadPwdsFromFile() {
+void PwdValidator::loadPwdsFromFile() {
     std::ifstream file(getFilePath());
     if (!file.is_open()) {
         std::cerr << "Could not open weak pwd list file.\n";
@@ -146,7 +146,7 @@ void PwdChecker::loadPwdsFromFile() {
     std::cout << "Loaded " << weakPwds.size() << " weak passwords.\n";
 }
 
-void PwdChecker::cleanupMemory(std::string &str) {
+void PwdValidator::cleanupMemory(std::string &str) {
     if (str.empty()) return;
     volatile char *p = str.data();
     for (size_t i = 0; i < str.size(); i++) {
@@ -154,7 +154,7 @@ void PwdChecker::cleanupMemory(std::string &str) {
     }
 }
 
-void PwdChecker::cleanupMemory(QByteArray &bytes) {
+void PwdValidator::cleanupMemory(QByteArray &bytes) {
     if (bytes.isEmpty()) return;
     volatile char *p = bytes.data();
     for (size_t i = 0; i < bytes.size(); i++) {

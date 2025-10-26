@@ -7,9 +7,9 @@
 #include <list>
 #include <string>
 
-class MailChecker {
+class EmailValidator {
 public:
-    explicit MailChecker();
+    explicit EmailValidator();
 
     bool checkDisposableEmail(const std::string &email);
     bool isDisposableEmail(const std::string &domain);
