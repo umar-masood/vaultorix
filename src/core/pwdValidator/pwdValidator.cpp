@@ -9,7 +9,7 @@ PwdValidator::PwdValidator() {
     loadPwdsFromFile();
 }
 
-bool PwdValidator::checkStrongPwd(std::string password) {
+bool PwdValidator::checkStrongPwd(std::string password, PwdRulesWidget *pwdRules) {
     QByteArray pwdBytes = QByteArray::fromStdString(password);
     cleanupMemory(password);
     
@@ -31,18 +31,18 @@ bool PwdValidator::checkStrongPwd(std::string password) {
             hasSpecial = true;
     }
 
-    hasLength ? pwdRules.atLeastEight()->setChecked() : pwdRules.atLeastEight()->setUnchecked();
-    hasUpper ? pwdRules.oneUpperCase()->setChecked() : pwdRules.oneUpperCase()->setUnchecked();
-    hasLower ? pwdRules.oneLowerCase()->setChecked() : pwdRules.oneLowerCase()->setUnchecked();
-    hasDigit ? pwdRules.oneDigit()->setChecked() : pwdRules.oneDigit()->setUnchecked();
-    hasSpecial ? pwdRules.oneSpecialChar()->setChecked() : pwdRules.oneSpecialChar()->setUnchecked();
+    hasLength ? pwdRules->atLeastEight()->setChecked() : pwdRules->atLeastEight()->setUnchecked();
+    hasUpper ? pwdRules->oneUpperCase()->setChecked() : pwdRules->oneUpperCase()->setUnchecked();
+    hasLower ? pwdRules->oneLowerCase()->setChecked() : pwdRules->oneLowerCase()->setUnchecked();
+    hasDigit ? pwdRules->oneDigit()->setChecked() : pwdRules->oneDigit()->setUnchecked();
+    hasSpecial ? pwdRules->oneSpecialChar()->setChecked() : pwdRules->oneSpecialChar()->setUnchecked();
 
     for (int i = 0; i < pwdBytes.size(); i++) 
         pwdBytes[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(pwdBytes[i])));
 
     bool notWeak = !isWeakPwd(pwdBytes.toStdString());
     bool isStrongPwd = hasLength && hasUpper && hasLower && hasDigit && hasSpecial && notWeak;
-    isStrongPwd ? pwdRules.strongPwd()->setChecked() : pwdRules.strongPwd()->setUnchecked();
+    isStrongPwd ? pwdRules->strongPwd()->setChecked() : pwdRules->strongPwd()->setUnchecked();
 
     cleanupMemory(pwdBytes);
 

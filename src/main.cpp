@@ -2,7 +2,7 @@
 #include "ui/accountCreate/AccountCreate.h"
 #include "ui/dialogs/termsConditions/TermsConditions.h"
 #include "ui/components/Dialog.h"
-#include "core/emailValidator/emailValidator.h"
+#include "core/pwdValidator/pwdValidator.h"
 #include <iostream>
 #include <QTimer>
 
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     AccountCreate *ac = new AccountCreate;
     aw->setRightWidget(ac);
 
-    EmailValidator *ev = new EmailValidator;
+    PwdValidator *ev = new PwdValidator;
 
     Dialog *d = new Dialog(tC, aw->subWindow(), true);
     aw->setSubWidgets({d, tC});
@@ -24,24 +24,22 @@ int main(int argc, char *argv[])
     static QTimer timer;
     timer.setSingleShot(true);
 
-    QObject::connect(ac->emailField(), &CustomTextField::textChanged, [=](const QString &text){
-        timer.stop();
+    QObject::connect(ac->pwdField(), &CustomTextField::textChanged, [=](const QString &text){
+        //timer.stop();
 
-        QObject::disconnect(&timer, nullptr, nullptr, nullptr);
-        QObject::connect(&timer, &QTimer::timeout, [ev, ac, text](){
+        //QObject::disconnect(&timer, nullptr, nullptr, nullptr);
+        //QObject::connect(&timer, &QTimer::timeout, [ev, ac, text](){
             if (!ev || !ac) return;
-            bool ok = ev->checkDisposableEmail(text.toStdString());
-            
-            if (!ok) ac->emailField()->setChecked();
-            else ac->emailField()->setUnchecked();
+            bool ok = ev->checkStrongPwd(text.toStdString(), ac->pwdRulesWidget());
 
             qDebug() << ok;
             qDebug()  << "   " << text;
-        });
+        //});
 
-        timer.start(5000);
+        //timer.start(2000);
     });
 
+    
     QObject::connect(ac->termsCondsBtn(), &CheckWithBtn::onButtonClicked, [d](){
         d->show();
     });

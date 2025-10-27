@@ -55,6 +55,7 @@ public:
    CustomTextField* pwdField() const;
    CustomTextField* emailField() const;
    CheckWithBtn* termsCondsBtn() const;
+   PwdRulesWidget *pwdRulesWidget() const;
    
 private:
    bool isDarkMode = false;

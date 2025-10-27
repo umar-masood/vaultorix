@@ -1,3 +1,25 @@
+
+    QObject::connect(ac->pwdField(), CustomTextField::textChanged, [=](const QString &text){
+        timer.stop();
+
+        QObject::disconnect(&timer, nullptr, nullptr, nullptr);
+        QObject::connect(&timer, &QTimer::timeout, [ev, ac, text](){
+            if (!ev || !ac) return;
+            bool ok = ev->checkStrongPwd(text.toStdString());
+            
+            if (!ok) ac->pwdField()->setChecked();
+            else ac->pwdField()->setUnchecked();
+
+            qDebug() << ok;
+            qDebug()  << "   " << text;
+        });
+
+        timer.start(5000);
+    });
+
+
+
+
 #include "ui/accountWindow/AccountWindow.h"
 #include "ui/accountCreate/AccountCreate.h"
 #include "ui/dialogs/termsConditions/TermsConditions.h"

@@ -25,7 +25,7 @@ class PwdValidator {
 public:
     explicit PwdValidator();
 
-    bool checkStrongPwd(std::string password);
+    bool checkStrongPwd(std::string password, PwdRulesWidget *pwdRules);
     bool isWeakPwd(const std::string &password);
 
 private:
@@ -33,7 +33,6 @@ private:
     std::list<std::string> order;
     std::unordered_map<std::string, std::list<std::string>::iterator> cacheMap;
     const size_t MAX_CACHE_SIZE = 1000;
-    PwdRulesWidget pwdRules;
 
     std::string getFilePath();
     static void lower(std::string &str);

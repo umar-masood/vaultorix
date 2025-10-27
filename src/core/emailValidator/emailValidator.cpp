@@ -5,6 +5,8 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QEventLoop>
+#include <QStringList>
+#include <QRegularExpression>
 #include <QFile>
 #include <QStandardPaths>
 #include <QDir>
@@ -23,7 +25,63 @@ EmailValidator::EmailValidator() {
     loadMailsFromFile();
 }
 
+bool EmailValidator::isValidEmail(const std::string &email) {
+    QString str = QString::fromStdString(email).trimmed();
+
+    if (str.isEmpty() || !str.contains('@'))
+        return false;
+
+    if (str.count('@') != 1)
+        return false;
+
+    if (str.contains(' ') || str.contains('\t'))
+        return false;
+
+    QStringList parts = str.split('@');
+    if (parts.size() != 2)
+        return false;
+
+    QString local = parts[0];
+    QString domain = parts[1];
+
+    if (local.isEmpty() || domain.isEmpty())
+        return false;
+
+    if (local.startsWith('.') || local.endsWith('.') || local.contains(".."))
+        return false;
+
+    if (domain.startsWith('.') || domain.endsWith('.') || domain.contains(".."))
+        return false;
+
+    if (!domain.contains('.'))
+        return false;
+
+    for (QChar c : str) {
+        if (c.unicode() > 127)
+            return false;
+    }
+
+    static const QRegularExpression localRe("^[A-Za-z0-9._%+-]+$");
+    static const QRegularExpression domainRe("^(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,24}$");
+
+    if (!localRe.match(local).hasMatch())
+        return false;
+
+    if (!domainRe.match(domain).hasMatch())
+        return false;
+
+    QStringList labels = domain.split('.');
+    for (const QString &label : labels) {
+        if (label.startsWith('-') || label.endsWith('-') || label.isEmpty())
+            return false;
+    }
+
+    return true;
+}
+
 bool EmailValidator::checkDisposableEmail(const std::string &email) {
+    if (!isValidEmail(email)) return true;
+
     size_t pos = email.find('@');
     if (pos == std::string::npos) return true;
 

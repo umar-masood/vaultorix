@@ -242,3 +242,7 @@ QFont AccountCreate::font(const QString &family , int fontSize, QFont::Weight we
    font.setWeight(weight);
    return font;
 }
+
+PwdRulesWidget * AccountCreate::pwdRulesWidget() const {
+   return pwdValidator;
+}

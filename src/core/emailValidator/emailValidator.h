@@ -24,5 +24,6 @@ private:
     static void lower(std::string &str);
     bool isOlderList() const;
     bool downloadList();
+    bool isValidEmail(const std::string &email);
     void loadMailsFromFile();
 };
