@@ -16,29 +16,13 @@ int main(int argc, char *argv[])
     AccountCreate *ac = new AccountCreate;
     aw->setRightWidget(ac);
 
-    PwdValidator *ev = new PwdValidator;
 
     Dialog *d = new Dialog(tC, aw->subWindow(), true);
     aw->setSubWidgets({d, tC});
 
-    static QTimer timer;
-    timer.setSingleShot(true);
-
-    QObject::connect(ac->pwdField(), &CustomTextField::textChanged, [=](const QString &text){
-        //timer.stop();
-
-        //QObject::disconnect(&timer, nullptr, nullptr, nullptr);
-        //QObject::connect(&timer, &QTimer::timeout, [ev, ac, text](){
-            if (!ev || !ac) return;
-            bool ok = ev->checkStrongPwd(text.toStdString(), ac->pwdRulesWidget());
-
-            qDebug() << ok;
-            qDebug()  << "   " << text;
-        //});
-
-        //timer.start(2000);
-    });
-
+    GetPassword *gp = new GetPassword;
+    gp->setAccountCreateObject(ac);
+    
     
     QObject::connect(ac->termsCondsBtn(), &CheckWithBtn::onButtonClicked, [d](){
         d->show();
@@ -48,5 +32,3 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
-
-#include "main.moc"

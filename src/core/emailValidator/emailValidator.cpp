@@ -127,13 +127,15 @@ bool EmailValidator::isOlderList() const {
     if (std::filesystem::exists(getFilePath())) {
         QFileInfo info(QString::fromStdString(getFilePath()));
         QDateTime modified = info.lastModified();
-        return modified.daysTo(QDateTime::currentDateTime()) > 1;
+        qint64 secsAgo = modified.secsTo(QDateTime::currentDateTime());
+        const int twoDays = 48 * 60 * 60; 
+        return secsAgo > twoDays;
     }
     return true;
 }
 
 bool EmailValidator::downloadList() {
-    if (!isOlderList()) return true;
+    if (!isOlderList()) return false;
 
     QNetworkAccessManager manager;
     QNetworkRequest request(QUrl("https://raw.githubusercontent.com/umar-masood/Disposable-Emails-List/refs/heads/main/tempMails.conf"));
@@ -172,7 +174,7 @@ void EmailValidator::loadMailsFromFile() {
         return;
     }
 
-    tempMails.reserve(72000);
+    tempMails.reserve(71500);
     std::string line;
     while (std::getline(file, line)) {
         if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
@@ -183,4 +185,29 @@ void EmailValidator::loadMailsFromFile() {
     }
     file.close();
     std::cout << "Loaded " << tempMails.size() << " domains.\n";
+}
+
+GetEmail::GetEmail(QObject *parent) : QObject(parent) {
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
+
+    emailValidate = new EmailValidator;
+
+    connect(timer, &QTimer::timeout, this, [this](){
+        if (!ac) return;
+        bool ok = emailValidate->checkDisposableEmail(ac->emailField()->text().toStdString());
+        ok ? ac->emailField()->setUnchecked() : ac->emailField()->setChecked();
+    });
+}
+
+void GetEmail::setAccountCreateObject(AccountCreate *ac) {
+    if (!ac) return;
+    this->ac = ac;
+    connect(ac->emailField(), &CustomTextField::textChanged, this, &GetEmail::onEmailChanged);
+}
+
+void GetEmail::onEmailChanged(const QString &text) {
+    Q_UNUSED(text)
+    timer->stop();
+    timer->start(2000);
 }

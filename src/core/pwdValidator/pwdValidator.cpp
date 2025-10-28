@@ -88,13 +88,15 @@ bool PwdValidator::isOlderList() {
     if (std::filesystem::exists(getFilePath())) {
         QFileInfo info(QString::fromStdString(getFilePath()));
         QDateTime modified = info.lastModified();
-        return modified.daysTo(QDateTime::currentDateTime()) > 1;
+        qint64 secsAgo = modified.secsTo(QDateTime::currentDateTime());
+        const int twoDays = 48 * 60 * 60; 
+        return secsAgo > twoDays;
     }
     return true;
 }
 
 bool PwdValidator::downloadList() {
-    if (!isOlderList()) return true;
+    if (!isOlderList()) return false;
 
     QNetworkAccessManager manager;
     QNetworkRequest request(QUrl("https://raw.githubusercontent.com/umar-masood/Weak-Passwords/refs/heads/main/weakPwds.config"));
@@ -161,4 +163,29 @@ void PwdValidator::cleanupMemory(QByteArray &bytes) {
         bytes[i] = 0;
     }
     bytes.clear();
+}
+
+
+GetPassword::GetPassword(QObject *parent) : QObject(parent) {
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
+
+    pwdValidate = new PwdValidator;
+
+    connect(timer, &QTimer::timeout, this, [this](){
+        if (!ac) return;
+        bool ok = pwdValidate->checkStrongPwd(ac->pwdField()->text().toStdString(), ac->pwdRulesWidget());
+    });
+}
+
+void GetPassword::setAccountCreateObject(AccountCreate *ac) {
+    if (!ac) return;
+    this->ac = ac;
+    connect(ac->pwdField(), &CustomTextField::textChanged, this, &GetPassword::onPwdChanged);
+}
+
+void GetPassword::onPwdChanged(const QString &text) {
+    Q_UNUSED(text);
+    timer->stop();
+    timer->start(2000);
 }

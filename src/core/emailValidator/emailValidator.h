@@ -1,11 +1,14 @@
 #pragma once
 
 #include <QString>
+#include <QTimer>
 #include <QDateTime>
 #include <unordered_set>
 #include <unordered_map>
 #include <list>
 #include <string>
+
+#include "../../ui/accountCreate/AccountCreate.h"
 
 class EmailValidator {
 public:
@@ -26,4 +29,19 @@ private:
     bool downloadList();
     bool isValidEmail(const std::string &email);
     void loadMailsFromFile();
+};
+
+class GetEmail : public QObject {
+    Q_OBJECT
+    public:
+    explicit GetEmail(QObject *parent = nullptr);
+    
+    void setAccountCreateObject(AccountCreate *ac = nullptr);
+
+    private:
+    QTimer *timer = nullptr;
+    EmailValidator *emailValidate = nullptr;
+    AccountCreate *ac = nullptr;
+
+    void onEmailChanged(const QString &pwd);
 };
