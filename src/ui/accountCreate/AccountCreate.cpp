@@ -180,6 +180,10 @@ void AccountCreate::setDarkMode(bool value)
    if (agreement) agreement->setDarkMode(isDarkMode);
 }
 
+Button* AccountCreate::createBtn() const {
+   return createAccBtn;
+}
+
 CustomTextField *AccountCreate::nameField() const
 {
    return NAME;

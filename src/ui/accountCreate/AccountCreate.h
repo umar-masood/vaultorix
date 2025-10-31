@@ -50,6 +50,7 @@ public:
    explicit AccountCreate(QWidget *parent = nullptr);
    Q_INVOKABLE void setDarkMode(bool value);
 
+   Button* createBtn() const;
    CustomTextField* nameField() const;
    CustomTextField* usernameField() const;
    CustomTextField* pwdField() const;
