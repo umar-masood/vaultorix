@@ -107,7 +107,6 @@ bool PwdValidator::downloadList() {
     loop.exec(); 
 
     if (reply->error() != QNetworkReply::NoError) {
-        reply->deleteLater();
         std::cerr << reply->errorString().toStdString();
         return false;
     }
