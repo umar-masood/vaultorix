@@ -40,9 +40,6 @@
     <!-- Terms & Conditions -->
     <file>terms/termsConds.html</file>
     
-    <!-- OTP -->
-    <file>otp/otp.html</file>
-
     <!-- Account Window -->
     <file>icons/AccountWindow/darkMode.svg</file>
     <file>icons/AccountWindow/lightMode.svg</file>

@@ -4,7 +4,6 @@ project(Vaultorix VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
-set(LIBSODIUM_DIR "${CMAKE_SOURCE_DIR}/Dependencies/libsodium")
 
 find_package(Qt6 REQUIRED Core Gui Widgets Svg Network)
 
@@ -72,15 +71,6 @@ add_executable(Vaultorix
     src/resources/resources.qrc
 )
 
-# Link libraries
-target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${LIBSODIUM_DIR}/include
-)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${LIBSODIUM_DIR}/library/dynamic/libsodium.lib
-)
 
 target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt6::Network Qt6::Gui Qt6::Svg Qt6::Widgets dwmapi user32)
-
 set_target_properties(Vaultorix PROPERTIES WIN32_EXECUTABLE TRUE)
