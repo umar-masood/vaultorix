@@ -43,6 +43,8 @@ TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent)
 
 Label* TextWithBtn::label() const { return text; }
 
+Button * TextWithBtn::btn() const { return button; }
+
 AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent)
 {
    setAttribute(Qt::WA_TranslucentBackground);
@@ -68,14 +70,14 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent)
       emit resendClicked();
    });
 
-   submit = new Button("Submit");
-   submit->setDisplayMode(Button::TextOnly);
-   submit->setSize(QSize(360, 36));
-   submit->setGradientColor(true, "#008EDE", "#15F2FF");
-   submit->setHoverGradientColor("#008EDE");
-   submit->setFontProperties("Segoe UI", 11, true, false);
-   connect(submit, &Button::clicked, this, [this](){
-      emit submitClicked();
+   verify = new Button("Verify");
+   verify->setDisplayMode(Button::TextOnly);
+   verify->setSize(QSize(360, 36));
+   verify->setGradientColor(true, "#008EDE", "#15F2FF");
+   verify->setHoverGradientColor("#008EDE");
+   verify->setFontProperties("Segoe UI", 11, true, false);
+   connect(verify, &Button::clicked, this, [this](){
+      emit verifyClicked();
    });
 
    cancel = new Button("Cancel");
@@ -99,7 +101,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent)
    layout->addSpacing(16);
    layout->addWidget(resendOtp, 0, Qt::AlignHCenter);
    layout->addSpacing(26);
-   layout->addWidget(submit, 0, Qt::AlignHCenter);
+   layout->addWidget(verify, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
    layout->addWidget(cancel, 0, Qt::AlignHCenter);
    layout->addStretch();
@@ -119,6 +121,14 @@ void AccountOTP::onEmailEntered(const QString &email) {
 
 OTPWidget* AccountOTP::OTP() const {
    return otpWidget;
+}
+
+Button *AccountOTP::verifyBtn() const {
+   return verify;
+}
+
+TextWithBtn *AccountOTP::resendBtn() const {
+   return resendOtp;
 }
 
 void AccountOTP::setEmail(const QString &email)

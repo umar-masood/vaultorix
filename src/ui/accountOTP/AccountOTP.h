@@ -21,6 +21,7 @@ class TextWithBtn : public QWidget {
    public:
    explicit TextWithBtn(QWidget *parent = nullptr);
    Label* label() const;
+   Button* btn() const;
 
    private:
    Label *text = nullptr;
@@ -38,6 +39,8 @@ class AccountOTP : public QWidget {
    void setEmail(const QString &email);
    Q_INVOKABLE void setDarkMode(bool value);
    OTPWidget *OTP() const;
+   Button *verifyBtn() const;
+   TextWithBtn *resendBtn() const;
 
    private:
    bool isDarkMode = false;
@@ -49,14 +52,14 @@ class AccountOTP : public QWidget {
    OTPWidget *otpWidget = nullptr;
    TextWithBtn *resendOtp = nullptr;
 
-   Button *submit = nullptr;
+   Button *verify = nullptr;
    Button *cancel = nullptr;
    QVBoxLayout *layout = nullptr;
 
    signals:
    void emailEntered(const QString &email);
    void resendClicked();
-   void submitClicked();
+   void verifyClicked();
    void cancelClicked();
    void themeModeChanged(bool enable);
 
