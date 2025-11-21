@@ -190,7 +190,7 @@ void Button::paintEvent(QPaintEvent *event)
   {
     QLinearGradient gradient(rect().topLeft(), rect().topRight());
     gradient.setColorAt(0, color1);
-    gradient.setColorAt(1, color2);
+    if (!isDisabledState()) gradient.setColorAt(1, color2);
     painter.setBrush(gradient);
   } else if (hyperLink) {
     painter.setBrush(QBrush(Qt::NoBrush));
@@ -206,7 +206,6 @@ void Button::paintEvent(QPaintEvent *event)
 
   // Icon handling
   QPixmap pixmap;
-
   if (!useUnicodeIcon) {
     QString iconPath = (!secondary) ? dark_icon : (isDarkMode ? dark_icon : light_icon);
     if (!iconPath.isEmpty()) {
@@ -231,12 +230,17 @@ void Button::paintEvent(QPaintEvent *event)
 
   QColor textColor;
   if (secondary) {
-    if (isDarkMode)
-      textColor = QColor("#F0F0F0");
-    else
-      textColor = QColor("#000000");
+
+    if (isDarkMode) textColor = QColor("#F0F0F0");
+    else textColor = QColor("#000000");
+
   } else if (hyperLink) {
-    textColor = isHoverState() ? hyperlinkHover : hyperlinkNormal;
+
+    if (isDisabledState())
+      textColor = "#555555";
+    else
+      textColor = isHoverState() ? hyperlinkHover : hyperlinkNormal;
+
   } else {
     textColor = QColor("#FFFFFF");
   }
@@ -245,10 +249,8 @@ void Button::paintEvent(QPaintEvent *event)
   painter.setOpacity(isPressed ? 0.6 : 1.0);
 
   // Draw based on mode
-  switch (displayMode)
-  {
-  case IconText:
-  {
+  switch (displayMode) {
+  case IconText: {
     int iconX = 12;
     int spacing = iconX;
     int iconY = (rect().height() - (useUnicodeIcon ? unicodeIconSize : pixmap.height())) / 2;
@@ -265,8 +267,7 @@ void Button::paintEvent(QPaintEvent *event)
     break;
   }
 
-  case IconOnly:
-  {
+  case IconOnly: {
     if (useUnicodeIcon) {
       painter.drawText(rect(), Qt::AlignCenter, unicodeIcon);
     } else {
@@ -277,8 +278,7 @@ void Button::paintEvent(QPaintEvent *event)
     break;
   }
 
-  case TextOnly:
-  {
+  case TextOnly:{
     if (hyperLink) {
       QRect text_area(0, 0, width(), height());
       painter.drawText(text_area, Qt::AlignLeft | Qt::AlignVCenter, text());
@@ -289,8 +289,7 @@ void Button::paintEvent(QPaintEvent *event)
     break;
   }
 
-  case TextUnderIcon:
-  {
+  case TextUnderIcon:{
     const int spacing = 6;
     int iconY = spacing;
 
