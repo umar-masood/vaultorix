@@ -5,6 +5,9 @@
 #include "../components/Button.h"
 
 class Label : public QLabel {
+
+   Q_OBJECT 
+
    public:
    explicit Label(bool isIconic = false,
                   const QString &family = "Segoe UI",
@@ -14,6 +17,16 @@ class Label : public QLabel {
                   const QString &text = " ",
                   Qt::Alignment alignment = Qt::AlignCenter,
                   QWidget *parent = nullptr);
+   
+   void show();
+   void hide();
+   void setTextAnimated(const QString &text);
+
+   private:
+   QPropertyAnimation *fadeIn = nullptr;
+   QPropertyAnimation *fadeOut = nullptr;
+   QGraphicsOpacityEffect *opacity = nullptr;
+
 };
 
 class TextWithBtn : public QWidget {

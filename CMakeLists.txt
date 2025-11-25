@@ -63,12 +63,15 @@ add_executable(Vaultorix
     # Core
     src/core/emailValidator/emailValidator.cpp
     src/core/pwdValidator/pwdValidator.cpp
+    src/core/OTPValidator/OTPValidator.cpp
     
     # Entry Point of App
     src/main.cpp
 
     # Resources
     src/resources/resources.qrc
+
+
 )
 
 

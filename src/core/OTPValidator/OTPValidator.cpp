@@ -16,7 +16,7 @@
 #include <QDebug>
 #include <iostream>
 
-// ================= OTPValidator Implementation =================
+/* OTPValidator Implementation */
 OTPValidator::OTPValidator() {}
 
 int OTPValidator::sendOTP(const QString &fullName, const QString &username, const QString &email)
@@ -85,8 +85,7 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
     loop.exec();
 
     // If there's an error
-    if (reply->error() != QNetworkReply::NoError)
-    {
+    if (reply->error() != QNetworkReply::NoError) {
         std::cerr << "We could not be able to verify your entered OTP" << reply->errorString().toStdString();
         return false;
     }
@@ -107,7 +106,7 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
     return isVerified; // If the OTP is verified then it will return True otherwise False
 }
 
-// ================= GetOTP Implementation =================
+/* GetOTP Implementation */
 GetOTP::GetOTP(QObject *parent) : QObject(parent) {
     ov = new OTPValidator; // Initializing OTP Validator class
 
@@ -135,7 +134,8 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QStr
 
     // When OTP input fields are filled, store the code
     connect(ao->OTP(), &OTPWidget::OTPcompleted, this, [this](const QString &otp){
-        currOtp = otp; });
+        currOtp = otp; 
+    });
 
     // Connect resend-limit signal once
     connect(this, &GetOTP::maxLimitReached, this, &GetOTP::onMaxLimitReached);
@@ -185,7 +185,7 @@ void GetOTP::onMaxLimitReached() {
     }
 
     if (ao && ao->messageLabel()) {
-        ao->messageLabel()->setText("Maximum limit reached. Try again after 48hrs");
+        ao->messageLabel()->setTextAnimated("Maximum limit reached. Try again after 48hrs");
     }
 }
 
@@ -198,13 +198,13 @@ void GetOTP::onVerifyClicked() {
     if (!ok) {  // If the otp is incorrect or expired
         ao->verifyBtn()->setText("Verify");
         ao->verifyBtn()->setEnabled(true);
-        ao->messageLabel()->setText("Your entered OTP is incorrect or expired.");
+        ao->messageLabel()->setTextAnimated("Your entered OTP is incorrect or expired.");
     } else {
         ao->verifyBtn()->setText("Verified");
         ao->verifyBtn()->setEnabled(false); // Disabled the verify button after successful OTP matching
         ao->resendOtpWidget()->btn()->setEnabled(false); // Disabled the resend button when otp is verified
         ao->resendOtpWidget()->timerLabel()->hide(); // hides the timer
-        ao->messageLabel()->setText("");
+        ao->messageLabel()->setTextAnimated("");
 
         if (timer) timer->stop();
         ao->OTP()->setEnabled(false);

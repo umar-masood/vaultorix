@@ -1,8 +1,13 @@
 #include "AccountOTP.h"
+#include <QTimer>
 
 Label::Label(bool isIconic, const QString &family, int pointSize, QFont::Weight weight, bool italic, const QString &text, Qt::Alignment alignment, QWidget *parent) : QLabel(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
    setAlignment(alignment);
+
+   opacity = new QGraphicsOpacityEffect(this);
+   opacity->setOpacity(1.0);
+   setGraphicsEffect(opacity);
 
    if (!isIconic) {
       setText(text);
@@ -15,6 +20,45 @@ Label::Label(bool isIconic, const QString &family, int pointSize, QFont::Weight 
       setFont(fnt);
    }
 }
+
+void Label::show() {
+   if (!isVisible()) {
+      opacity->setOpacity(0.0);
+      QLabel::show();
+   }
+
+   fadeIn = new QPropertyAnimation(opacity, "opacity", this);
+   fadeIn->setStartValue(0.0);
+   fadeIn->setEndValue(1.0);
+   fadeIn->setDuration(500);
+   fadeIn->setEasingCurve(QEasingCurve::InOutQuad);
+   fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void Label::hide() {
+   fadeOut = new QPropertyAnimation(opacity, "opacity", this);
+   fadeOut->setStartValue(1.0);
+   fadeOut->setEndValue(0.0);
+   fadeOut->setDuration(500);
+   fadeOut->setEasingCurve(QEasingCurve::InOutQuad);
+
+   connect(fadeOut, &QPropertyAnimation::finished, this, [this](){
+      QLabel::hide();
+      opacity->setOpacity(1.0);
+   });
+
+   fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void Label::setTextAnimated(const QString &text)
+{
+   hide();
+   QTimer::singleShot(500, [this, text]() {
+      QLabel::setText(text);
+      show();
+   });
+}
+
 
 TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent)
 {
