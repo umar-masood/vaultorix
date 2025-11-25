@@ -15,6 +15,7 @@ class OTPWidget : public QWidget
 public:
    explicit OTPWidget(QWidget *parent = nullptr);
    void setDarkMode(bool value);
+   void setEnabled(bool enabled);
 
 signals:
    void OTPcompleted(const QString &otp);
@@ -30,6 +31,7 @@ private:
 
    QString normalStyle;
    QString focusedStyle;
+   QString disabledStyle;
 
    void updateStyles();
    void updateHighlight();

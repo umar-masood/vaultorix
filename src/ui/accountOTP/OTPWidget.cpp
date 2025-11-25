@@ -46,7 +46,7 @@ void OTPWidget::keyPressEvent(QKeyEvent *event)
 {
    const int n = OTPBoxes.size();
    if ((event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9) ||
-       (event->key() >= Qt::Key_A && event->key() <= Qt::Key_Z))
+      (event->key() >= Qt::Key_A && event->key() <= Qt::Key_Z))
    {
       QString text = event->text().toUpper();
       if (!text.isEmpty() && currentIndex >= 0 && currentIndex < n)
@@ -102,15 +102,28 @@ void OTPWidget::updateStyles()
                       "background-color: %1; border: 2px solid #109AC7; border-radius: 7px; color: %2;")
                       .arg(bg_color_focused)
                       .arg(text_color);
+
+   disabledStyle = QString(
+                     "background-color: %1; border-radius: 7px; border: 1px solid %2; color: gray;")
+                     .arg(bg_color_normal)
+                     .arg(border_color);
 }
 
 void OTPWidget::updateHighlight()
 {
    for (int i = 0; i < OTPBoxes.size(); i++)
    {
-      if (i == currentIndex)
+      if (!isEnabled()) 
+         OTPBoxes[i]->setStyleSheet(disabledStyle);
+      else if (i == currentIndex)
          OTPBoxes[i]->setStyleSheet(focusedStyle);
       else
          OTPBoxes[i]->setStyleSheet(normalStyle);
    }
+}
+
+void OTPWidget::setEnabled(bool enabled) {
+   QWidget::setEnabled(enabled);
+   updateStyles();
+   updateHighlight();
 }

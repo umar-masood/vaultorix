@@ -38,15 +38,22 @@ TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent)
       emit onButtonClicked();
    });
 
-   setFixedSize(QSize(text->width() + button->width() + 2, 18));
+   timer = new Label(false, "Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
+   timer->setStyleSheet("color: black;");
+   timer->setParent(this);
+   timer->setFixedSize(36, 22);
+   timer->move(text->width() + button->width() + 4,0);
+
+   setFixedSize(QSize(text->width() + button->width() + timer->width() + 2, 18));
 }
 
 Label* TextWithBtn::label() const { return text; }
 
 Button * TextWithBtn::btn() const { return button; }
 
-AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent)
-{
+Label *TextWithBtn::timerLabel() const { return timer; }
+
+AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
    icon = new Label(true);
@@ -64,6 +71,11 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent)
    connect(this, &AccountOTP::emailEntered, this, &AccountOTP::onEmailEntered);
 
    otpWidget = new OTPWidget;
+
+   message = new Label(false, "Segoe UI", 10, QFont::Medium, false);
+   message->setWordWrap(true);
+   message->setStyleSheet("color: red;");
+   message->setFixedWidth(324);
 
    resendOtp = new TextWithBtn;
    connect(resendOtp, &TextWithBtn::onButtonClicked, this, [this](){
@@ -98,6 +110,8 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent)
    layout->addWidget(text, 0, Qt::AlignHCenter);
    layout->addSpacing(20);
    layout->addWidget(otpWidget, 0, Qt::AlignHCenter);
+   layout->addSpacing(8);
+   layout->addWidget(message, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
    layout->addWidget(resendOtp, 0, Qt::AlignHCenter);
    layout->addSpacing(26);
@@ -113,9 +127,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent)
 void AccountOTP::onEmailEntered(const QString &email) {
    QString e = email;
    int idx = e.indexOf('@');
-   if (idx > 3)
-      for (int i = 3; i < idx; i++)  e[i] = '*';
-      
+   if (idx > 3) for (int i = 3; i < idx; i++)  e[i] = '*';
    text->setText(QString("To ensure your security, please enter the One-Time Password (OTP) sent to your registered email-address (%1) below.").arg(e));
 }
 
@@ -127,18 +139,20 @@ Button *AccountOTP::verifyBtn() const {
    return verify;
 }
 
-TextWithBtn *AccountOTP::resendBtn() const {
+TextWithBtn *AccountOTP::resendOtpWidget() const {
    return resendOtp;
 }
 
-void AccountOTP::setEmail(const QString &email)
-{
+Label *AccountOTP::messageLabel() const {
+   return message;
+}
+
+void AccountOTP::setEmail(const QString &email) {
    if (!email.isEmpty()) 
       emit emailEntered(email);
 }
 
-void AccountOTP::setDarkMode(bool value)
-{
+void AccountOTP::setDarkMode(bool value) {
    if (isDarkMode == value) return;
    isDarkMode = value;
    emit themeModeChanged(isDarkMode);
@@ -147,6 +161,9 @@ void AccountOTP::setDarkMode(bool value)
 void AccountOTP::onThemeModeChanged(bool enable) {
    if (heading) heading->setStyleSheet(QString("color: %1;").arg(enable ? "white" : "black"));
    if (cancel) cancel->setDarkMode(enable);
-   if (resendOtp) resendOtp->label()->setStyleSheet(QString("color: %1").arg(enable ? "white" : "black")); 
+   if (resendOtp) {
+      resendOtp->label()->setStyleSheet(QString("color: %1").arg(enable ? "white" : "black")); 
+      resendOtp->timerLabel()->setStyleSheet(QString("color: %1").arg(enable ? "white" : "black")); 
+   } 
    if (otpWidget) otpWidget->setDarkMode(enable);
 }
