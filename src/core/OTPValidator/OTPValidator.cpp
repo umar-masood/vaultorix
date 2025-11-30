@@ -15,6 +15,7 @@
 #include <QJsonParseError>
 #include <QDebug>
 #include <iostream>
+#include "OTPValidator.h"
 
 /* OTPValidator Implementation */
 OTPValidator::OTPValidator() {}
@@ -26,6 +27,7 @@ int OTPValidator::sendOTP(const QString &fullName, const QString &username, cons
     // Headers of Request
     request.setRawHeader("accept", "application/json");
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("api_key", API_KEY.toUtf8());
 
     // Send OTP Data for POST request to the server
     QJsonObject obj;
@@ -140,6 +142,9 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QStr
     // Connect resend-limit signal once
     connect(this, &GetOTP::maxLimitReached, this, &GetOTP::onMaxLimitReached);
 
+    // Connect when get something wrong
+    connect(this, &GetOTP::somethingWrong, this, &GetOTP::onSomethingWrong);
+
     // Send OTP to user
     int status_code = ov->sendOTP(cName, cUserName, cEmail);
 
@@ -148,12 +153,15 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QStr
         resendOtpWithTimer();
     
     // If max resend limit reached (HTTP 429)
-    if (status_code == 429) {
+    if (status_code == 429) 
         emit maxLimitReached();
-    }
-        
+    
+    // If something went wrong
+    if (status_code == 400) 
+        emit somethingWrong();
+    
     // Any failure returns false
-    if (status_code == 429 || status_code == 500 || status_code == 502 || status_code == -1)
+    if (status_code == 429 || status_code == 500 || status_code == 502 || status_code == -1 || status_code == 400)
         return false;
 
     return true; // OTP sent successfully
@@ -176,17 +184,17 @@ void GetOTP::onMaxLimitReached() {
         ao->resendOtpWidget()->timerLabel()->hide(); // When max limit is reached then hide the timer label inside textwithbutton
     }
 
-    if (ao && ao->OTP()) {
+    if (ao && ao->OTP()) 
         ao->OTP()->setEnabled(false); // Disables the OTP widget when maxLimitReached()l=
-    }
+    
 
-    if (ao && ao->verifyBtn()) {
+    if (ao && ao->verifyBtn()) 
         ao->verifyBtn()->setEnabled(false); // Disables the verify button when maxLimitReached()
-    }
+    
 
-    if (ao && ao->messageLabel()) {
+    if (ao && ao->messageLabel()) 
         ao->messageLabel()->setTextAnimated("Maximum limit reached. Try again after 48hrs");
-    }
+    
 }
 
 void GetOTP::onVerifyClicked() {
@@ -200,15 +208,7 @@ void GetOTP::onVerifyClicked() {
         ao->verifyBtn()->setEnabled(true);
         ao->messageLabel()->setTextAnimated("Your entered OTP is incorrect or expired.");
     } else {
-        ao->verifyBtn()->setText("Verified");
-        ao->verifyBtn()->setEnabled(false); // Disabled the verify button after successful OTP matching
-        ao->resendOtpWidget()->btn()->setEnabled(false); // Disabled the resend button when otp is verified
-        ao->resendOtpWidget()->timerLabel()->hide(); // hides the timer
-        ao->messageLabel()->setTextAnimated("");
-
-        if (timer) timer->stop();
-        ao->OTP()->setEnabled(false);
-
+        disableControls("Verified");
     }
     emit otpVerified(ok);
 }
@@ -232,6 +232,22 @@ void GetOTP::onTimeout() {
 
     timeString = QString("%1:%2").arg(mins, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
     ao->resendOtpWidget()->timerLabel()->setText(timeString);
+}
+
+void GetOTP::onSomethingWrong() {
+    disableControls("Verify");
+}
+
+void GetOTP::disableControls(QString btnText) {
+    ao->verifyBtn()->setText(btnText);
+    ao->verifyBtn()->setEnabled(false);              // Disabled the verify button after successful OTP matching
+    ao->resendOtpWidget()->btn()->setEnabled(false); // Disabled the resend button when otp is verified
+    ao->resendOtpWidget()->timerLabel()->hide();     // hides the timer
+    ao->messageLabel()->setTextAnimated("");
+
+    if (timer)
+        timer->stop();
+    ao->OTP()->setEnabled(false);
 }
 
 void GetOTP::resendOtpWithTimer() {
