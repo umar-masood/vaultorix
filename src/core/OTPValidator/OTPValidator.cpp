@@ -161,21 +161,28 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QStr
         emit somethingWrong();
     
     // Any failure returns false
-    if (status_code == 429 || status_code == 500 || status_code == 502 || status_code == -1 || status_code == 400)
+    if (status_code == 429 || status_code == 500 || status_code == 502 || status_code == -1 || status_code == 400) {
+        disableControls("Verify");
         return false;
+    }
 
     return true; // OTP sent successfully
 }
 
 void GetOTP::onResendClicked() {
-    // When user clicks resend, resend button will disabled and timer shows and start
-    resendOtpWithTimer();
-
     int code = ov->sendOTP(cName, cUserName, cEmail);
     if (code == 429) {
         emit maxLimitReached();
         return;
     }
+
+    // In case if we got error from server after clicking on resend button
+    if (code == 429 || code == 500 || code == 502 || code == -1 || code == 400)
+        disableControls("Verify");
+    
+    // When user clicks resend, resend button will disabled and timer shows and start
+    if (code == 200)
+        resendOtpWithTimer();
 }
 
 void GetOTP::onMaxLimitReached() {
