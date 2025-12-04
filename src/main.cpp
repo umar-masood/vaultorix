@@ -1,20 +1,18 @@
 #include "ui/accountWindow/AccountWindow.h"
-#include "./ui/accountOTP/AccountOTP.h"
-#include "./core/OTPValidator/OTPValidator.h"
+#include "./ui/accountCreate/AccountCreate.h"
+#include "./core/emailValidator/emailValidator.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     
     AccountWindow *aw = new AccountWindow;
-    AccountOTP *ac = new AccountOTP;
+    AccountCreate *ac = new AccountCreate;
     aw->setRightWidget(ac);
 
-    GetOTP *go = new GetOTP;
-    QString e = "alimasood7281@gmail.com", u = "umarmasood1", n = "Umar Masood";
-    go->setAccountOTPObjectWithDetails(ac, e, u, n);
+    GetEmail *ge = new GetEmail;
+    ge->setAccountCreateObject(ac);
 
-  
     aw->show();
     return app.exec();
 }

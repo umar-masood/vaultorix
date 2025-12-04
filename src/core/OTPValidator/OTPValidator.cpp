@@ -135,9 +135,7 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QStr
     connect(ao, &AccountOTP::resendClicked, this, &GetOTP::onResendClicked);
 
     // When OTP input fields are filled, store the code
-    connect(ao->OTP(), &OTPWidget::OTPcompleted, this, [this](const QString &otp){
-        currOtp = otp; 
-    });
+    connect(ao->OTP(), &OTPWidget::OTPcompleted, this, [this](const QString &otp){ currOtp = otp; });
 
     // Connect resend-limit signal once
     connect(this, &GetOTP::maxLimitReached, this, &GetOTP::onMaxLimitReached);
@@ -161,7 +159,7 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QStr
         emit somethingWrong();
     
     // Any failure returns false
-    if (status_code == 429 || status_code == 500 || status_code == 502 || status_code == -1 || status_code == 400) {
+    if (status_code == 500 || status_code == 502 || status_code == -1) {
         disableControls("Verify");
         return false;
     }
@@ -177,7 +175,7 @@ void GetOTP::onResendClicked() {
     }
 
     // In case if we got error from server after clicking on resend button
-    if (code == 429 || code == 500 || code == 502 || code == -1 || code == 400)
+    if (code == 500 || code == 502 || code == -1 || code == 400)
         disableControls("Verify");
     
     // When user clicks resend, resend button will disabled and timer shows and start
@@ -187,19 +185,19 @@ void GetOTP::onResendClicked() {
 
 void GetOTP::onMaxLimitReached() {
     if (ao && ao->resendOtpWidget()) {
-        ao->resendOtpWidget()->btn()->setEnabled(false); // Get the resend button inside textwithbutton
-        ao->resendOtpWidget()->timerLabel()->hide(); // When max limit is reached then hide the timer label inside textwithbutton
+        ao->resendOtpWidget()->btn()->setEnabled(false); // Get the resend button inside textwithbutton & disable it
+        ao->resendOtpWidget()->timerLabel()->hide(); // Hide the timer label inside textwithbutton
     }
 
     if (ao && ao->OTP()) 
-        ao->OTP()->setEnabled(false); // Disables the OTP widget when maxLimitReached()l=
+        ao->OTP()->setEnabled(false); // Disables the OTP widget 
     
 
     if (ao && ao->verifyBtn()) 
-        ao->verifyBtn()->setEnabled(false); // Disables the verify button when maxLimitReached()
+        ao->verifyBtn()->setEnabled(false); // Disables the verify button
     
 
-    if (ao && ao->messageLabel()) 
+    if (ao && ao->messageLabel()) // Display the maximum limit reached message.
         ao->messageLabel()->setTextAnimated("Maximum limit reached. Try again after 48hrs");
     
 }

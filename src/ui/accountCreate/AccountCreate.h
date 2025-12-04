@@ -3,6 +3,7 @@
 #include "../pwdRulesWidget/pwdRulesWidget.h"
 #include "../components/CheckBox.h"
 #include "../components/Button.h"
+#include "../components/ToolTip.h"
 #include <QLabel>
 
 class CustomTextField : public TextField
@@ -12,11 +13,13 @@ class CustomTextField : public TextField
 public:
    explicit CustomTextField(bool useCheck = false, QWidget *parent = nullptr);
 
-   void setChecked();
-   void setUnchecked();
+   void setChecked(const QString &tooltiptext = "");
+   void setUnchecked(const QString &tooltiptext = "");
+   void setDarkMode(bool value) override;
 
 private:
    QLabel *checkIcon = nullptr;
+   ToolTip *tooltip = nullptr;
    const QString checked = ":/icons/AccountCreate/checked.svg";
    const QString unchecked = ":/icons/AccountCreate/unchecked.svg";
 };
@@ -63,15 +66,18 @@ private:
 
    QLabel *heading = nullptr;
 
-   CustomTextField *NAME = nullptr;
-   QWidget *_NAME = nullptr;
-   CustomTextField *PWD = nullptr;
-   QWidget *_PWD = nullptr;
+   CustomTextField *name = nullptr;
+   QWidget *nameWidget = nullptr;
 
-   CustomTextField *USERNAME = nullptr;
-   QWidget *_USERNAME = nullptr;
-   CustomTextField *EMAIL = nullptr;
-   QWidget *_EMAIL = nullptr;
+   CustomTextField *pwd = nullptr;
+   QWidget *pwdWidget = nullptr;
+
+   CustomTextField *username = nullptr;
+   QWidget *usernameWidget = nullptr;
+
+   CustomTextField *email = nullptr;
+   QWidget *emailWidget = nullptr;
+
    QVector<QWidget *> fieldsWidgets;
 
    QVBoxLayout *layout = nullptr;

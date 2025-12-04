@@ -1,41 +1,58 @@
 #include "AccountCreate.h"
 
 // CustomTextField Implementation
-CustomTextField::CustomTextField(bool useCheck, QWidget *parent) : TextField(parent)
-{
-   if (useCheck)
-   {
+CustomTextField::CustomTextField(bool useCheck, QWidget *parent) : TextField(parent) {
+   if (useCheck) {
       setSpacingRight(true);
       checkIcon = new QLabel(this);
       checkIcon->setAttribute(Qt::WA_TranslucentBackground);
       checkIcon->setFixedSize(QSize(20, 20));
-
-      QTimer::singleShot(0, this, [this]()
-      {
+      
+      QTimer::singleShot(0, this, [this]() {
          int x = width() - (checkIcon->width() + 12);
          int y = (height() - checkIcon->height()) / 2;
          checkIcon->move(x, y); 
       });
 
+      tooltip = new ToolTip;
+
       setUnchecked();
    }
 }
 
-void CustomTextField::setChecked()
-{
+void CustomTextField::setChecked(const QString &tooltipText) {
    if (checkIcon)
       checkIcon->setPixmap(QPixmap(checked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   
+   if (tooltip)
+      tooltip->setText(tooltipText);
 }
 
-void CustomTextField::setUnchecked()
-{
+void CustomTextField::setUnchecked(const QString &tooltipText) {
+   if (tooltip && !tooltipText.isEmpty()) 
+      tooltip->setTargetWidget(checkIcon);
+
    if (checkIcon)
       checkIcon->setPixmap(QPixmap(unchecked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   
+   if (tooltipText.isEmpty()) {
+      if (tooltip) tooltip->hide();
+      return;
+   }
+
+   if (tooltip)
+      tooltip->setText(tooltipText);
+}
+
+void CustomTextField::setDarkMode(bool value)
+{
+   TextField::setDarkMode(value);
+   if (tooltip)
+      tooltip->setDarkMode(value);
 }
 
 // Terms & Conditions Widget
-CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent)
-{
+CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
    // Create checkbox
@@ -84,8 +101,7 @@ CheckBox* CheckWithBtn::termsCheckBox() const {
 }
 
 // AccountCreate Implementation
-AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent)
-{
+AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
    // Heading
@@ -96,28 +112,27 @@ AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent)
    heading->setFont(font("Inter", 22, QFont::Bold));
 
    // Name
-   NAME = Field("Enter your name");
-   QRegularExpression rex("[A-Za-z ]+");
-   NAME->setValidator(new QRegularExpressionValidator(rex, this));
-   NAME->setClearButton(true);
-   _NAME = LabeledField("Name", NAME);
+   name = Field("Enter your name", true);
+   name->setContextMenu(true);
+   nameWidget = LabeledField("Name", name);
 
    // Username
-   USERNAME = Field("Enter unique username", true);
-   _USERNAME = LabeledField("Username", USERNAME);
+   username = Field("Enter unique username", true);
+   username->setContextMenu(false);
+   usernameWidget = LabeledField("Username", username);
 
    // Email
-   EMAIL = Field("Enter your email-address", true);
-   EMAIL->setContextMenu(false);
-   _EMAIL = LabeledField("Email-Address", EMAIL);
+   email = Field("Enter your email-address", true);
+   email->setContextMenu(false);
+   emailWidget = LabeledField("Email-Address", email);
 
    // Password
-   PWD = Field("Enter strong password");
-   PWD->setContextMenu(false);
-   PWD->setPasswordTextField(true);
-   _PWD = LabeledField("Password", PWD);
+   pwd = Field("Enter strong password");
+   pwd->setContextMenu(false);
+   pwd->setPasswordTextField(true);
+   pwdWidget = LabeledField("Password", pwd);
 
-   fieldsWidgets = {_NAME, _USERNAME, _EMAIL, _PWD};
+   fieldsWidgets = {nameWidget, usernameWidget, emailWidget, pwdWidget};
 
    // Validator
    pwdValidator = new PwdRulesWidget;
@@ -155,13 +170,11 @@ AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent)
    setDarkMode(isDarkMode);
 }
 
-void AccountCreate::setDarkMode(bool value)
-{
+void AccountCreate::setDarkMode(bool value) {
    isDarkMode = value;
 
    QVector<QLabel *> labels;
-   for (auto *widget : fieldsWidgets)
-   {
+   for (auto *widget : fieldsWidgets) {
       QLabel *label = widget->findChild<QLabel *>();
       if (label)
          labels.append(label);
@@ -173,7 +186,7 @@ void AccountCreate::setDarkMode(bool value)
    for (auto *label : labels)
       label->setStyleSheet(QString("color: %1;").arg(labelColor));
 
-   QVector<CustomTextField *> textFields = {NAME, USERNAME, PWD, EMAIL};
+   QVector<CustomTextField *> textFields = {name, username, pwd, email};
    for (auto *field : textFields)
       field->setDarkMode(isDarkMode);
 
@@ -184,41 +197,34 @@ Button* AccountCreate::createBtn() const {
    return createAccBtn;
 }
 
-CustomTextField *AccountCreate::nameField() const
-{
-   return NAME;
+CustomTextField *AccountCreate::nameField() const {
+   return name;
 }
 
-CustomTextField *AccountCreate::usernameField() const
-{
-   return USERNAME;
+CustomTextField *AccountCreate::usernameField() const {
+   return username;
 }
 
-CustomTextField *AccountCreate::pwdField() const
-{
-   return PWD;
+CustomTextField *AccountCreate::pwdField() const {
+   return pwd;
 }
 
-CustomTextField *AccountCreate::emailField() const
-{
-   return EMAIL;
+CustomTextField *AccountCreate::emailField() const {
+   return email;
 }
 
-CheckWithBtn *AccountCreate::termsCondsBtn() const
-{
+CheckWithBtn *AccountCreate::termsCondsBtn() const {
    return agreement;
 }
 
-CustomTextField *AccountCreate::Field(const QString &placeholderText, bool useCheck)
-{
+CustomTextField *AccountCreate::Field(const QString &placeholderText, bool useCheck) {
    auto *field = new CustomTextField(useCheck);
    field->setPlaceholderText(placeholderText);
    field->setSize(QSize(360, 36));
    return field;
 }
 
-QWidget *AccountCreate::LabeledField(const QString labelName, CustomTextField *currField)
-{
+QWidget *AccountCreate::LabeledField(const QString labelName, CustomTextField *currField) {
    auto *widget = new QWidget;
    widget->setFixedSize(currField->width(), 60);
    widget->setAttribute(Qt::WA_TranslucentBackground);

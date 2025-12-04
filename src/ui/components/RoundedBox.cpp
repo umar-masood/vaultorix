@@ -1,21 +1,24 @@
 #include "RoundedBox.h"
 
-RoundedBox::RoundedBox(const QString &txt, QWidget *parent) : QWidget(nullptr), isDarkMode(false), text(txt), useAsToolTip(false)
-{
+RoundedBox::RoundedBox(const QString &txt, QWidget *parent) : QWidget(nullptr), isDarkMode(false), text(txt), useAsToolTip(false) {
     setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowFlag(Qt::Tool);
     setAsToolTip(false);
 }
 
-void RoundedBox::setDarkMode(bool value)
-{
+void RoundedBox::setDarkMode(bool value) {
     isDarkMode = value;
     update();
 }
 
 void RoundedBox::setAsToolTip(bool value) {
     useAsToolTip = value;
+    update();
+}
+
+void RoundedBox::setText(const QString &text) {
+    this->text = text;
     update();
 }
 
@@ -33,7 +36,6 @@ QSize RoundedBox::sizeHint() const {
     QSize s = fm.boundingRect(0, 0, MAX_W, 0, Qt::TextWordWrap, text).size();
     return QSize(s.width() + 24, s.height() + 12);
 }
-
 
 void RoundedBox::paintEvent(QPaintEvent *event)
 {

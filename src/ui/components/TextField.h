@@ -29,7 +29,7 @@ public:
   explicit TextField(QWidget *parent = nullptr);
 
   void setShadow(bool value);
-  void setDarkMode(bool value);
+  virtual void setDarkMode(bool value);
   void setSize(QSize s);
   void setTextFieldIcon(bool value);
   void setTextFieldIconSize(QSize s);

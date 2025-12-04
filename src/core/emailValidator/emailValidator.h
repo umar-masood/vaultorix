@@ -43,5 +43,7 @@ class GetEmail : public QObject {
     EmailValidator *emailValidate = nullptr;
     AccountCreate *ac = nullptr;
 
+    private slots:
     void onEmailChanged(const QString &pwd);
+    void onTimeout();
 };

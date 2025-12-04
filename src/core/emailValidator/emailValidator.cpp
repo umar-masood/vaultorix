@@ -192,11 +192,7 @@ GetEmail::GetEmail(QObject *parent) : QObject(parent) {
 
     emailValidate = new EmailValidator;
 
-    connect(timer, &QTimer::timeout, this, [this](){
-        if (!ac) return;
-        bool ok = emailValidate->checkDisposableEmail(ac->emailField()->text().toStdString());
-        ok ? ac->emailField()->setUnchecked() : ac->emailField()->setChecked();
-    });
+    connect(timer, &QTimer::timeout, this, &GetEmail::onTimeout);
 }
 
 void GetEmail::setAccountCreateObject(AccountCreate *ac) {
@@ -209,4 +205,11 @@ void GetEmail::onEmailChanged(const QString &text) {
     Q_UNUSED(text)
     timer->stop();
     timer->start(2000);
+}
+
+void GetEmail::onTimeout() {
+    if (!ac) return;
+    std::string text = ac->emailField()->text().toStdString();
+    bool ok = emailValidate->checkDisposableEmail(text);
+    ok ? ac->emailField()->setUnchecked(text.empty() ? "" : "Invalid email-address") : ac->emailField()->setChecked("Valid email-address");
 }

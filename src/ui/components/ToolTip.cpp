@@ -1,18 +1,13 @@
 #include "ToolTip.h"
 
-
-void ToolTip::setToolTip(QWidget *widget, const QString &text, bool isDarkMode) {
-  new ToolTip(widget, text, isDarkMode);
-}
-
-ToolTip::ToolTip(QWidget *target, const QString &text, bool isDarkMode)
-  : QObject(target), target(target) {
-  tooltipWidget = new RoundedBox(text);
+ToolTip::ToolTip(QWidget *target, const QString &text, bool isDarkMode) : QObject(target), target(target) {
+  tooltipWidget = new RoundedBox(!text.isEmpty() ? text : nullptr);
   tooltipWidget->setAsToolTip(true);
   tooltipWidget->setDarkMode(isDarkMode);
   tooltipWidget->hide();
 
-  target->installEventFilter(this);
+  if (this->target) 
+    this->target->installEventFilter(this);
   tooltipWidget->installEventFilter(this);
 
   timer.setSingleShot(true);
@@ -24,9 +19,9 @@ ToolTip::ToolTip(QWidget *target, const QString &text, bool isDarkMode)
   animation->setEasingCurve(QEasingCurve::InOutQuad);
   animation->setDuration(300);
 
-  connect(&timer, &QTimer::timeout, this, [this]() {
-    showToolTip();
-  });
+  connect(this, &ToolTip::textEntered, this, &ToolTip::onTextEntered);
+  connect(&timer, &QTimer::timeout, this, &ToolTip::onTimeout);
+  connect(this, &ToolTip::themeModeChanged, this, &ToolTip::onThemeModeChanged);
 }
 
 void ToolTip::fadeInAnimation() {
@@ -56,9 +51,7 @@ bool ToolTip::eventFilter(QObject *obj, QEvent *event) {
     } else if (event->type() == QEvent::Leave) {
       timer.stop();
       QTimer::singleShot(200, this, [this]() {
-        if (tooltipWidget && !isHovering) {
-          fadeOutAnimation();
-        }
+        if (tooltipWidget && !isHovering) fadeOutAnimation();
       });
     }
   }
@@ -69,9 +62,7 @@ bool ToolTip::eventFilter(QObject *obj, QEvent *event) {
     } else if (event->type() == QEvent::Leave) {
       isHovering = false;
       QTimer::singleShot(200, this, [this]() {
-        if (tooltipWidget && !target->underMouse()) {
-          fadeOutAnimation();
-        }
+        if (tooltipWidget && !target->underMouse()) fadeOutAnimation();
       });
     }
   }
@@ -82,9 +73,9 @@ bool ToolTip::eventFilter(QObject *obj, QEvent *event) {
 void ToolTip::position(QWidget *target) {
   QPoint globalPos = target->mapToGlobal(QPoint(0, 0));
   QScreen *screen = QApplication::screenAt(globalPos);
-  if (!screen) {
+  if (!screen) 
     screen = QApplication::primaryScreen();
-  }
+  
   QRect screenArea = screen->availableGeometry();
 
   QRect targetRect = QRect(globalPos, target->size());
@@ -113,9 +104,51 @@ void ToolTip::position(QWidget *target) {
   tooltipWidget->move(QPoint(x, y));
 }
 
+void ToolTip::onTextEntered(const QString &text) {
+  if (tooltipWidget) {
+    tooltipWidget->setText(text);
+  }
+}
+
+void ToolTip::onTimeout() {
+  showToolTip();
+}
+
+void ToolTip::setText(const QString &text){
+  emit textEntered(text);
+}
+
 void ToolTip::showToolTip() {
   if (tooltipWidget) {
     position(target);
     fadeInAnimation();
+  }
+}
+
+void ToolTip::setDarkMode(bool isDarkMode) {
+  emit themeModeChanged(isDarkMode);
+}
+
+void ToolTip::setTargetWidget(QWidget *target) {
+  if (target == nullptr) return;
+
+  if (this->target)
+    this->target->removeEventFilter(this);
+
+  this->target = target;
+  
+  if (this->target) 
+    this->target->installEventFilter(this);
+}
+
+void ToolTip::onThemeModeChanged(bool enable) {
+  if (tooltipWidget) {
+    tooltipWidget->setDarkMode(enable);
+  }
+}
+
+void ToolTip::hide() {
+  if (tooltipWidget) {
+    tooltipWidget->hide();
   }
 }
