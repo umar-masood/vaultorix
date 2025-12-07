@@ -20,28 +20,33 @@ CustomTextField::CustomTextField(bool useCheck, QWidget *parent) : TextField(par
    }
 }
 
-void CustomTextField::setChecked(const QString &tooltipText) {
-   if (checkIcon)
-      checkIcon->setPixmap(QPixmap(checked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-   
-   if (tooltip)
-      tooltip->setText(tooltipText);
-}
-
-void CustomTextField::setUnchecked(const QString &tooltipText) {
-   if (tooltip && !tooltipText.isEmpty()) 
-      tooltip->setTargetWidget(checkIcon);
-
-   if (checkIcon)
-      checkIcon->setPixmap(QPixmap(unchecked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-   
+void CustomTextField::setTooltip(const QString &tooltipText) {
    if (tooltipText.isEmpty()) {
-      if (tooltip) tooltip->hide();
+      if (tooltip) {
+         tooltip->hide();
+         tooltip->setTargetWidget(nullptr);
+      }
+      hasTip = false;
       return;
    }
 
-   if (tooltip)
+   if (tooltip) {
+      tooltip->setTargetWidget(checkIcon);
       tooltip->setText(tooltipText);
+   }
+
+   hasTip = true;
+}
+
+
+void CustomTextField::setChecked() {
+   if (checkIcon)
+      checkIcon->setPixmap(QPixmap(checked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
+void CustomTextField::setUnchecked() {
+   if (checkIcon)
+      checkIcon->setPixmap(QPixmap(unchecked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 void CustomTextField::setDarkMode(bool value)
@@ -112,9 +117,9 @@ AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent) {
    heading->setFont(font("Inter", 22, QFont::Bold));
 
    // Name
-   name = Field("Enter your name", true);
+   name = Field("Enter your full name", true);
    name->setContextMenu(true);
-   nameWidget = LabeledField("Name", name);
+   nameWidget = LabeledField("Full Name", name);
 
    // Username
    username = Field("Enter unique username", true);

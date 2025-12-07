@@ -105,9 +105,8 @@ void ToolTip::position(QWidget *target) {
 }
 
 void ToolTip::onTextEntered(const QString &text) {
-  if (tooltipWidget) {
+  if (tooltipWidget) 
     tooltipWidget->setText(text);
-  }
 }
 
 void ToolTip::onTimeout() {
@@ -130,25 +129,27 @@ void ToolTip::setDarkMode(bool isDarkMode) {
 }
 
 void ToolTip::setTargetWidget(QWidget *target) {
-  if (target == nullptr) return;
-
-  if (this->target)
+  if (this->target) 
     this->target->removeEventFilter(this);
 
   this->target = target;
-  
-  if (this->target) 
-    this->target->installEventFilter(this);
+  if (!target) {
+    timer.stop();
+    if (animation) animation->stop();
+    hide();
+    return;
+  }
+
+  this->target->installEventFilter(this);
 }
 
 void ToolTip::onThemeModeChanged(bool enable) {
-  if (tooltipWidget) {
+  if (tooltipWidget) 
     tooltipWidget->setDarkMode(enable);
-  }
+  
 }
 
 void ToolTip::hide() {
-  if (tooltipWidget) {
+  if (tooltipWidget) 
     tooltipWidget->hide();
-  }
 }

@@ -64,16 +64,15 @@ add_executable(Vaultorix
     src/core/emailValidator/emailValidator.cpp
     src/core/pwdValidator/pwdValidator.cpp
     src/core/OTPValidator/OTPValidator.cpp
-    
+    src/core/usernameValidator/usernameValidator.cpp
+    src/core/validatorUtils/validatorUtils.cpp
+
     # Entry Point of App
     src/main.cpp
 
     # Resources
     src/resources/resources.qrc
-
-
 )
-
 
 target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt6::Network Qt6::Gui Qt6::Svg Qt6::Widgets dwmapi user32)
 set_target_properties(Vaultorix PROPERTIES WIN32_EXECUTABLE TRUE)

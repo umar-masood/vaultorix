@@ -1,6 +1,8 @@
 #include "ui/accountWindow/AccountWindow.h"
 #include "./ui/accountCreate/AccountCreate.h"
 #include "./core/emailValidator/emailValidator.h"
+#include "./core/usernameValidator/usernameValidator.h"
+#include "./core/pwdValidator/pwdValidator.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +14,12 @@ int main(int argc, char *argv[])
 
     GetEmail *ge = new GetEmail;
     ge->setAccountCreateObject(ac);
+
+    GetUsername *gu = new GetUsername;
+    gu->setAccountCreateObject(ac);
+
+    GetPassword *gp = new GetPassword;
+    gp->setAccountCreateObject(ac);
 
     aw->show();
     return app.exec();

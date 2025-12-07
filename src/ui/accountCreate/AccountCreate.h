@@ -13,13 +13,16 @@ class CustomTextField : public TextField
 public:
    explicit CustomTextField(bool useCheck = false, QWidget *parent = nullptr);
 
-   void setChecked(const QString &tooltiptext = "");
-   void setUnchecked(const QString &tooltiptext = "");
+   void setChecked();
+   void setUnchecked();
    void setDarkMode(bool value) override;
+   void setTooltip(const QString &tooltipText);
 
 private:
    QLabel *checkIcon = nullptr;
    ToolTip *tooltip = nullptr;
+   bool hasTip = false;
+   
    const QString checked = ":/icons/AccountCreate/checked.svg";
    const QString unchecked = ":/icons/AccountCreate/unchecked.svg";
 };

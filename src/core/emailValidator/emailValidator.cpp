@@ -1,48 +1,33 @@
 #include "emailValidator.h"
 
-#include <QCoreApplication>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QEventLoop>
-#include <QStringList>
-#include <QRegularExpression>
-#include <QFile>
-#include <QStandardPaths>
-#include <QDir>
-#include <QFileInfo>
-#include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <cctype>
-
 EmailValidator::EmailValidator() {
-    if (downloadList()) 
-        std::cout << "List downloaded successfully.\n";
-    else 
-        std::cerr << "Using local file or failed to download.\n";
-    
-    loadMailsFromFile();
+    vu = new ValidatorUtils(nullptr, "Email");
+    vu->setFileName("badDomains.config");
+    if (vu->downloadList(QUrl("https://raw.githubusercontent.com/umar-masood/Weak-Credentials/refs/heads/main/badDomains.config"))) 
+       qDebug() << "Email blacklist download started.\n";
+    else
+        loadMailsFromFile();
+
+    QObject::connect(vu, &ValidatorUtils::listDownloaded, [this]() {
+        qDebug() << "Email blacklist download completed.\n";
+        loadMailsFromFile();
+    });
 }
 
-bool EmailValidator::isValidEmail(const std::string &email) {
-    QString str = QString::fromStdString(email).trimmed();
-
-    if (str.isEmpty() || !str.contains('@'))
+bool EmailValidator::isValidEmail(QByteArray &email) {
+    if (email.isEmpty() || !email.contains('@'))
         return false;
 
-    if (str.count('@') != 1)
+    if (email.count('@') != 1)
         return false;
 
-    if (str.contains(' ') || str.contains('\t'))
+    if (email.contains(' ') || email.contains('\t'))
         return false;
 
-    QStringList parts = str.split('@');
-    if (parts.size() != 2)
-        return false;
-
-    QString local = parts[0];
-    QString domain = parts[1];
+    // Split email into local and domain parts
+    int atIndex = email.indexOf('@');
+    QByteArray local = email.left(atIndex);
+    QByteArray domain = email.mid(atIndex + 1);
 
     if (local.isEmpty() || domain.isEmpty())
         return false;
@@ -56,45 +41,66 @@ bool EmailValidator::isValidEmail(const std::string &email) {
     if (!domain.contains('.'))
         return false;
 
-    for (QChar c : str) {
-        if (c.unicode() > 127)
+    // Check all characters are ASCII
+    for (auto c : email) 
+        if (static_cast<unsigned char>(c) > 127)
             return false;
-    }
 
+    // Regex patterns for local and domain
     static const QRegularExpression localRe("^[A-Za-z0-9._%+-]+$");
     static const QRegularExpression domainRe("^(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,24}$");
 
-    if (!localRe.match(local).hasMatch())
+    if (!localRe.match(QString::fromUtf8(local)).hasMatch())
         return false;
 
-    if (!domainRe.match(domain).hasMatch())
+    if (!domainRe.match(QString::fromUtf8(domain)).hasMatch())
         return false;
 
-    QStringList labels = domain.split('.');
-    for (const QString &label : labels) {
+    // Check individual domain labels
+    QList<QByteArray> labels = domain.split('.');
+    for (const QByteArray &label : labels) {
         if (label.startsWith('-') || label.endsWith('-') || label.isEmpty())
             return false;
     }
 
+    // Securely wipe local and domain parts after use
+    ValidatorUtils::cleanupMemory(local);
+    ValidatorUtils::cleanupMemory(domain);
+
     return true;
 }
 
-bool EmailValidator::checkDisposableEmail(const std::string &email) {
-    if (!isValidEmail(email)) return true;
+bool EmailValidator::checkDisposableEmail(QByteArray &email) {
+    if (!isValidEmail(email)) return true; // True invalid email (considered disposable)
 
-    size_t pos = email.find('@');
-    if (pos == std::string::npos) return true;
+    if (tempMails.empty()) {
+        ValidatorUtils::cleanupMemory(email);
+        std::cerr << "Disposable domain list is not loaded.\n";
+        return true; // If disposable password list is not loaded, we cannot check for weak passwords
+    }
 
-    std::string domain = email.substr(pos + 1);
-    lower(domain);
+    int atIndex = email.indexOf('@');
+    QByteArray domainBA = email.mid(atIndex + 1);
+    ValidatorUtils::cleanupMemory(email); 
 
-    return isDisposableEmail(domain);
+    std::string domain(domainBA.constData(), domainBA.size());
+    ValidatorUtils::lower(domain);
+
+    // Securely wipe temporary QByteArray
+    ValidatorUtils::cleanupMemory(domainBA);
+
+    bool result = isDisposableEmail(domain);
+
+    // Wipe temporary std::string
+    ValidatorUtils::cleanupMemory(domain);
+
+    return result;
 }
 
 bool EmailValidator::isDisposableEmail(const std::string &domain) {
     auto it = cacheMap.find(domain);
     if (it != cacheMap.end()){
-        std::cout << "domain is already checked...";
+       qDebug() << "Domain is already checked...";
         order.splice(order.end(), order, it->second); 
         return true;
     }
@@ -113,63 +119,10 @@ bool EmailValidator::isDisposableEmail(const std::string &domain) {
     return result;
 }
 
-std::string EmailValidator::getFilePath() const {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/config";
-    QDir().mkpath(path);
-    return path.toStdString() + "/tempMails.config";
-}
-
-void EmailValidator::lower(std::string &str) {
-    for (auto &c : str) c = std::tolower(static_cast<unsigned char>(c));
-}
-
-bool EmailValidator::isOlderList() const {
-    if (std::filesystem::exists(getFilePath())) {
-        QFileInfo info(QString::fromStdString(getFilePath()));
-        QDateTime modified = info.lastModified();
-        qint64 secsAgo = modified.secsTo(QDateTime::currentDateTime());
-        const int twoDays = 48 * 60 * 60; 
-        return secsAgo > twoDays;
-    }
-    return true;
-}
-
-bool EmailValidator::downloadList() {
-    if (!isOlderList()) return false;
-
-    QNetworkAccessManager manager;
-    QNetworkRequest request(QUrl("https://raw.githubusercontent.com/umar-masood/Disposable-Emails-List/refs/heads/main/tempMails.conf"));
-    QNetworkReply *reply = manager.get(request);
-
-    QEventLoop loop;
-    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec(); 
-
-    if (reply->error() != QNetworkReply::NoError) {
-        std::cerr << reply->errorString().toStdString();
-        return false;
-    }
-
-    QByteArray data = reply->readAll();
-    reply->deleteLater();
-
-    if (data.isEmpty()) return false;
-
-    QFile file(QString::fromStdString(getFilePath()));
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        std::cerr << "Could not write to file.\n";
-        return false;
-    }
-
-    file.write(data);
-    file.close();
-    return true;
-}
-
 void EmailValidator::loadMailsFromFile() {
-    std::ifstream file(getFilePath());
+    std::ifstream file(vu->filePath);
     if (!file.is_open()) {
-        std::cerr << "Could not open mail list file.\n";
+        std::cerr << "Could not open domains list file.\n";
         return;
     }
 
@@ -178,20 +131,17 @@ void EmailValidator::loadMailsFromFile() {
     while (std::getline(file, line)) {
         if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
             line.pop_back();
-        lower(line);
+        ValidatorUtils::lower(line);
         if (!line.empty())
             tempMails.insert(line);
     }
     file.close();
-    std::cout << "Loaded " << tempMails.size() << " domains.\n";
+   qDebug() << "Loaded " << tempMails.size() << " domains.\n";
 }
 
 GetEmail::GetEmail(QObject *parent) : QObject(parent) {
     timer = new QTimer(this);
     timer->setSingleShot(true);
-
-    emailValidate = new EmailValidator;
-
     connect(timer, &QTimer::timeout, this, &GetEmail::onTimeout);
 }
 
@@ -209,7 +159,23 @@ void GetEmail::onEmailChanged(const QString &text) {
 
 void GetEmail::onTimeout() {
     if (!ac) return;
-    std::string text = ac->emailField()->text().toStdString();
-    bool ok = emailValidate->checkDisposableEmail(text);
-    ok ? ac->emailField()->setUnchecked(text.empty() ? "" : "Invalid email-address") : ac->emailField()->setChecked("Valid email-address");
+    
+    QByteArray text = ac->emailField()->text().toUtf8();
+    if (text.isEmpty()) {
+        ac->emailField()->setUnchecked();
+        ac->emailField()->setTooltip("");
+        return;
+    }
+
+    bool ok = emailValidator.checkDisposableEmail(text);
+
+    if (!ok) {
+        ac->emailField()->setChecked();
+        ac->emailField()->setTooltip("Valid email-address");
+    } else {
+        ac->emailField()->setUnchecked();
+        ac->emailField()->setTooltip("Invalid email-address");
+    }
+
+    ValidatorUtils::cleanupMemory(text);
 }

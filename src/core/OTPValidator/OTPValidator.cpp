@@ -46,9 +46,8 @@ int OTPValidator::sendOTP(const QString &fullName, const QString &username, cons
     loop.exec();
 
     // If there's a problem in connectivity
-    if (reply->error() != QNetworkReply::NoError)
-    {
-        std::cerr << "Failed to send otp..." << reply->errorString().toStdString();
+    if (reply->error() != QNetworkReply::NoError) {
+        std::cerr << "Failed to Send OTP. " << reply->errorString().toStdString();
         return -1;
     }
 
@@ -56,13 +55,13 @@ int OTPValidator::sendOTP(const QString &fullName, const QString &username, cons
     QByteArray response = reply->readAll();
     QJsonDocument r = QJsonDocument::fromJson(response);
     if (!r.isObject())
-        std::cerr << "Sending Response is invalid...";
+        std::cerr << "Sending Response is Invalid.";
 
     // Collecting Response Data
     QJsonObject rObj = r.object();
     status_code = rObj["status_code"].toInt();
     message = rObj["message"].toString();
-    qDebug() << status_code << ",  " << message;
+    std::cerr << status_code << ",  " << message.toStdString();
 
     reply->deleteLater();
     return status_code;
@@ -88,7 +87,7 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
 
     // If there's an error
     if (reply->error() != QNetworkReply::NoError) {
-        std::cerr << "We could not be able to verify your entered OTP" << reply->errorString().toStdString();
+        std::cerr << "We could not be able to verify your entered OTP at this time. " << reply->errorString().toStdString();
         return false;
     }
 
@@ -103,8 +102,10 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
 
     QJsonObject rObj = r.object();
     isVerified = rObj["isVerified"].toBool();
-    reply->deleteLater();
 
+    std::clog << "OTP Verified: " << isVerified;
+
+    reply->deleteLater();
     return isVerified; // If the OTP is verified then it will return True otherwise False
 }
 
@@ -198,7 +199,7 @@ void GetOTP::onMaxLimitReached() {
     
 
     if (ao && ao->messageLabel()) // Display the maximum limit reached message.
-        ao->messageLabel()->setTextAnimated("Maximum limit reached. Try again after 48hrs");
+        ao->messageLabel()->setTextAnimated("Maximum limit reached. Try again after 48hrs.");
     
 }
 
@@ -250,8 +251,7 @@ void GetOTP::disableControls(QString btnText) {
     ao->resendOtpWidget()->timerLabel()->hide();     // hides the timer
     ao->messageLabel()->setTextAnimated("");
 
-    if (timer)
-        timer->stop();
+    if (timer) timer->stop();
     ao->OTP()->setEnabled(false);
 }
 
