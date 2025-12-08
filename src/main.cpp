@@ -3,6 +3,7 @@
 #include "./core/emailValidator/emailValidator.h"
 #include "./core/usernameValidator/usernameValidator.h"
 #include "./core/pwdValidator/pwdValidator.h"
+#include "./core/nameValidator/nameValidator.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,6 +22,10 @@ int main(int argc, char *argv[])
     GetPassword *gp = new GetPassword;
     gp->setAccountCreateObject(ac);
 
+    GetName *gn = new GetName;
+    gn->setAccountCreateObject(ac);
+
     aw->show();
     return app.exec();
 }
+#include "main.moc"

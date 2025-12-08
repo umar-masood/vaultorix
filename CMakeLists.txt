@@ -66,6 +66,7 @@ add_executable(Vaultorix
     src/core/OTPValidator/OTPValidator.cpp
     src/core/usernameValidator/usernameValidator.cpp
     src/core/validatorUtils/validatorUtils.cpp
+    src/core/nameValidator/nameValidator.cpp
 
     # Entry Point of App
     src/main.cpp
