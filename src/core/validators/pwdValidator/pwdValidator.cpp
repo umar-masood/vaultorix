@@ -119,8 +119,14 @@ GetPassword::GetPassword(QObject *parent) : QObject(parent) {
 
     connect(timer, &QTimer::timeout, this, [this](){
         if (!ac) return;
+        
         QByteArray bytes = ac->pwdField()->text().toUtf8();
+        
         bool ok = pwdValidate->checkStrongPwd(bytes, ac->pwdRulesWidget());
+        
+        // Emit signal
+        emit pwdValidated(ok);
+
         ValidatorUtils::cleanupMemory(bytes);
     });
 }

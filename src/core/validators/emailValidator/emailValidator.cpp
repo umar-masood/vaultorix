@@ -169,6 +169,9 @@ void GetEmail::onTimeout() {
 
     bool ok = emailValidator.checkDisposableEmail(text);
 
+    // Emit signal
+    emit emailValidated(!ok);
+    
     if (!ok) {
         ac->emailField()->setChecked();
         ac->emailField()->setTooltip("Valid email-address");

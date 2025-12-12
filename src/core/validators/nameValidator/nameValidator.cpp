@@ -62,6 +62,9 @@ void GetName::onTimeout()
 
     bool ok = nameValidator.isValidName(text);
 
+    // Emit signal
+    emit nameValidated(ok);
+
     ValidatorUtils::cleanupMemory(text);
 
     if (ok) {

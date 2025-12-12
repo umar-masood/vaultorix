@@ -146,6 +146,9 @@ void GetUsername::onTimeout() {
     // Validate username
     bool ok = usernameValidator.isValidUsername(text);
 
+    // Emit signal
+    emit usernameValidated(ok);
+    
     // Clear sensitive memory
     ValidatorUtils::cleanupMemory(text);
     
@@ -156,5 +159,4 @@ void GetUsername::onTimeout() {
         ac->usernameField()->setUnchecked();
         ac->usernameField()->setTooltip("Invalid username");
     }
-
 }

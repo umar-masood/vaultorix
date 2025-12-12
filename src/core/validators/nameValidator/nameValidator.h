@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QTimer>
 
-#include "../../ui/accountCreate/AccountCreate.h"
+#include "../../../ui/accountCreate/AccountCreate.h"
 #include "../validatorUtils/validatorUtils.h"
 
 class NameValidator {
@@ -20,6 +20,9 @@ class GetName : public QObject {
     explicit GetName(QObject *parent = nullptr);
     void setAccountCreateObject(AccountCreate *ac);
 
+    signals:
+    void nameValidated(bool isValid);
+    
     private slots:
     void onNameChanged(const QString &text);
     void onTimeout();

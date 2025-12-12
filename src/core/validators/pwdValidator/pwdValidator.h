@@ -12,8 +12,8 @@
 #include <list>
 #include <string>
 
-#include "../../ui/pwdRulesWidget/pwdRulesWidget.h"
-#include "../../ui/accountCreate/AccountCreate.h"
+#include "../../../ui/pwdRulesWidget/pwdRulesWidget.h"
+#include "../../../ui/accountCreate/AccountCreate.h"
 #include "../validatorUtils/validatorUtils.h"
 
 class PwdValidator {
@@ -46,5 +46,9 @@ class GetPassword : public QObject {
     PwdValidator *pwdValidate = nullptr;
     AccountCreate *ac = nullptr;
 
+    signals:
+    void pwdValidated(bool isValid);
+
+    private slots:
     void onPwdChanged(const QString &pwd);
 };

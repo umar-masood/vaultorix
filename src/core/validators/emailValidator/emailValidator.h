@@ -12,7 +12,7 @@
 #include <QString>
 #include <QTimer>
 
-#include "../../ui/accountCreate/AccountCreate.h"
+#include "../../../ui/accountCreate/AccountCreate.h"
 #include "../validatorUtils/validatorUtils.h"
 
 class EmailValidator {
@@ -51,4 +51,7 @@ class GetEmail : public QObject {
     private slots:
     void onEmailChanged(const QString &pwd);
     void onTimeout();
+
+    signals:
+    void emailValidated(bool isValid);
 };

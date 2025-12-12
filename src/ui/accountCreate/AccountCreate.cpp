@@ -166,6 +166,7 @@ AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent) {
    createAccBtn->setHoverGradientColor("#008EDE");
    createAccBtn->setText("Create Account");
    createAccBtn->setFontProperties("Segoe UI", 11, true, false);
+   createAccBtn->setEnabled(false);
 
    layout->addSpacing(20);
    layout->addWidget(createAccBtn, 0, Qt::AlignLeft);

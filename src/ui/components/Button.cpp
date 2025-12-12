@@ -3,8 +3,7 @@
 Button::Button(const QString &text, QWidget *parent) : QPushButton(text, parent) { init(); }
 Button::Button(QWidget *parent) : QPushButton(parent) { init(); }
 
-void Button::init()
-{
+void Button::init() {
   setCursor(Qt::PointingHandCursor);
   setFocusPolicy(Qt::NoFocus);
 
@@ -21,31 +20,26 @@ void Button::init()
   animate->setEasingCurve(QEasingCurve::InOutQuad);
 }
 
-void Button::setShadow(bool value)
-{
+void Button::setShadow(bool value) {
   hasShadow = value;
   if (hasShadow) setGraphicsEffect(effect);
   else setGraphicsEffect(nullptr);
 }
 
-void Button::setHyperLink(bool value)
-{
+void Button::setHyperLink(bool value) {
   hyperLink = value;
   if (secondary) secondary = false; 
 }
 
-void Button::setHyperLinkColors(const QColor &normalState, const QColor &hoverState)
-{
+void Button::setHyperLinkColors(const QColor &normalState, const QColor &hoverState) {
   hyperlinkNormal = normalState; hyperlinkHover = hoverState;
 }
 
-void Button::setFontProperties(const QString &family, int pointSize, bool bold, bool italic)
-{
+void Button::setFontProperties(const QString &family, int pointSize, bool bold, bool italic) {
   fontFamily = family; fontSize = pointSize; isBold = bold; isItalic = italic;
 }
 
-void Button::setGradientColor(bool value, const QString &hex1, const QString &hex2)
-{
+void Button::setGradientColor(bool value, const QString &hex1, const QString &hex2) {
   useGradient = value;
 
   baseStart = QColor(hex1);
@@ -111,39 +105,15 @@ void Button::setSize(QSize s)
   update();
 }
 
-void Button::setDarkMode(bool value)
-{
-  isDarkMode = value;
-}
+void Button::setDarkMode(bool value) { isDarkMode = value; }
 
-void Button::setSecondary(bool value)
-{
-  secondary = value;
-}
+void Button::setSecondary(bool value) { secondary = value; }
 
-bool Button::isDisabledState() const
-{
-  return !isEnabled();
-}
-
-bool Button::isHoverState() const
-{
-  return isHover && !isPressed;
-}
-
-bool Button::isNormalState() const
-{
-  return !isHover && !isPressed;
-}
-
-bool Button::isPressedState() const
-{
-  return isPressed;
-}
-
-bool Button::isIconOnly() const {
-  return displayMode == IconOnly;
-}
+bool Button::isDisabledState() const { return !isEnabled(); }
+bool Button::isHoverState() const { return isHover && !isPressed; }
+bool Button::isNormalState() const { return !isHover && !isPressed; }
+bool Button::isPressedState() const { return isPressed; }
+bool Button::isIconOnly() const { return displayMode == IconOnly; }
 
 void Button::paintEvent(QPaintEvent *event)
 {
@@ -173,8 +143,7 @@ void Button::paintEvent(QPaintEvent *event)
   // Border Colors
   QColor borderColor = isDarkMode ? "#4D4D4D" : "#CCCCCC";
   bool showBorder = false;
-  if (secondary)
-    if (isIconOnly()) showBorder = false;  else  showBorder = true;
+  if (secondary) if (isIconOnly()) showBorder = false;  else  showBorder = true;
 
   if (!showBorder || useGradient || hyperLink) {
     painter.setPen(Qt::NoPen);

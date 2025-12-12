@@ -1,9 +1,6 @@
 #include "ui/accountWindow/AccountWindow.h"
 #include "./ui/accountCreate/AccountCreate.h"
-#include "./core/emailValidator/emailValidator.h"
-#include "./core/usernameValidator/usernameValidator.h"
-#include "./core/pwdValidator/pwdValidator.h"
-#include "./core/nameValidator/nameValidator.h"
+#include "./core/accountCreate/accountCreationManager/accountCreationManager.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,19 +10,9 @@ int main(int argc, char *argv[])
     AccountCreate *ac = new AccountCreate;
     aw->setRightWidget(ac);
 
-    GetEmail *ge = new GetEmail;
-    ge->setAccountCreateObject(ac);
-
-    GetUsername *gu = new GetUsername;
-    gu->setAccountCreateObject(ac);
-
-    GetPassword *gp = new GetPassword;
-    gp->setAccountCreateObject(ac);
-
-    GetName *gn = new GetName;
-    gn->setAccountCreateObject(ac);
+    AccountCreationManager *acm = new AccountCreationManager;
+    acm->setAccountCreateObject(ac);
 
     aw->show();
     return app.exec();
 }
-#include "main.moc"

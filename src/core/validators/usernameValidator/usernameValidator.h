@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../ui/accountCreate/AccountCreate.h"
+#include "../../../ui/accountCreate/AccountCreate.h"
 #include "../validatorUtils/validatorUtils.h"
 
 #include <string>
@@ -38,6 +38,9 @@ private:
     UsernameValidator usernameValidator;
     AccountCreate *ac = nullptr;
 
+signals:
+    void usernameValidated(bool isValid);
+    
 private slots:
     void onUsernameChanged(const QString &text);
     void onTimeout();
