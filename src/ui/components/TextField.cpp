@@ -35,14 +35,12 @@ void TextField::setTextFieldIcon(bool value) {
     updateStyle();
 }
 
-void TextField::setTextFieldIconSize(QSize s) {
-    if (textFieldIcon) textFieldIconSize = s;
-}
+void TextField::setTextFieldIconSize(QSize s) { if (textFieldIcon) textFieldIconSize = s; }
 
-void TextField::setIconPaths(const QString &light_icon_path, const QString &dark_icon_path) {
+void TextField::setIconPaths(const QString &lightIcon, const QString &darkIcon) {
     if (textFieldIcon) {
-        light_icon = light_icon_path;
-        dark_icon = dark_icon_path;
+        light_icon = lightIcon;
+        dark_icon = darkIcon;
     } else {
         light_icon.clear();
         dark_icon.clear();
@@ -66,20 +64,14 @@ void TextField::setEnabled(bool value)
     QLineEdit::setEnabled(value);
 }
 
-void TextField::setContextMenu(bool value)
-{
-    cxtMenu = value;
-}
+void TextField::setContextMenu(bool value) { cxtMenu = value; }
 
 void TextField::setFontProperties(const QString &family, int pointSize, bool bold, bool italic) {
     isItalic = italic; isBold = bold; fontSize = pointSize; fontFamily = family;
     updateStyle(); 
 }
 
-void TextField::setSpacingRight(bool value)
-{
-    rightSpacing = value;
-}
+void TextField::setSpacingRight(bool value) { rightSpacing = value; }
 
 void TextField::setClearButton(bool value) {
     clearButton = value;
@@ -278,33 +270,35 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
     if (!cxtMenu) return;
 
     Menu *menu = new Menu(this);
-    menu->setMaxVisibleItems(7);
-    menu->setItemSize(QSize(220, 36));
+    menu->setMaxVisibleItems(12);
+    menu->setItemSize(QSize(180, 36));
     menu->setDarkMode(isDarkMode);
     menu->setIconic(true);
 
     const bool hasText = !this->text().isEmpty();
     const bool hasSelection = this->hasSelectedText();
 
-    const QString copyIcon = ":/icons/ComponentsIcons/copy.svg";
-    const QString cutIcon = ":/icons/ComponentsIcons/cut.svg";
-    const QString pasteIcon = ":/icons/ComponentsIcons/paste.svg";
-    const QString deleteIcon = ":/icons/ComponentsIcons/delete.svg";
-    const QString selectAllIcon = ":/icons/ComponentsIcons/select-all.svg";
-    const QString undoIcon = ":/icons/ComponentsIcons/undo.svg";
-    const QString redoIcon = ":/icons/ComponentsIcons/redo.svg";
+    static const QHash<QString , QString> icons = {
+        { "Copy", ":/icons/ComponentsIcons/copy.svg" },
+        { "Cut", ":/icons/ComponentsIcons/cut.svg" },
+        { "Paste", ":/icons/ComponentsIcons/paste.svg" },
+        { "Delete", ":/icons/ComponentsIcons/delete.svg" },
+        { "Select All", ":/icons/ComponentsIcons/select-all.svg" },
+        { "Undo", ":/icons/ComponentsIcons/undo.svg" },
+        { "Redo", ":/icons/ComponentsIcons/redo.svg" }
+    };
 
     if (hasSelection) {
-        menu->addAction({ "Copy", false, copyIcon, copyIcon, "Ctrl + C" });
-        menu->addAction({ "Cut", false, cutIcon, cutIcon, "Ctrl + X" });
-        menu->addAction({ "Delete", false, deleteIcon, deleteIcon, "Delete" });
+        menu->addAction({ "Copy", false, icons["Copy"], icons["Copy"], "Ctrl + C" });
+        menu->addAction({ "Cut", false, icons["Cut"],  icons["Cut"], "Ctrl + X" });
+        menu->addAction({ "Delete", false, icons["Delete"], icons["Delete"], "Delete" });
     }
 
-    menu->addAction({ "Paste", false, pasteIcon, pasteIcon, "Ctrl + V" });
+    menu->addAction({ "Paste", false, icons["Paste"], icons["Paste"], "Ctrl + V" });
     
-    if (hasText && !hasSelection) menu->addAction({ "Select All", false, selectAllIcon, selectAllIcon, "Ctrl + A" });
-    if (this->isUndoAvailable()) menu->addAction({ "Undo", false, undoIcon, undoIcon, "Ctrl + Z" });
-    if (this->isRedoAvailable()) menu->addAction({ "Redo", false, redoIcon, redoIcon, "Ctrl + Y" });
+    if (hasText && !hasSelection) menu->addAction({ "Select All", false, icons["Select All"], icons["Select All"], "Ctrl + A" });
+    if (this->isUndoAvailable()) menu->addAction({ "Undo", false, icons["Undo"], icons["Undo"], "Ctrl + Z" });
+    if (this->isRedoAvailable()) menu->addAction({ "Redo", false, icons["Redo"], icons["Redo"], "Ctrl + Y" });
 
     connect(menu, &Menu::itemClicked, this, [=]() {
         QString action = menu->clickedItemText();

@@ -3,20 +3,11 @@
 #include "Button.h"
 #include "Menu.h"
 #include "SmoothShadow.h"
-#include <QPainter>
-#include <QPaintEvent>
+
 #include <QResizeEvent>
-#include <QEnterEvent>
 #include <QFocusEvent>
 #include <QContextMenuEvent>
 #include <QTimer>
-#include <QPropertyAnimation>
-#include <QColor>
-#include <QRect>
-#include <QPen>
-#include <QPainterPath>
-#include <QPixmap>
-#include <QString>
 #include <QDebug>
 #include <algorithm>
 #include <QLineEdit>
@@ -33,7 +24,7 @@ public:
   void setSize(QSize s);
   void setTextFieldIcon(bool value);
   void setTextFieldIconSize(QSize s);
-  void setIconPaths(const QString &light_icon_path = "", const QString &dark_icon_path = "");
+  void setIconPaths(const QString &lightIcon = "", const QString &darkIcon = "");
   void setClearButton(bool value);
   void setPasswordTextField(bool value);
   void setDropDownPadding(bool value);
