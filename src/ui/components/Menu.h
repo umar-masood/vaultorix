@@ -4,6 +4,7 @@
 #include "RoundedBox.h"
 #include "Delegate.h"
 #include "SmoothOpacity.h"
+
 #include <QStandardItem>
 #include <QListView>
 #include <QStandardItemModel>
@@ -20,12 +21,7 @@
 #include <QTimer>
 #include <QCursor>
 #include <QMap>
-#include <QIcon>
 #include <QEvent>
-#include <QPoint>
-#include <QRect>
-#include <QSize>
-#include <QString>
 #include <algorithm>
 
 class MenuItem : public QStandardItem {
