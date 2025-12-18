@@ -1,14 +1,16 @@
 #include "UsernameValidator.h"
 
-UsernameValidator::UsernameValidator() {
-    vu = new ValidatorUtils(nullptr, "Username");
+UsernameValidator::UsernameValidator(QObject *parent) : QObject(parent) {
+    manager = new QNetworkAccessManager(this);
+
+    vu = new ValidatorUtils(this, "Username");
     vu->setFileName("badUsernames.config");
     if (vu->downloadList(QUrl("https://raw.githubusercontent.com/umar-masood/Weak-Credentials/refs/heads/main/badUsernames.config")))
         qDebug() << "Username blacklist download started.\n";
     else
         loadUsernamesFromFile();
     
-    QObject::connect(vu, &ValidatorUtils::listDownloaded, [this]() {
+    connect(vu, &ValidatorUtils::listDownloaded, this, [this]() {
         qDebug() << "Username blacklist download completed.\n";
         loadUsernamesFromFile();
     });
@@ -17,27 +19,23 @@ UsernameValidator::UsernameValidator() {
 bool UsernameValidator::isValidUsername(QByteArray &username) {
     //  Length check
     if (username.length() < 3 || username.length() > 20) {
-        ValidatorUtils::cleanupMemory(username);
         return false;
     }
 
     // First character must be a letter
     if (!std::isalpha(static_cast<unsigned char>(username.at(0)))) {
-        ValidatorUtils::cleanupMemory(username);
         return false;
     }
 
     // Start/end character restrictions
     if (username.startsWith("-") || username.startsWith(".") || username.startsWith("_") ||
         username.endsWith("-") || username.endsWith(".") || username.endsWith("_")) {
-        ValidatorUtils::cleanupMemory(username);
         return false;
     }
 
     // Non-ASCII check
     for (auto c : username) {
         if (static_cast<unsigned char>(c) > 127) {
-            ValidatorUtils::cleanupMemory(username);
             return false;
         }
     }
@@ -45,14 +43,11 @@ bool UsernameValidator::isValidUsername(QByteArray &username) {
     // Allowed characters regex
     static const QRegularExpression pattern("^[A-Za-z0-9._-]+$");
     if (!pattern.match(QString::fromUtf8(username)).hasMatch()) {
-        ValidatorUtils::cleanupMemory(username);
         return false;
     }
 
     // Convert to lowercase safely
     std::string usernameStd = username.toStdString();                
-    ValidatorUtils::cleanupMemory(username);
-
     ValidatorUtils::lower(usernameStd);
 
     // Check for repeated characters (>=3)
@@ -84,9 +79,60 @@ bool UsernameValidator::isValidUsername(QByteArray &username) {
     return !blacklisted;
 }
 
-
 bool UsernameValidator::isUsernameBlacklisted(const std::string &username) const {
     return tempUsernames.find(username) != tempUsernames.end(); // Username is blacklisted (True if found)
+}
+
+void UsernameValidator::isUsernameAvailable(QByteArray &username) {
+    QUrl url("http://127.0.0.1:8000");
+    url.setPath("/check-username/" + QString::fromUtf8(username));    
+
+    qDebug() << "Checking username availability for: " << QString::fromUtf8(username) << "\n";
+    QNetworkRequest request(url);
+    QNetworkReply *reply = manager->get(request);
+
+    connect(reply, &QNetworkReply::finished, [this, reply, &username](){
+        if (!reply)
+            return;
+
+        if (reply->error() != QNetworkReply::NoError) {
+            reply->deleteLater();
+            qDebug() << "Error :  " << reply->errorString() << "\n";
+
+            emit unableToCheckUsernameAvailability(); // Emit signal when there is an error while handling the request
+            return;
+        }
+
+        QByteArray data = reply->readAll();
+        reply->deleteLater();
+
+        if (data.isEmpty()) {
+            qDebug() << "Data is empty." << "\n"; 
+            return;
+        }
+
+        QJsonParseError parseError;
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
+
+        if (parseError.error != QJsonParseError::NoError) {
+            qDebug() << "Json parsing error." << "\n";
+            return;
+        }
+
+        if (!jsonDoc.isObject()) {
+            qDebug() << "Invalid json data" << "\n";
+            return;
+        }
+
+        QJsonObject obj = jsonDoc.object();
+        message = obj["message"].toString();
+        statusCode = obj["status_code"].toInt();
+        
+        qDebug() << "Username check response: " << message << " (Status Code: " << statusCode << ")\n";
+
+        ValidatorUtils::cleanupMemory(username);
+        emit usernameAvailable(statusCode == 200);
+    });
 }
 
 void UsernameValidator::loadUsernamesFromFile() {
@@ -115,9 +161,14 @@ void UsernameValidator::loadUsernamesFromFile() {
 
 /* ==================== Get Username ==================== */
 GetUsername::GetUsername(QObject *parent) : QObject(parent) {
+    usernameValidator = new UsernameValidator(this);
+
     timer = new QTimer(this);
     timer->setSingleShot(true);
+
     connect(timer, &QTimer::timeout, this, &GetUsername::onTimeout);
+    connect(usernameValidator, &UsernameValidator::usernameAvailable, this, &GetUsername::onUsernameAvailable);
+    connect(usernameValidator, &UsernameValidator::unableToCheckUsernameAvailability, this, &GetUsername::onUnableToCheckUsernameAvailability);
 }
 
 void GetUsername::setAccountCreateObject(AccountCreate *ac) {
@@ -132,10 +183,35 @@ void GetUsername::onUsernameChanged(const QString &text) {
     timer->start(2000); 
 }
 
+void GetUsername::onUsernameAvailable(bool isAvailable) {
+    if (isAvailable) {
+        ac->usernameField()->setChecked();
+        ac->usernameField()->setTooltip("Username is available.");
+    } else {
+        ac->usernameField()->setUnchecked();
+        ac->usernameField()->setTooltip("Username is already taken.\nPlease use another.");
+    }
+    emit usernameValidated(isAvailable);
+}
+
+void GetUsername::onUnableToCheckUsernameAvailability() {
+    if (retryAttempts < 3) {
+        retryAttempts++;
+        usernameValidator->isUsernameAvailable(text);
+    } else {
+        ac->usernameField()->setUnchecked();
+        ac->usernameField()->setTooltip("Failed to check username availability.");
+        retryAttempts = 0;
+
+        ValidatorUtils::cleanupMemory(text);
+        return;
+    }
+}
+    
 void GetUsername::onTimeout() {
     if (!ac) return;
 
-    QByteArray text = ac->usernameField()->text().toUtf8();
+    text = ac->usernameField()->text().toUtf8();
 
     if (text.isEmpty()) {
         ac->usernameField()->setUnchecked();
@@ -144,19 +220,21 @@ void GetUsername::onTimeout() {
     }
 
     // Validate username
-    bool ok = usernameValidator.isValidUsername(text);
-
-    // Emit signal
-    emit usernameValidated(ok);
-    
-    // Clear sensitive memory
-    ValidatorUtils::cleanupMemory(text);
+    bool ok = usernameValidator->isValidUsername(text);
     
     if (ok) {
-        ac->usernameField()->setChecked();
-        ac->usernameField()->setTooltip("Valid username");
+        qDebug() << "Username is Valid: " << text << "\n";
+        ac->usernameField()->setTooltip("");
+        
+        usernameValidator->isUsernameAvailable(text);
     } else {
         ac->usernameField()->setUnchecked();
-        ac->usernameField()->setTooltip("Invalid username");
+        ac->usernameField()->setTooltip("Invalid username.");
+        qDebug() << "Username is not Valid: " << text << "\n";
+
+        emit usernameValidated(false); 
+        ValidatorUtils::cleanupMemory(text);
     }
+    
 }
+

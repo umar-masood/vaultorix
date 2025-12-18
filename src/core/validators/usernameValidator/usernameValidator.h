@@ -3,27 +3,37 @@
 #include "../../../ui/accountCreate/AccountCreate.h"
 #include "../validatorUtils/validatorUtils.h"
 
-#include <string>
 #include <unordered_set>
-#include <iostream>
 #include <fstream>
 
-#include <QTimer>
-#include <QString>
 #include <QRegularExpression>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
 
-class UsernameValidator {
-
+class UsernameValidator : public QObject {
+    Q_OBJECT
+    
 public:
-    UsernameValidator();
+    explicit UsernameValidator(QObject *parent = nullptr);
     bool isValidUsername(QByteArray &username);
+    void isUsernameAvailable(QByteArray &username);
 
 private:
     ValidatorUtils *vu = nullptr;
+    QNetworkAccessManager *manager = nullptr;
+
+    QString message;
+    int statusCode;
 
     std::unordered_set<std::string> tempUsernames;
     bool isUsernameBlacklisted(const std::string &username) const;
     void loadUsernamesFromFile();
+
+    signals:
+    void usernameAvailable(bool isavailable);
+    void unableToCheckUsernameAvailability();
 };
 
 class GetUsername : public QObject {
@@ -35,13 +45,18 @@ public:
 
 private:
     QTimer *timer = nullptr;
-    UsernameValidator usernameValidator;
+    UsernameValidator *usernameValidator = nullptr;
     AccountCreate *ac = nullptr;
+
+    int retryAttempts = 0;
+    QByteArray text;
 
 signals:
     void usernameValidated(bool isValid);
     
 private slots:
     void onUsernameChanged(const QString &text);
+    void onUsernameAvailable(bool isAvailable);
+    void onUnableToCheckUsernameAvailability();
     void onTimeout();
 };

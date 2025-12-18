@@ -1,6 +1,6 @@
 #include "ui/accountWindow/AccountWindow.h"
+#include "./core/accountCreationManager/accountCreationManager.h"
 #include "./ui/accountCreate/AccountCreate.h"
-#include "./core/accountCreate/accountCreationManager/accountCreationManager.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     AccountCreationManager *acm = new AccountCreationManager;
     acm->setAccountCreateObject(ac);
-
+    
     aw->show();
     return app.exec();
 }

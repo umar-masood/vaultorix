@@ -1,27 +1,11 @@
-#include "./OTPValidator.h"
-
-#include <QApplication>
-#include <QFile>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QUrl>
-#include <QTimer>
-#include <QChar>
-#include <QEventLoop>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QJsonParseError>
-#include <QDebug>
-#include <iostream>
 #include "OTPValidator.h"
 
 /* OTPValidator Implementation */
-OTPValidator::OTPValidator() {}
+OTPValidator::OTPValidator(QObject *parent) : QObject(parent) {
+    manager = new QNetworkAccessManager(this);
+}
 
-int OTPValidator::sendOTP(const QString &fullName, const QString &username, const QString &email)
-{
+int OTPValidator::sendOTP(const QString &fullName, const QString &username, const QString &email) {
     QNetworkRequest request(API_URL + "sendOtp");
     
     // Headers of Request
@@ -38,7 +22,7 @@ int OTPValidator::sendOTP(const QString &fullName, const QString &username, cons
     QJsonDocument doc(obj);
 
     // POST request of OTP
-    QNetworkReply *reply = manager.post(request, doc.toJson());
+    QNetworkReply *reply = manager->post(request, doc.toJson());
 
     // Wait until we get final response from the server
     QEventLoop loop;
@@ -47,21 +31,25 @@ int OTPValidator::sendOTP(const QString &fullName, const QString &username, cons
 
     // If there's a problem in connectivity
     if (reply->error() != QNetworkReply::NoError) {
-        std::cerr << "Failed to Send OTP. " << reply->errorString().toStdString();
+        qDebug() << "Failed to Send OTP. " << reply->errorString();
         return -1;
     }
 
     // Reading response received from the server
     QByteArray response = reply->readAll();
     QJsonDocument r = QJsonDocument::fromJson(response);
-    if (!r.isObject())
-        std::cerr << "Sending Response is Invalid.";
+
+    if (!r.isObject()) {
+        qDebug() << "Json is Invalid.";
+        return -1;
+    }
 
     // Collecting Response Data
     QJsonObject rObj = r.object();
     status_code = rObj["status_code"].toInt();
     message = rObj["message"].toString();
-    std::cerr << status_code << ",  " << message.toStdString();
+
+    qDebug() << status_code << ",  " << message;
 
     reply->deleteLater();
     return status_code;
@@ -80,14 +68,15 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
 
     QJsonDocument doc(obj);
 
-    QNetworkReply *reply = manager.post(request, doc.toJson());
+    QNetworkReply *reply = manager->post(request, doc.toJson());
     QEventLoop loop;
-    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    
+    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
 
     // If there's an error
     if (reply->error() != QNetworkReply::NoError) {
-        std::cerr << "We could not be able to verify your entered OTP at this time. " << reply->errorString().toStdString();
+        qDebug() << "Error:  " << reply->errorString();
         return false;
     }
 
@@ -96,14 +85,14 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
 
     // Make sure the response has main object for valid JSON
     if (!r.isObject()) {
-        std::cerr << "Verification Response is invalid...";
+        qDebug() << "Json is not valid";
         return false;
     }
 
     QJsonObject rObj = r.object();
     isVerified = rObj["isVerified"].toBool();
 
-    std::clog << "OTP Verified: " << isVerified;
+    qDebug() << "OTP Verified: " << isVerified;
 
     reply->deleteLater();
     return isVerified; // If the OTP is verified then it will return True otherwise False
@@ -111,7 +100,7 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
 
 /* GetOTP Implementation */
 GetOTP::GetOTP(QObject *parent) : QObject(parent) {
-    ov = new OTPValidator; // Initializing OTP Validator class
+    ov = new OTPValidator(this); // Initializing OTP Validator class
 
     timer = new QTimer(this); // Initializing OTP Timer
     connect(timer, &QTimer::timeout, this, &GetOTP::onTimeout);
@@ -152,16 +141,14 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QStr
         resendOtpWithTimer();
     
     // If max resend limit reached (HTTP 429)
-    if (status_code == 429) 
+    if (status_code == 429)  {
         emit maxLimitReached();
+        return false;
+    }
     
-    // If something went wrong
-    if (status_code == 400) 
+    // If some server error occurs
+    if (status_code == 500 || status_code == 502 || status_code == 512 || status_code == 400 || status_code == -1) {
         emit somethingWrong();
-    
-    // Any failure returns false
-    if (status_code == 500 || status_code == 502 || status_code == -1) {
-        disableControls("Verify");
         return false;
     }
 
@@ -176,9 +163,11 @@ void GetOTP::onResendClicked() {
     }
 
     // In case if we got error from server after clicking on resend button
-    if (code == 500 || code == 502 || code == -1 || code == 400)
-        disableControls("Verify");
-    
+    if (code == 500 || code == 502 || code == -1 || code == 400 || code == 512) {
+        emit somethingWrong();
+        return;
+    }
+
     // When user clicks resend, resend button will disabled and timer shows and start
     if (code == 200)
         resendOtpWithTimer();
@@ -200,7 +189,6 @@ void GetOTP::onMaxLimitReached() {
 
     if (ao && ao->messageLabel()) // Display the maximum limit reached message.
         ao->messageLabel()->setTextAnimated("Maximum limit reached. Try again after 48hrs.");
-    
 }
 
 void GetOTP::onVerifyClicked() {
@@ -219,9 +207,7 @@ void GetOTP::onVerifyClicked() {
     emit otpVerified(ok);
 }
 
-void GetOTP::onCancelClicked() {
-    QApplication::quit();
-}
+void GetOTP::onCancelClicked() { QApplication::quit(); }
 
 void GetOTP::onTimeout() {
     totalSecs--;

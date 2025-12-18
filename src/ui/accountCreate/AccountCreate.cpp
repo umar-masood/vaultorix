@@ -81,7 +81,7 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    });
 
    connect(checkbox, &CheckBox::toggled, this, [this](bool checked){
-      emit onBoxChecked(checked);
+      emit boxChecked(checked);
    });
 
    connect(this, &CheckWithBtn::themeModeChanged, this, [this](bool enable){

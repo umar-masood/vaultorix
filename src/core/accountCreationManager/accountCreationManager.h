@@ -1,11 +1,9 @@
 #pragma once
 
-#include "../../validators/emailValidator/emailValidator.h"
-#include "../../validators/usernameValidator/usernameValidator.h"
-#include "../../validators/pwdValidator/pwdValidator.h"
-#include "../../validators/nameValidator/nameValidator.h"
-#include <unordered_map>
-#include <string>
+#include "../validators/emailValidator/emailValidator.h"
+#include "../validators/usernameValidator/usernameValidator.h"
+#include "../validators/pwdValidator/pwdValidator.h"
+#include "../validators/nameValidator/nameValidator.h"
 
 class AccountCreationManager : public QObject{
     Q_OBJECT
@@ -20,7 +18,8 @@ class AccountCreationManager : public QObject{
         {"username", false},
         {"email", false},
         {"password", false},
-        {"fullName", false}
+        {"fullName", false},
+        {"acceptedTC", false}
     };
 
     AccountCreate* accountCreate = nullptr;
@@ -41,4 +40,5 @@ class AccountCreationManager : public QObject{
     void onEmailValidated(bool isValid);
     void onPwdValidated(bool isValid);
     void onValidationDone(bool isValidationDone);
+    void onTCBoxCheck(bool checked);
 };

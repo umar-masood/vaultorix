@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QVBoxLayout>
 #include "../accountOTP/OTPWidget.h"
 #include "../components/Button.h"
 #include "../components/TextField.h"

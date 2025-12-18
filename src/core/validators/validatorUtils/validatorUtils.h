@@ -1,12 +1,22 @@
 #pragma once
 
+#include <algorithm>
+#include <filesystem>
+#include <iostream>
 #include <string>
+
+#include <QFile>
+#include <QDir>
+#include <QFileInfo>
+#include <QDateTime>
+#include <QStandardPaths>
+#include <QNetworkRequest>
+#include <QTimer>
 #include <QUrl>
 #include <QByteArray>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include <QObject>
-
 
 class ValidatorUtils : public QObject
 {

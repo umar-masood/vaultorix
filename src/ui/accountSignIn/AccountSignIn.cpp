@@ -5,8 +5,8 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent)
    setAttribute(Qt::WA_TranslucentBackground);
 
    icon = new Label(true);
-   icon->setFixedSize(QSize(200, 140));
-   icon->setPixmap(QPixmap(":/icons/AccountSignIn/sign-in.png").scaled(200, 140, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   icon->setFixedSize(QSize(150, 150));
+   icon->setPixmap(QPixmap(":/icons/AccountSignIn/sign-in.png").scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation));
    icon->setScaledContents(true);
 
    heading = new Label(false, "Inter", 22, QFont::Bold, false, "Sign in to your Account");

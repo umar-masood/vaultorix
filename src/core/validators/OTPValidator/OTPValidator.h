@@ -1,22 +1,39 @@
 #pragma once
 
-#include <QObject>
-#include <QString>
-#include <QTimer>
 #include <QNetworkAccessManager>
+#include <QApplication>
+#include <QFile>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QUrl>
+#include <QTimer>
+#include <QChar>
+#include <QEventLoop>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QDebug>
+
+#include <iostream>
 #include "../../../ui/accountOTP/AccountOTP.h"
 
-class OTPValidator {
+class OTPValidator : public QObject {
+    Q_OBJECT
+
 public:
-    OTPValidator();
+    OTPValidator(QObject *parent = nullptr);
 
     int sendOTP(const QString &fullName, const QString &username, const QString &email);
     bool verifyOTP(const QString &otp, const QString &email);
 
 private:
-    QNetworkAccessManager manager;
+    QNetworkAccessManager *manager = nullptr;
+
     const QString API_URL = "https://www.umarcreations.site/";
     const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
+    
     int status_code;
     bool isVerified = false;
     QString message;

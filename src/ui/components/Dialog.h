@@ -1,14 +1,10 @@
 #pragma once
 
 #include "Button.h"
-#include <QWidget>
 #include "../windows/subWindow/SubWindow.h"
+
 #include <QScreen>
 #include <QCursor>
-#include <QColor>
-#include <QPainter>
-#include <QPainterPath>
-#include <QPaintEvent>
 #include <QShowEvent>
 #include <QResizeEvent>
 #include <QCloseEvent>
@@ -40,10 +36,10 @@ protected:
    
 private:
    void centerInParent();
+   void setup();
 
    QWidget *contentWidget = nullptr;
    Overlay *overlay = nullptr;
-   void setup();
 
    bool isDarkMode = false;
    bool setupDone = false;

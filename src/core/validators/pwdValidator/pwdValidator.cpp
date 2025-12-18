@@ -1,20 +1,20 @@
 #include "pwdValidator.h"
 
-PwdValidator::PwdValidator() {
-    vu = new ValidatorUtils(nullptr, "Password");
+PwdValidator::PwdValidator(QObject *parent) : QObject(parent) {
+    vu = new ValidatorUtils(this, "Password");
     vu->setFileName("badPwds.config");
     if (vu->downloadList(QUrl("https://raw.githubusercontent.com/umar-masood/Weak-Credentials/refs/heads/main/badPwds.config"))) 
         qDebug() << "Password blacklist downloaded started.\n";
     else
         loadPwdsFromFile();
 
-    QObject::connect(vu, &ValidatorUtils::listDownloaded, [this]() {
+    connect(vu, &ValidatorUtils::listDownloaded, this, [this]() {
         qDebug() << "Password blacklist download completed.\n";
         loadPwdsFromFile();
     });
 }
 
-bool PwdValidator::checkStrongPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules) {    
+bool PwdValidator::isValidPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules) {    
     bool hasLength = pwdBytes.size() >= 8;
     bool hasUpper = false;
     bool hasLower = false;
@@ -52,7 +52,7 @@ bool PwdValidator::checkStrongPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules
         return false; // If weak password list is not loaded, we cannot check for weak passwords
     }
 
-    bool notWeak = !isWeakPwd(pwdStd);
+    bool notWeak = !isPwdBlacklisted(pwdStd);
     ValidatorUtils::cleanupMemory(pwdStd);
 
     bool isStrongPwd = hasLength && hasUpper && hasLower && hasDigit && hasSpecial && notWeak;
@@ -61,7 +61,7 @@ bool PwdValidator::checkStrongPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules
     return isStrongPwd;
 }
 
-bool PwdValidator::isWeakPwd(const std::string &password) {
+bool PwdValidator::isPwdBlacklisted(const std::string &password) {
     auto it = cacheMap.find(password); // We make a search in the cache map to see if the password has been checked before using an iterator.
     if (it != cacheMap.end()) { // If the password is found in the cache map (means the iterator does not reached at the end of the map)
         qDebug() << "Password is already checked...";
@@ -115,14 +115,14 @@ GetPassword::GetPassword(QObject *parent) : QObject(parent) {
     timer = new QTimer(this);
     timer->setSingleShot(true);
 
-    pwdValidate = new PwdValidator;
+    pwdValidate = new PwdValidator(this);
 
     connect(timer, &QTimer::timeout, this, [this](){
         if (!ac) return;
         
         QByteArray bytes = ac->pwdField()->text().toUtf8();
         
-        bool ok = pwdValidate->checkStrongPwd(bytes, ac->pwdRulesWidget());
+        bool ok = pwdValidate->isValidPwd(bytes, ac->pwdRulesWidget());
         
         // Emit signal
         emit pwdValidated(ok);

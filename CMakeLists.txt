@@ -61,14 +61,15 @@ add_executable(Vaultorix
     src/ui/components/Seperator.cpp
 
     # Core
+    ## Validators
     src/core/validators/emailValidator/emailValidator.cpp
     src/core/validators/pwdValidator/pwdValidator.cpp
     src/core/validators/OTPValidator/OTPValidator.cpp
     src/core/validators/usernameValidator/usernameValidator.cpp
     src/core/validators/validatorUtils/validatorUtils.cpp
     src/core/validators/nameValidator/nameValidator.cpp
-
-    src/core/accountCreate/accountCreationManager/accountCreationManager.cpp
+    ## Managers
+    src/core/accountCreationManager/accountCreationManager.cpp
 
     # Entry Point of App
     src/main.cpp

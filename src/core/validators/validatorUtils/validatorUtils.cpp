@@ -1,17 +1,5 @@
 #include "./validatorUtils.h"
 
-#include <algorithm>
-#include <filesystem>
-#include <iostream>
-
-#include <QFile>
-#include <QDir>
-#include <QFileInfo>
-#include <QDateTime>
-#include <QStandardPaths>
-#include <QNetworkRequest>
-#include <QTimer>
-
 ValidatorUtils::ValidatorUtils(QObject *parent, const QString &alias) : QObject(parent), alias(alias)
 {
     manager = new QNetworkAccessManager(this);

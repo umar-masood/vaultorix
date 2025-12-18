@@ -45,7 +45,7 @@ private:
 signals:
    void themeModeChanged(bool enable);
    void onButtonClicked();
-   void onBoxChecked(bool checked);
+   void boxChecked(bool checked);
 };
 
 class AccountCreate : public QWidget
