@@ -1,7 +1,16 @@
 #include "AccountOTP.h"
 #include <QTimer>
 
-Label::Label(bool isIconic, const QString &family, int pointSize, QFont::Weight weight, bool italic, const QString &text, Qt::Alignment alignment, QWidget *parent) : QLabel(parent) {
+/* Custom Text Label (With and Without Icon)*/
+Label::Label(bool isIconic, 
+            const QString &family, 
+            int pointSize, 
+            QFont::Weight weight, 
+            bool italic, 
+            const QString &text, 
+            Qt::Alignment alignment, 
+            QWidget *parent) : QLabel(parent) {
+
    setAttribute(Qt::WA_TranslucentBackground);
    setAlignment(alignment);
 
@@ -9,6 +18,7 @@ Label::Label(bool isIconic, const QString &family, int pointSize, QFont::Weight 
    opacity->setOpacity(1.0);
    setGraphicsEffect(opacity);
 
+   // If not iconic, set the font and text
    if (!isIconic) {
       setText(text);
 
@@ -21,6 +31,7 @@ Label::Label(bool isIconic, const QString &family, int pointSize, QFont::Weight 
    }
 }
 
+// Show with Fade In Animation
 void Label::show() {
    if (!isVisible()) {
       opacity->setOpacity(0.0);
@@ -35,6 +46,7 @@ void Label::show() {
    fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+// Hide with Fade Out Animation
 void Label::hide() {
    fadeOut = new QPropertyAnimation(opacity, "opacity", this);
    fadeOut->setStartValue(1.0);
@@ -50,8 +62,8 @@ void Label::hide() {
    fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void Label::setTextAnimated(const QString &text)
-{
+// Set Text with Fade Out and Fade In Animation
+void Label::setTextAnimated(const QString &text) {
    hide();
    QTimer::singleShot(500, [this, text]() {
       QLabel::setText(text);
@@ -59,17 +71,18 @@ void Label::setTextAnimated(const QString &text)
    });
 }
 
-
-TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent)
-{
+/* Resend OTP Widget */
+TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
+   // Text 
    text = new Label(false, "Segoe UI", 10, QFont::Normal, false, "Didn`t receive the OTP?", Qt::AlignHCenter);
    text->setStyleSheet("color: black;");
    text->setParent(this);
    text->setFixedSize(136, 22);
    text->move(0,0);
    
+   // Resend Button
    button = new Button(this);
    button->setDisplayMode(Button::TextOnly);
    button->setSize(QSize(50, 12));
@@ -82,6 +95,7 @@ TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent)
       emit onButtonClicked();
    });
 
+   // Timer Label
    timer = new Label(false, "Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
    timer->setStyleSheet("color: black;");
    timer->setParent(this);
@@ -91,41 +105,48 @@ TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent)
    setFixedSize(QSize(text->width() + button->width() + timer->width() + 2, 18));
 }
 
-Label* TextWithBtn::label() const { return text; }
-
-Button * TextWithBtn::btn() const { return button; }
-
+// Getters of Resend OTP Widget
+Label* TextWithBtn::textLabel() const { return text; }
+Button * TextWithBtn::resendButton() const { return button; }
 Label *TextWithBtn::timerLabel() const { return timer; }
 
+/* AccountOTP Main Widget Implementation */
 AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
+   // Main Icon of OTP at the top
    icon = new Label(true);
    icon->setFixedSize(QSize(106, 106));
    icon->setPixmap(QPixmap(":/icons/AccountOTP/otp.png").scaled(106, 106, Qt::KeepAspectRatio, Qt::SmoothTransformation));
    icon->setScaledContents(true);
 
+   // Main Heading
    heading = new Label(false, "Inter", 22, QFont::Bold, false, "Verify with OTP");
    heading->setStyleSheet("color: black;");
    
+   // Text Under Main Heading
    text = new Label(false, "Segoe UI", 10, QFont::Medium, false);
    text->setWordWrap(true);
    text->setStyleSheet("color: #8D8D8D;");
    text->setFixedWidth(324);
    connect(this, &AccountOTP::emailEntered, this, &AccountOTP::onEmailEntered);
 
+   // OTP Widget (Contains 6 input boxes)
    otpWidget = new OTPWidget;
 
+   // Message Label (For displaying error messages)
    message = new Label(false, "Segoe UI", 10, QFont::Medium, false);
    message->setWordWrap(true);
-   message->setStyleSheet("color: red;");
+   message->setStyleSheet("color: #FF0000;");
    message->setFixedWidth(324);
 
+   // Resend OTP Widget (Resend Text + Button + Timer)
    resendOtp = new TextWithBtn;
    connect(resendOtp, &TextWithBtn::onButtonClicked, this, [this](){
       emit resendClicked();
    });
 
+   // Verify Button
    verify = new Button("Verify");
    verify->setDisplayMode(Button::TextOnly);
    verify->setSize(QSize(360, 36));
@@ -136,6 +157,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
       emit verifyClicked();
    });
 
+   // Cancel Button
    cancel = new Button("Cancel");
    cancel->setDisplayMode(Button::TextOnly);
    cancel->setSecondary(true);
@@ -145,6 +167,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
       emit cancelClicked();
    });
 
+   // Main Layout
    layout = new QVBoxLayout(this);
    layout->setSpacing(0);
    layout->addWidget(icon, 0, Qt::AlignHCenter);
@@ -168,27 +191,17 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    connect(this, &AccountOTP::themeModeChanged, this, &AccountOTP::onThemeModeChanged);
 }
 
+// Getters of AccountOTP Main Widget
+OTPWidget* AccountOTP::OTP() const { return otpWidget; } // Return OTP Widget (for retrieving entered OTP) in backend
+Button* AccountOTP::verifyBtn() const { return verify; } // Return Verify Button for updating its properties in backend
+TextWithBtn* AccountOTP::resendOtpWidget() const { return resendOtp;} // Return Resend OTP Widget for updating its properties in backend
+Label* AccountOTP::messageLabel() const { return message; } // Return Message Label for displaying error messages in backend
+
 void AccountOTP::onEmailEntered(const QString &email) {
    QString e = email;
    int idx = e.indexOf('@');
    if (idx > 3) for (int i = 3; i < idx; i++)  e[i] = '*';
    text->setText(QString("To ensure your security, please enter the One-Time Password (OTP) sent to your registered email-address (%1) below.").arg(e));
-}
-
-OTPWidget* AccountOTP::OTP() const {
-   return otpWidget;
-}
-
-Button *AccountOTP::verifyBtn() const {
-   return verify;
-}
-
-TextWithBtn *AccountOTP::resendOtpWidget() const {
-   return resendOtp;
-}
-
-Label *AccountOTP::messageLabel() const {
-   return message;
 }
 
 void AccountOTP::setEmail(const QString &email) {
@@ -206,7 +219,7 @@ void AccountOTP::onThemeModeChanged(bool enable) {
    if (heading) heading->setStyleSheet(QString("color: %1;").arg(enable ? "white" : "black"));
    if (cancel) cancel->setDarkMode(enable);
    if (resendOtp) {
-      resendOtp->label()->setStyleSheet(QString("color: %1").arg(enable ? "white" : "black")); 
+      resendOtp->textLabel()->setStyleSheet(QString("color: %1").arg(enable ? "white" : "black")); 
       resendOtp->timerLabel()->setStyleSheet(QString("color: %1").arg(enable ? "white" : "black")); 
    } 
    if (otpWidget) otpWidget->setDarkMode(enable);
