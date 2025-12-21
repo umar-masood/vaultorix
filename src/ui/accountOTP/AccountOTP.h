@@ -35,8 +35,8 @@ class TextWithBtn : public QWidget {
    public:
    explicit TextWithBtn(QWidget *parent = nullptr);
    
-   Label* label() const;
-   Button* btn() const;
+   Label* textLabel() const;
+   Button* resendButton() const;
    Label* timerLabel() const;
 
    private:
