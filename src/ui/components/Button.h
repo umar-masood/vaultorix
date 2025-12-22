@@ -1,6 +1,8 @@
 #pragma once 
-#include <QPushButton>
 #include "SmoothShadow.h"
+#include "SpinnerProgress.h"
+
+#include <QPushButton>
 #include <QPropertyAnimation>
 #include <QPainter>
 #include <QPainterPath>
@@ -49,6 +51,8 @@ public:
   void setHoverGradientColor(const QString &hex);
   void setStartColor(const QColor &c);
   void setEndColor(const QColor &c);
+  void setLoaderButton(bool value);
+  void setText(const QString &text);
 
   protected:
   void paintEvent(QPaintEvent *event) override;
@@ -71,7 +75,8 @@ private:
   bool isHyperLink = false;
   bool isBold = false;
   bool isItalic = false;
-
+  bool isLoaderBtn = false;
+  
   bool isDisabledState() const;
   bool isHoverState() const;
   bool isNormalState() const;
@@ -117,4 +122,7 @@ private:
   // Font 
   QString fontFamily = "Segoe UI";
   int fontSize = 11;
+
+  // Loader
+  SpinnerProgress *spinner = nullptr;
 };

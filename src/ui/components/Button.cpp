@@ -20,6 +20,11 @@ void Button::init() {
   animate = new QPropertyAnimation(effect, "blurRadius", this);
   animate->setDuration(300);
   animate->setEasingCurve(QEasingCurve::InOutQuad);
+
+  // Loader Spinner
+  spinner = new SpinnerProgress(this);
+  spinner->setIndeterminate(true);
+  spinner->setSize(QSize(20, 20), true);
 }
 
 void Button::setShadow(bool value) {
@@ -97,7 +102,12 @@ void Button::setSize(QSize s) {
   update();
 }
 
-void Button::setDarkMode(bool value) { isDarkMode = value; }
+void Button::setDarkMode(bool value) { 
+  isDarkMode = value; 
+  if (isLoaderBtn && spinner) 
+    spinner->setDarkMode(value); 
+}
+
 void Button::setSecondary(bool value) { isSecondary = value; }
 
 bool Button::isDisabledState() const { return !isEnabled(); }
@@ -109,6 +119,21 @@ bool Button::isIconOnly() const { return displayMode == IconOnly; }
 void Button::setHoverGradientColor(const QString &hex) { hoverColor = QColor(hex); }
 void Button::setStartColor(const QColor &c) { color1 = c.name(); update(); }
 void Button::setEndColor(const QColor &c) { color2 = c.name(); update(); }
+
+void Button::setLoaderButton(bool value) { isLoaderBtn = value; }
+
+void Button::setText(const QString &text) {
+  if (isLoaderBtn && spinner) {
+    if (text.isEmpty()) {
+      spinner->start();
+      spinner->move((width() - spinner->width()) / 2, (height() - spinner->height()) / 2);
+    } else {
+      spinner->stop();
+    }
+  }
+
+  QPushButton::setText(text);
+}
 
 QColor Button::getStartColor() const { return QColor(color1); }
 QColor Button::getEndColor() const { return QColor(color2); }
