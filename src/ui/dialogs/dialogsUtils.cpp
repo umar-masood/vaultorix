@@ -1,17 +1,18 @@
 #include "dialogsUtils.h"
 
 namespace DialogUtils {
-    const QSize noInternetDialogSize = QSize(342, 330);
-    const QSize wrongCredentialsDialogSize = QSize(342, 330);
-    const QSize noRegDeviceAccDialogSize = QSize(342, 300);
+    const QSize dialogSize = QSize(342, 320);
+    const QSize illustrationSize = QSize(200, 200);
 
-    const QSize illustrationSize = QSize(230, 160);
-
-    const QString noInternet = ":/icons/Dialogs/noInternet.png";
-    const QString wrongCredentials = ":/icons/Dialogs/wrongCredentials.png";
-    const QString noRegDeviceAcc = ":/icons/Dialogs/noRegDeviceAcc.png";
+    const QString noInternetIcon = ":/icons/Dialogs/noInternet.png";
+    const QString wrongCredentialsIcon = ":/icons/Dialogs/wrongCredentials.png";
+    const QString unknownDeviceIcon = ":/icons/Dialogs/unknownDevice.png";
+    const QString somethingWentWrongIcon = ":/icons/Dialogs/somethingWentWrong.png";
+    const QString maxAttemptsIcon = ":/icons/Dialogs/maxLimitReached.png";
 
     const QString noInternetText = "You're offline. We couldn't connect to the internet. Check your connection and try again.";
     const QString wrongCredentialsText = "The email or password you entered is incorrect. Please try again.";
-    const QString noRegDeviceAccText = "This account is linked to another device and can't be used here for security reasons.";
+    const QString unknownDeviceText = "This account is linked to another device and can't be used here for security reasons.";
+    const QString somethingWentWrongText = "Something went wrong. Please try again.";
+    const QString maxAttemptsText = "Maximum invalid sign-in attempts limit reached. Please try again after 24 hours.";
 };

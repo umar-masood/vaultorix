@@ -13,6 +13,7 @@ class AccountSignIn : public QWidget {
    Q_INVOKABLE void setDarkMode(bool value);
    TextField* usernameField() const;
    TextField* pwdField() const;
+   Button* signInButton() const;
 
    private:
    bool isDarkMode = false;
@@ -31,7 +32,7 @@ class AccountSignIn : public QWidget {
    QVBoxLayout *layout = nullptr;
 
    signals:
-   void onForgotPwdClicked();
-   void onSignInClicked();
-   void onCancelClicked();
+   void forgotPwdClicked();
+   void signInClicked();
+   void cancelClicked();
 };

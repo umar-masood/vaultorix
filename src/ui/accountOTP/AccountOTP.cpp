@@ -177,7 +177,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    layout->addWidget(text, 0, Qt::AlignHCenter);
    layout->addSpacing(20);
    layout->addWidget(otpWidget, 0, Qt::AlignHCenter);
-   layout->addSpacing(8);
+   layout->addSpacing(10);
    layout->addWidget(message, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
    layout->addWidget(resendOtp, 0, Qt::AlignHCenter);
@@ -200,7 +200,9 @@ Label* AccountOTP::messageLabel() const { return message; } // Return Message La
 void AccountOTP::onEmailEntered(const QString &email) {
    QString e = email;
    int idx = e.indexOf('@');
-   if (idx > 3) for (int i = 3; i < idx; i++)  e[i] = '*';
+   if (idx > 3) 
+      for (int i = 3; i < idx; i++)  
+         e[i] = '*';
    text->setText(QString("To ensure your security, please enter the One-Time Password (OTP) sent to your registered email-address (%1) below.").arg(e));
 }
 

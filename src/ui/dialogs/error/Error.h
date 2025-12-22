@@ -1,11 +1,5 @@
 #pragma once
 
-#include <QWidget>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QPixmap>
-#include <QSize>
-
 #include "../../windows/subWindow/SubWindow.h"
 #include "../../components/Button.h"
 #include "../../components/Text.h"

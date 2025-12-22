@@ -1,7 +1,6 @@
 #include "AccountSignIn.h"
 
-AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent)
-{
+AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
    icon = new Label(true);
@@ -39,7 +38,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent)
    forgotPwd->setFontProperties("Segoe UI", 10, false, false);
    forgotPwd->setHyperLinkColors("#008EDE", "#15F2FF");
    connect(forgotPwd, &Button::clicked, this, [this](){
-      emit onForgotPwdClicked();
+      emit forgotPwdClicked();
    });
 
    signIn = new Button("Sign in");
@@ -49,7 +48,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent)
    signIn->setHoverGradientColor("#008EDE");
    signIn->setFontProperties("Segoe UI", 11, true, false);
    connect(signIn, &Button::clicked, this, [this](){
-      emit onSignInClicked();
+      emit signInClicked();
    });
 
    cancel = new Button("Cancel");
@@ -58,7 +57,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent)
    cancel->setSize(QSize(360, 36));
    cancel->setFontProperties("Segoe UI", 11, true, false);
    connect(cancel, &Button::clicked, this, [this](){
-      emit onCancelClicked();
+      emit cancelClicked();
    });
 
    layout = new QVBoxLayout(this);
@@ -84,8 +83,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent)
    setDarkMode(false);
 }
 
-void AccountSignIn::setDarkMode(bool value)
-{
+void AccountSignIn::setDarkMode(bool value) {
    isDarkMode = value;
    
    if (heading) heading->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
@@ -105,12 +103,14 @@ void AccountSignIn::setDarkMode(bool value)
    }
 }
 
-TextField *AccountSignIn::usernameField() const
-{
+TextField *AccountSignIn::usernameField() const {
    return username;
 }
 
-TextField *AccountSignIn::pwdField() const
-{
+TextField *AccountSignIn::pwdField() const {
    return pwd;
 }
+
+Button* AccountSignIn::signInButton() const {
+   return signIn;
+}  

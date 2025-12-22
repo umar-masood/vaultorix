@@ -7,7 +7,7 @@ Error::Error(QSize widgetSize, const QString &text, const QString &illustrationL
 
     layout = new QVBoxLayout(this);
     layout->setSpacing(0);
-    layout->setContentsMargins(10, 16, 10, 10);
+    //layout->setContentsMargins(10, 16, 10, 10);
 
     // Action Button
     actionBtn = new Button;
@@ -33,12 +33,13 @@ Error::Error(QSize widgetSize, const QString &text, const QString &illustrationL
     }
 
     layout->addStretch();
+    layout->addSpacing(4);
     layout->addWidget(illustration, 0, Qt::AlignCenter);
-    layout->addSpacing(24);
+    layout->addSpacing(16);
 
     if (textWidget) {
         layout->addWidget(textWidget, 0, Qt::AlignCenter);
-        layout->addSpacing(24);
+        layout->addSpacing(16);
     }
 
     layout->addWidget(actionBtn, 0, Qt::AlignCenter);

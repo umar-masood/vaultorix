@@ -70,6 +70,7 @@ add_executable(Vaultorix
     src/core/validators/nameValidator/nameValidator.cpp
     ## Managers
     src/core/accountCreationManager/accountCreationManager.cpp
+    src/core/accountSignInManager/accountSignInManager.cpp
 
     # Entry Point of App
     src/main.cpp

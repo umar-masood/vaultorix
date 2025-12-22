@@ -1,19 +1,12 @@
+<!DOCTYPE RCC>
 <RCC>
-    <qresource prefix="/">
-
-    <!-- Account Create Icons -->
+  <qresource prefix="/">
     <file>icons/AccountCreate/checked.svg</file>
     <file>icons/AccountCreate/unchecked.svg</file>
-
-    <!-- Account OTP Icons -->
     <file>icons/AccountOTP/otp.png</file>
-
-    <!-- Account Sign In Icons -->
     <file>icons/AccountSignIn/password.svg</file>
     <file>icons/AccountSignIn/sign-in.png</file>
     <file>icons/AccountSignIn/user.svg</file>
-
-    <!-- Branding Icons -->
     <file>icons/AppBranding/2FA.svg</file>
     <file>icons/AppBranding/app-icon.png</file>
     <file>icons/AppBranding/backup.svg</file>
@@ -21,8 +14,6 @@
     <file>icons/AppBranding/illustration.png</file>
     <file>icons/AppBranding/lock.svg</file>
     <file>icons/AppBranding/timer.svg</file>
-
-    <!-- Components Icons -->
     <file>icons/ComponentsIcons/arrow-down.svg</file>
     <file>icons/ComponentsIcons/arrow-right.svg</file>
     <file>icons/ComponentsIcons/checkbox.png</file>
@@ -36,18 +27,13 @@
     <file>icons/ComponentsIcons/select-all.svg</file>
     <file>icons/ComponentsIcons/undo.svg</file>
     <file>icons/ComponentsIcons/x.svg</file>
-
-    <!-- Terms & Conditions -->
     <file>terms/termsConds.html</file>
-    
-    <!-- Account Window -->
     <file>icons/AccountWindow/darkMode.svg</file>
     <file>icons/AccountWindow/lightMode.svg</file>
-
-    <!-- Dailogs -->
     <file>icons/Dialogs/noInternet.png</file>
-    <file>icons/Dialogs/noRegDeviceAcc.png</file>
+    <file>icons/Dialogs/unknownDevice.png</file>
     <file>icons/Dialogs/wrongCredentials.png</file>
-
-    </qresource>
+    <file>icons/Dialogs/somethingWentWrong.png</file>
+    <file>icons/Dialogs/maxLimitReached.png</file>
+  </qresource>
 </RCC>

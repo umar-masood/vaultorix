@@ -55,6 +55,20 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
+ Error *nI = new Error(DialogUtils::wrongCredentialsDialogSize, DialogUtils::wrongCredentialsText, DialogUtils::wrongCredentials, DialogUtils::wrongCredentials, DialogUtils::illustrationSize);
+
+    Dialog *dialog = new Dialog(nI, aw->subWindow(), false);
+
+    aw->setSubWidgets({nI, dialog});
+
+    QObject::connect(ac->termsCondsBtn(), &CheckWithBtn::onButtonClicked, [dialog](){
+        dialog->show();
+    });
+
+    
+    QObject::connect(nI->actionButton(), &Button::pressed, [aw,dialog](){
+       dialog->close();
+    });
 
 
 //int main(int argc, char *argv[])

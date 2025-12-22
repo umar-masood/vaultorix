@@ -3,17 +3,18 @@
 #include <QString>
 
 namespace DialogUtils {
-    extern const QSize noInternetDialogSize;
-    extern const QSize wrongCredentialsDialogSize;
-    extern const QSize noRegDeviceAccDialogSize;
-
+    extern const QSize dialogSize;
     extern const QSize illustrationSize;
 
-    extern const QString noInternet;    
-    extern const QString wrongCredentials;
-    extern const QString noRegDeviceAcc;
+    extern const QString noInternetIcon;    
+    extern const QString wrongCredentialsIcon;
+    extern const QString unknownDeviceIcon;
+    extern const QString somethingWentWrongIcon;
+    extern const QString maxAttemptsIcon;
 
     extern const QString noInternetText;
     extern const QString wrongCredentialsText;
-    extern const QString noRegDeviceAccText;
+    extern const QString unknownDeviceText;
+    extern const QString maxAttemptsText;
+    extern const QString somethingWentWrongText;
 };
