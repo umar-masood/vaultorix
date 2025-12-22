@@ -47,6 +47,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    signIn->setGradientColor(true, "#008EDE", "#15F2FF");
    signIn->setHoverGradientColor("#008EDE");
    signIn->setFontProperties("Segoe UI", 11, true, false);
+   signIn->setLoaderButton(true);
    connect(signIn, &Button::clicked, this, [this](){
       emit signInClicked();
    });

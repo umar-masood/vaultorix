@@ -52,7 +52,7 @@ class AccountSignInManager : public QObject {
     void verifyCredentials();
     void updateSignInBtnState(bool isEnabled, QString text);
 
-    signals:
+signals:
     void verifiedCredentials();
     void maxLimitReached();
     void somethingWentWrong();
@@ -60,7 +60,7 @@ class AccountSignInManager : public QObject {
 
     private slots:
     void onSignInClicked();
-    void onCancelClicked();
+    void onCancelClicked() const;
     void onVerifiedCredentials();
     void onMaxLimitReached();
     void onSomethingWentWrong();

@@ -53,13 +53,16 @@ void AccountSignInManager::verifyCredentials() {
     request.setRawHeader("Accept", "application/json");
     request.setRawHeader("api_key", API_KEY.toUtf8());
 
+    // Json data preparation
     QJsonObject mainObj;
     mainObj["username"] = QString::fromUtf8(this->username);
     mainObj["password"] = QString::fromUtf8(this->password);
 
+    // Cleaning Memory
     ValidatorUtils::cleanupMemory(this->username);
     ValidatorUtils::cleanupMemory(this->password);
 
+    // Sending prepared json in post request
     QJsonDocument doc(mainObj);
     QNetworkReply *reply = manager->post(request, doc.toJson());
 
@@ -96,10 +99,10 @@ void AccountSignInManager::verifyCredentials() {
             return;
         }
 
+        // Reading Response from the server
         QJsonObject obj = jsonDoc.object();
         message = obj["message"].toString();
         statusCode = obj["status_code"].toInt();
-        
         qDebug() << "Verification response: " << message << " (Status Code: " << statusCode << ")\n";
 
         if (statusCode == 403)
@@ -113,13 +116,13 @@ void AccountSignInManager::verifyCredentials() {
     });
 }
 
-void AccountSignInManager::onCancelClicked() {
-    QApplication::quit();
-}
+void AccountSignInManager::onCancelClicked() const { QApplication::quit(); }
 
 void AccountSignInManager::onVerifiedCredentials() {
     qDebug() << "Credentials are verified." << "\n";
     updateSignInBtnState(false, "Signed In");
+    as->usernameField()->setText("");
+    as->pwdField()->setText("");
 }
 
 void AccountSignInManager::onMaxLimitReached() {
@@ -127,7 +130,6 @@ void AccountSignInManager::onMaxLimitReached() {
     if (maxAttemptsErrorDialog)
         maxAttemptsErrorDialog->show();
     updateSignInBtnState(false, "Sign In");
-
 }
 
 void AccountSignInManager::onSomethingWentWrong() {
@@ -163,13 +165,13 @@ void AccountSignInManager::onSignInClicked() {
     if (!this->as) 
         return;
 
-    this->username = as->usernameField()->text().toUtf8();
-    this->password = as->pwdField()->text().toUtf8();
+    this->username = as->usernameField()->text().toUtf8(); // Getting username from UI
+    this->password = as->pwdField()->text().toUtf8(); // Getting password from UI
 
     if (this->username.isEmpty() || this->password.isEmpty())
         return;
 
-    updateSignInBtnState(false, "Signing In...");
+    updateSignInBtnState(false, "");
     verifyCredentials();
 }
 
