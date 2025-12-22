@@ -24,7 +24,7 @@ public:
    void stop();
    void setText(const QString &text);
    void setDarkMode(bool value);
-   void setSize(QSize s);
+   void setSize(QSize s, bool forButton = false);
    void setIndeterminate(bool value);
    void setValue(int value);
    int getValue() const;
@@ -42,6 +42,7 @@ private:
 
    bool isDarkMode = false;
    bool isIndeterminate = false;
+   bool isButtonMode = false;
 
    int angle = 0;
    int minimum = 0;
