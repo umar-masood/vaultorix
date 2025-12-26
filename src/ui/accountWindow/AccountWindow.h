@@ -5,66 +5,68 @@
 #include "../components/Button.h"
 #include "../components/Dialog.h"
 #include "../components/Seperator.h"
+
 #include <QVBoxLayout>
 #include <QFont>
 #include <QFontMetrics>
 #include <QVector>
+#include <QLabel>
 
 /* ---------------- Branding Widget ---------------- */
-class Branding : public QWidget
-{
+class Branding : public QWidget {
    Q_OBJECT
-public:
+
+   public:
    explicit Branding(QWidget *parent = nullptr);
 
-protected:
+   protected:
    void paintEvent(QPaintEvent *event) override;
 
-private:
+   private:
    QPixmap logo;
 };
 
 /* ---------------- BulletPoint Widget ---------------- */
-class BulletPoint : public QLabel
-{
+class BulletPoint : public QLabel {
    Q_OBJECT
-public:
+
+   public:
    explicit BulletPoint(const QString &text, const QString &iconPath, QWidget *parent = nullptr);
 
-protected:
+   protected:
    void paintEvent(QPaintEvent *event) override;
 
-private:
+   private:
    QFont font() const;
    QPixmap icon;
    QString text;
 };
 
 /* ---------------- AccountWindow ---------------- */
-class AccountWindow : public QObject
-{
+class AccountWindow : public QObject {
    Q_OBJECT
-public:
+
+   public:
    explicit AccountWindow(QWidget *rightWidget = nullptr, QObject *parent = nullptr, const QVector<QWidget *> &dialogs = {});
 
    void setDarkMode(bool value);
-   SubWindow *subWindow() const;
    void setRightWidget(QWidget *rightWidget);
-   void init();
    void setSubWidgets(const QVector<QWidget *> subWidgets = {});
    void show();
+   SubWindow *subWindow() const;
 
    signals:
    void themeModeChanged(bool enable);
 
-private slots:
+   private slots:
    void onthemeModeChanged(bool enable);
 
-private:
+   private:
+   void init();
+
    bool isDarkMode = false;
 
    SubWindow *w = nullptr;
-
    QWidget *rightWidget = nullptr;
 
    QVBoxLayout *entireLayoutRight = nullptr;

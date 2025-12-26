@@ -1,15 +1,13 @@
 #include "AccountWindow.h"
 
 /* ---------------- Branding ---------------- */
-Branding::Branding(QWidget *parent) : QWidget(parent)
-{
+Branding::Branding(QWidget *parent) : QWidget(parent) {
    setFixedSize(QSize(220, 60));
    setAttribute(Qt::WA_TranslucentBackground);
    logo = QPixmap(":/icons/AppBranding/app-icon.png").scaled(54, 50, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 }
 
-void Branding::paintEvent(QPaintEvent *)
-{
+void Branding::paintEvent(QPaintEvent *) {
    QPainter painter(this);
    painter.setRenderHints(QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
    painter.drawPixmap(2, 2, logo);
@@ -33,21 +31,18 @@ void Branding::paintEvent(QPaintEvent *)
 }
 
 /* ---------------- Bullet Point ---------------- */
-BulletPoint::BulletPoint(const QString &text, const QString &iconPath, QWidget *parent) : QLabel(parent), text(text)
-{
+BulletPoint::BulletPoint(const QString &text, const QString &iconPath, QWidget *parent) : QLabel(parent), text(text) {
    setAttribute(Qt::WA_TranslucentBackground);
    icon = QPixmap(iconPath).scaled(22, 22, Qt::KeepAspectRatio, Qt::SmoothTransformation);
    setFixedSize(22 + 12 + QFontMetrics(font()).horizontalAdvance(text), 22);
 }
 
-void BulletPoint::paintEvent(QPaintEvent *)
-{
+void BulletPoint::paintEvent(QPaintEvent *) {
    QPainter painter(this);
    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 
    QRect rec(0, 1, 20, 20);
-   if (!icon.isNull())
-   {
+   if (!icon.isNull()) {
       int xPos = rec.x() + (rec.width() - icon.width()) / 2;
       int yPos = rec.y() + (rec.height() - icon.height()) / 2;
       painter.drawPixmap(xPos, yPos, icon);
@@ -60,8 +55,7 @@ void BulletPoint::paintEvent(QPaintEvent *)
    painter.drawText(textRec, Qt::AlignVCenter | Qt::AlignLeft, text);
 }
 
-QFont BulletPoint::font() const
-{
+QFont BulletPoint::font() const {
    QFont fnt;
    fnt.setPixelSize(16);
    fnt.setFamily("Segoe UI");
@@ -70,26 +64,18 @@ QFont BulletPoint::font() const
 }
 
 /* ---------------- Account Window ---------------- */
-AccountWindow::AccountWindow(QWidget *rightWidget, QObject *parent, const QVector<QWidget *> &subWidgets) : QObject(parent), rightWidget(rightWidget)
-{
-   if (rightWidget != nullptr) {
+AccountWindow::AccountWindow(QWidget *rightWidget, QObject *parent, const QVector<QWidget *> &subWidgets) : QObject(parent), rightWidget(rightWidget) {
+   if (rightWidget != nullptr)
       init();
-   }
 }
 
-void AccountWindow::setDarkMode(bool value)
-{
+void AccountWindow::setDarkMode(bool value) {
    isDarkMode = value;
    emit themeModeChanged(isDarkMode);
 }
 
-SubWindow *AccountWindow::subWindow() const
-{
-   return w;
-}
-
-void AccountWindow::setRightWidget(QWidget *rightWidget)
-{
+SubWindow *AccountWindow::subWindow() const { return w; }
+void AccountWindow::setRightWidget(QWidget *rightWidget) {
    if (rightWidget) {
       this->rightWidget = rightWidget;
       init();
@@ -111,7 +97,7 @@ void AccountWindow::init() {
    themeMode->setSecondary(true);
    themeMode->setIconSize(QSize(16,16));
    themeMode->setDisplayMode(Button::IconOnly);
-   themeMode->setSize(QSize(26, 26));
+   themeMode->setFixedSize(QSize(26, 26));
    themeMode->setIconPaths(lightModeIcon, lightModeIcon);
 
    // Seperator 
@@ -164,8 +150,7 @@ void AccountWindow::init() {
    entireLayoutLeft->addWidget(mainPoint, 0);
    entireLayoutLeft->addSpacing(16);
 
-   for (int i = 0; i < points.size(); ++i)
-   {
+   for (int i = 0; i < points.size(); ++i) {
       entireLayoutLeft->addWidget(points[i], 0);
       if (i < points.size() - 1)
          entireLayoutLeft->addSpacing(16);
@@ -210,6 +195,4 @@ void AccountWindow::onthemeModeChanged(bool enable) {
       QMetaObject::invokeMethod(subWidget, "setDarkMode", Q_ARG(bool, enable));
 }
 
-void AccountWindow::setSubWidgets(const QVector<QWidget *> subWidgets) {
-   this->subWidgets = subWidgets;
-}
+void AccountWindow::setSubWidgets(const QVector<QWidget *> subWidgets) { this->subWidgets = subWidgets; }
