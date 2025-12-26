@@ -69,7 +69,7 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    _button = new Button;
    _button->setParent(this);
    _button->setDisplayMode(Button::TextOnly);
-   _button->setSize(QSize(160, 12));
+   _button->setFixedSize(QSize(160, 12));
    _button->setHyperLink(true);
    _button->setText("Terms & Conditions");
    _button->setFontProperties("Segoe UI", 10, false, false);
@@ -161,7 +161,7 @@ AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent) {
 
    createAccBtn = new Button;
    createAccBtn->setDisplayMode(Button::TextOnly);
-   createAccBtn->setSize(QSize(360, 36));
+   createAccBtn->setFixedSize(QSize(360, 36));
    createAccBtn->setGradientColor(true, "#008EDE", "#15F2FF");
    createAccBtn->setHoverGradientColor("#008EDE");
    createAccBtn->setText("Create Account");
@@ -226,7 +226,7 @@ CheckWithBtn *AccountCreate::termsCondsBtn() const {
 CustomTextField *AccountCreate::Field(const QString &placeholderText, bool useCheck) {
    auto *field = new CustomTextField(useCheck);
    field->setPlaceholderText(placeholderText);
-   field->setSize(QSize(360, 36));
+   field->setFixedSize(QSize(360, 36));
    return field;
 }
 

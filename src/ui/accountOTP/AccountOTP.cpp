@@ -85,7 +85,7 @@ TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent) {
    // Resend Button
    button = new Button(this);
    button->setDisplayMode(Button::TextOnly);
-   button->setSize(QSize(50, 12));
+   button->setFixedSize(QSize(50, 12));
    button->setHyperLink(true);
    button->setText("Resend");
    button->setFontProperties("Segoe UI", 10, false, false);
@@ -149,7 +149,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    // Verify Button
    verify = new Button("Verify");
    verify->setDisplayMode(Button::TextOnly);
-   verify->setSize(QSize(360, 36));
+   verify->setFixedSize(QSize(360, 36));
    verify->setGradientColor(true, "#008EDE", "#15F2FF");
    verify->setHoverGradientColor("#008EDE");
    verify->setFontProperties("Segoe UI", 11, true, false);
@@ -161,7 +161,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    cancel = new Button("Cancel");
    cancel->setDisplayMode(Button::TextOnly);
    cancel->setSecondary(true);
-   cancel->setSize(QSize(360, 36));
+   cancel->setFixedSize(QSize(360, 36));
    cancel->setFontProperties("Segoe UI", 11, true, false);
    connect(cancel, &Button::clicked, this, [this](){
       emit cancelClicked();
