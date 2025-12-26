@@ -1,10 +1,11 @@
 #pragma once
-#include <QtWidgets>
 #include "../../components/Button.h"
+
 #include <dwmapi.h>
 #include <windowsx.h>
 #include <windows.h>
 #include <QWindow>
+#include <QVBoxLayout>
 
 class SubWindow : public QWidget {
     Q_OBJECT
@@ -18,9 +19,6 @@ public:
     QWidget* contentArea() const;
     QWidget* titleBarArea() const;
 
-    void onCloseClicked();
-    void onMinimizedClicked();
-   
 protected: 
     void paintEvent(QPaintEvent *event) override;
     bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
@@ -29,23 +27,33 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
 
+private slots:
+    void onCloseClicked();
+    void onMinimizedClicked();
+
 private:
-    HWND hwnd;
     void applyDWMEffects();
     void applyThemedIcons();
     void setupTitleBar();
-    bool m_dragging = false;
-    QPoint m_dragStartPos;
     Button* windowButton();
 
+    // Window Handle (Unique Identifier)
+    HWND hwnd;
+
+    // Dragging
+    bool m_dragging = false;
+    QPoint m_dragStartPos;
+
+    // Window Controls
     Button *closeBtn = nullptr;
     Button *minimizeBtn = nullptr;
-
-    bool isDarkMode = false;
     bool hasCloseBtn = true;
     bool hasMinimizeBtn = false;
 
+    // Theme Mode
+    bool isDarkMode = false;
+
     QWidget *titleBar = nullptr;
-    QWidget *_contentArea = nullptr;
+    QWidget *contentAreaWidget = nullptr;
     QVBoxLayout *entireLayout = nullptr;
 };

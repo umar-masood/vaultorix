@@ -109,13 +109,8 @@ void ToolTip::onTextEntered(const QString &text) {
     tooltipWidget->setText(text);
 }
 
-void ToolTip::onTimeout() {
-  showToolTip();
-}
-
-void ToolTip::setText(const QString &text){
-  emit textEntered(text);
-}
+void ToolTip::onTimeout() { showToolTip(); }
+void ToolTip::setText(const QString &text){ emit textEntered(text); }
 
 void ToolTip::showToolTip() {
   if (tooltipWidget) {
@@ -124,10 +119,7 @@ void ToolTip::showToolTip() {
   }
 }
 
-void ToolTip::setDarkMode(bool isDarkMode) {
-  emit themeModeChanged(isDarkMode);
-}
-
+void ToolTip::setDarkMode(bool isDarkMode) { emit themeModeChanged(isDarkMode); }
 void ToolTip::setTargetWidget(QWidget *target) {
   if (this->target) 
     this->target->removeEventFilter(this);
@@ -146,7 +138,6 @@ void ToolTip::setTargetWidget(QWidget *target) {
 void ToolTip::onThemeModeChanged(bool enable) {
   if (tooltipWidget) 
     tooltipWidget->setDarkMode(enable);
-  
 }
 
 void ToolTip::hide() {

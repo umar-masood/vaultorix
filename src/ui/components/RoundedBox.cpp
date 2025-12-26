@@ -22,9 +22,7 @@ void RoundedBox::setText(const QString &text) {
     update();
 }
 
-void RoundedBox::updateSizeForText() {
-    resize(sizeHint());
-}
+void RoundedBox::updateSizeForText() { resize(sizeHint()); }
 
 QSize RoundedBox::sizeHint() const {
     QFont font;
@@ -37,8 +35,7 @@ QSize RoundedBox::sizeHint() const {
     return QSize(s.width() + 24, s.height() + 12);
 }
 
-void RoundedBox::paintEvent(QPaintEvent *event)
-{
+void RoundedBox::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
 
     // Colors

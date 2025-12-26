@@ -1,32 +1,18 @@
 #include "TextField.h"
 
-TextField::TextField(const QString &text, QWidget *parent)
-    : QLineEdit(text, parent) {
-    init();
-}
-
-TextField::TextField(QWidget *parent)
-    : QLineEdit(parent) {
-    init();
-}
-
-void TextField::setShadow(bool value) {
-    hasShadow = value;
-}
+TextField::TextField(const QString &text, QWidget *parent) : QLineEdit(text, parent) { init(); }
+TextField::TextField(QWidget *parent) : QLineEdit(parent) { init(); }
+void TextField::setShadow(bool value) { hasShadow = value; }
 
 void TextField::setDarkMode(bool value) {
     isDarkMode = value;
     updateStyle();
 }
 
-void TextField::setSize(QSize s) {
-    const int fixedHeight = 36;
-    const int minWidth = 36;
-
+void TextField::setFixedSize(QSize s) {
     int finalWidth = std::max(s.width(), minWidth);
     int finalHeight = fixedHeight;
-
-    setFixedSize(finalWidth, finalHeight);
+    QLineEdit::setFixedSize(finalWidth, finalHeight);
 }
 
 
@@ -52,27 +38,23 @@ void TextField::setDropDownPadding(bool value) {
     updateStyle();
 }
 
-void TextField::setReadOnly(bool value)
-{
+void TextField::setReadOnly(bool value) {
     isReadOnly = value;
     QLineEdit::setReadOnly(value);
 }
 
-void TextField::setEnabled(bool value)
-{
+void TextField::setEnabled(bool value) {
     isEnabled = value;
     QLineEdit::setEnabled(value);
 }
 
 void TextField::setContextMenu(bool value) { cxtMenu = value; }
-
 void TextField::setFontProperties(const QString &family, int pointSize, bool bold, bool italic) {
     isItalic = italic; isBold = bold; fontSize = pointSize; fontFamily = family;
     updateStyle(); 
 }
 
 void TextField::setSpacingRight(bool value) { rightSpacing = value; }
-
 void TextField::setClearButton(bool value) {
     clearButton = value;
 
@@ -81,15 +63,11 @@ void TextField::setClearButton(bool value) {
         clear->setShadow(false);
         clear->setDisplayMode(Button::IconOnly);
         clear->setIconSize(this->textFieldIconSize);
-        clear->setSize(QSize(28, 28));
-
-        const QString clearIcon = ":/icons/ComponentsIcons/x.svg";
+        clear->setFixedSize(QSize(28, 28));
         clear->setIconPaths(clearIcon, clearIcon);
         clear->setEnabled(isEnabled);
-
-        int x = width() - (12 + clear->width()) + 3;
-        int y = (height() - clear->height()) / 2;
-        clear->move(x, y);
+        buttonPositioning(clear);
+        
         clear->raise();
         clear->hide();
 
@@ -113,21 +91,15 @@ void TextField::setPasswordTextField(bool value) {
         password->setShadow(false);
         password->setDisplayMode(Button::IconOnly);
         password->setIconSize(this->textFieldIconSize);
-        password->setSize(QSize(28, 28));
+        password->setFixedSize(QSize(28, 28));
         password->setEnabled(isEnabled);
         this->setEchoMode(QLineEdit::Password);
+        buttonPositioning(password);
 
-        int x = width() - (12 + password->width()) + 3;
-        int y = (height() - password->height()) / 2;
-        password->move(x, y);
         password->hide();
-
-        const QString eyeIcon = ":/icons/ComponentsIcons/eye.svg";
-        const QString eyeClosedIcon = ":/icons/ComponentsIcons/eye-closed.svg";
-
         password->setIconPaths(eyeClosedIcon, eyeClosedIcon);
 
-        connect(password, &Button::pressed, this, [this, eyeIcon, eyeClosedIcon]() {
+        connect(password, &Button::pressed, this, [this]() {
             isPasswordVisible = !isPasswordVisible;
             if (isPasswordVisible) {
                 password->setIconPaths(eyeIcon, eyeIcon);
@@ -138,7 +110,7 @@ void TextField::setPasswordTextField(bool value) {
             }
         });
 
-        connect(this, &QLineEdit::textChanged, this, [this, eyeClosedIcon](const QString &text) {
+        connect(this, &QLineEdit::textChanged, this, [this](const QString &text) {
             password->setVisible(isFocused && !text.isEmpty());
             if (isPasswordVisible) {
                 password->setIconPaths(eyeClosedIcon, eyeClosedIcon);
@@ -154,17 +126,15 @@ void TextField::setPasswordTextField(bool value) {
 
 void TextField::resizeEvent(QResizeEvent *event) {
     QLineEdit::resizeEvent(event);
+    buttonPositioning(clear);
+    buttonPositioning(password);
+}
 
-    if (clear) {
-        int x = width() - (12 + clear->width()) + 3;
-        int y = (height() - clear->height()) / 2;
-        clear->move(x, y);
-    }
-
-    if (password) {
-        int x = width() - (12 + password->width()) + 3;
-        int y = (height() - password->height()) / 2;
-        password->move(x, y);
+void TextField::buttonPositioning(Button *button) {
+    if (button) {
+        int x = width() - (12 + button->width()) + 3;
+        int y = (height() - button->height()) / 2;
+        button->move(x, y);
     }
 }
 
@@ -269,7 +239,7 @@ void TextField::focusOutEvent(QFocusEvent *event) {
 void TextField::contextMenuEvent(QContextMenuEvent *event) {
     if (!cxtMenu) return;
 
-    Menu *menu = new Menu(this);
+    menu = new Menu(this);
     menu->setMaxVisibleItems(12);
     menu->setItemSize(QSize(180, 36));
     menu->setDarkMode(isDarkMode);
@@ -317,7 +287,7 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
 }
 
 void TextField::init() {
-    setSize(QSize(0, 0));
+    setFixedSize(QSize(0, 0));
     setFocusPolicy(Qt::StrongFocus);
     updateStyle();
     

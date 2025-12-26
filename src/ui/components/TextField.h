@@ -15,13 +15,13 @@
 class TextField : public QLineEdit {
   Q_OBJECT
 
-public:
+  public:
   explicit TextField(const QString &text, QWidget *parent = nullptr);
   explicit TextField(QWidget *parent = nullptr);
 
   void setShadow(bool value);
   virtual void setDarkMode(bool value);
-  void setSize(QSize s);
+  void setFixedSize(QSize s);
   void setTextFieldIcon(bool value);
   void setTextFieldIconSize(QSize s);
   void setIconPaths(const QString &lightIcon = "", const QString &darkIcon = "");
@@ -34,7 +34,7 @@ public:
   void setSpacingRight(bool value);
   void setContextMenu(bool value);
 
-protected:
+  protected:
   void paintEvent(QPaintEvent *event) override;
   void enterEvent(QEnterEvent *event) override;
   void leaveEvent(QEvent *event) override;
@@ -44,9 +44,11 @@ protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
 
-private:
+
+  private:
   void init();
   void updateStyle();
+  void buttonPositioning(Button *button);
 
   // States
   bool isHover = false;
@@ -72,8 +74,9 @@ private:
   // Icons
   QString light_icon;
   QString dark_icon;
-  const QString eye_icon_path = "C:/Users/umara/Desktop/Vaultorix/Assets/Icons/eye.svg";
-  const QString eyeclosed_icon_path = "C:/Users/umara/Desktop/Vaultorix/Assets/Icons/eye-closed.svg";
+  const QString eyeIcon = ":/icons/ComponentsIcons/eye.svg";
+  const QString eyeClosedIcon = ":/icons/ComponentsIcons/eye-closed.svg";
+  const QString clearIcon = ":/icons/ComponentsIcons/x.svg";
   QSize textFieldIconSize = QSize(20, 20);
 
   // Buttons
@@ -83,4 +86,11 @@ private:
   // Font 
   QString fontFamily = "Segoe UI";
   int fontSize = 10;
+
+  // Size
+  const int fixedHeight = 36;
+  const int minWidth = 36;
+
+  // Menu
+  Menu *menu = nullptr;
 };

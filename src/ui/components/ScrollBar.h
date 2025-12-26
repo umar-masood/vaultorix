@@ -16,7 +16,7 @@ class ScrollBar : public QScrollBar {
   Q_PROPERTY(qreal opacity READ getOpacity WRITE setOpacity)
   Q_PROPERTY(qreal handle READ getHandle WRITE setHandle)
 
-public:
+  public:
   explicit ScrollBar(Qt::Orientation orientation, QWidget *parent = nullptr);
   explicit ScrollBar(QWidget *parent = nullptr);
   ~ScrollBar() noexcept override = default;
@@ -29,13 +29,13 @@ public:
   void setHandle(qreal w);
   qreal getHandle();
 
-protected:
+  protected:
   void paintEvent(QPaintEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void enterEvent(QEnterEvent *event) override;
   void leaveEvent(QEvent *event) override;
 
-private:
+  private:
   void init();
 
   bool isPressed = false;

@@ -12,11 +12,11 @@ LineProgress::LineProgress(QWidget *parent) : QWidget(parent) {
    animation->setEasingCurve(QEasingCurve::InOutQuad);
 }
 
-void LineProgress::setSize(QSize s) {
+void LineProgress::setFixedSize(QSize s) {
    const QSize minimumSize(250, 50);
    int width = qMax(s.width(), minimumSize.width());
    int height = minimumSize.height();
-   setFixedSize(width, height);
+   QWidget::setFixedSize(width, height);
    update();
 }
 

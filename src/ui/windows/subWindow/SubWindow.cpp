@@ -1,7 +1,6 @@
 #include "SubWindow.h"
 
-SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimizeButton) : QWidget(parent), hasCloseBtn(closeButton), hasMinimizeBtn(minimizeButton)
-{
+SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimizeButton) : QWidget(parent), hasCloseBtn(closeButton), hasMinimizeBtn(minimizeButton) {
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setFixedSize(size);
     setupTitleBar();
@@ -125,17 +124,17 @@ Button* SubWindow::windowButton() {
     b->setSecondary(true);
     b->setIconSize(QSize(16,16));
     b->setDisplayMode(Button::IconOnly);
-    b->setSize(QSize(26, 26));
+    b->setFixedSize(QSize(26, 26));
     return b;
 }
 
 void SubWindow::setupTitleBar() {
     // Content Area
-    _contentArea = new QWidget(this);
-    _contentArea->setGeometry(0,0, width(), height());
-    _contentArea->setContentsMargins(0, 0, 0, 0);
-    _contentArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    _contentArea->setAttribute(Qt::WA_TranslucentBackground);
+    contentAreaWidget = new QWidget(this);
+    contentAreaWidget->setGeometry(0,0, width(), height());
+    contentAreaWidget->setContentsMargins(0, 0, 0, 0);
+    contentAreaWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    contentAreaWidget->setAttribute(Qt::WA_TranslucentBackground);
 
     // Title Bar
     titleBar = new QWidget(this);
@@ -180,16 +179,9 @@ void SubWindow::setupTitleBar() {
     }
 }
 
-void SubWindow::onCloseClicked() {
-    ::SendMessage(hwnd, WM_CLOSE, 0, 0);
-}
-
-void SubWindow::onMinimizedClicked() {
-    ::SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
-}
-
-bool SubWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr *result)
-{
+void SubWindow::onCloseClicked() { ::SendMessage(hwnd, WM_CLOSE, 0, 0); }
+void SubWindow::onMinimizedClicked() { ::SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0); }
+bool SubWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr *result) {
     MSG *msg = (MSG *)message;
 
     switch (msg->message) {
@@ -204,19 +196,14 @@ bool SubWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr 
     return false;
 }
 
-void SubWindow::showEvent(QShowEvent *event)
-{
-    applyDWMEffects();
-}
-
-void SubWindow::mousePressEvent(QMouseEvent *event)
-{
+void SubWindow::showEvent(QShowEvent *event) { applyDWMEffects(); }
+void SubWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         if (titleBar && titleBar->geometry().contains(event->pos())) {
-            for (auto *widget : {closeBtn, minimizeBtn}) {
-                if (widget && widget->geometry().contains(event->pos())) return;
-            }
-    
+            for (auto *widget : {closeBtn, minimizeBtn}) 
+                if (widget && widget->geometry().contains(event->pos())) 
+                    return;
+            
             m_dragging = true;
             m_dragStartPos = event->globalPos() - frameGeometry().topLeft();
         }
@@ -225,23 +212,19 @@ void SubWindow::mousePressEvent(QMouseEvent *event)
     QWidget::mousePressEvent(event);
 }
 
-void SubWindow::mouseMoveEvent(QMouseEvent *event)
-{
-    if (m_dragging && (event->buttons() & Qt::LeftButton)) {
+void SubWindow::mouseMoveEvent(QMouseEvent *event) {
+    if (m_dragging && (event->buttons() & Qt::LeftButton)) 
         move(event->globalPos() - m_dragStartPos);
-    }
-
+    
     QWidget::mouseMoveEvent(event);
 }
 
-void SubWindow::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
+void SubWindow::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton) 
         m_dragging = false;
-    }
-
+    
     QWidget::mouseReleaseEvent(event);
 }
 
 QWidget* SubWindow::titleBarArea() const { return titleBar; }
-QWidget* SubWindow::contentArea() const { return _contentArea; }
+QWidget* SubWindow::contentArea() const { return contentAreaWidget; }

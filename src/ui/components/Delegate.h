@@ -18,7 +18,7 @@
 class Delegate : public QStyledItemDelegate {
     Q_OBJECT
 
-public:
+    public:
     explicit Delegate(const QSize& itemSize, QObject *parent = nullptr);
     void setDarkMode(bool value);
     void setIconic(bool value);
@@ -29,7 +29,7 @@ public:
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
-private:
+    private:
     QSize m_itemSize;
     QModelIndex hoveredIndex;
 

@@ -5,11 +5,11 @@
 
 #include <QScreen>
 #include <QCursor>
-#include <QShowEvent>
 #include <QResizeEvent>
 #include <QCloseEvent>
 #include <QVBoxLayout>
 #include <QEvent>
+#include <QApplication>
 
 class Overlay : public QWidget {
    Q_OBJECT

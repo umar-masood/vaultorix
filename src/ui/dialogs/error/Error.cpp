@@ -12,7 +12,7 @@ Error::Error(QSize widgetSize, const QString &text, const QString &illustrationL
     // Action Button
     actionBtn = new Button;
     actionBtn->setDisplayMode(Button::TextOnly);
-    actionBtn->setSize(QSize(316, 36));
+    actionBtn->setFixedSize(QSize(316, 36));
     actionBtn->setText("Retry");
 
     // Icon

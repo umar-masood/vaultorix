@@ -6,8 +6,7 @@ Overlay::Overlay(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TransparentForMouseEvents, false);
 }
 
-void Overlay::paintEvent(QPaintEvent *event)
-{
+void Overlay::paintEvent(QPaintEvent *event) {
    Q_UNUSED(event);
 
    // Colors
@@ -23,9 +22,7 @@ void Overlay::paintEvent(QPaintEvent *event)
    painter.drawPath(path);
 }
 
-Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool closeBtn) : SubWindow(centralWidget->size(), parent, closeBtn, false), contentWidget(centralWidget)
-{
-
+Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool closeBtn) : SubWindow(centralWidget->size(), parent, closeBtn, false), contentWidget(centralWidget) {
    setWindowFlag(Qt::Dialog);
    setWindowFlag(Qt::WindowStaysOnTopHint);
    setWindowModality(Qt::ApplicationModal);
@@ -38,17 +35,14 @@ Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool closeBtn) : SubWind
    } 
 }
 
-void Dialog::setDarkMode(bool value)
-{
+void Dialog::setDarkMode(bool value) {
    if (isDarkMode == value) return;
    isDarkMode = value;
    SubWindow::setDarkMode(isDarkMode);
 }
 
-void Dialog::centerInParent()
-{
-   if (parentWidget())
-   {
+void Dialog::centerInParent() {
+   if (parentWidget()) {
       QScreen *screen = QApplication::screenAt(QCursor::pos());
       if (!screen)
          screen = QApplication::primaryScreen();
@@ -60,16 +54,13 @@ void Dialog::centerInParent()
    }
 }
 
-void Dialog::showEvent(QShowEvent *event)
-{
-   if (!setupDone)
-   {
+void Dialog::showEvent(QShowEvent *event) {
+   if (!setupDone) {
       setup();
       setupDone = true;
    }
 
-   if (overlay && parentWidget())
-   {
+   if (overlay && parentWidget()) {
       overlay->setGeometry(parentWidget()->rect());
       overlay->show();
       overlay->raise();
@@ -80,20 +71,17 @@ void Dialog::showEvent(QShowEvent *event)
    SubWindow::showEvent(event);
 }
 
-void Dialog::resizeEvent(QResizeEvent *event)
-{
+void Dialog::resizeEvent(QResizeEvent *event) {
    if (overlay && parentWidget()) overlay->setGeometry(parentWidget()->rect());
    SubWindow::resizeEvent(event);
 }
 
-void Dialog::closeEvent(QCloseEvent *event)
-{
+void Dialog::closeEvent(QCloseEvent *event) {
    if (overlay) overlay->hide();
    SubWindow::closeEvent(event);
 }
 
-bool Dialog::eventFilter(QObject *obj, QEvent *event)
-{
+bool Dialog::eventFilter(QObject *obj, QEvent *event) {
    if (obj == parentWidget() && overlay)
       if (event->type() == QEvent::Resize || event->type() == QEvent::Move)
           overlay->setGeometry(parentWidget()->rect());

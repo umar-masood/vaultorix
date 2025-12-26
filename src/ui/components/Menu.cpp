@@ -77,7 +77,6 @@ void Menu::setup() {
     setVerticalScrollBar(vScroll);
     setHorizontalScrollBar(hScroll);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    // setSpacing(3);
     setStyleSheet("QListView::item { margin: 0px; padding: 0px; } QListView { background: transparent; margin: 4px; padding: 0px; border:none; }");
 
     layout = new QVBoxLayout();
@@ -199,17 +198,13 @@ QPoint Menu::adjustXY(const QSize &s, const QPoint &p, QRect &screenGeo, bool is
     return QPoint(x,y);
 }
 
-void Menu::hide() {
-    fadeOutAnimation();
-}
-
+void Menu::hide() { fadeOutAnimation(); }
 void Menu::show() {
     setup();
     updateMenuHeight();
 }
 
-void Menu::showAt(QWidget *anchorWidget)
-{
+void Menu::showAt(QWidget *anchorWidget) {
     show();
     
     if (!anchorWidget) return;
@@ -304,16 +299,13 @@ void Menu::mouseMoveEvent(QMouseEvent *event) {
     QListView::mouseMoveEvent(event);
 }
 
-void Menu::leaveEvent(QEvent *event)
-{
+void Menu::leaveEvent(QEvent *event) {
    QTimer::singleShot(200, [this](){
      bool stillHovering = false;
-        for (auto *submenu : subMenus) {
-            if (submenu && submenu->popup && submenu->popup->underMouse()) {
+        for (auto *submenu : subMenus) 
+            if (submenu && submenu->popup && submenu->popup->underMouse()) 
                 stillHovering = true;
-            }
-        }
-
+        
         if (!stillHovering) {  
             setHoveredIndex(QModelIndex());
             update();

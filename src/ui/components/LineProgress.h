@@ -1,7 +1,7 @@
 #pragma once
+#include "SmoothOpacity.h"
 
 #include <QWidget>
-#include "SmoothOpacity.h"
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QPainter>
@@ -15,24 +15,27 @@
 class LineProgress : public QWidget {
    Q_OBJECT
 
-public:
+   public:
    explicit LineProgress(QWidget *parent = nullptr);
     
-   void setSize(QSize s);
-   void fadeInAnimation();
-   void fadeOutAnimation();
+   void setFixedSize(QSize s);
    void setDarkMode(bool value);
+   void setText(const QString &text);
+   void setIndeterminate(bool value);   
+
    void start();
    void stop();
-   void setText(const QString &text);
+
    void setValue(int value);
-   void setIndeterminate(bool value);
    int getValue() const;
 
-protected:
+   protected:
    void paintEvent(QPaintEvent *event) override;
 
-private:
+   private: 
+   void fadeInAnimation();
+   void fadeOutAnimation();
+   
    bool isDarkMode = false;
    bool isIndeterminate = false;
 
@@ -51,5 +54,4 @@ private:
    SmoothOpacity *op = nullptr;
 
    QString loaderText;
-
 };

@@ -1,8 +1,8 @@
 #pragma once
-
-#include <QObject>
 #include "RoundedBox.h"
 #include "SmoothOpacity.h"
+
+#include <QObject>
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QEvent>
@@ -12,6 +12,7 @@
 
 class ToolTip : public QObject {
   Q_OBJECT
+  
 public:
   explicit ToolTip(QWidget *target = nullptr, const QString &text = "", bool isDarkMode = false);
   void setText(const QString &text);

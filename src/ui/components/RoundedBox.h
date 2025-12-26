@@ -14,7 +14,7 @@
 class RoundedBox : public QWidget {
     Q_OBJECT
 
-public:
+    public:
     explicit RoundedBox(const QString &txt = "", QWidget *parent = nullptr);
     virtual ~RoundedBox() = default;
 
@@ -23,10 +23,10 @@ public:
     void setText(const QString &text);
     QSize sizeHint() const;
 
-protected:
+    protected:
     void paintEvent(QPaintEvent *event) override;
 
-private:
+    private:
     void updateSizeForText(); 
 
     bool isDarkMode;
