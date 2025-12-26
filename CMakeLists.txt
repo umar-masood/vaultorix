@@ -71,6 +71,8 @@ add_executable(Vaultorix
     ## Managers
     src/core/accountCreationManager/accountCreationManager.cpp
     src/core/accountSignInManager/accountSignInManager.cpp
+    ## Device Info
+    src/core/deviceInfo/deviceInfo.cpp
 
     # Entry Point of App
     src/main.cpp
