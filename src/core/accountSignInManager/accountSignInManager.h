@@ -15,20 +15,22 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QByteArray>
+#include <QMap>
 
 using namespace DialogUtils;
 
 class AccountSignInManager : public QObject {
     Q_OBJECT
     
-    public:
+public:
     explicit AccountSignInManager(AccountWindow *accountWindow = nullptr, QObject *parent = nullptr);
-    
     void setAccountSignInObject(AccountSignIn *accountSignInObject);
 
-    private:
+private:
     const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
-
+    const QString API_URL = "https://www.umarcreations.site/check-credentials";
+    
+    AccountWindow *accountWindow = nullptr;
     AccountSignIn *as = nullptr;
     QNetworkAccessManager *manager = nullptr;
 
@@ -38,34 +40,36 @@ class AccountSignInManager : public QObject {
     QString message;
     int statusCode;
 
-    // Error Dialogs
-    Error *invalidCredentialsErrorWidget = nullptr;
-    Dialog *invalidCredentialsErrorDialog = nullptr;
+    struct ErrorDialog {
+        Error *widget = nullptr;
+        Dialog *dialog = nullptr;
+    };
 
-    Error *maxAttemptsErrorWidget = nullptr;
-    Dialog *maxAttemptsErrorDialog = nullptr;
+    QMap<QString, ErrorDialog> errorDialogs;
 
-    Error *somethingWentWrongErrorWidget = nullptr;
-    Dialog *somethingWentWrongErrorDialog = nullptr;
-
+    // Core functions
     void handleDialogs(AccountWindow *accountWindow);
+    void createErrorDialog(const QString &key, const QString &text, const QString &iconPath, void(AccountSignInManager::*actionBtnSlot)(const QString&));
+    void showErrorDialog(const QString &key, bool isSignInBtnEnabled = true, const QString &text = "Sign In");
+    void onErrorDialogActionBtnClicked(const QString &key);
     void verifyCredentials();
-    void updateSignInBtnState(bool isEnabled, QString text);
+    void updateSignInBtnState(bool isEnabled, const QString &text);
 
 signals:
     void verifiedCredentials();
     void maxLimitReached();
     void somethingWentWrong();
     void invalidCredentials();
+    void accessDenied();
+    void requestTimeout();
 
-    private slots:
+private slots:
     void onSignInClicked();
     void onCancelClicked() const;
     void onVerifiedCredentials();
     void onMaxLimitReached();
     void onSomethingWentWrong();
-    void onInvalidCredentials();
-    void onWrongCredentialsDailogActionBtnClicked();
-    void onMaxAttemptsDailogActionBtnClicked();
-    void onSomethingWentWrongDailogActionBtnClicked();
+    void onInvalidCredentials();    
+    void onAccessDenied();
+    void onRequestTimeout();
 };
