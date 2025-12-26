@@ -18,7 +18,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    username = new TextField;
    username->setPlaceholderText("Username");
    username->setContextMenu(false);
-   username->setSize(QSize(360, 36));
+   username->setFixedSize(QSize(360, 36));
    username->setTextFieldIcon(true);
    username->setClearButton(true);
    username->setTextFieldIconSize(QSize(18,18));
@@ -26,14 +26,14 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    pwd = new TextField;
    pwd->setContextMenu(false);
    pwd->setPlaceholderText("Password");
-   pwd->setSize(QSize(360, 36));
+   pwd->setFixedSize(QSize(360, 36));
    pwd->setPasswordTextField(true);
    pwd->setTextFieldIcon(true);
    pwd->setTextFieldIconSize(QSize(18,18));
 
    forgotPwd = new Button("Forgot Password?");
    forgotPwd->setDisplayMode(Button::TextOnly);
-   forgotPwd->setSize(QSize(110, 18));
+   forgotPwd->setFixedSize(QSize(110, 18));
    forgotPwd->setHyperLink(true);
    forgotPwd->setFontProperties("Segoe UI", 10, false, false);
    forgotPwd->setHyperLinkColors("#008EDE", "#15F2FF");
@@ -43,7 +43,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
 
    signIn = new Button("Sign in");
    signIn->setDisplayMode(Button::TextOnly);
-   signIn->setSize(QSize(360, 36));
+   signIn->setFixedSize(QSize(360, 36));
    signIn->setGradientColor(true, "#008EDE", "#15F2FF");
    signIn->setHoverGradientColor("#008EDE");
    signIn->setFontProperties("Segoe UI", 11, true, false);
@@ -55,7 +55,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    cancel = new Button("Cancel");
    cancel->setDisplayMode(Button::TextOnly);
    cancel->setSecondary(true);
-   cancel->setSize(QSize(360, 36));
+   cancel->setFixedSize(QSize(360, 36));
    cancel->setFontProperties("Segoe UI", 11, true, false);
    connect(cancel, &Button::clicked, this, [this](){
       emit cancelClicked();
