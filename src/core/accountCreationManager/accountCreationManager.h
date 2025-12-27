@@ -4,6 +4,7 @@
 #include "../validators/usernameValidator/usernameValidator.h"
 #include "../validators/pwdValidator/pwdValidator.h"
 #include "../validators/nameValidator/nameValidator.h"
+#include "../deviceInfo/deviceInfo.h"
 
 class AccountCreationManager : public QObject{
     Q_OBJECT
@@ -22,6 +23,16 @@ class AccountCreationManager : public QObject{
         {"acceptedTC", false}
     };
 
+    const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
+    const QString API_URL = "https://www.umarcreations.site/store-credentials";
+
+    QNetworkAccessManager *manager = nullptr;
+
+    QString message;
+    int statusCode;
+
+    DeviceInfo deviceInfo;
+    
     AccountCreate* accountCreate = nullptr;
     GetEmail* emailValidator = nullptr;
     GetUsername* usernameValidator = nullptr;
@@ -30,6 +41,7 @@ class AccountCreationManager : public QObject{
 
     void setupConnections();
     void checkValidationStatus();
+    void storeCredentials();
 
     signals:
     void validationDone(bool isValidationDone);
