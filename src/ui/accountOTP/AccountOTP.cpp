@@ -1,75 +1,4 @@
 #include "AccountOTP.h"
-#include <QTimer>
-
-/* Custom Text Label (With and Without Icon)*/
-Label::Label(bool isIconic, 
-            const QString &family, 
-            int pointSize, 
-            QFont::Weight weight, 
-            bool italic, 
-            const QString &text, 
-            Qt::Alignment alignment, 
-            QWidget *parent) : QLabel(parent) {
-
-   setAttribute(Qt::WA_TranslucentBackground);
-   setAlignment(alignment);
-
-   opacity = new QGraphicsOpacityEffect(this);
-   opacity->setOpacity(1.0);
-   setGraphicsEffect(opacity);
-
-   // If not iconic, set the font and text
-   if (!isIconic) {
-      setText(text);
-
-      QFont fnt;
-      fnt.setPointSize(pointSize);
-      fnt.setFamily(family);
-      fnt.setWeight(weight);
-      fnt.setItalic(italic);
-      setFont(fnt);
-   }
-}
-
-// Show with Fade In Animation
-void Label::show() {
-   if (!isVisible()) {
-      opacity->setOpacity(0.0);
-      QLabel::show();
-   }
-
-   fadeIn = new QPropertyAnimation(opacity, "opacity", this);
-   fadeIn->setStartValue(0.0);
-   fadeIn->setEndValue(1.0);
-   fadeIn->setDuration(500);
-   fadeIn->setEasingCurve(QEasingCurve::InOutQuad);
-   fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-// Hide with Fade Out Animation
-void Label::hide() {
-   fadeOut = new QPropertyAnimation(opacity, "opacity", this);
-   fadeOut->setStartValue(1.0);
-   fadeOut->setEndValue(0.0);
-   fadeOut->setDuration(500);
-   fadeOut->setEasingCurve(QEasingCurve::InOutQuad);
-
-   connect(fadeOut, &QPropertyAnimation::finished, this, [this](){
-      QLabel::hide();
-      opacity->setOpacity(1.0);
-   });
-
-   fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-// Set Text with Fade Out and Fade In Animation
-void Label::setTextAnimated(const QString &text) {
-   hide();
-   QTimer::singleShot(500, [this, text]() {
-      QLabel::setText(text);
-      show();
-   });
-}
 
 /* Resend OTP Widget */
 TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent) {
@@ -168,7 +97,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    });
 
    // Main Layout
-   layout = new QVBoxLayout(this);
+   layout = new QVBoxLayout;
    layout->setSpacing(0);
    layout->addWidget(icon, 0, Qt::AlignHCenter);
    layout->addSpacing(20);
@@ -186,6 +115,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    layout->addSpacing(16);
    layout->addWidget(cancel, 0, Qt::AlignHCenter);
    layout->addStretch();
+   setLayout(layout);
 
    // Theme Mode 
    connect(this, &AccountOTP::themeModeChanged, this, &AccountOTP::onThemeModeChanged);

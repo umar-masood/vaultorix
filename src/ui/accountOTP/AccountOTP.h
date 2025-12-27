@@ -3,31 +3,7 @@
 #include <QVBoxLayout>
 #include "../accountOTP/OTPWidget.h"
 #include "../components/Button.h"
-
-class Label : public QLabel {
-
-   Q_OBJECT 
-
-   public:
-   explicit Label(bool isIconic = false,
-                  const QString &family = "Segoe UI",
-                  int pointSize = 8,
-                  QFont::Weight weight = QFont::Normal,
-                  bool italic = false,
-                  const QString &text = " ",
-                  Qt::Alignment alignment = Qt::AlignCenter,
-                  QWidget *parent = nullptr);
-   
-   void show();
-   void hide();
-   void setTextAnimated(const QString &text);
-
-   private:
-   QPropertyAnimation *fadeIn = nullptr;
-   QPropertyAnimation *fadeOut = nullptr;
-   QGraphicsOpacityEffect *opacity = nullptr;
-
-};
+#include "../components/Label.h"
 
 class TextWithBtn : public QWidget {
    Q_OBJECT
