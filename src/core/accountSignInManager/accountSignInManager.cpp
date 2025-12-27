@@ -74,8 +74,7 @@ void AccountSignInManager::showErrorDialog(const QString &key, bool isSignInBtnE
 }
 
 void AccountSignInManager::verifyCredentials() {
-    QUrl url("http://www.umarcreations.site/check-credentials");
-
+    QUrl url(API_URL);
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
