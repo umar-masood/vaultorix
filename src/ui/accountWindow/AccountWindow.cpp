@@ -1,4 +1,5 @@
 #include "AccountWindow.h"
+/* ---------------- Stacked Widget ---------------- */
 
 /* ---------------- Branding ---------------- */
 Branding::Branding(QWidget *parent) : QWidget(parent) {
@@ -65,8 +66,7 @@ QFont BulletPoint::font() const {
 
 /* ---------------- Account Window ---------------- */
 AccountWindow::AccountWindow(QWidget *rightWidget, QObject *parent, const QVector<QWidget *> &subWidgets) : QObject(parent), rightWidget(rightWidget) {
-   if (rightWidget != nullptr)
-      init();
+   init();
 }
 
 void AccountWindow::setDarkMode(bool value) {
@@ -75,15 +75,32 @@ void AccountWindow::setDarkMode(bool value) {
 }
 
 SubWindow *AccountWindow::subWindow() const { return w; }
-void AccountWindow::setRightWidget(QWidget *rightWidget) {
-   if (rightWidget) {
-      this->rightWidget = rightWidget;
-      init();
+
+void AccountWindow::setRightWidget(QWidget *widget) {
+  if (!widget || !right)
+      return;
+
+   if (this->rightWidget) {
+      entireLayoutRight->removeWidget(this->rightWidget);
+      this->rightWidget->hide();
+      this->rightWidget->setParent(nullptr);
    }
+
+   this->rightWidget = widget;
+   entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
+
+   QMetaObject::invokeMethod(
+      widget,
+      "setDarkMode",
+      Qt::DirectConnection,
+      Q_ARG(bool, isDarkMode)
+   );
 }
 
 void AccountWindow::show() { if (w) w->show(); }
 void AccountWindow::init() {
+   if (w) return;
+
    // SubWindow Creation
    w = new SubWindow(QSize(1000, 720), nullptr, true, true);
    w->setWindowTitle("Vaultorix");
@@ -125,7 +142,6 @@ void AccountWindow::init() {
 
    brand = new Branding;
    mainPoint = new QLabel("Protect What Matters Most");
-   mainPoint->setAttribute(Qt::WA_TranslucentBackground);
    mainPoint->setStyleSheet("color: white;");
    mainPoint->setAlignment(Qt::AlignLeft);
 
@@ -175,7 +191,9 @@ void AccountWindow::init() {
    entireLayoutRight = new QVBoxLayout(right);
    entireLayoutRight->setContentsMargins(30, 30, 30, 30);
    entireLayoutRight->setSpacing(0);
-   entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
+   
+   if (rightWidget)
+      entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
 
    // Theme Connection
    connect(this, &AccountWindow::themeModeChanged, this, &AccountWindow::onthemeModeChanged);
@@ -189,7 +207,8 @@ void AccountWindow::onthemeModeChanged(bool enable) {
       enable ? themeMode->setIconPaths(darkModeIcon, darkModeIcon) : themeMode->setIconPaths(lightModeIcon, lightModeIcon);
    }
 
-   QMetaObject::invokeMethod(rightWidget, "setDarkMode", Q_ARG(bool, enable));
+   if (rightWidget)
+      QMetaObject::invokeMethod(rightWidget, "setDarkMode", Q_ARG(bool, enable));
 
    for (auto *subWidget : subWidgets) 
       QMetaObject::invokeMethod(subWidget, "setDarkMode", Q_ARG(bool, enable));
