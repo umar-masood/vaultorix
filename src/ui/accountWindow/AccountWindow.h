@@ -64,16 +64,28 @@ class AccountWindow : public QObject {
    private:
    void init();
 
+   // Theme
    bool isDarkMode = false;
+   const QString darkModeIcon = ":/icons/AccountWindow/darkMode.svg";
+   const QString lightModeIcon = ":/icons/AccountWindow/lightMode.svg";
 
+   // SubWindow 
    SubWindow *w = nullptr;
-   QWidget *rightWidget = nullptr;
+   Seperator *seperator = nullptr;
+   Button *themeMode = nullptr;
+   QVector<QWidget *> subWidgets = {};
 
-   QVBoxLayout *entireLayoutRight = nullptr;
-   QVBoxLayout *entireLayoutLeft = nullptr;
+   QHBoxLayout *mainLayout = nullptr;
+
    QWidget *right = nullptr;
-   QWidget *left = nullptr;
+   QVBoxLayout *entireLayoutRight = nullptr;
 
+   QWidget *left = nullptr;
+   QVBoxLayout *entireLayoutLeft = nullptr;
+   
+   QWidget *rightWidget = nullptr; // Dynamic
+
+   // Left Panel
    QLabel *illustration = nullptr;
    QLabel *mainPoint = nullptr;
 
@@ -85,11 +97,4 @@ class AccountWindow : public QObject {
    BulletPoint *point4 = nullptr;
    BulletPoint *point5 = nullptr;
    QVector<BulletPoint *> points;
-
-   Button *themeMode = nullptr;
-   const QString darkModeIcon = ":/icons/AccountWindow/darkMode.svg";
-   const QString lightModeIcon = ":/icons/AccountWindow/lightMode.svg";
-
-   QVector<QWidget *> subWidgets = {};
-   Seperator *seperator = nullptr;
 };

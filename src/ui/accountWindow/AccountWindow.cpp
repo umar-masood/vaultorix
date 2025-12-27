@@ -1,5 +1,4 @@
 #include "AccountWindow.h"
-/* ---------------- Stacked Widget ---------------- */
 
 /* ---------------- Branding ---------------- */
 Branding::Branding(QWidget *parent) : QWidget(parent) {
@@ -87,7 +86,19 @@ void AccountWindow::setRightWidget(QWidget *widget) {
    }
 
    this->rightWidget = widget;
+ 
+   SmoothOpacity *effect = new SmoothOpacity;
+   effect->setOpacity(0.0);
+   rightWidget->setGraphicsEffect(effect);
+
    entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
+
+   QPropertyAnimation *ani = new QPropertyAnimation(effect, "opacity", rightWidget);
+   ani->setEasingCurve(QEasingCurve::InOutQuad);
+   ani->setDuration(600);
+   ani->setStartValue(0.0);
+   ani->setEndValue(1.0);
+   ani->start(QAbstractAnimation::DeleteWhenStopped);
 
    QMetaObject::invokeMethod(
       widget,
@@ -106,6 +117,11 @@ void AccountWindow::init() {
    w->setWindowTitle("Vaultorix");
    w->setWindowIcon(QIcon(":/icons/AppBranding/app-icon.png"));
 
+   // Main Layout
+   mainLayout = new QHBoxLayout(w->contentArea());
+   mainLayout->setContentsMargins(0, 0, 0, 0);
+   mainLayout->setSpacing(0);
+
    // TitleBar Area
    QWidget *titleBar = w->titleBarArea();
 
@@ -119,13 +135,12 @@ void AccountWindow::init() {
 
    // Seperator 
    seperator = new Seperator(titleBar, 18, 1, Qt::Vertical);
-
    int x = titleBar->width() - 26*2 - 5*3 - 4;
    int y = (titleBar->height() - 18) / 2;
-
    seperator->move(x, y);
    seperator->raise();
 
+   // Theme Button Positioning
    y = (titleBar->height() - 26) / 2;
    themeMode->move(x - 26 - 8, y );
    themeMode->raise();
@@ -136,8 +151,7 @@ void AccountWindow::init() {
    });
 
    // Left Panel
-   left = new QWidget(w->contentArea());
-   left->setGeometry(0, 0, w->width() / 2, w->height());
+   left = new QWidget;
    left->setStyleSheet("background-color: #003F66;");
 
    brand = new Branding;
@@ -156,10 +170,9 @@ void AccountWindow::init() {
    point3 = new BulletPoint("Two-factor authentication by default ", ":/icons/AppBranding/2FA.svg");
    point4 = new BulletPoint("Auto-Lock for maximum privacy", ":/icons/AppBranding/timer.svg");
    point5 = new BulletPoint("Backup & recovery on the way", ":/icons/AppBranding/backup.svg");
-
    points = {point1, point2, point3, point4, point5};
 
-   entireLayoutLeft = new QVBoxLayout;
+   entireLayoutLeft = new QVBoxLayout(left);
    entireLayoutLeft->setContentsMargins(30, 30, 24, 30);
    entireLayoutLeft->addWidget(brand, 0);
    entireLayoutLeft->addSpacing(20);
@@ -181,19 +194,19 @@ void AccountWindow::init() {
    entireLayoutLeft->addSpacing(16);
    entireLayoutLeft->addWidget(illustration, 0, Qt::AlignCenter);
    entireLayoutLeft->addStretch();
-   left->setLayout(entireLayoutLeft);
 
    // Right Panel
-   right = new QWidget(w->contentArea());
-   right->setGeometry(left->width(), 0, w->width() / 2, w->height());
-   right->setAttribute(Qt::WA_TranslucentBackground);
+   right = new QWidget;
 
    entireLayoutRight = new QVBoxLayout(right);
    entireLayoutRight->setContentsMargins(30, 30, 30, 30);
    entireLayoutRight->setSpacing(0);
-   
    if (rightWidget)
       entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
+
+   // Adding Left and Right Panels into main layout
+   mainLayout->addWidget(left);
+   mainLayout->addWidget(right);
 
    // Theme Connection
    connect(this, &AccountWindow::themeModeChanged, this, &AccountWindow::onthemeModeChanged);
