@@ -106,15 +106,12 @@ GetOTP::GetOTP(QObject *parent) : QObject(parent) {
     connect(timer, &QTimer::timeout, this, &GetOTP::onTimeout);
 }
 
-bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QString &username, QString &name) {
+bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, const QString &email, const QString &username, const QString &name) {
     if (!ao)  return false;
     this->ao = ao;
 
     // Store user details
     cEmail = email; cUserName = username; cName = name;
-
-    // Clear original variables (as you intended)
-    email = username = name = "";
 
     // Update OTP UI with masked email
     ao->setEmail(cEmail);
@@ -188,7 +185,7 @@ void GetOTP::onMaxLimitReached() {
     
 
     if (ao && ao->messageLabel()) // Display the maximum limit reached message.
-        ao->messageLabel()->setTextAnimated("Maximum limit reached. Try again after 48hrs.");
+        ao->messageLabel()->setText("Maximum limit reached. Try again after 48hrs.");
 }
 
 void GetOTP::onVerifyClicked() {
@@ -200,7 +197,7 @@ void GetOTP::onVerifyClicked() {
     if (!ok) {  // If the otp is incorrect or expired
         ao->verifyBtn()->setText("Verify");
         ao->verifyBtn()->setEnabled(true);
-        ao->messageLabel()->setTextAnimated("Your entered OTP is incorrect or expired.");
+        ao->messageLabel()->setText("Your entered OTP is incorrect or expired.");
     } else {
         disableControls("Verified");
     }
@@ -235,7 +232,7 @@ void GetOTP::disableControls(QString btnText) {
     ao->verifyBtn()->setEnabled(false);              // Disabled the verify button after successful OTP matching
     ao->resendOtpWidget()->resendButton()->setEnabled(false); // Disabled the resend button when otp is verified
     ao->resendOtpWidget()->timerLabel()->hide();     // hides the timer
-    ao->messageLabel()->setTextAnimated("");
+    ao->messageLabel()->setText("");
 
     if (timer) timer->stop();
     ao->OTP()->setEnabled(false);

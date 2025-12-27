@@ -46,7 +46,7 @@ class GetOTP : public QObject
 public:
     explicit GetOTP(QObject *parent = nullptr);
 
-    bool setAccountOTPObjectWithDetails(AccountOTP *ao, QString &email, QString &username, QString &name);
+    bool setAccountOTPObjectWithDetails(AccountOTP *ao, const QString &email, const QString &username, const QString &name);
 
 signals:
     void otpVerified(bool value); // Emits verification result: True = verified
