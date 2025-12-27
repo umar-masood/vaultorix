@@ -59,6 +59,7 @@ add_executable(Vaultorix
     src/ui/components/Toggle.cpp
     src/ui/components/ToolTip.cpp
     src/ui/components/Seperator.cpp
+    src/ui/components/Label.cpp
 
     # Core
     ## Validators
