@@ -6,24 +6,25 @@
 #include <QString>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QShowEvent>
 #include <QFont>
 
-class OTPWidget : public QWidget
-{
+class OTPWidget : public QWidget {
    Q_OBJECT
 
-public:
+   public:
    explicit OTPWidget(QWidget *parent = nullptr);
    void setDarkMode(bool value);
    void setEnabled(bool enabled);
 
-signals:
+   signals:
    void OTPcompleted(const QString &otp);
 
-protected:
+   protected:
    void keyPressEvent(QKeyEvent *event) override;
+   void showEvent(QShowEvent *event) override;
 
-private:
+   private:
    bool isDarkMode = false;
    int currentIndex = 0;
    QVector<QLabel *> OTPBoxes;
