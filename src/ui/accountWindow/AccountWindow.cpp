@@ -100,6 +100,11 @@ void AccountWindow::setRightWidget(QWidget *widget) {
    ani->setEndValue(1.0);
    ani->start(QAbstractAnimation::DeleteWhenStopped);
 
+   connect(ani, &QPropertyAnimation::finished, [=](){
+      ani->deleteLater();
+      rightWidget->setGraphicsEffect(nullptr); 
+   });
+
    QMetaObject::invokeMethod(
       widget,
       "setDarkMode",
