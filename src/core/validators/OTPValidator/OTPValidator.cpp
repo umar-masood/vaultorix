@@ -185,7 +185,8 @@ void GetOTP::onMaxLimitReached() {
     
 
     if (ao && ao->messageLabel()) // Display the maximum limit reached message.
-        ao->messageLabel()->setText("Maximum limit reached. Try again after 48hrs.");
+        ao->messageLabel()->setAnimatedText("Maximum limit reached. Try again after 48hrs.");
+        
 }
 
 void GetOTP::onVerifyClicked() {
@@ -197,7 +198,7 @@ void GetOTP::onVerifyClicked() {
     if (!ok) {  // If the otp is incorrect or expired
         ao->verifyBtn()->setText("Verify");
         ao->verifyBtn()->setEnabled(true);
-        ao->messageLabel()->setText("Your entered OTP is incorrect or expired.");
+        ao->messageLabel()->setAnimatedText("Your entered OTP is incorrect or expired.");
     } else {
         disableControls("Verified");
     }
@@ -232,7 +233,7 @@ void GetOTP::disableControls(QString btnText) {
     ao->verifyBtn()->setEnabled(false);              // Disabled the verify button after successful OTP matching
     ao->resendOtpWidget()->resendButton()->setEnabled(false); // Disabled the resend button when otp is verified
     ao->resendOtpWidget()->timerLabel()->hide();     // hides the timer
-    ao->messageLabel()->setText("");
+    ao->messageLabel()->setAnimatedText("");
 
     if (timer) timer->stop();
     ao->OTP()->setEnabled(false);
