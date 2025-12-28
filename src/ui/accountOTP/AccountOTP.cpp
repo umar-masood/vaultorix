@@ -64,7 +64,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    otpWidget = new OTPWidget;
 
    // Message Label (For displaying error messages)
-   message = new Label(false, "Segoe UI", 10, QFont::Medium, false);
+   message = new AnimatedLabel(false, "Segoe UI", 10, QFont::Medium, false);
    message->setWordWrap(true);
    message->setStyleSheet("color: #FF0000;");
    message->setFixedWidth(324);
@@ -125,7 +125,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
 OTPWidget* AccountOTP::OTP() const { return otpWidget; } // Return OTP Widget (for retrieving entered OTP) in backend
 Button* AccountOTP::verifyBtn() const { return verify; } // Return Verify Button for updating its properties in backend
 TextWithBtn* AccountOTP::resendOtpWidget() const { return resendOtp;} // Return Resend OTP Widget for updating its properties in backend
-Label* AccountOTP::messageLabel() const { return message; } // Return Message Label for displaying error messages in backend
+AnimatedLabel* AccountOTP::messageLabel() const { return message; } // Return Message Label for displaying error messages in backend
 
 void AccountOTP::onEmailEntered(const QString &email) {
    QString e = email;

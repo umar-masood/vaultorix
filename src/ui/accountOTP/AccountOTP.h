@@ -35,7 +35,7 @@ class AccountOTP : public QWidget {
    OTPWidget *OTP() const;
    Button *verifyBtn() const;
    TextWithBtn *resendOtpWidget() const;
-   Label *messageLabel() const;
+   AnimatedLabel *messageLabel() const;
 
    private:
    bool isDarkMode = false;
@@ -43,7 +43,7 @@ class AccountOTP : public QWidget {
    Label *icon = nullptr;
    Label *heading = nullptr;
    Label *text = nullptr;
-   Label *message = nullptr;
+   AnimatedLabel *message = nullptr;
 
    OTPWidget *otpWidget = nullptr;
    TextWithBtn *resendOtp = nullptr;
