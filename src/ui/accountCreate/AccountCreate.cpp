@@ -49,8 +49,7 @@ void CustomTextField::setUnchecked() {
       checkIcon->setPixmap(QPixmap(unchecked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
-void CustomTextField::setDarkMode(bool value)
-{
+void CustomTextField::setDarkMode(bool value) {
    TextField::setDarkMode(value);
    if (tooltip)
       tooltip->setDarkMode(value);
@@ -97,16 +96,11 @@ void CheckWithBtn::setDarkMode(bool value) {
    emit themeModeChanged(isDarkMode);
 }
 
-Button* CheckWithBtn::button() const {
-   return _button;
-}
-
-CheckBox* CheckWithBtn::termsCheckBox() const {
-   return checkbox;
-}
+Button* CheckWithBtn::button() const { return _button; }
+CheckBox* CheckWithBtn::termsCheckBox() const { return checkbox; }
 
 // AccountCreate Implementation
-AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent) {
+AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
    // Heading
@@ -145,6 +139,18 @@ AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent) {
    // Agreement
    agreement = new CheckWithBtn;
 
+   // Terms & Conditions Popup
+   // termsConditionsWidget = new TermsConditions;
+
+   // if (accountWindow) {
+   //    termsDialog = new Dialog(termsConditionsWidget, accountWindow->subWindow(), true);
+   //    accountWindow->setSubWidgets({termsConditionsWidget, termsDialog});
+   // }
+   
+   // connect(agreement, &CheckWithBtn::onButtonClicked, this, [this]() {
+   //    termsDialog->show();
+   // });
+
    // Layout
    layout = new QVBoxLayout;
    layout->addWidget(heading, 0, Qt::AlignHCenter);
@@ -159,6 +165,7 @@ AccountCreate::AccountCreate(QWidget *parent) : QWidget(parent) {
    layout->addSpacing(10);
    layout->addWidget(agreement, 0, Qt::AlignLeft);
 
+   // Create Account Button
    createAccBtn = new Button;
    createAccBtn->setDisplayMode(Button::TextOnly);
    createAccBtn->setFixedSize(QSize(360, 36));
@@ -199,29 +206,15 @@ void AccountCreate::setDarkMode(bool value) {
    if (agreement) agreement->setDarkMode(isDarkMode);
 }
 
-Button* AccountCreate::createBtn() const {
-   return createAccBtn;
-}
-
-CustomTextField *AccountCreate::nameField() const {
-   return name;
-}
-
-CustomTextField *AccountCreate::usernameField() const {
-   return username;
-}
-
-CustomTextField *AccountCreate::pwdField() const {
-   return pwd;
-}
-
-CustomTextField *AccountCreate::emailField() const {
-   return email;
-}
-
-CheckWithBtn *AccountCreate::termsCondsBtn() const {
-   return agreement;
-}
+Button* AccountCreate::createBtn() const { return createAccBtn; }
+CustomTextField *AccountCreate::nameField() const { return name; }
+CustomTextField *AccountCreate::usernameField() const { return username; }
+CustomTextField *AccountCreate::pwdField() const { return pwd; }
+CustomTextField *AccountCreate::emailField() const { return email; }
+CheckWithBtn *AccountCreate::termsCondsBtn() const { return agreement; }
+PwdRulesWidget * AccountCreate::pwdRulesWidget() const { return pwdValidator; }
+// Dialog * AccountCreate::termsCondsDialog() const { return termsDialog; }
+// TermsConditions *AccountCreate::termsCondsWidget() const { return termsConditionsWidget; }
 
 CustomTextField *AccountCreate::Field(const QString &placeholderText, bool useCheck) {
    auto *field = new CustomTextField(useCheck);
@@ -257,8 +250,4 @@ QFont AccountCreate::font(const QString &family , int fontSize, QFont::Weight we
    font.setPointSize(fontSize);
    font.setWeight(weight);
    return font;
-}
-
-PwdRulesWidget * AccountCreate::pwdRulesWidget() const {
-   return pwdValidator;
 }
