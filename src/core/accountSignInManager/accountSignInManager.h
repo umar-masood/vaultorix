@@ -3,7 +3,7 @@
 #include "../../ui/accountSignIn/AccountSignIn.h"
 #include "../../ui/accountWindow/AccountWindow.h"
 #include "../validators/validatorUtils/validatorUtils.h"
-#include "../../ui/dialogs/error/Error.h"
+#include "../../ui/dialogs/errorDialog/errorDialog.h"
 #include "../../ui/components/Dialog.h"
 #include "../../ui/dialogs/dialogsUtils.h"
 
@@ -32,26 +32,16 @@ private:
     
     AccountWindow *accountWindow = nullptr;
     AccountSignIn *as = nullptr;
-    QNetworkAccessManager *manager = nullptr;
-
+    
     QByteArray username;
     QByteArray password;
 
+    QNetworkAccessManager *manager = nullptr;
     QString message;
     int statusCode;
 
-    struct ErrorDialog {
-        Error *widget = nullptr;
-        Dialog *dialog = nullptr;
-    };
-
-    QMap<QString, ErrorDialog> errorDialogs;
-
-    // Core functions
-    void handleDialogs(AccountWindow *accountWindow);
-    void createErrorDialog(const QString &key, const QString &text, const QString &iconPath, void(AccountSignInManager::*actionBtnSlot)(const QString&));
-    void showErrorDialog(const QString &key, bool isSignInBtnEnabled = true, const QString &text = "Sign In");
-    void onErrorDialogActionBtnClicked(const QString &key);
+    ErrorDialogManager *errorDialogManager = nullptr;
+    
     void verifyCredentials();
     void updateSignInBtnState(bool isEnabled, const QString &text);
 
@@ -72,4 +62,5 @@ private slots:
     void onInvalidCredentials();    
     void onAccessDenied();
     void onRequestTimeout();
+    void onErrorDialogActionBtnClicked(const QString &key);
 };

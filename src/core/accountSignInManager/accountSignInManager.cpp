@@ -3,10 +3,12 @@
 #include <QDebug>
 
 AccountSignInManager::AccountSignInManager(AccountWindow *accountWindow, QObject *parent) : QObject(parent) {
-    handleDialogs(accountWindow);
-
     // Network Manager
     manager = new QNetworkAccessManager(this);
+
+    // Error Dialogs Manager
+    errorDialogManager = new ErrorDialogManager(accountWindow, this);
+    connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &AccountSignInManager::onErrorDialogActionBtnClicked);
 
     // Connect internal signals
     connect(this, &AccountSignInManager::verifiedCredentials, this, &AccountSignInManager::onVerifiedCredentials);
@@ -25,52 +27,9 @@ void AccountSignInManager::setAccountSignInObject(AccountSignIn *accountSignInOb
     connect(as, &AccountSignIn::cancelClicked, this, &AccountSignInManager::onCancelClicked);
 }
 
-void AccountSignInManager::handleDialogs(AccountWindow *accountWindow) {
-    if (!accountWindow) return;
-    this->accountWindow = accountWindow;
-
-    createErrorDialog("InvalidCredentials", wrongCredentialsText, wrongCredentialsIcon, &AccountSignInManager::onErrorDialogActionBtnClicked);
-    createErrorDialog("MaxAttempts", maxAttemptsText, maxAttemptsIcon, &AccountSignInManager::onErrorDialogActionBtnClicked);
-    createErrorDialog("SomethingWentWrong", somethingWentWrongText, somethingWentWrongIcon, &AccountSignInManager::onErrorDialogActionBtnClicked);
-    createErrorDialog("AccessDenied", accessDeniedText, accessDeniedIcon, &AccountSignInManager::onErrorDialogActionBtnClicked);
-    createErrorDialog("RequestTimeout", timeoutText, timeoutIcon, &AccountSignInManager::onErrorDialogActionBtnClicked);
-
-    // Provide all dialogs to AccountWindow for theme changes
-    QList<QWidget *> dialogs;
-    for (const auto &ed : errorDialogs) {
-        dialogs << ed.dialog << ed.widget;
-    }
-    accountWindow->setSubWidgets(dialogs);
-}
-
-void AccountSignInManager::createErrorDialog(const QString &key, const QString &text, const QString &iconPath, void(AccountSignInManager::*actionBtnSlot)(const QString&)) {
-    ErrorDialog ed;
-    ed.widget = new Error(dialogSize, text, iconPath, iconPath, illustrationSize);
-    ed.dialog = new Dialog(ed.widget, accountWindow->subWindow(), false);
-
-    // Use lambda to pass the key to the slot
-    connect(ed.widget->actionButton(), &Button::clicked, [this, key, actionBtnSlot]() {
-        (this->*actionBtnSlot)(key);
-    });
-
-    errorDialogs[key] = ed;
-}
-
 void AccountSignInManager::onErrorDialogActionBtnClicked(const QString &key) {
-    if (errorDialogs.contains(key) && errorDialogs[key].dialog) {
-        if (errorDialogs[key].dialog->isVisible())
-            errorDialogs[key].dialog->close();
-    }
-
-    if (key == "MaxAttempts") QApplication::quit();
-}
-
-void AccountSignInManager::showErrorDialog(const QString &key, bool isSignInBtnEnabled, const QString &text) {
-    if (errorDialogs.contains(key) && errorDialogs[key].dialog) {
-        if (!errorDialogs[key].dialog->isVisible())
-            errorDialogs[key].dialog->show();
-    }
-    updateSignInBtnState(isSignInBtnEnabled, text);
+    if (key == "MaxAttempts") 
+        QApplication::quit();
 }
 
 void AccountSignInManager::verifyCredentials() {
@@ -159,8 +118,27 @@ void AccountSignInManager::onVerifiedCredentials() {
     as->pwdField()->setText("");
 }
 
-void AccountSignInManager::onMaxLimitReached() { showErrorDialog("MaxAttempts", false); }
-void AccountSignInManager::onSomethingWentWrong() { showErrorDialog("SomethingWentWrong"); }
-void AccountSignInManager::onInvalidCredentials() { showErrorDialog("InvalidCredentials"); }
-void AccountSignInManager::onAccessDenied() { showErrorDialog("AccessDenied"); }
-void AccountSignInManager::onRequestTimeout() { showErrorDialog("RequestTimeout"); }
+void AccountSignInManager::onMaxLimitReached() { 
+    errorDialogManager->show("MaxAttempts"); 
+    updateSignInBtnState(false, "Sign In");
+}
+
+void AccountSignInManager::onSomethingWentWrong() { 
+    errorDialogManager->show("SomethingWentWrong");
+    updateSignInBtnState(true, "Sign In");
+}
+
+void AccountSignInManager::onInvalidCredentials() { 
+    errorDialogManager->show("InvalidCredentials"); 
+    updateSignInBtnState(true, "Sign In");
+}
+
+void AccountSignInManager::onAccessDenied() { 
+    errorDialogManager->show("AccessDenied"); 
+    updateSignInBtnState(false, "Sign In");
+}
+
+void AccountSignInManager::onRequestTimeout() { 
+    errorDialogManager->show("RequestTimeout"); 
+    updateSignInBtnState(true, "Sign In");
+}
