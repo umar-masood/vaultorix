@@ -1,18 +1,17 @@
 #include "TermsConditions.h"
 
-TermsConditions::TermsConditions(QWidget *parent) : QWidget(parent)
-{
+TermsConditions::TermsConditions(QWidget *parent) : QWidget(parent) {
    setFixedSize(500, 600);
    setAttribute(Qt::WA_TranslucentBackground);
    scrollBar = new ScrollBar(Qt::Vertical);
 
-   termsConds = new QTextBrowser;
+   termsConds = new QTextBrowser(this);
    termsConds->setSource(QUrl::fromLocalFile(":/terms/termsConds.html"));
    termsConds->setOpenExternalLinks(true);
    termsConds->setFrameShape(QFrame::NoFrame);
    termsConds->setFixedSize(478, 530);
    termsConds->setVerticalScrollBar(scrollBar);
-   termsConds->setAttribute(Qt::WA_TranslucentBackground);
+   termsConds->setStyleSheet("background-color: transparent;");
    termsConds->setContextMenuPolicy(Qt::NoContextMenu);
    termsConds->setTextInteractionFlags(Qt::NoTextInteraction);
 
@@ -27,14 +26,12 @@ TermsConditions::TermsConditions(QWidget *parent) : QWidget(parent)
    layout->addWidget(termsConds, 0, Qt::AlignCenter);
    layout->addStretch();
 
-   connect(this, &TermsConditions::themeModeChanged, this, [this](bool enable)
-   {
+   connect(this, &TermsConditions::themeModeChanged, this, [this](bool enable) {
       scrollBar->setDarkMode(enable); 
    });
 }
 
-void TermsConditions::setDarkMode(bool value)
-{
+void TermsConditions::setDarkMode(bool value) {
    if (isDarkMode == value) return;
    isDarkMode = value;
    emit themeModeChanged(isDarkMode);

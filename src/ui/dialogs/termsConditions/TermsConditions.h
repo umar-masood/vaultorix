@@ -1,23 +1,24 @@
 #pragma once
 
 #include <QTextBrowser>
+
 #include "../../windows/subWindow/SubWindow.h"
 #include "../../accountOTP/AccountOTP.h"
 #include "../../accountWindow/AccountWindow.h"
 #include "../../components/ScrollBar.h"
 
-class TermsConditions : public QWidget
-{
+class TermsConditions : public QWidget {
    Q_OBJECT
-public:
+
+   public:
    explicit TermsConditions(QWidget *parent = nullptr);
 
    Q_INVOKABLE void setDarkMode(bool value);
 
-signals:
+   signals:
    void themeModeChanged(bool enable);
 
-private:
+   private:
    bool isDarkMode = false;
 
    ScrollBar *scrollBar = nullptr;
