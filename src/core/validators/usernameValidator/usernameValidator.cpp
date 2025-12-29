@@ -84,7 +84,7 @@ bool UsernameValidator::isUsernameBlacklisted(const std::string &username) const
 }
 
 void UsernameValidator::isUsernameAvailable(QByteArray &username) {
-    QUrl url("http://127.0.0.1:8000");
+    QUrl url("http://www.umarcreations.site");
     url.setPath("/check-username/" + QString::fromUtf8(username));    
 
     qDebug() << "Checking username availability for: " << QString::fromUtf8(username) << "\n";
