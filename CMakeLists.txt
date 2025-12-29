@@ -32,7 +32,7 @@ add_executable(Vaultorix
     src/ui/dialogs/termsConditions/TermsConditions.cpp
 
     # Error Dialogs
-    src/ui/dialogs/error/Error.cpp
+    src/ui/dialogs/errorDialog/errorDialog.cpp
 
     # Dialogs Utils
     src/ui/dialogs/dialogsUtils.cpp
