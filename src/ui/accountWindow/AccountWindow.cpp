@@ -232,4 +232,8 @@ void AccountWindow::onthemeModeChanged(bool enable) {
       QMetaObject::invokeMethod(subWidget, "setDarkMode", Q_ARG(bool, enable));
 }
 
-void AccountWindow::setSubWidgets(const QVector<QWidget *> subWidgets) { this->subWidgets = subWidgets; }
+void AccountWindow::setSubWidgets(const QVector<QWidget *> subWidgets) { 
+   for (QWidget *w : subWidgets) 
+      if (!this->subWidgets.contains(w)) 
+         this->subWidgets.append(w);
+}
