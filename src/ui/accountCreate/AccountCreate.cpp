@@ -139,17 +139,14 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    // Agreement
    agreement = new CheckWithBtn;
 
-   // Terms & Conditions Popup
-   // termsConditionsWidget = new TermsConditions;
-
-   // if (accountWindow) {
-   //    termsDialog = new Dialog(termsConditionsWidget, accountWindow->subWindow(), true);
-   //    accountWindow->setSubWidgets({termsConditionsWidget, termsDialog});
-   // }
+   //Terms & Conditions Popup
+   termsConditionsWidget = new TermsConditions;
+   termsDialog = new Dialog(termsConditionsWidget, accountWindow->subWindow(), true);
+   accountWindow->setSubWidgets({termsConditionsWidget, termsDialog});
    
-   // connect(agreement, &CheckWithBtn::onButtonClicked, this, [this]() {
-   //    termsDialog->show();
-   // });
+   connect(agreement, &CheckWithBtn::onButtonClicked, this, [=]() {
+      termsDialog->show();
+   });
 
    // Layout
    layout = new QVBoxLayout;
