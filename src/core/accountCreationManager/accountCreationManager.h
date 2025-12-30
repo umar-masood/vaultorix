@@ -4,14 +4,16 @@
 #include "../validators/usernameValidator/usernameValidator.h"
 #include "../validators/pwdValidator/pwdValidator.h"
 #include "../validators/nameValidator/nameValidator.h"
+#include "../../ui/dialogs/errorDialog/errorDialog.h"
 #include "../deviceInfo/deviceInfo.h"
+
+#include <QSettings>
 
 class AccountCreationManager : public QObject{
     Q_OBJECT
 
     public:
-    explicit AccountCreationManager(QObject *parent = nullptr);
-
+    explicit AccountCreationManager(AccountWindow *accountWindow = nullptr, QObject *parent = nullptr);
     void setAccountCreateObject(AccountCreate* accountCreateObj);
 
     private:
@@ -23,17 +25,20 @@ class AccountCreationManager : public QObject{
         {"acceptedTC", false}
     };
 
+    QNetworkAccessManager *manager = nullptr;
     const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
     const QString API_URL = "https://www.umarcreations.site/store-credentials";
-
-    QNetworkAccessManager *manager = nullptr;
-
     QString message;
     int statusCode;
 
     DeviceInfo deviceInfo;
+    QSettings *settings = nullptr;
+
+    ErrorDialogManager *errorDialogManager = nullptr;
     
+    AccountWindow *accountWindow = nullptr;
     AccountCreate* accountCreate = nullptr;
+
     GetEmail* emailValidator = nullptr;
     GetUsername* usernameValidator = nullptr;
     GetPassword* pwdValidator = nullptr;
@@ -41,10 +46,18 @@ class AccountCreationManager : public QObject{
 
     void setupConnections();
     void checkValidationStatus();
+
+    QJsonObject getCredentials();
     void storeCredentials();
+
+    void storeDeviceId();
+    QString getDeviceIdLocally() const;
+    
+    void updateCreateAccBtnState(bool isEnabled, const QString &text);
 
     signals:
     void validationDone(bool isValidationDone);
+    void credentialsStoredSuccessfully();
 
     private slots:
     void onNameValidated(bool isValid);
@@ -53,4 +66,7 @@ class AccountCreationManager : public QObject{
     void onPwdValidated(bool isValid);
     void onValidationDone(bool isValidationDone);
     void onTCBoxCheck(bool checked);
+    void onCreateAccBtnClicked();
+    void onErrorDialogActionBtnClicked(const QString &key);
+    void onCredentialsStoredSuccessfully();
 };

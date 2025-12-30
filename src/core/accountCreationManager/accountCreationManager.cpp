@@ -1,24 +1,40 @@
 #include "accountCreationManager.h"
+#include <QDebug>
 
-AccountCreationManager::AccountCreationManager(QObject *parent) : QObject(parent) {
+AccountCreationManager::AccountCreationManager(AccountWindow *accountWindow, QObject *parent) : QObject(parent), accountWindow(accountWindow) {
+    // Account Window object
+    if (accountWindow) 
+        this->accountWindow = accountWindow;
+
+    // Validators
     emailValidator = new GetEmail(this);
     usernameValidator = new GetUsername(this);
     pwdValidator = new GetPassword(this);
-    nameValidator = new GetName(this); 
-    
+    nameValidator = new GetName(this);
+
     // Network Manager
     manager = new QNetworkAccessManager(this);
+
+    // Settings
+    settings = new QSettings(this);
+
+    // Generate device id and stores it if it does not exists
+    storeDeviceId();
+
+    // Error Dialogs Manager
+    errorDialogManager = new ErrorDialogManager(accountWindow, this);
 }
 
-void AccountCreationManager::setAccountCreateObject(AccountCreate* accountCreateObj) {
-   if (!accountCreateObj) return;
-   this->accountCreate = accountCreateObj;
+void AccountCreationManager::setAccountCreateObject(AccountCreate *accountCreateObj) {
+    if (!accountCreateObj) return;
+    accountCreate = accountCreateObj;
 
-   emailValidator->setAccountCreateObject(this->accountCreate);
-   usernameValidator->setAccountCreateObject(this->accountCreate);
-   pwdValidator->setAccountCreateObject(this->accountCreate);
-   nameValidator->setAccountCreateObject(this->accountCreate);   
-   setupConnections();
+    emailValidator->setAccountCreateObject(accountCreate);
+    usernameValidator->setAccountCreateObject(accountCreate);
+    pwdValidator->setAccountCreateObject(accountCreate);
+    nameValidator->setAccountCreateObject(accountCreate);
+
+    setupConnections();
 }
 
 void AccountCreationManager::setupConnections() {
@@ -28,11 +44,14 @@ void AccountCreationManager::setupConnections() {
     connect(nameValidator, &GetName::nameValidated, this, &AccountCreationManager::onNameValidated);
     connect(this, &AccountCreationManager::validationDone, this, &AccountCreationManager::onValidationDone);
     connect(accountCreate->termsCondsBtn(), &CheckWithBtn::boxChecked, this, &AccountCreationManager::onTCBoxCheck);
+    connect(accountCreate->createBtn(), &Button::clicked, this, &AccountCreationManager::onCreateAccBtnClicked);
+    connect(this, &AccountCreationManager::credentialsStoredSuccessfully, this, &AccountCreationManager::onCredentialsStoredSuccessfully);
+    connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &AccountCreationManager::onErrorDialogActionBtnClicked);
 }
 
 void AccountCreationManager::checkValidationStatus() {
-    for (const auto &it : validationStatus) {
-        if (it.second == false) {
+    for (auto it = validationStatus.begin(); it != validationStatus.end(); ++it) {
+        if (!it->second) {
             emit validationDone(false);
             return;
         }
@@ -40,27 +59,21 @@ void AccountCreationManager::checkValidationStatus() {
     emit validationDone(true);
 }
 
-void AccountCreationManager::storeCredentials() {
-    QUrl url(API_URL);
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Accept", "application/json");
-    request.setRawHeader("api_key", API_KEY.toUtf8());
-    request.setTransferTimeout(15000);
-
-    QJsonObject mainObj;
-    
+QJsonObject AccountCreationManager::getCredentials() {
     QJsonObject userObj;
-    userObj["full_name"] = "Ali";
-    userObj["username"] = "this->username";
-    userObj["email_address"] = "this->email";
-    userObj["password"] = "this->password";
+    userObj["full_name"] = accountCreate->nameField()->text();
+    userObj["username"] = accountCreate->usernameField()->text();
+    userObj["email_address"] = accountCreate->emailField()->text();
+    userObj["password"] = accountCreate->pwdField()->text();
     userObj["created_at"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
     userObj["is_active"] = true;
 
     QJsonObject deviceObj;
     deviceObj["device_name"] = deviceInfo.getDeviceName();
-    deviceObj["device_id"] = deviceInfo.getDeviceId();
+    deviceObj["device_id"] = getDeviceIdLocally();
+
+    qDebug() << getDeviceIdLocally();
+    
     deviceObj["os_type"] = deviceInfo.getOSName();
     deviceObj["os_version"] = deviceInfo.getProductVersion();
     deviceObj["kernel_version"] = deviceInfo.getKernelVersion();
@@ -68,55 +81,78 @@ void AccountCreationManager::storeCredentials() {
     QJsonObject appObj;
     appObj["version"] = QCoreApplication::applicationVersion();
 
+    QJsonObject mainObj;
     mainObj["user_info"] = userObj;
     mainObj["device_info"] = deviceObj;
     mainObj["app_info"] = appObj;
 
-    //ValidatorUtils::cleanupMemory(this->username);
-    //ValidatorUtils::cleanupMemory(this->password);
+    return mainObj;
+}
 
-    QJsonDocument doc(mainObj);
-    QNetworkReply *reply = manager->post(request, doc.toJson());
+void AccountCreationManager::storeCredentials() {
+    // QUrl url(API_URL);
+    QUrl url("http://192.168.100.29:8000/store-credentials");
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Accept", "application/json");
+    request.setRawHeader("api_key", API_KEY.toUtf8());
+    request.setTransferTimeout(15000);
 
-    connect(reply, &QNetworkReply::finished, [this, reply]() {
-        if (!reply) return;
+    QNetworkReply *reply = manager->post(request, QJsonDocument(getCredentials()).toJson());
 
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         if (reply->error() == QNetworkReply::TimeoutError) {
             reply->deleteLater();
-            //emit requestTimeout();
+            errorDialogManager->show("RequestTimeout");
+            updateCreateAccBtnState(true, "Create Account");
             return;
         }
 
         if (reply->error() != QNetworkReply::NoError) {
             reply->deleteLater();
-            //emit somethingWentWrong();
+            qDebug() << reply->errorString();
+            errorDialogManager->show("SomethingWentWrong");
+            updateCreateAccBtnState(true, "Create Account");
             return;
         }
-
-        QByteArray data = reply->readAll();
-        reply->deleteLater();
-
-        if (data.isEmpty()) return;
 
         QJsonParseError parseError;
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
-        if (parseError.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
-           // emit somethingWentWrong();
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll(), &parseError);
+        reply->deleteLater();
+
+        if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
+            errorDialogManager->show("SomethingWentWrong");
+            updateCreateAccBtnState(true, "Create Account");
             return;
         }
 
-        QJsonObject obj = jsonDoc.object();
-        message = obj["message"].toString();
+        QJsonObject obj = doc.object();
         statusCode = obj["status_code"].toInt();
+        message = obj["message"].toString();
 
-        // switch (statusCode) {
-        //     case 200: emit verifiedCredentials(); break;
-        //     case 400: emit invalidCredentials(); break;
-        //     case 403: emit maxLimitReached(); break;
-        //     case 511: emit accessDenied(); break;
-        //     default: emit somethingWentWrong(); break;
-        // }
+        if (statusCode == 200) {
+            emit credentialsStoredSuccessfully(); 
+        } else if (statusCode == 403) {
+            errorDialogManager->show("MaxAttempts"); 
+            updateCreateAccBtnState(false, "Create Account");
+        } else if (statusCode == 400) {
+            qDebug() << "Bad Request";
+            updateCreateAccBtnState(true, "Create Account");
+        } else {
+            errorDialogManager->show("SomethingWentWrong"); 
+            updateCreateAccBtnState(true, "Create Account");
+        }
+        
     });
+}
+
+void AccountCreationManager::storeDeviceId() {
+    if (!settings->contains("deviceId"))
+        settings->setValue("deviceId", deviceInfo.getDeviceId());
+}
+
+QString AccountCreationManager::getDeviceIdLocally() const {
+    return settings->value("deviceId").toString();
 }
 
 void AccountCreationManager::onUsernameValidated(bool isValid) {
@@ -131,23 +167,38 @@ void AccountCreationManager::onEmailValidated(bool isValid) {
 
 void AccountCreationManager::onPwdValidated(bool isValid) {
     validationStatus["password"] = isValid;
-    qDebug() << "Password validation result: " << (isValid ? "Valid" : "Invalid") << "\n";
-    checkValidationStatus();
-}
-
-void AccountCreationManager::onValidationDone(bool isValidationDone) {
-    if (!accountCreate) return;
-    accountCreate->createBtn()->setEnabled(isValidationDone);
-}
-
-void AccountCreationManager::onTCBoxCheck(bool checked) {
-    validationStatus["acceptedTC"] = checked;
-    qDebug() << "Does the user accepted T&C: " << (checked ? "Accepted" : "Declined") << "\n";
     checkValidationStatus();
 }
 
 void AccountCreationManager::onNameValidated(bool isValid) {
     validationStatus["fullName"] = isValid;
-    qDebug() << "Full Name validation result: " << (isValid ? "Valid" : "Invalid") << "\n";
     checkValidationStatus();
+}
+
+void AccountCreationManager::onValidationDone(bool isValidationDone) {
+    accountCreate->createBtn()->setEnabled(isValidationDone);
+}
+
+void AccountCreationManager::onTCBoxCheck(bool checked) {
+    validationStatus["acceptedTC"] = checked;
+    checkValidationStatus();
+}
+
+void AccountCreationManager::onCreateAccBtnClicked() {
+    storeCredentials();
+    updateCreateAccBtnState(false, "");
+}
+
+void AccountCreationManager::updateCreateAccBtnState(bool isEnabled, const QString &text) {
+    accountCreate->createBtn()->setEnabled(isEnabled);
+    accountCreate->createBtn()->setText(text);
+}
+
+void AccountCreationManager::onErrorDialogActionBtnClicked(const QString &key) {
+    // future use
+}
+
+void AccountCreationManager::onCredentialsStoredSuccessfully() {
+    qDebug() << "Credentials stored successfully!";
+    QApplication::quit();
 }
