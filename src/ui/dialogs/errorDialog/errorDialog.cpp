@@ -91,8 +91,7 @@ void ErrorDialogManager::create( const QString &key, const QString &text, const 
 
 void ErrorDialogManager::show(const QString &key) {
     if (dialogs.contains(key) && dialogs[key].dialog) 
-        dialogs[key].dialog->show();
-    
+        dialogs[key].dialog->show();    
 }
 
 void ErrorDialogManager::close(const QString &key) {
