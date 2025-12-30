@@ -166,6 +166,7 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    createAccBtn = new Button;
    createAccBtn->setDisplayMode(Button::TextOnly);
    createAccBtn->setFixedSize(QSize(360, 36));
+   createAccBtn->setLoaderButton(true);
    createAccBtn->setGradientColor(true, "#008EDE", "#15F2FF");
    createAccBtn->setHoverGradientColor("#008EDE");
    createAccBtn->setText("Create Account");
