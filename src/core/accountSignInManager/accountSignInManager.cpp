@@ -9,14 +9,6 @@ AccountSignInManager::AccountSignInManager(AccountWindow *accountWindow, QObject
     // Error Dialogs Manager
     errorDialogManager = new ErrorDialogManager(accountWindow, this);
     connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &AccountSignInManager::onErrorDialogActionBtnClicked);
-
-    // Connect internal signals
-    connect(this, &AccountSignInManager::verifiedCredentials, this, &AccountSignInManager::onVerifiedCredentials);
-    connect(this, &AccountSignInManager::maxLimitReached, this, &AccountSignInManager::onMaxLimitReached);
-    connect(this, &AccountSignInManager::somethingWentWrong, this, &AccountSignInManager::onSomethingWentWrong);
-    connect(this, &AccountSignInManager::invalidCredentials, this, &AccountSignInManager::onInvalidCredentials);
-    connect(this, &AccountSignInManager::accessDenied, this, &AccountSignInManager::onAccessDenied);
-    connect(this, &AccountSignInManager::requestTimeout, this, &AccountSignInManager::onRequestTimeout);
 }
 
 void AccountSignInManager::setAccountSignInObject(AccountSignIn *accountSignInObject) {
@@ -55,13 +47,13 @@ void AccountSignInManager::verifyCredentials() {
 
         if (reply->error() == QNetworkReply::TimeoutError) {
             reply->deleteLater();
-            emit requestTimeout();
+            handleSignInError("RequestTimeout", true);
             return;
         }
 
         if (reply->error() != QNetworkReply::NoError) {
             reply->deleteLater();
-            emit somethingWentWrong();
+            handleSignInError("SomethingWentWrong", true);
             return;
         }
 
@@ -73,7 +65,7 @@ void AccountSignInManager::verifyCredentials() {
         QJsonParseError parseError;
         QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
         if (parseError.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
-            emit somethingWentWrong();
+            handleSignInError("SomethingWentWrong", true);
             return;
         }
 
@@ -82,11 +74,22 @@ void AccountSignInManager::verifyCredentials() {
         statusCode = obj["status_code"].toInt();
 
         switch (statusCode) {
-            case 200: emit verifiedCredentials(); break;
-            case 400: emit invalidCredentials(); break;
-            case 403: emit maxLimitReached(); break;
-            case 511: emit accessDenied(); break;
-            default: emit somethingWentWrong(); break;
+            case 200:
+                updateSignInBtnState(false, "Signed In");
+                as->usernameField()->setText("");
+                as->pwdField()->setText("");
+                break;
+            case 400:  
+                handleSignInError("InvalidCredentials", true);
+                break;
+            case 403:
+                handleSignInError("MaxAttempts");
+                break;
+            case 511: 
+                handleSignInError("AccessDenied");
+                break;
+            default: 
+                handleSignInError("SomethingWentWrong", true);
         }
     });
 }
@@ -108,37 +111,9 @@ void AccountSignInManager::updateSignInBtnState(bool isEnabled, const QString &t
     as->signInButton()->setText(text);
 }
 
-void AccountSignInManager::onCancelClicked() const {
-    QApplication::quit();
+void AccountSignInManager::handleSignInError(const QString &errorName, bool isSignInButtonEnabled, const QString &signInButtonText) {
+    errorDialogManager->show(errorName); 
+    updateSignInBtnState(isSignInButtonEnabled, signInButtonText);
 }
 
-void AccountSignInManager::onVerifiedCredentials() {
-    updateSignInBtnState(false, "Signed In");
-    as->usernameField()->setText("");
-    as->pwdField()->setText("");
-}
-
-void AccountSignInManager::onMaxLimitReached() { 
-    errorDialogManager->show("MaxAttempts"); 
-    updateSignInBtnState(false, "Sign In");
-}
-
-void AccountSignInManager::onSomethingWentWrong() { 
-    errorDialogManager->show("SomethingWentWrong");
-    updateSignInBtnState(true, "Sign In");
-}
-
-void AccountSignInManager::onInvalidCredentials() { 
-    errorDialogManager->show("InvalidCredentials"); 
-    updateSignInBtnState(true, "Sign In");
-}
-
-void AccountSignInManager::onAccessDenied() { 
-    errorDialogManager->show("AccessDenied"); 
-    updateSignInBtnState(false, "Sign In");
-}
-
-void AccountSignInManager::onRequestTimeout() { 
-    errorDialogManager->show("RequestTimeout"); 
-    updateSignInBtnState(true, "Sign In");
-}
+void AccountSignInManager::onCancelClicked() const { QApplication::quit(); }

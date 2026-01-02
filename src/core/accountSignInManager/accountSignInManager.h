@@ -44,23 +44,10 @@ private:
     
     void verifyCredentials();
     void updateSignInBtnState(bool isEnabled, const QString &text);
-
-signals:
-    void verifiedCredentials();
-    void maxLimitReached();
-    void somethingWentWrong();
-    void invalidCredentials();
-    void accessDenied();
-    void requestTimeout();
+    void handleSignInError(const QString &errorName, bool isSignInButtonEnabled = false, const QString &signInButtonText = "Sign In");
 
 private slots:
     void onSignInClicked();
     void onCancelClicked() const;
-    void onVerifiedCredentials();
-    void onMaxLimitReached();
-    void onSomethingWentWrong();
-    void onInvalidCredentials();    
-    void onAccessDenied();
-    void onRequestTimeout();
     void onErrorDialogActionBtnClicked(const QString &key);
 };
