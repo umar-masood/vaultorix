@@ -13,6 +13,7 @@ namespace DialogUtils {
     extern const QString maxAttemptsIcon;
     extern const QString accessDeniedIcon;
     extern const QString timeoutIcon;
+    extern const QString futherAttemptBlockedIcon;
 
     extern const QString noInternetText;
     extern const QString wrongCredentialsText;
@@ -21,4 +22,5 @@ namespace DialogUtils {
     extern const QString somethingWentWrongText;
     extern const QString accessDeniedText;
     extern const QString timeoutText;
+    extern const QString futherAttemptBlockedText;
 };
