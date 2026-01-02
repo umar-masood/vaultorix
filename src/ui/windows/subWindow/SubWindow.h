@@ -1,5 +1,6 @@
 #pragma once
 #include "../../components/Button.h"
+#include "../../components/ToolTip.h"
 
 #include <dwmapi.h>
 #include <windowsx.h>
@@ -46,7 +47,11 @@ private:
 
     // Window Controls
     Button *closeBtn = nullptr;
+    ToolTip *closeBtnTip = nullptr;
+
     Button *minimizeBtn = nullptr;
+    ToolTip *minimizeBtnTip = nullptr;
+
     bool hasCloseBtn = true;
     bool hasMinimizeBtn = false;
 

@@ -9,8 +9,16 @@ SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimiz
 
 void SubWindow::setDarkMode(bool value) {
     isDarkMode = value; 
-    if (closeBtn) closeBtn->setDarkMode(isDarkMode);
-    if (minimizeBtn) minimizeBtn->setDarkMode(isDarkMode);
+
+    if (closeBtn) {
+        closeBtn->setDarkMode(isDarkMode);
+        closeBtnTip->setDarkMode(isDarkMode);
+    }
+
+    if (minimizeBtn) {
+       minimizeBtn->setDarkMode(isDarkMode); 
+       minimizeBtnTip->setDarkMode(isDarkMode);
+    } 
 
     update();
     applyThemedIcons();
@@ -147,6 +155,7 @@ void SubWindow::setupTitleBar() {
     if (hasCloseBtn) {
         closeBtn = windowButton();
         closeBtn->setParent(titleBar);
+        closeBtnTip = new ToolTip(closeBtn, "Close");
         connect(closeBtn, &Button::clicked, this, &SubWindow::onCloseClicked);
     }
 
@@ -154,6 +163,7 @@ void SubWindow::setupTitleBar() {
     if (hasMinimizeBtn) {
         minimizeBtn = windowButton();
         minimizeBtn->setParent(titleBar);
+        minimizeBtnTip = new ToolTip(minimizeBtn, "Minimize");
         connect(minimizeBtn, &Button::clicked, this, &SubWindow::onMinimizedClicked);
     }
 
