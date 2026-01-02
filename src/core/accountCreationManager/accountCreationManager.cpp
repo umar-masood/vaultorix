@@ -2,10 +2,6 @@
 #include <QDebug>
 
 AccountCreationManager::AccountCreationManager(AccountWindow *accountWindow, QObject *parent) : QObject(parent), accountWindow(accountWindow) {
-    // Account Window object
-    if (accountWindow) 
-        this->accountWindow = accountWindow;
-
     // Validators
     emailValidator = new GetEmail(this);
     usernameValidator = new GetUsername(this);
@@ -28,7 +24,7 @@ AccountCreationManager::AccountCreationManager(AccountWindow *accountWindow, QOb
 void AccountCreationManager::setAccountCreateObject(AccountCreate *accountCreateObj) {
     if (!accountCreateObj) return;
     accountCreate = accountCreateObj;
-
+    
     emailValidator->setAccountCreateObject(accountCreate);
     usernameValidator->setAccountCreateObject(accountCreate);
     pwdValidator->setAccountCreateObject(accountCreate);
@@ -91,7 +87,7 @@ QJsonObject AccountCreationManager::getCredentials() {
 
 void AccountCreationManager::storeCredentials() {
     // QUrl url(API_URL);
-    QUrl url("http://192.168.100.29:8000/store-credentials");
+    QUrl url("http://127.0.0.1:8000/store-credentials");
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
@@ -103,16 +99,14 @@ void AccountCreationManager::storeCredentials() {
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         if (reply->error() == QNetworkReply::TimeoutError) {
             reply->deleteLater();
-            errorDialogManager->show("RequestTimeout");
-            updateCreateAccBtnState(true, "Create Account");
+            handleCreateAccError("RequestTimeout", true);
             return;
         }
 
         if (reply->error() != QNetworkReply::NoError) {
             reply->deleteLater();
             qDebug() << reply->errorString();
-            errorDialogManager->show("SomethingWentWrong");
-            updateCreateAccBtnState(true, "Create Account");
+            handleCreateAccError("SomethingWentWrong", true);
             return;
         }
 
@@ -121,8 +115,7 @@ void AccountCreationManager::storeCredentials() {
         reply->deleteLater();
 
         if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
-            errorDialogManager->show("SomethingWentWrong");
-            updateCreateAccBtnState(true, "Create Account");
+            handleCreateAccError("SomethingWentWrong", true);
             return;
         }
 
@@ -130,20 +123,26 @@ void AccountCreationManager::storeCredentials() {
         statusCode = obj["status_code"].toInt();
         message = obj["message"].toString();
 
-        if (statusCode == 200) {
+        if (statusCode == 200) 
             emit credentialsStoredSuccessfully(); 
-        } else if (statusCode == 403) {
-            errorDialogManager->show("MaxAttempts"); 
-            updateCreateAccBtnState(false, "Create Account");
-        } else if (statusCode == 400) {
-            qDebug() << "Bad Request";
-            updateCreateAccBtnState(true, "Create Account");
-        } else {
-            errorDialogManager->show("SomethingWentWrong"); 
-            updateCreateAccBtnState(true, "Create Account");
-        }
-        
+        else if (statusCode == 403) 
+            handleCreateAccError("MaxAttempts");
+        else if (statusCode == 513) 
+            handleCreateAccError("FurtherAttemptBlocked");
+        else 
+            handleCreateAccError("SomethingWentWrong", true);
     });
+}
+
+void AccountCreationManager::handleCreateAccError(const QString &errorName, bool createAccButtonEnabled, const QString &createAccButtonText) {
+    errorDialogManager->show(errorName); 
+    errorDialogManager->show("FurtherAttemptBlocked");
+    errorDialogManager->show("SomethingWentWrong");
+    errorDialogManager->show("MaxAttempts");
+    errorDialogManager->show("InvalidCredentials");
+    errorDialogManager->show("AccessDenied");
+    errorDialogManager->show("RequestTimeout");
+    updateCreateAccBtnState(createAccButtonEnabled, createAccButtonText);
 }
 
 void AccountCreationManager::storeDeviceId() {

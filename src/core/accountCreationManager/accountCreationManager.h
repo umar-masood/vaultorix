@@ -54,6 +54,7 @@ class AccountCreationManager : public QObject{
     QString getDeviceIdLocally() const;
     
     void updateCreateAccBtnState(bool isEnabled, const QString &text);
+    void handleCreateAccError(const QString &errorName, bool createAccButtonEnabled = false, const QString &createAccButtonText = "Create Account");
 
     signals:
     void validationDone(bool isValidationDone);
