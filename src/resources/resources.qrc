@@ -35,5 +35,7 @@
     <file>icons/Dialogs/wrongCredentials.png</file>
     <file>icons/Dialogs/somethingWentWrong.png</file>
     <file>icons/Dialogs/maxLimitReached.png</file>
+    <file>icons/Dialogs/accessDenied.png</file>
+    <file>icons/Dialogs/timeout.png</file>
   </qresource>
 </RCC>
