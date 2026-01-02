@@ -114,11 +114,14 @@ bool EmailValidator::isEmailBlacklisted(const std::string &domain) {
 }
 
 void EmailValidator::isEmailAvailable(QByteArray &email) {
-    QUrl url("http://www.umarcreations.site");
+    // QUrl url("http://www.umarcreations.site");
+    QUrl url("http://127.0.0.1:8000");
     url.setPath("/check-email/" + QString::fromUtf8(email));    
 
     qDebug() << "Checking email availability for: " << QString::fromUtf8(email) << "\n";
     QNetworkRequest request(url);
+    request.setTransferTimeout(15000);
+    
     QNetworkReply *reply = manager->get(request);
 
     connect(reply, &QNetworkReply::finished, [this, reply, &email](){
