@@ -17,7 +17,7 @@ class Error : public QWidget {
     Q_OBJECT
 
     public:
-    explicit Error ( QSize widgetSize = QSize(300,300),
+    explicit Error (QSize widgetSize = QSize(300,300),
                     const QString &text = QString(),
                     const QString &illustrationLight = QString(),
                     const QString &illustrationDark = QString(),
@@ -72,6 +72,7 @@ class ErrorDialogManager : public QObject {
     void create(
         const QString &key,
         const QString &text,
+        const QString &actionButtonText,
         const QString &iconPath
     );
 };

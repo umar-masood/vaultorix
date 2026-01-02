@@ -7,7 +7,6 @@ Error::Error(QSize widgetSize, const QString &text, const QString &illustrationL
 
     layout = new QVBoxLayout(this);
     layout->setSpacing(0);
-    //layout->setContentsMargins(10, 16, 10, 10);
 
     // Action Button
     actionBtn = new Button;
@@ -67,18 +66,21 @@ ErrorDialogManager::ErrorDialogManager(AccountWindow *window, QObject *parent) :
 
     if (!accountWindow) return;
 
-    create("InvalidCredentials", wrongCredentialsText, wrongCredentialsIcon);
-    create("MaxAttempts", maxAttemptsText, maxAttemptsIcon);
-    create("SomethingWentWrong", somethingWentWrongText, somethingWentWrongIcon);
-    create("AccessDenied", accessDeniedText, accessDeniedIcon);
-    create("RequestTimeout", timeoutText, timeoutIcon);
+    create("InvalidCredentials", wrongCredentialsText, "Retry", wrongCredentialsIcon);
+    create("MaxAttempts", maxAttemptsText, "OK", maxAttemptsIcon);
+    create("SomethingWentWrong", somethingWentWrongText, "Retry", somethingWentWrongIcon);
+    create("AccessDenied", accessDeniedText, "OK", accessDeniedIcon);
+    create("RequestTimeout", timeoutText, "Retry", timeoutIcon);
+    create("FurtherAttemptBlocked", futherAttemptBlockedText, "OK", futherAttemptBlockedIcon);
 
     accountWindow->setSubWidgets(allWidgets());
 }
 
-void ErrorDialogManager::create( const QString &key, const QString &text, const QString &iconPath) {
+void ErrorDialogManager::create(const QString &key, const QString &text, const QString &actionButtonText, const QString &iconPath) {
     ErrorDialog ed;
     ed.widget = new Error(dialogSize, text, iconPath, iconPath, illustrationSize);
+    ed.widget->actionButton()->setText(actionButtonText);
+
     ed.dialog = new Dialog(ed.widget, accountWindow->subWindow(), false);
 
     connect(ed.widget->actionButton(), &Button::clicked, this, [this, key]() {
