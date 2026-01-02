@@ -138,6 +138,10 @@ void AccountWindow::init() {
    themeMode->setFixedSize(QSize(26, 26));
    themeMode->setIconPaths(lightModeIcon, lightModeIcon);
 
+   // Theme Button Tooltip
+   themeButtonTip = new ToolTip(themeMode);
+   themeButtonTip->setText("Change theme mode");
+
    // Seperator 
    seperator = new Seperator(titleBar, 18, 1, Qt::Vertical);
    int x = titleBar->width() - 26*2 - 5*3 - 4;
@@ -222,6 +226,7 @@ void AccountWindow::onthemeModeChanged(bool enable) {
 
    if (themeMode) {
       themeMode->setDarkMode(enable);
+      themeButtonTip->setDarkMode(enable);
       enable ? themeMode->setIconPaths(darkModeIcon, darkModeIcon) : themeMode->setIconPaths(lightModeIcon, lightModeIcon);
    }
 

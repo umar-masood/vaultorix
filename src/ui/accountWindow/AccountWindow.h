@@ -5,6 +5,7 @@
 #include "../components/Button.h"
 #include "../components/Dialog.h"
 #include "../components/Seperator.h"
+#include "../components/ToolTip.h"
 
 #include <QVBoxLayout>
 #include <QFont>
@@ -72,7 +73,10 @@ class AccountWindow : public QObject {
    // SubWindow 
    SubWindow *w = nullptr;
    Seperator *seperator = nullptr;
+
    Button *themeMode = nullptr;
+   ToolTip *themeButtonTip = nullptr;
+
    QVector<QWidget *> subWidgets = {};
 
    QHBoxLayout *mainLayout = nullptr;
