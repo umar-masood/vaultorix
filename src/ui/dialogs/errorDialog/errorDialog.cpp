@@ -1,10 +1,12 @@
 #include "ErrorDialog.h"
 
 /* -------------- Error Widget ----------------- */
-Error::Error(QSize widgetSize, const QString &text, const QString &illustrationLight, const QString &illustrationDark, QSize iconSize, QWidget *parent) : QWidget(parent), lightIcon(illustrationLight), darkIcon(illustrationDark), size(iconSize) {
+Error::Error(const QString &text, const QString &illustrationLight, const QString &illustrationDark, QWidget *parent) : QWidget(parent), lightIcon(illustrationLight), darkIcon(illustrationDark) {
     
     setAttribute(Qt::WA_TranslucentBackground);
-    setFixedSize(widgetSize);
+
+    // Size
+    int errorWidgetHeight = 0;
 
     // Main Layout
     layout = new QVBoxLayout(this);
@@ -15,13 +17,17 @@ Error::Error(QSize widgetSize, const QString &text, const QString &illustrationL
     actionBtn->setDisplayMode(Button::TextOnly);
     actionBtn->setFixedSize(QSize(316, 36));
     actionBtn->setText("Retry");
+    errorWidgetHeight += 36;
 
     // Illustration
+    QPixmap pixmap(lightIcon);
+    errorWidgetHeight += pixmap.height();
+    
     illustration = new QLabel;
     illustration->setAttribute(Qt::WA_TranslucentBackground);
-    illustration->setFixedSize(size);
+    illustration->setFixedSize(pixmap.size() + QSize(20, 20));
     illustration->setAlignment(Qt::AlignCenter);
-    illustration->setPixmap(QPixmap(lightIcon).scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    illustration->setPixmap(pixmap);
 
     // Text (only if provided)
     if (!text.isEmpty()) {
@@ -31,13 +37,21 @@ Error::Error(QSize widgetSize, const QString &text, const QString &illustrationL
         textWidget->setTextColor("#8D8D8D");
         textWidget->setWordWrap(true);
         textWidget->setText(text);
+
+        // Font Handling
+        QFontMetrics fm(textWidget->font());
+        errorWidgetHeight += 36;
     }
+
+    errorWidgetHeight += 42;
+    setFixedSize(342, errorWidgetHeight);
 
     layout->addStretch();
     layout->addWidget(illustration, 0, Qt::AlignCenter);
     layout->addSpacing(12);
 
     if (textWidget) {
+        layout->addStretch();
         layout->addWidget(textWidget, 0, Qt::AlignCenter);
         layout->addSpacing(12);
     }
@@ -73,13 +87,14 @@ ErrorDialogManager::ErrorDialogManager(AccountWindow *window, QObject *parent) :
     create("AccessDenied", accessDeniedText, "OK", accessDeniedIcon);
     create("RequestTimeout", timeoutText, "Retry", timeoutIcon);
     create("FurtherAttemptBlocked", futherAttemptBlockedText, "OK", futherAttemptBlockedIcon);
+    create("NoInternet", noInternetText, "Retry", noInternetIcon);
 
     accountWindow->setSubWidgets(allWidgets());
 }
 
 void ErrorDialogManager::create(const QString &key, const QString &text, const QString &actionButtonText, const QString &iconPath) {
     ErrorDialog ed;
-    ed.widget = new Error(dialogSize, text, iconPath, iconPath, illustrationSize);
+    ed.widget = new Error(text, iconPath, iconPath);
     ed.widget->actionButton()->setText(actionButtonText);
     connect(ed.widget->actionButton(), &Button::clicked, this, [this, key]() {
         emit actionTriggered(key);

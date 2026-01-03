@@ -6,6 +6,7 @@
 #include "./core/deviceInfo/deviceInfo.h"
 #include "./core/accountSignInManager/accountSignInManager.h"
 #include "./core/accountCreationManager/accountCreationManager.h"
+#include "./ui/dialogs/errorDialog/ErrorDialog.h"
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -14,12 +15,21 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Umar Creations");
     
     AccountWindow *aw = new AccountWindow;
-
+    aw->setDarkMode(true);
+    
     AccountCreate *ac = new AccountCreate(nullptr, aw);
     aw->setRightWidget(ac);
 
-    AccountCreationManager *m = new AccountCreationManager(aw);
-    m->setAccountCreateObject(ac);
+    ErrorDialogManager *m = new ErrorDialogManager(aw);
+    m->show("InvalidCredentials");
+    m->show("MaxAttempts");
+    m->show("NoInternet");
+    m->show("AccessDenied");
+    m->show("RequestTimeout");
+    m->show("FurtherAttemptBlocked");
+
+    // AccountCreationManager *m = new AccountCreationManager(aw);
+    // m->setAccountCreateObject(ac);
 
 
     aw->show();

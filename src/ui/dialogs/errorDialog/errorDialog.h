@@ -18,11 +18,9 @@ class Error : public QWidget {
     Q_OBJECT
 
     public:
-    explicit Error(QSize widgetSize = QSize(300,300),
-                    const QString &text = QString(),
+    explicit Error( const QString &text = QString(),
                     const QString &illustrationLight = QString(),
                     const QString &illustrationDark = QString(),
-                    QSize iconSize = QSize(203, 201),
                     QWidget *parent = nullptr);
 
     Q_INVOKABLE void setDarkMode(bool value);

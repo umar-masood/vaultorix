@@ -1,9 +1,6 @@
 #include "DialogsUtils.h"
 
 namespace DialogUtils {
-    const QSize dialogSize = QSize(342, 320);
-    const QSize illustrationSize = QSize(200, 200);
-
     const QString noInternetIcon = ":/icons/Dialogs/noInternet.png";
     const QString wrongCredentialsIcon = ":/icons/Dialogs/wrongCredentials.png";
     const QString unknownDeviceIcon = ":/icons/Dialogs/unknownDevice.png";
@@ -19,6 +16,6 @@ namespace DialogUtils {
     const QString somethingWentWrongText = "Something went wrong. Please try again.";
     const QString maxAttemptsText = "Maximum invalid sign-in attempts limit reached. Please try again after 24 hours.";
     const QString accessDeniedText = "We have blocked access to your account from this device for security reasons.";
-    const QString timeoutText = "Unable to connect to the server. Please check your internet connection and try again.";
+    const QString timeoutText = "Request tmeout. Please check your internet connection and try again.";
     const QString futherAttemptBlockedText = "You cannot create multiple accounts on same device.";
 };
