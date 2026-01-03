@@ -34,13 +34,12 @@ Error::Error(QSize widgetSize, const QString &text, const QString &illustrationL
     }
 
     layout->addStretch();
-    layout->addSpacing(4);
     layout->addWidget(illustration, 0, Qt::AlignCenter);
-    layout->addSpacing(16);
+    layout->addSpacing(12);
 
     if (textWidget) {
         layout->addWidget(textWidget, 0, Qt::AlignCenter);
-        layout->addSpacing(16);
+        layout->addSpacing(12);
     }
 
     layout->addWidget(actionBtn, 0, Qt::AlignCenter);
