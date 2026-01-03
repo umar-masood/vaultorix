@@ -18,19 +18,16 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 
-class ValidatorUtils : public QObject
-{
+class ValidatorUtils : public QObject {
     Q_OBJECT
 
     public:
-    explicit ValidatorUtils(QObject *parent = nullptr, const QString &alias = "");
+    explicit ValidatorUtils(QObject *parent = nullptr, const QString &blacklistName = "");
     
     std::string filePath;
 
     void setFileName(const std::string &filename);
-    bool isOlderList();
     bool downloadList(const QUrl &url);
-
     static void lower(std::string &str);
     static void cleanupMemory(std::string &str);
     static void cleanupMemory(QByteArray &bytes);
@@ -39,10 +36,14 @@ class ValidatorUtils : public QObject
     void networkError(QNetworkReply::NetworkError err);
     void listDownloaded();
 
-    private slots:
+    private:
+    // Network Manager
+    QNetworkAccessManager *manager = nullptr;    
+    
+    // Slot
     void onFinished(QNetworkReply *reply);
 
-    private:
-    QString alias;
-    QNetworkAccessManager *manager = nullptr;
+    // Helper Methods
+    bool isOlderList();
+
 };

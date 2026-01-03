@@ -1,4 +1,4 @@
-#include "dialogsUtils.h"
+#include "DialogsUtils.h"
 
 namespace DialogUtils {
     const QSize dialogSize = QSize(342, 320);

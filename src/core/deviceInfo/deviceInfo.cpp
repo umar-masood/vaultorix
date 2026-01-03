@@ -1,4 +1,4 @@
-#include "deviceInfo.h"
+#include "DeviceInfo.h"
 
 DeviceInfo::DeviceInfo() {}
 

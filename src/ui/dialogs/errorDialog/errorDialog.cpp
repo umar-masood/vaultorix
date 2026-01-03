@@ -1,10 +1,12 @@
-#include "errorDialog.h"
+#include "ErrorDialog.h"
 
+/* -------------- Error Widget ----------------- */
 Error::Error(QSize widgetSize, const QString &text, const QString &illustrationLight, const QString &illustrationDark, QSize iconSize, QWidget *parent) : QWidget(parent), lightIcon(illustrationLight), darkIcon(illustrationDark), size(iconSize) {
     
     setAttribute(Qt::WA_TranslucentBackground);
     setFixedSize(widgetSize);
 
+    // Main Layout
     layout = new QVBoxLayout(this);
     layout->setSpacing(0);
 
@@ -14,7 +16,7 @@ Error::Error(QSize widgetSize, const QString &text, const QString &illustrationL
     actionBtn->setFixedSize(QSize(316, 36));
     actionBtn->setText("Retry");
 
-    // Icon
+    // Illustration
     illustration = new QLabel;
     illustration->setAttribute(Qt::WA_TranslucentBackground);
     illustration->setFixedSize(size);
@@ -59,7 +61,7 @@ void Error::setDarkMode(bool value) {
     emit themeModeChanged(isDarkMode); 
 }
 
-Button * Error::actionButton() { return actionBtn; }
+Button* Error::actionButton() { return actionBtn; }
 
 /* ---------------  Error Dialog Manager  --------------- */
 ErrorDialogManager::ErrorDialogManager(AccountWindow *window, QObject *parent) : QObject(parent), accountWindow(window) {
@@ -80,13 +82,12 @@ void ErrorDialogManager::create(const QString &key, const QString &text, const Q
     ErrorDialog ed;
     ed.widget = new Error(dialogSize, text, iconPath, iconPath, illustrationSize);
     ed.widget->actionButton()->setText(actionButtonText);
-
-    ed.dialog = new Dialog(ed.widget, accountWindow->subWindow(), false);
-
     connect(ed.widget->actionButton(), &Button::clicked, this, [this, key]() {
         emit actionTriggered(key);
         close(key);
     });
+
+    ed.dialog = new Dialog(ed.widget, accountWindow->subWindow(), false);
 
     dialogs.insert(key, ed);
 }

@@ -3,18 +3,22 @@
 AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
-   icon = new Label(true);
-   icon->setFixedSize(QSize(150, 150));
-   icon->setPixmap(QPixmap(":/icons/AccountSignIn/sign-in.png").scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-   icon->setScaledContents(true);
+   // Main Icon
+   illustration = new Label(true);
+   illustration->setFixedSize(QSize(150, 150));
+   illustration->setPixmap(QPixmap(":/icons/AccountSignIn/sign-in.png").scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   illustration->setScaledContents(true);
 
+   // Heading
    heading = new Label(false, "Inter", 22, QFont::Bold, false, "Sign in to your Account");
    
+   // Text under Heading (Welcome Text)
    text = new Label(false, "Segoe UI", 10, QFont::Medium, false, "Hi, Welcome back!");
    text->setWordWrap(true);
    text->setStyleSheet("color: #8D8D8D;");
    text->setFixedWidth(324);
 
+   // Username Field
    username = new TextField;
    username->setPlaceholderText("Username");
    username->setContextMenu(false);
@@ -23,48 +27,47 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    username->setClearButton(true);
    username->setTextFieldIconSize(QSize(18,18));
    
-   pwd = new TextField;
-   pwd->setContextMenu(false);
-   pwd->setPlaceholderText("Password");
-   pwd->setFixedSize(QSize(360, 36));
-   pwd->setPasswordTextField(true);
-   pwd->setTextFieldIcon(true);
-   pwd->setTextFieldIconSize(QSize(18,18));
+   // Password Field
+   password = new TextField;
+   password->setContextMenu(false);
+   password->setPlaceholderText("Password");
+   password->setFixedSize(QSize(360, 36));
+   password->setPasswordTextField(true);
+   password->setTextFieldIcon(true);
+   password->setTextFieldIconSize(QSize(18,18));
 
+   // Forgot Password Field
    forgotPwd = new Button("Forgot Password?");
    forgotPwd->setDisplayMode(Button::TextOnly);
    forgotPwd->setFixedSize(QSize(110, 18));
    forgotPwd->setHyperLink(true);
    forgotPwd->setFontProperties("Segoe UI", 10, false, false);
    forgotPwd->setHyperLinkColors("#008EDE", "#15F2FF");
-   connect(forgotPwd, &Button::clicked, this, [this](){
-      emit forgotPwdClicked();
-   });
+   connect(forgotPwd, &Button::clicked, this, [this]() { emit forgotPwdClicked(); });
 
-   signIn = new Button("Sign in");
-   signIn->setDisplayMode(Button::TextOnly);
-   signIn->setFixedSize(QSize(360, 36));
-   signIn->setGradientColor(true, "#008EDE", "#15F2FF");
-   signIn->setHoverGradientColor("#008EDE");
-   signIn->setFontProperties("Segoe UI", 11, true, false);
-   signIn->setLoaderButton(true);
-   connect(signIn, &Button::clicked, this, [this](){
-      emit signInClicked();
-   });
+   // Sign In Button
+   signInBtn = new Button("Sign in");
+   signInBtn->setDisplayMode(Button::TextOnly);
+   signInBtn->setFixedSize(QSize(360, 36));
+   signInBtn->setGradientColor(true, "#008EDE", "#15F2FF");
+   signInBtn->setHoverGradientColor("#008EDE");
+   signInBtn->setFontProperties("Segoe UI", 11, true, false);
+   signInBtn->setLoaderButton(true);
+   connect(signInBtn, &Button::clicked, this, [this]() { emit signInClicked(); });
 
-   cancel = new Button("Cancel");
-   cancel->setDisplayMode(Button::TextOnly);
-   cancel->setSecondary(true);
-   cancel->setFixedSize(QSize(360, 36));
-   cancel->setFontProperties("Segoe UI", 11, true, false);
-   connect(cancel, &Button::clicked, this, [this](){
-      emit cancelClicked();
-   });
+   // Cancel Button
+   cancelBtn = new Button("Cancel");
+   cancelBtn->setDisplayMode(Button::TextOnly);
+   cancelBtn->setSecondary(true);
+   cancelBtn->setFixedSize(QSize(360, 36));
+   cancelBtn->setFontProperties("Segoe UI", 11, true, false);
+   connect(cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
 
+   // Main Layout
    layout = new QVBoxLayout(this);
    layout->setSpacing(0);
    layout->addStretch();
-   layout->addWidget(icon, 0, Qt::AlignHCenter);
+   layout->addWidget(illustration, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
    layout->addWidget(heading, 0, Qt::AlignHCenter);
    layout->addSpacing(20);
@@ -72,13 +75,13 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    layout->addSpacing(20);
    layout->addWidget(username, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
-   layout->addWidget(pwd, 0, Qt::AlignHCenter);
+   layout->addWidget(password, 0, Qt::AlignHCenter);
    layout->addSpacing(20);
    layout->addWidget(forgotPwd, 0, Qt::AlignRight);
    layout->addSpacing(26);
-   layout->addWidget(signIn, 0, Qt::AlignHCenter);
+   layout->addWidget(signInBtn, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
-   layout->addWidget(cancel, 0, Qt::AlignHCenter);
+   layout->addWidget(cancelBtn, 0, Qt::AlignHCenter);
    layout->addStretch();
 
    setDarkMode(false);
@@ -88,30 +91,19 @@ void AccountSignIn::setDarkMode(bool value) {
    isDarkMode = value;
    
    if (heading) heading->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
-   if (cancel) cancel->setDarkMode(isDarkMode);
-
-   const QString userIcon = ":/icons/AccountSignIn/user.svg";
-   const QString pwdIcon = ":/icons/AccountSignIn/password.svg";
+   if (cancelBtn) cancelBtn->setDarkMode(isDarkMode);
 
    if (username) {
       username->setIconPaths(userIcon, userIcon);
       username->setDarkMode(isDarkMode);
    }
 
-   if (pwd) {
-      pwd->setIconPaths(pwdIcon,pwdIcon);
-      pwd->setDarkMode(isDarkMode);
+   if (password) {
+      password->setIconPaths(passwordIcon,passwordIcon);
+      password->setDarkMode(isDarkMode);
    }
 }
 
-TextField *AccountSignIn::usernameField() const {
-   return username;
-}
-
-TextField *AccountSignIn::pwdField() const {
-   return pwd;
-}
-
-Button* AccountSignIn::signInButton() const {
-   return signIn;
-}  
+TextField *AccountSignIn::usernameField() const { return username; }
+TextField *AccountSignIn::passwordField() const { return password; }
+Button* AccountSignIn::signInButton() const { return signInBtn; }  

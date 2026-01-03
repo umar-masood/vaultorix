@@ -60,9 +60,9 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
    // Create checkbox
-   checkbox = new CheckBox("I agree to our");
-   checkbox->setParent(this);
-   checkbox->move(0, 0); 
+   _checkbox = new CheckBox("I agree to our");
+   _checkbox->setParent(this);
+   _checkbox->move(0, 0); 
 
    // Create button
    _button = new Button;
@@ -73,21 +73,13 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    _button->setText("Terms & Conditions");
    _button->setFontProperties("Segoe UI", 10, false, false);
    _button->setHyperLinkColors("#008EDE", "#15F2FF");
-   _button->move(checkbox->width() + 4, 4); 
+   _button->move(_checkbox->width() + 4, 4); 
 
-   connect(_button, &Button::clicked, this, [this](){
-      emit onButtonClicked();
-   });
-
-   connect(checkbox, &CheckBox::toggled, this, [this](bool checked){
-      emit boxChecked(checked);
-   });
-
-   connect(this, &CheckWithBtn::themeModeChanged, this, [this](bool enable){
-      if (checkbox) checkbox->setDarkMode(enable); 
-   });
+   connect(_button, &Button::clicked, this, [this]() { emit onButtonClicked(); });
+   connect(_checkbox, &CheckBox::toggled, this, [this](bool checked) { emit boxChecked(checked); });
+   connect(this, &CheckWithBtn::themeModeChanged, this, [this](bool enable) { if (_checkbox) _checkbox->setDarkMode(enable); });
    
-   setFixedSize(QSize((checkbox->width() + _button->width() + 5), 22));
+   setFixedSize(QSize((_checkbox->width() + _button->width() + 5), 22));
 }
 
 void CheckWithBtn::setDarkMode(bool value) {
@@ -97,7 +89,7 @@ void CheckWithBtn::setDarkMode(bool value) {
 }
 
 Button* CheckWithBtn::button() const { return _button; }
-CheckBox* CheckWithBtn::termsCheckBox() const { return checkbox; }
+CheckBox* CheckWithBtn::checkBox() const { return _checkbox; }
 
 // AccountCreate Implementation
 AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QWidget(parent) {
@@ -126,27 +118,25 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    emailWidget = LabeledField("Email-Address", email);
 
    // Password
-   pwd = Field("Enter strong password");
-   pwd->setContextMenu(false);
-   pwd->setPasswordTextField(true);
-   pwdWidget = LabeledField("Password", pwd);
+   password = Field("Enter strong password");
+   password->setContextMenu(false);
+   password->setPasswordTextField(true);
+   passwordWidget = LabeledField("Password", password);
 
-   fieldsWidgets = {nameWidget, usernameWidget, emailWidget, pwdWidget};
+   fieldsWidgets = {nameWidget, usernameWidget, emailWidget, passwordWidget};
 
    // Validator
-   pwdValidator = new PwdRulesWidget;
+   _passwordValidatorWidget = new PwdRulesWidget;
 
    // Agreement
-   agreement = new CheckWithBtn;
+   _termsConditionsWidget = new CheckWithBtn;
 
-   //Terms & Conditions Popup
-   termsConditionsWidget = new TermsConditions;
-   termsDialog = new Dialog(termsConditionsWidget, accountWindow->subWindow(), true);
-   accountWindow->setSubWidgets({termsConditionsWidget, termsDialog});
+   // Terms & Conditions Popup
+   termsConditionsDialogWidget = new TermsConditions;
+   termsConditionsDialog = new Dialog(termsConditionsDialogWidget, accountWindow->subWindow(), true);
+   accountWindow->setSubWidgets({termsConditionsDialogWidget, termsConditionsDialog});
    
-   connect(agreement, &CheckWithBtn::onButtonClicked, this, [=]() {
-      termsDialog->show();
-   });
+   connect(_termsConditionsWidget, &CheckWithBtn::onButtonClicked, this, [=]() { termsConditionsDialog->show(); });
 
    // Layout
    layout = new QVBoxLayout;
@@ -158,9 +148,9 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
       layout->addSpacing(10);
    }
 
-   layout->addWidget(pwdValidator, 0, Qt::AlignLeft);
+   layout->addWidget(_passwordValidatorWidget, 0, Qt::AlignLeft);
    layout->addSpacing(10);
-   layout->addWidget(agreement, 0, Qt::AlignLeft);
+   layout->addWidget(_termsConditionsWidget, 0, Qt::AlignLeft);
 
    // Create Account Button
    createAccBtn = new Button;
@@ -197,22 +187,22 @@ void AccountCreate::setDarkMode(bool value) {
    for (auto *label : labels)
       label->setStyleSheet(QString("color: %1;").arg(labelColor));
 
-   QVector<CustomTextField *> textFields = {name, username, pwd, email};
+   QVector<CustomTextField *> textFields = {name, username, password, email};
    for (auto *field : textFields)
       field->setDarkMode(isDarkMode);
 
-   if (agreement) agreement->setDarkMode(isDarkMode);
+   if (_termsConditionsWidget) _termsConditionsWidget->setDarkMode(isDarkMode);
 }
 
-Button* AccountCreate::createBtn() const { return createAccBtn; }
+Button* AccountCreate::createAccountButton() const { return createAccBtn; }
+
 CustomTextField *AccountCreate::nameField() const { return name; }
 CustomTextField *AccountCreate::usernameField() const { return username; }
-CustomTextField *AccountCreate::pwdField() const { return pwd; }
+CustomTextField *AccountCreate::passwordField() const { return password; }
 CustomTextField *AccountCreate::emailField() const { return email; }
-CheckWithBtn *AccountCreate::termsCondsBtn() const { return agreement; }
-PwdRulesWidget * AccountCreate::pwdRulesWidget() const { return pwdValidator; }
-// Dialog * AccountCreate::termsCondsDialog() const { return termsDialog; }
-// TermsConditions *AccountCreate::termsCondsWidget() const { return termsConditionsWidget; }
+
+CheckWithBtn *AccountCreate::termsConditionsWidget() const { return _termsConditionsWidget; }
+PwdRulesWidget * AccountCreate::passwordValidatorWidget() const { return _passwordValidatorWidget; }
 
 CustomTextField *AccountCreate::Field(const QString &placeholderText, bool useCheck) {
    auto *field = new CustomTextField(useCheck);

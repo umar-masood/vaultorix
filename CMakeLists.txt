@@ -13,7 +13,6 @@ add_executable(Vaultorix
 
     # Windows
     src/ui/windows/subWindow/SubWindow.cpp
-    src/ui/windows/subWindow/resources.qrc
 
     # Account Window
     src/ui/accountWindow/AccountWindow.cpp
@@ -23,7 +22,6 @@ add_executable(Vaultorix
     
     # Account OTP
     src/ui/accountOTP/AccountOTP.cpp
-    src/ui/accountOTP/OTPWidget.cpp
 
     # Account Sign In
     src/ui/accountSignIn/AccountSignIn.cpp
@@ -32,10 +30,10 @@ add_executable(Vaultorix
     src/ui/dialogs/termsConditions/TermsConditions.cpp
 
     # Error Dialogs
-    src/ui/dialogs/errorDialog/errorDialog.cpp
+    src/ui/dialogs/errorDialog/ErrorDialog.cpp
 
     # Dialogs Utils
-    src/ui/dialogs/dialogsUtils.cpp
+    src/ui/dialogs/dialogUtils/DialogsUtils.cpp
 
     # Pwd Validator
     src/ui/pwdRulesWidget/pwdRulesWidget.cpp
@@ -63,17 +61,17 @@ add_executable(Vaultorix
 
     # Core
     ## Validators
-    src/core/validators/emailValidator/emailValidator.cpp
-    src/core/validators/pwdValidator/pwdValidator.cpp
+    src/core/validators/emailValidator/EmailValidator.cpp
+    src/core/validators/pwdValidator/PwdValidator.cpp
     src/core/validators/OTPValidator/OTPValidator.cpp
-    src/core/validators/usernameValidator/usernameValidator.cpp
-    src/core/validators/validatorUtils/validatorUtils.cpp
-    src/core/validators/nameValidator/nameValidator.cpp
+    src/core/validators/usernameValidator/UsernameValidator.cpp
+    src/core/validators/validatorUtils/ValidatorUtils.cpp
+    src/core/validators/nameValidator/NameValidator.cpp
     ## Managers
-    src/core/accountCreationManager/accountCreationManager.cpp
-    src/core/accountSignInManager/accountSignInManager.cpp
+    src/core/accountCreationManager/AccountCreationManager.cpp
+    src/core/accountSignInManager/AccountSignInManager.cpp
     ## Device Info
-    src/core/deviceInfo/deviceInfo.cpp
+    src/core/deviceInfo/DeviceInfo.cpp
 
     # Entry Point of App
     src/main.cpp

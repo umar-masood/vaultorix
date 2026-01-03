@@ -1,5 +1,6 @@
-#include "pwdValidator.h"
+#include "PwdValidator.h"
 
+/* -------------------- Password Validator --------------------- */
 PwdValidator::PwdValidator(QObject *parent) : QObject(parent) {
     vu = new ValidatorUtils(this, "Password");
     vu->setFileName("badPwds.config");
@@ -34,10 +35,10 @@ bool PwdValidator::isValidPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules) {
     }
 
     hasLength ? pwdRules->atLeastEight()->setChecked() : pwdRules->atLeastEight()->setUnchecked();
-    hasUpper ? pwdRules->oneUpperCase()->setChecked() : pwdRules->oneUpperCase()->setUnchecked();
-    hasLower ? pwdRules->oneLowerCase()->setChecked() : pwdRules->oneLowerCase()->setUnchecked();
-    hasDigit ? pwdRules->oneDigit()->setChecked() : pwdRules->oneDigit()->setUnchecked();
-    hasSpecial ? pwdRules->oneSpecialChar()->setChecked() : pwdRules->oneSpecialChar()->setUnchecked();
+    hasUpper ? pwdRules->atLeastOneUpperCaseChar()->setChecked() : pwdRules->atLeastOneUpperCaseChar()->setUnchecked();
+    hasLower ? pwdRules->atLeastOneLowerCaseChar()->setChecked() : pwdRules->atLeastOneLowerCaseChar()->setUnchecked();
+    hasDigit ? pwdRules->atLeastOneDigit()->setChecked() : pwdRules->atLeastOneDigit()->setUnchecked();
+    hasSpecial ? pwdRules->atLeastOneSpecialChar()->setChecked() : pwdRules->atLeastOneSpecialChar()->setUnchecked();
 
     for (int i = 0; i < pwdBytes.size(); i++) 
         pwdBytes[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(pwdBytes[i])));
@@ -47,7 +48,7 @@ bool PwdValidator::isValidPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules) {
 
     if (weakPwds.empty()) {
         ValidatorUtils::cleanupMemory(pwdStd);
-        pwdRules->strongPwd()->setUnchecked();
+        pwdRules->strongPassword()->setUnchecked();
         qDebug() << "Weak password list is not loaded.\n";
         return false; // If weak password list is not loaded, we cannot check for weak passwords
     }
@@ -56,7 +57,7 @@ bool PwdValidator::isValidPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules) {
     ValidatorUtils::cleanupMemory(pwdStd);
 
     bool isStrongPwd = hasLength && hasUpper && hasLower && hasDigit && hasSpecial && notWeak;
-    isStrongPwd ? pwdRules->strongPwd()->setChecked() : pwdRules->strongPwd()->setUnchecked();
+    isStrongPwd ? pwdRules->strongPassword()->setChecked() : pwdRules->strongPassword()->setUnchecked();
 
     return isStrongPwd;
 }
@@ -111,6 +112,7 @@ void PwdValidator::loadPwdsFromFile() {
     qDebug() << "Loaded " << weakPwds.size() << " weak passwords.\n";
 }
 
+/* -----------------------  Get Password ----------------------- */
 GetPassword::GetPassword(QObject *parent) : QObject(parent) {
     timer = new QTimer(this);
     timer->setSingleShot(true);
@@ -120,9 +122,8 @@ GetPassword::GetPassword(QObject *parent) : QObject(parent) {
     connect(timer, &QTimer::timeout, this, [this](){
         if (!ac) return;
         
-        QByteArray bytes = ac->pwdField()->text().toUtf8();
-        
-        bool ok = pwdValidate->isValidPwd(bytes, ac->pwdRulesWidget());
+        QByteArray bytes = ac->passwordField()->text().toUtf8();
+        bool ok = pwdValidate->isValidPwd(bytes, ac->passwordValidatorWidget());
         
         // Emit signal
         emit pwdValidated(ok);
@@ -134,7 +135,7 @@ GetPassword::GetPassword(QObject *parent) : QObject(parent) {
 void GetPassword::setAccountCreateObject(AccountCreate *ac) {
     if (!ac) return;
     this->ac = ac;
-    connect(ac->pwdField(), &CustomTextField::textChanged, this, &GetPassword::onPwdChanged);
+    connect(ac->passwordField(), &CustomTextField::textChanged, this, &GetPassword::onPwdChanged);
 }
 
 void GetPassword::onPwdChanged(const QString &text) {

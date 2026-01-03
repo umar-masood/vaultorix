@@ -76,9 +76,10 @@ void AccountWindow::setDarkMode(bool value) {
 SubWindow *AccountWindow::subWindow() const { return w; }
 
 void AccountWindow::setRightWidget(QWidget *widget) {
-  if (!widget || !right)
+   if (!widget || !right)
       return;
 
+   // Hide and Delete if there's already existed right widget
    if (this->rightWidget) {
       entireLayoutRight->removeWidget(this->rightWidget);
       this->rightWidget->hide();
@@ -87,30 +88,27 @@ void AccountWindow::setRightWidget(QWidget *widget) {
 
    this->rightWidget = widget;
  
+   // Smooth Opacity Effect
    SmoothOpacity *effect = new SmoothOpacity;
    effect->setOpacity(0.0);
    rightWidget->setGraphicsEffect(effect);
 
+   // Adding Right Widget into the layout
    entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
 
+   // Opacity Effect Animation
    QPropertyAnimation *ani = new QPropertyAnimation(effect, "opacity", rightWidget);
    ani->setEasingCurve(QEasingCurve::InOutQuad);
    ani->setDuration(600);
    ani->setStartValue(0.0);
    ani->setEndValue(1.0);
    ani->start(QAbstractAnimation::DeleteWhenStopped);
-
    connect(ani, &QPropertyAnimation::finished, [=](){
       ani->deleteLater();
       rightWidget->setGraphicsEffect(nullptr); 
    });
 
-   QMetaObject::invokeMethod(
-      widget,
-      "setDarkMode",
-      Qt::DirectConnection,
-      Q_ARG(bool, isDarkMode)
-   );
+   QMetaObject::invokeMethod(widget, "setDarkMode", Qt::DirectConnection, Q_ARG(bool, isDarkMode));
 }
 
 void AccountWindow::show() { if (w) w->show(); }
@@ -137,6 +135,10 @@ void AccountWindow::init() {
    themeMode->setDisplayMode(Button::IconOnly);
    themeMode->setFixedSize(QSize(26, 26));
    themeMode->setIconPaths(lightModeIcon, lightModeIcon);
+   connect(themeMode, &Button::clicked, this, [this](){
+      isDarkMode = !isDarkMode;
+      emit themeModeChanged(isDarkMode);
+   });
 
    // Theme Button Tooltip
    themeButtonTip = new ToolTip(themeMode);
@@ -154,26 +156,26 @@ void AccountWindow::init() {
    themeMode->move(x - 26 - 8, y );
    themeMode->raise();
 
-   connect(themeMode, &Button::clicked, this, [this](){
-      isDarkMode = !isDarkMode;
-      emit themeModeChanged(isDarkMode);
-   });
-
    // Left Panel
    left = new QWidget;
    left->setStyleSheet("background-color: #003F66;");
 
+   // Branding of App
    brand = new Branding;
-   mainPoint = new QLabel("Protect What Matters Most");
-   mainPoint->setStyleSheet("color: white;");
-   mainPoint->setAlignment(Qt::AlignLeft);
 
+   // Tagline
+   tagline = new QLabel("Protect What Matters Most");
+   tagline->setStyleSheet("color: white;");
+   tagline->setAlignment(Qt::AlignLeft);
+
+   // Setting Font on Tagline
    QFont font;
    font.setPixelSize(24);
    font.setFamily("Segoe UI");
    font.setWeight(QFont::DemiBold);
-   mainPoint->setFont(font);
+   tagline->setFont(font);
 
+   // Features Bullet Points
    point1 = new BulletPoint("AES-256 encryption trusted worldwide", ":/icons/AppBranding/lock.svg");
    point2 = new BulletPoint("Quick file encryption & decryption", ":/icons/AppBranding/folder.svg");
    point3 = new BulletPoint("Two-factor authentication by default ", ":/icons/AppBranding/2FA.svg");
@@ -181,19 +183,20 @@ void AccountWindow::init() {
    point5 = new BulletPoint("Backup & recovery on the way", ":/icons/AppBranding/backup.svg");
    points = {point1, point2, point3, point4, point5};
 
+   // left Side Layout
    entireLayoutLeft = new QVBoxLayout(left);
    entireLayoutLeft->setContentsMargins(30, 30, 24, 30);
    entireLayoutLeft->addWidget(brand, 0);
    entireLayoutLeft->addSpacing(20);
-   entireLayoutLeft->addWidget(mainPoint, 0);
+   entireLayoutLeft->addWidget(tagline, 0);
    entireLayoutLeft->addSpacing(16);
-
    for (int i = 0; i < points.size(); ++i) {
       entireLayoutLeft->addWidget(points[i], 0);
       if (i < points.size() - 1)
          entireLayoutLeft->addSpacing(16);
    }
 
+   // Illustration
    illustration = new QLabel;
    illustration->setAttribute(Qt::WA_TranslucentBackground);
    illustration->setFixedSize(QSize(340, 320));
@@ -207,6 +210,7 @@ void AccountWindow::init() {
    // Right Panel
    right = new QWidget;
 
+   // Right Side Layout
    entireLayoutRight = new QVBoxLayout(right);
    entireLayoutRight->setContentsMargins(30, 30, 30, 30);
    entireLayoutRight->setSpacing(0);

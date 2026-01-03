@@ -1,6 +1,6 @@
 #pragma once
 #include "../components/TextField.h" 
-#include "../pwdRulesWidget/pwdRulesWidget.h"
+#include "../pwdRulesWidget/PwdRulesWidget.h"
 #include "../components/CheckBox.h"
 #include "../components/Button.h"
 #include "../components/ToolTip.h"
@@ -9,26 +9,32 @@
 #include "../accountWindow/AccountWindow.h"
 #include <QLabel>
 
+/* -------------- Customized TextField --------------- */
 class CustomTextField : public TextField {
    Q_OBJECT
 
    public:
    explicit CustomTextField(bool useCheck = false, QWidget *parent = nullptr);
-
    void setChecked();
    void setUnchecked();
    void setDarkMode(bool value) override;
    void setTooltip(const QString &tooltipText);
 
    private:
+   // Check Icon
    QLabel *checkIcon = nullptr;
+   
+   // ToolTop showing on Check Icon
    ToolTip *tooltip = nullptr;
+   // Flag
    bool hasTip = false;
    
+   // Icon Paths
    const QString checked = ":/icons/AccountCreate/checked.svg";
    const QString unchecked = ":/icons/AccountCreate/unchecked.svg";
 };
 
+/* ------------------ CheckBox with Button (In this case for Terms & Conditions Acceptance) -------------- */
 class CheckWithBtn : public QWidget {
    Q_OBJECT
 
@@ -36,11 +42,16 @@ class CheckWithBtn : public QWidget {
    explicit CheckWithBtn(QWidget *parent = nullptr);
    void setDarkMode(bool value);
    Button* button() const;
-   CheckBox* termsCheckBox() const;
+   CheckBox* checkBox() const;
 
    private:
+   // Theme Mode Flag
    bool isDarkMode = false;
-   CheckBox *checkbox = nullptr;
+
+   // CheckBox
+   CheckBox *_checkbox = nullptr;
+
+   // HyperLink Button
    Button *_button = nullptr;
 
    signals:
@@ -49,22 +60,23 @@ class CheckWithBtn : public QWidget {
    void boxChecked(bool checked);
 };
 
+/*  ------------------------- Account Create Main Widget ------------------ */
 class AccountCreate : public QWidget {
    Q_OBJECT
 
    public:
    explicit AccountCreate(QWidget *parent = nullptr, AccountWindow *accountWindow = nullptr);
    Q_INVOKABLE void setDarkMode(bool value);
-
-   Button* createBtn() const;
+   Button* createAccountButton() const;
    CustomTextField* nameField() const;
    CustomTextField* usernameField() const;
-   CustomTextField* pwdField() const;
+   CustomTextField* passwordField() const;
    CustomTextField* emailField() const;
-   CheckWithBtn* termsCondsBtn() const;
-   PwdRulesWidget *pwdRulesWidget() const;
+   CheckWithBtn* termsConditionsWidget() const;
+   PwdRulesWidget* passwordValidatorWidget() const;
    
    private:
+   // Theme Mode Flag
    bool isDarkMode = false;
 
    // Heading
@@ -75,8 +87,8 @@ class AccountCreate : public QWidget {
    QWidget *nameWidget = nullptr;
 
    // Password Widget
-   CustomTextField *pwd = nullptr;
-   QWidget *pwdWidget = nullptr;
+   CustomTextField *password = nullptr;
+   QWidget *passwordWidget = nullptr;
 
    // Username Widget
    CustomTextField *username = nullptr;
@@ -93,15 +105,13 @@ class AccountCreate : public QWidget {
    QVBoxLayout *layout = nullptr;
 
    // Password Rules Validator
-   PwdRulesWidget *pwdValidator = nullptr;
+   PwdRulesWidget *_passwordValidatorWidget = nullptr;
 
    // Terms & Conditions
-   CheckWithBtn *agreement = nullptr;
-   Dialog *termsDialog = nullptr;
-   TermsConditions *termsConditionsWidget = nullptr;
-      // Getters
-      // Dialog *termsCondsDialog() const;
-      // TermsConditions *termsCondsWidget() const;
+   CheckWithBtn *_termsConditionsWidget = nullptr;
+
+   Dialog *termsConditionsDialog = nullptr;
+   TermsConditions *termsConditionsDialogWidget = nullptr;
 
    // Create Account Button
    Button *createAccBtn = nullptr;

@@ -15,6 +15,7 @@ void AccountSignInManager::setAccountSignInObject(AccountSignIn *accountSignInOb
     if (!accountSignInObject) return;
 
     this->as = accountSignInObject;
+    
     connect(as, &AccountSignIn::signInClicked, this, &AccountSignInManager::onSignInClicked);
     connect(as, &AccountSignIn::cancelClicked, this, &AccountSignInManager::onCancelClicked);
 }
@@ -77,7 +78,7 @@ void AccountSignInManager::verifyCredentials() {
             case 200:
                 updateSignInBtnState(false, "Signed In");
                 as->usernameField()->setText("");
-                as->pwdField()->setText("");
+                as->passwordField()->setText("");
                 break;
             case 400:  
                 handleSignInError("InvalidCredentials", true);
@@ -98,7 +99,7 @@ void AccountSignInManager::onSignInClicked() {
     if (!as) return;
 
     username = as->usernameField()->text().toUtf8();
-    password = as->pwdField()->text().toUtf8();
+    password = as->passwordField()->text().toUtf8();
 
     if (username.isEmpty() || password.isEmpty()) return;
 

@@ -1,7 +1,7 @@
 #include "NameValidator.h"
 
-bool NameValidator::isValidName(const QByteArray &bytes)
-{
+/* -----------  Name Validator -------------------  */
+bool NameValidator::isValidName(const QByteArray &bytes) {
     if (bytes.isEmpty())
         return false;
 
@@ -25,31 +25,26 @@ bool NameValidator::isValidName(const QByteArray &bytes)
     return true;
 }
 
-// -------- GetName ----------
-GetName::GetName(QObject *parent) : QObject(parent)
-{
+/* ----------------- GetName ----------------------  */
+GetName::GetName(QObject *parent) : QObject(parent) {
     timer = new QTimer(this);
     timer->setSingleShot(true);
     connect(timer, &QTimer::timeout, this, &GetName::onTimeout);
 }
 
-void GetName::setAccountCreateObject(AccountCreate *ac)
-{
+void GetName::setAccountCreateObject(AccountCreate *ac) {
     if (!ac) return;
     this->ac = ac;
-
     connect(ac->nameField(), &CustomTextField::textChanged, this, &GetName::onNameChanged);
 }
 
-void GetName::onNameChanged(const QString &text)
-{
+void GetName::onNameChanged(const QString &text) {
     Q_UNUSED(text)
     timer->stop();
     timer->start(2000);
 }
 
-void GetName::onTimeout()
-{
+void GetName::onTimeout() {
     if (!ac) return;
 
     QByteArray text = ac->nameField()->text().toUtf8();

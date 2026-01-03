@@ -1,4 +1,4 @@
-#include "emailValidator.h"
+#include "EmailValidator.h"
 
 EmailValidator::EmailValidator(QObject *parent) : QObject(parent) {
     vu = new ValidatorUtils(this, "Email");

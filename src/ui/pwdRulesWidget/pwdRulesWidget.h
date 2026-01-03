@@ -9,23 +9,27 @@
 
 class RuleItem : public QWidget {
     Q_OBJECT
-public:
-    RuleItem(const QString &ruleTxt, QWidget *parent = nullptr);
 
+    public:
+    RuleItem(const QString &ruleTxt, QWidget *parent = nullptr);
     void setChecked();
     void setUnchecked();
 
-protected:
+    protected:
     void paintEvent(QPaintEvent *event) override;
 
-private:
+    private:
+    // Flag to check validity of each rule
     bool checkedState = false;
 
+    // Icon Size 
+    const int iconSize = 20;
+
+    // Different Icons for different states
     QPixmap iconChecked;
     QPixmap iconUnchecked;
 
-    const int iconSize = 20;
-
+    // Text Color Codes
     QString uncoloredText = "#8D8D8D";
     QString coloredText= "#009138";
 
@@ -35,25 +39,29 @@ private:
 
 class PwdRulesWidget : public QWidget {
     Q_OBJECT
-public:
+
+    public:
     explicit PwdRulesWidget(QWidget *parent = nullptr);
 
+    // Getters of Password Validation Rules Widgets
     RuleItem* atLeastEight() const;
-    RuleItem* oneLowerCase() const;
-    RuleItem* oneUpperCase() const;
-    RuleItem* oneDigit() const;
-    RuleItem* oneSpecialChar() const;
-    RuleItem* strongPwd() const;
+    RuleItem* atLeastOneLowerCaseChar() const;
+    RuleItem* atLeastOneUpperCaseChar() const;
+    RuleItem* atLeastOneDigit() const;
+    RuleItem* atLeastOneSpecialChar() const;
+    RuleItem* strongPassword() const;
 
-private:
-    RuleItem *lst_8 = nullptr;
-    RuleItem *o_lc = nullptr;
-    RuleItem *o_uc = nullptr;
-    RuleItem *o_n = nullptr;
-    RuleItem *o_sc = nullptr;
-    RuleItem *stg_pwd = nullptr;
+    private:
+    // Main Layout
+    QVBoxLayout *mainLayout = nullptr;
 
-    QSet<QString> weak_pwds;
+    // Password Validation Rules Widgets
+    RuleItem *_atLeastEightChars = nullptr;
+    RuleItem *_atLeastOneLowerChar = nullptr;
+    RuleItem *_atLeastOneUpperChar = nullptr;
+    RuleItem *_atLeastOneDigit = nullptr;
+    RuleItem *_atLeastOneSpecialChar = nullptr;
+    RuleItem *_strongPassword = nullptr;
 };
 
 

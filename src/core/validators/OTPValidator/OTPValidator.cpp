@@ -1,6 +1,6 @@
 #include "OTPValidator.h"
 
-/* OTPValidator Implementation */
+/* --------------  OTPValidator Implementation ---------------------  */
 OTPValidator::OTPValidator(QObject *parent) : QObject(parent) {
     manager = new QNetworkAccessManager(this);
 }
@@ -55,8 +55,7 @@ int OTPValidator::sendOTP(const QString &fullName, const QString &username, cons
     return status_code;
 }
 
-bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
-{
+bool OTPValidator::verifyOTP(const QString &otp, const QString &email) {
     QNetworkRequest request(API_URL + "verifyOtp");
     request.setRawHeader("accept", "application/json");
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -98,7 +97,7 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email)
     return isVerified; // If the OTP is verified then it will return True otherwise False
 }
 
-/* GetOTP Implementation */
+/* ----------------------  Get OTP  ---------------------------- */
 GetOTP::GetOTP(QObject *parent) : QObject(parent) {
     ov = new OTPValidator(this); // Initializing OTP Validator class
 
@@ -122,7 +121,7 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, const QString &email
     connect(ao, &AccountOTP::resendClicked, this, &GetOTP::onResendClicked);
 
     // When OTP input fields are filled, store the code
-    connect(ao->OTP(), &OTPWidget::OTPcompleted, this, [this](const QString &otp){ currOtp = otp; });
+    connect(ao->otpWidget(), &OTPWidget::OTPcompleted, this, [this](const QString &otp){ currOtp = otp; });
 
     // Connect resend-limit signal once
     connect(this, &GetOTP::maxLimitReached, this, &GetOTP::onMaxLimitReached);
@@ -173,32 +172,32 @@ void GetOTP::onResendClicked() {
 void GetOTP::onMaxLimitReached() {
     if (ao && ao->resendOtpWidget()) {
         ao->resendOtpWidget()->resendButton()->setEnabled(false); // Get the resend button inside textwithbutton & disable it
-        ao->resendOtpWidget()->timerLabel()->hide(); // Hide the timer label inside textwithbutton
+        ao->resendOtpWidget()->timer()->hide(); // Hide the timer label inside textwithbutton
     }
 
-    if (ao && ao->OTP()) 
-        ao->OTP()->setEnabled(false); // Disables the OTP widget 
+    if (ao && ao->otpWidget()) 
+        ao->otpWidget()->setEnabled(false); // Disables the OTP widget 
     
 
-    if (ao && ao->verifyBtn()) 
-        ao->verifyBtn()->setEnabled(false); // Disables the verify button
+    if (ao && ao->verifyButton()) 
+        ao->verifyButton()->setEnabled(false); // Disables the verify button
     
 
-    if (ao && ao->messageLabel()) // Display the maximum limit reached message.
-        ao->messageLabel()->setAnimatedText("Maximum limit reached. Try again after 48hrs.");
+    if (ao && ao->message()) // Display the maximum limit reached message.
+        ao->message()->setAnimatedText("Maximum limit reached. Try again after 48hrs.");
         
 }
 
 void GetOTP::onVerifyClicked() {
-    ao->verifyBtn()->setEnabled(false);
-    ao->verifyBtn()->setText("Verifying...");
+    ao->verifyButton()->setEnabled(false);
+    ao->verifyButton()->setText("Verifying...");
 
     bool ok = ov->verifyOTP(currOtp, cEmail);
 
     if (!ok) {  // If the otp is incorrect or expired
-        ao->verifyBtn()->setText("Verify");
-        ao->verifyBtn()->setEnabled(true);
-        ao->messageLabel()->setAnimatedText("Your entered OTP is incorrect or expired.");
+        ao->verifyButton()->setText("Verify");
+        ao->verifyButton()->setEnabled(true);
+        ao->message()->setAnimatedText("Your entered OTP is incorrect or expired.");
     } else {
         disableControls("Verified");
     }
@@ -213,7 +212,7 @@ void GetOTP::onTimeout() {
     if (totalSecs < 0) {
         timer->stop();
         ao->resendOtpWidget()->resendButton()->setEnabled(true);
-        ao->resendOtpWidget()->timerLabel()->hide();
+        ao->resendOtpWidget()->timer()->hide();
         return;
     }
 
@@ -221,28 +220,26 @@ void GetOTP::onTimeout() {
     int secs = totalSecs % 60;
 
     timeString = QString("%1:%2").arg(mins, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
-    ao->resendOtpWidget()->timerLabel()->setText(timeString);
+    ao->resendOtpWidget()->timer()->setText(timeString);
 }
 
-void GetOTP::onSomethingWrong() {
-    disableControls("Verify");
-}
+void GetOTP::onSomethingWrong() { disableControls("Verify"); }
 
 void GetOTP::disableControls(QString btnText) {
-    ao->verifyBtn()->setText(btnText);
-    ao->verifyBtn()->setEnabled(false);              // Disabled the verify button after successful OTP matching
+    ao->verifyButton()->setText(btnText);
+    ao->verifyButton()->setEnabled(false);              // Disabled the verify button after successful OTP matching
     ao->resendOtpWidget()->resendButton()->setEnabled(false); // Disabled the resend button when otp is verified
-    ao->resendOtpWidget()->timerLabel()->hide();     // hides the timer
-    ao->messageLabel()->setAnimatedText("");
+    ao->resendOtpWidget()->timer()->hide();     // hides the timer
+    ao->message()->setAnimatedText("");
 
     if (timer) timer->stop();
-    ao->OTP()->setEnabled(false);
+    ao->otpWidget()->setEnabled(false);
 }
 
 void GetOTP::resendOtpWithTimer() {
     ao->resendOtpWidget()->resendButton()->setEnabled(false);
-    ao->resendOtpWidget()->timerLabel()->setText("01:30"); // Initial time
-    ao->resendOtpWidget()->timerLabel()->show();
+    ao->resendOtpWidget()->timer()->setText("01:30"); // Initial time
+    ao->resendOtpWidget()->timer()->show();
     totalSecs = 90;
     if (timer) timer->start(1000);
 }

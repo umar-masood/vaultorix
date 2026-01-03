@@ -12,17 +12,24 @@ class TermsConditions : public QWidget {
 
    public:
    explicit TermsConditions(QWidget *parent = nullptr);
-
    Q_INVOKABLE void setDarkMode(bool value);
 
    signals:
    void themeModeChanged(bool enable);
 
    private:
+   // Theme Mode Flag
    bool isDarkMode = false;
 
+   // ScrollBar
    ScrollBar *scrollBar = nullptr;
+
+   // Terms & Conditions HTML Page View Widget
    QTextBrowser *termsConds = nullptr;
+
+   // Heading
    Label *heading = nullptr;
+
+   // Main Layout
    QVBoxLayout *layout = nullptr;
 };

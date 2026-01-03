@@ -1,4 +1,4 @@
-#include "accountCreationManager.h"
+#include "AccountCreationManager.h"
 #include <QDebug>
 
 AccountCreationManager::AccountCreationManager(AccountWindow *accountWindow, QObject *parent) : QObject(parent), accountWindow(accountWindow) {
@@ -39,8 +39,8 @@ void AccountCreationManager::setupConnections() {
     connect(pwdValidator, &GetPassword::pwdValidated, this, &AccountCreationManager::onPwdValidated);
     connect(nameValidator, &GetName::nameValidated, this, &AccountCreationManager::onNameValidated);
     connect(this, &AccountCreationManager::validationDone, this, &AccountCreationManager::onValidationDone);
-    connect(accountCreate->termsCondsBtn(), &CheckWithBtn::boxChecked, this, &AccountCreationManager::onTCBoxCheck);
-    connect(accountCreate->createBtn(), &Button::clicked, this, &AccountCreationManager::onCreateAccBtnClicked);
+    connect(accountCreate->termsConditionsWidget(), &CheckWithBtn::boxChecked, this, &AccountCreationManager::onTCBoxCheck);
+    connect(accountCreate->createAccountButton(), &Button::clicked, this, &AccountCreationManager::onCreateAccBtnClicked);
     connect(this, &AccountCreationManager::credentialsStoredSuccessfully, this, &AccountCreationManager::onCredentialsStoredSuccessfully);
     connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &AccountCreationManager::onErrorDialogActionBtnClicked);
 }
@@ -60,7 +60,7 @@ QJsonObject AccountCreationManager::getCredentials() {
     userObj["full_name"] = accountCreate->nameField()->text();
     userObj["username"] = accountCreate->usernameField()->text();
     userObj["email_address"] = accountCreate->emailField()->text();
-    userObj["password"] = accountCreate->pwdField()->text();
+    userObj["password"] = accountCreate->passwordField()->text();
     userObj["created_at"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
     userObj["is_active"] = true;
 
@@ -175,7 +175,7 @@ void AccountCreationManager::onNameValidated(bool isValid) {
 }
 
 void AccountCreationManager::onValidationDone(bool isValidationDone) {
-    accountCreate->createBtn()->setEnabled(isValidationDone);
+    accountCreate->createAccountButton()->setEnabled(isValidationDone);
 }
 
 void AccountCreationManager::onTCBoxCheck(bool checked) {
@@ -189,8 +189,8 @@ void AccountCreationManager::onCreateAccBtnClicked() {
 }
 
 void AccountCreationManager::updateCreateAccBtnState(bool isEnabled, const QString &text) {
-    accountCreate->createBtn()->setEnabled(isEnabled);
-    accountCreate->createBtn()->setText(text);
+    accountCreate->createAccountButton()->setEnabled(isEnabled);
+    accountCreate->createAccountButton()->setText(text);
 }
 
 void AccountCreationManager::onErrorDialogActionBtnClicked(const QString &key) {
