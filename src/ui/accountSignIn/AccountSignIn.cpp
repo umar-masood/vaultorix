@@ -1,5 +1,34 @@
 #include "AccountSignIn.h"
+/* --------------- Sign up if no account is registered ------------ */
+TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent) {
+   setAttribute(Qt::WA_TranslucentBackground);
 
+   // Text 
+   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, "Don't have an account?", Qt::AlignHCenter);
+   _text->setStyleSheet("color: black;");
+   _text->setParent(this);
+   _text->setFixedSize(136, 22);
+   _text->move(0,0);
+   
+   // Resend Button
+   _createAccountButton = new Button(this);
+   _createAccountButton->setDisplayMode(Button::TextOnly);
+   _createAccountButton->setFixedSize(QSize(50, 12));
+   _createAccountButton->setHyperLink(true);
+   _createAccountButton->setText("Create an Account");
+   _createAccountButton->setFontProperties("Segoe UI", 10, false, false);
+   _createAccountButton->setHyperLinkColors("#008EDE", "#15F2FF");
+   _createAccountButton->move(_text->width() + 4, 2);
+   connect(_createAccountButton, &Button::clicked, this, [this]() { emit onButtonClicked(); });
+
+   setFixedSize(QSize(_text->width() + _createAccountButton->width() + 2, 18));
+}
+
+// Getters of Resend OTP Widget
+Label* TextWithBtn::text() const { return _text; }
+Button* TextWithBtn::createAccountButton() const { return _createAccountButton; }
+
+/* ------------  Account Sign In -------------------- */
 AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
@@ -10,7 +39,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    illustration->setScaledContents(true);
 
    // Heading
-   heading = new Label(false, "Inter", 22, QFont::Bold, false, "Sign in to your Account");
+   heading = new Label(false, "Inter", 22, QFont::Bold, false, "Sign in");
    
    // Text under Heading (Welcome Text)
    text = new Label(false, "Segoe UI", 10, QFont::Medium, false, "Hi, Welcome back!");
@@ -63,6 +92,9 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    cancelBtn->setFontProperties("Segoe UI", 11, true, false);
    connect(cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
 
+   // Sign up Redirect Widget
+   redirectToSignUpWidget = new TextWithBtn;
+
    // Main Layout
    layout = new QVBoxLayout(this);
    layout->setSpacing(0);
@@ -90,8 +122,11 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
 void AccountSignIn::setDarkMode(bool value) {
    isDarkMode = value;
    
-   if (heading) heading->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
-   if (cancelBtn) cancelBtn->setDarkMode(isDarkMode);
+   if (heading) 
+      heading->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
+
+   if (cancelBtn) 
+      cancelBtn->setDarkMode(isDarkMode);
 
    if (username) {
       username->setIconPaths(userIcon, userIcon);
@@ -102,6 +137,9 @@ void AccountSignIn::setDarkMode(bool value) {
       password->setIconPaths(passwordIcon,passwordIcon);
       password->setDarkMode(isDarkMode);
    }
+
+   if (redirectToSignUpWidget) 
+      redirectToSignUpWidget->text()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black")); 
 }
 
 TextField *AccountSignIn::usernameField() const { return username; }

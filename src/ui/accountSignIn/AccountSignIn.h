@@ -4,7 +4,29 @@
 #include "../components/Button.h"
 #include "../components/TextField.h"
 #include "../components/Label.h"
+#include "../accountOTP/AccountOTP.h"
 
+/* -----------------  Custom Text with Button ------------------ */
+class TextWithBtn : public QWidget {
+   Q_OBJECT
+
+   public:
+   explicit TextWithBtn(QWidget *parent = nullptr);
+   Label* text() const;
+   Button* createAccountButton() const;
+
+   private:
+   // Text Label
+   Label *_text = nullptr;
+
+   // Resend Button
+   Button *_createAccountButton = nullptr;
+
+   signals:
+   void onButtonClicked();
+};
+
+/* ---------------- Account Sign in ------------------  */
 class AccountSignIn : public QWidget {
    Q_OBJECT
 
@@ -46,6 +68,9 @@ class AccountSignIn : public QWidget {
 
    // Cancel Button
    Button *cancelBtn = nullptr;
+
+   // For Sign up if it doesn't have an active account
+   TextWithBtn *redirectToSignUpWidget = nullptr;
 
    // Main Layout
    QVBoxLayout *layout = nullptr;

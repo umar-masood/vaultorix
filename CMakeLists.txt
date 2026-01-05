@@ -7,7 +7,6 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED Core Gui Widgets Svg Network)
 
-
 add_executable(Vaultorix
     # User Interface
 
@@ -46,13 +45,11 @@ add_executable(Vaultorix
     src/ui/components/Dialog.cpp
     src/ui/components/LineProgress.cpp
     src/ui/components/Menu.cpp
-    src/ui/components/Rectangle.cpp
     src/ui/components/RoundedBox.cpp
     src/ui/components/ScrollBar.cpp
     src/ui/components/SmoothOpacity.cpp
     src/ui/components/SmoothShadow.cpp
     src/ui/components/SpinnerProgress.cpp
-    src/ui/components/Text.cpp
     src/ui/components/TextField.cpp
     src/ui/components/Toggle.cpp
     src/ui/components/ToolTip.cpp

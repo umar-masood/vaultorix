@@ -17,16 +17,8 @@ int main(int argc, char *argv[])
     AccountWindow *aw = new AccountWindow;
     aw->setDarkMode(true);
     
-    AccountCreate *ac = new AccountCreate(nullptr, aw);
+    AccountSignIn *ac = new AccountSignIn();
     aw->setRightWidget(ac);
-
-    ErrorDialogManager *m = new ErrorDialogManager(aw);
-    m->show("InvalidCredentials");
-    m->show("MaxAttempts");
-    m->show("NoInternet");
-    m->show("AccessDenied");
-    m->show("RequestTimeout");
-    m->show("FurtherAttemptBlocked");
 
     // AccountCreationManager *m = new AccountCreationManager(aw);
     // m->setAccountCreateObject(ac);

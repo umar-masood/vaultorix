@@ -127,21 +127,15 @@ void AccountCreationManager::storeCredentials() {
             emit credentialsStoredSuccessfully(); 
         else if (statusCode == 403) 
             handleCreateAccError("MaxAttempts");
-        else if (statusCode == 513) 
+        else /*if (statusCode == 513) 
             handleCreateAccError("FurtherAttemptBlocked");
-        else 
+        else*/  // We will handle this later if we thinks it's necessary 
             handleCreateAccError("SomethingWentWrong", true);
     });
 }
 
 void AccountCreationManager::handleCreateAccError(const QString &errorName, bool createAccButtonEnabled, const QString &createAccButtonText) {
     errorDialogManager->show(errorName); 
-    errorDialogManager->show("FurtherAttemptBlocked");
-    errorDialogManager->show("SomethingWentWrong");
-    errorDialogManager->show("MaxAttempts");
-    errorDialogManager->show("InvalidCredentials");
-    errorDialogManager->show("AccessDenied");
-    errorDialogManager->show("RequestTimeout");
     updateCreateAccBtnState(createAccButtonEnabled, createAccButtonText);
 }
 
