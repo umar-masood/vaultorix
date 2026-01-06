@@ -124,40 +124,45 @@ void OTPWidget::showEvent(QShowEvent *event) {
 }
 
 /* Resend OTP Widget */
-TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent) {
+TextWithBtn::TextWithBtn(QWidget *parent, const QString &text, const QString &hyperlinkText, const QSize &hyperlinkSize, bool useTimer) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
    // Text 
-   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, "Didn`t receive the OTP?", Qt::AlignHCenter);
+   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, text, Qt::AlignHCenter);
    _text->setStyleSheet("color: black;");
    _text->setParent(this);
    _text->setFixedSize(136, 22);
    _text->move(0,0);
-   
+
    // Resend Button
-   _resendButton = new Button(this);
-   _resendButton->setDisplayMode(Button::TextOnly);
-   _resendButton->setFixedSize(QSize(50, 12));
-   _resendButton->setHyperLink(true);
-   _resendButton->setText("Resend");
-   _resendButton->setFontProperties("Segoe UI", 10, false, false);
-   _resendButton->setHyperLinkColors("#008EDE", "#15F2FF");
-   _resendButton->move(_text->width() + 4, 2);
-   connect(_resendButton, &Button::clicked, this, [this]() { emit onButtonClicked(); });
+   _button = new Button(this);
+   _button->setDisplayMode(Button::TextOnly);
+   _button->setFixedSize(hyperlinkSize);
+   _button->setHyperLink(true);
+   _button->setText(hyperlinkText);
+   _button->setFontProperties("Segoe UI", 10, false, false);
+   _button->setHyperLinkColors("#008EDE", "#15F2FF");
+   _button->move(_text->width() + 4, 2);
+
+   connect(_button, &Button::clicked, this, [this]() { emit onButtonClicked(); });
+
+   setFixedSize(QSize(_text->width() + _button->width() + 2, 18));
 
    // Timer Label
-   _timer = new Label(false, "Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
-   _timer->setStyleSheet("color: black;");
-   _timer->setParent(this);
-   _timer->setFixedSize(36, 22);
-   _timer->move(_text->width() + _resendButton->width() + 4,0);
+   if (useTimer) {
+      _timer = new Label(false, "Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
+      _timer->setStyleSheet("color: black;");
+      _timer->setParent(this);
+      _timer->setFixedSize(36, 22);
+      _timer->move(_text->width() + _button->width() + 4,0);   
 
-   setFixedSize(QSize(_text->width() + _resendButton->width() + _timer->width() + 2, 18));
+      setFixedSize(QSize(_text->width() + _button->width() + _timer->width() + 2, 18));
+   }
 }
 
 // Getters of Resend OTP Widget
 Label* TextWithBtn::text() const { return _text; }
-Button * TextWithBtn::resendButton() const { return _resendButton; }
+Button * TextWithBtn::button() const { return _button; }
 Label *TextWithBtn::timer() const { return _timer; }
 
 /* AccountOTP Main Widget Implementation */
@@ -191,7 +196,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _message->setFixedWidth(324);
 
    // Resend OTP Widget (Resend Text + Button + Timer)
-   _resendOtpWidget = new TextWithBtn;
+   _resendOtpWidget = new TextWithBtn(nullptr, "Didn`t receive the OTP?", "Resend", QSize(50,12), true);
    connect(_resendOtpWidget, &TextWithBtn::onButtonClicked, this, [this]() { emit resendClicked(); });
 
    // Verify Button

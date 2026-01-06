@@ -1,30 +1,9 @@
 #pragma once
 
-#include "../accountOTP/AccountOTP.h"
 #include "../components/Button.h"
 #include "../components/TextField.h"
 #include "../components/Label.h"
 #include "../accountOTP/AccountOTP.h"
-
-/* -----------------  Custom Text with Button ------------------ */
-class TextWithBtn : public QWidget {
-   Q_OBJECT
-
-   public:
-   explicit TextWithBtn(QWidget *parent = nullptr);
-   Label* text() const;
-   Button* createAccountButton() const;
-
-   private:
-   // Text Label
-   Label *_text = nullptr;
-
-   // Resend Button
-   Button *_createAccountButton = nullptr;
-
-   signals:
-   void onButtonClicked();
-};
 
 /* ---------------- Account Sign in ------------------  */
 class AccountSignIn : public QWidget {

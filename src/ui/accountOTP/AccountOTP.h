@@ -60,9 +60,9 @@ class TextWithBtn : public QWidget {
    Q_OBJECT
 
    public:
-   explicit TextWithBtn(QWidget *parent = nullptr);
+   explicit TextWithBtn(QWidget *parent = nullptr, const QString &text = "", const QString &hyperlinkText = "", const QSize &hyperlinkSize = QSize(), bool useTimer = false);
    Label* text() const;
-   Button* resendButton() const;
+   Button* button() const;
    Label* timer() const;
 
    private:
@@ -71,7 +71,7 @@ class TextWithBtn : public QWidget {
    // Timer Label
    Label *_timer = nullptr;
    // Resend Button
-   Button *_resendButton = nullptr;
+   Button *_button = nullptr;
 
    signals:
    void onButtonClicked();

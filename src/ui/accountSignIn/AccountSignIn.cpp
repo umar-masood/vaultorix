@@ -1,37 +1,9 @@
 #include "AccountSignIn.h"
-/* --------------- Sign up if no account is registered ------------ */
-TextWithBtn::TextWithBtn(QWidget *parent) : QWidget(parent) {
-   setAttribute(Qt::WA_TranslucentBackground);
-
-   // Text 
-   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, "Don't have an account?", Qt::AlignHCenter);
-   _text->setStyleSheet("color: black;");
-   _text->setParent(this);
-   _text->setFixedSize(136, 22);
-   _text->move(0,0);
-   
-   // Resend Button
-   _createAccountButton = new Button(this);
-   _createAccountButton->setDisplayMode(Button::TextOnly);
-   _createAccountButton->setFixedSize(QSize(50, 12));
-   _createAccountButton->setHyperLink(true);
-   _createAccountButton->setText("Create an Account");
-   _createAccountButton->setFontProperties("Segoe UI", 10, false, false);
-   _createAccountButton->setHyperLinkColors("#008EDE", "#15F2FF");
-   _createAccountButton->move(_text->width() + 4, 2);
-   connect(_createAccountButton, &Button::clicked, this, [this]() { emit onButtonClicked(); });
-
-   setFixedSize(QSize(_text->width() + _createAccountButton->width() + 2, 18));
-}
-
-// Getters of Resend OTP Widget
-Label* TextWithBtn::text() const { return _text; }
-Button* TextWithBtn::createAccountButton() const { return _createAccountButton; }
 
 /* ------------  Account Sign In -------------------- */
 AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
-
+   
    // Main Icon
    illustration = new Label(true);
    illustration->setFixedSize(QSize(150, 150));
@@ -93,27 +65,34 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    connect(cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
 
    // Sign up Redirect Widget
-   redirectToSignUpWidget = new TextWithBtn;
+   redirectToSignUpWidget = new TextWithBtn(nullptr, "Don't have an account?", "Create an account", QSize(110,12), false);
 
    // Main Layout
    layout = new QVBoxLayout(this);
    layout->setSpacing(0);
    layout->addStretch();
+   
    layout->addWidget(illustration, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
    layout->addWidget(heading, 0, Qt::AlignHCenter);
    layout->addSpacing(20);
    layout->addWidget(text, 0, Qt::AlignHCenter);
    layout->addSpacing(20);
+
    layout->addWidget(username, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
    layout->addWidget(password, 0, Qt::AlignHCenter);
+   
    layout->addSpacing(20);
    layout->addWidget(forgotPwd, 0, Qt::AlignRight);
-   layout->addSpacing(26);
+   layout->addSpacing(20);
+
    layout->addWidget(signInBtn, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
    layout->addWidget(cancelBtn, 0, Qt::AlignHCenter);
+   
+   layout->addSpacing(20);
+   layout->addWidget(redirectToSignUpWidget, 0, Qt::AlignHCenter);
    layout->addStretch();
 
    setDarkMode(false);

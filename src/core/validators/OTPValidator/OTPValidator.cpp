@@ -171,7 +171,7 @@ void GetOTP::onResendClicked() {
 
 void GetOTP::onMaxLimitReached() {
     if (ao && ao->resendOtpWidget()) {
-        ao->resendOtpWidget()->resendButton()->setEnabled(false); // Get the resend button inside textwithbutton & disable it
+        ao->resendOtpWidget()->button()->setEnabled(false); // Get the resend button inside textwithbutton & disable it
         ao->resendOtpWidget()->timer()->hide(); // Hide the timer label inside textwithbutton
     }
 
@@ -211,7 +211,7 @@ void GetOTP::onTimeout() {
 
     if (totalSecs < 0) {
         timer->stop();
-        ao->resendOtpWidget()->resendButton()->setEnabled(true);
+        ao->resendOtpWidget()->button()->setEnabled(true);
         ao->resendOtpWidget()->timer()->hide();
         return;
     }
@@ -228,7 +228,7 @@ void GetOTP::onSomethingWrong() { disableControls("Verify"); }
 void GetOTP::disableControls(QString btnText) {
     ao->verifyButton()->setText(btnText);
     ao->verifyButton()->setEnabled(false);              // Disabled the verify button after successful OTP matching
-    ao->resendOtpWidget()->resendButton()->setEnabled(false); // Disabled the resend button when otp is verified
+    ao->resendOtpWidget()->button()->setEnabled(false); // Disabled the resend button when otp is verified
     ao->resendOtpWidget()->timer()->hide();     // hides the timer
     ao->message()->setAnimatedText("");
 
@@ -237,7 +237,7 @@ void GetOTP::disableControls(QString btnText) {
 }
 
 void GetOTP::resendOtpWithTimer() {
-    ao->resendOtpWidget()->resendButton()->setEnabled(false);
+    ao->resendOtpWidget()->button()->setEnabled(false);
     ao->resendOtpWidget()->timer()->setText("01:30"); // Initial time
     ao->resendOtpWidget()->timer()->show();
     totalSecs = 90;
