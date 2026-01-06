@@ -1,6 +1,6 @@
 #include "ui/accountWindow/AccountWindow.h"
-#include "./ui/accountSignIn/AccountSignIn.h"
 #include "./ui/accountOTP/AccountOTP.h"
+#include "./ui/accountSignIn/AccountSignIn.h"
 #include "./ui/accountCreate/AccountCreate.h"
 #include "./core/validators/OTPValidator/OTPValidator.h"
 #include "./core/deviceInfo/deviceInfo.h"
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     AccountWindow *aw = new AccountWindow;
     aw->setDarkMode(true);
     
-    AccountSignIn *ac = new AccountSignIn();
+    AccountOTP *ac = new AccountOTP();
     aw->setRightWidget(ac);
 
     // AccountCreationManager *m = new AccountCreationManager(aw);
