@@ -3,9 +3,6 @@
 #include <QString>
 
 namespace DialogUtils {
-    extern const QSize dialogSize;
-    extern const QSize illustrationSize;
-
     extern const QString noInternetIcon;    
     extern const QString wrongCredentialsIcon;
     extern const QString unknownDeviceIcon;

@@ -87,7 +87,8 @@ void AccountWindow::setRightWidget(QWidget *widget) {
    }
 
    this->rightWidget = widget;
- 
+   this->rightWidget->setParent(this->right);
+
    // Smooth Opacity Effect
    SmoothOpacity *effect = new SmoothOpacity;
    effect->setOpacity(0.0);
