@@ -15,7 +15,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Umar Creations");
     
     AccountWindow *aw = new AccountWindow;
-    aw->setDarkMode(true);
     
     AccountSignIn *ac = new AccountSignIn();
     aw->setRightWidget(ac);
