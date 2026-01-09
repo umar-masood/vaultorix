@@ -206,6 +206,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _verifyBtn->setGradientColor(true, "#008EDE", "#15F2FF");
    _verifyBtn->setHoverGradientColor("#008EDE");
    _verifyBtn->setFontProperties("Segoe UI", 11, true, false);
+   _verifyBtn->setLoaderButton(true);
    connect(_verifyBtn, &Button::clicked, this, [this]() { emit verifyClicked(); });
 
    // Cancel Button
