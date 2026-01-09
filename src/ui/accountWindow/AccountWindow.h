@@ -48,14 +48,16 @@ class BulletPoint : public QLabel {
 };
 
 /* ---------------- AccountWindow ---------------- */
-class AccountWindow : public SubWindow {
+class AccountWindow : public QObject {
    Q_OBJECT
 
    public:
-   explicit AccountWindow(QWidget *rightWidget = nullptr, QWidget *parent = nullptr, const QVector<QWidget *> &dialogs = {});
+   explicit AccountWindow(QWidget *rightWidget = nullptr, QObject *parent = nullptr, const QVector<QWidget *> &dialogs = {});
    void setDarkMode(bool value);
    void setRightWidget(QWidget *rightWidget);
    void setSubWidgets(const QVector<QWidget *> subWidgets = {});
+   void show();
+   SubWindow *subWindow() const;
 
    signals:
    void themeModeChanged(bool enable);
@@ -70,6 +72,9 @@ class AccountWindow : public SubWindow {
    // Icon Paths
    const QString darkModeIcon = ":/icons/AccountWindow/darkMode.svg";
    const QString lightModeIcon = ":/icons/AccountWindow/lightMode.svg";
+
+   // SubWindow 
+   SubWindow *w = nullptr;
 
    // Seperator for titlbar controls
    Seperator *seperator = nullptr;

@@ -1,13 +1,13 @@
 #include "ToolTip.h"
 
-ToolTip::ToolTip(QWidget *target, const QString &text, bool isDarkMode, QObject *parent) : QObject(parent), target(target) {
-  tooltipWidget = new RoundedBox(text, nullptr, true);
+ToolTip::ToolTip(QWidget *target, const QString &text, bool isDarkMode) : QObject(target), target(target) {
+  tooltipWidget = new RoundedBox(!text.isEmpty() ? text : nullptr);
+  tooltipWidget->setAsToolTip(true);
   tooltipWidget->setDarkMode(isDarkMode);
   tooltipWidget->hide();
 
   if (this->target) 
     this->target->installEventFilter(this);
-    
   tooltipWidget->installEventFilter(this);
 
   timer.setSingleShot(true);
@@ -45,68 +45,28 @@ void ToolTip::fadeOutAnimation() {
 }
 
 bool ToolTip::eventFilter(QObject *obj, QEvent *event) {
-  /*
-    if the current obj points to target:
-    -> When cursor enters that widget, a timer of 2 secs will start. If a user stays on that widget even after time passed then tooltip will appear.
-    -> For other events, we stop the timer and starts another timer of 150 ms. If a user cursor is not inside a tooltip, it will disappear.
-  */
   if (obj == target) {
-    switch (event->type()) {
-      case QEvent::Enter:
-        timer.start(2000);
-        break;
-
-      case QEvent::Leave:
-      case QEvent::MouseButtonPress:
-      case QEvent::MouseButtonDblClick:
-      case QEvent::Wheel:
-      case QEvent::FocusIn:
-      case QEvent::Destroy:
-      case QEvent::Hide:
-        timer.stop();
-        QTimer::singleShot(200, this, [this](){
-          if (tooltipWidget && !isHovering) 
-            fadeOutAnimation();
-        });
-
-      default: break;
+    if (event->type() == QEvent::Enter) {
+      timer.start(2000);
+    } else if (event->type() == QEvent::Leave) {
+      timer.stop();
+      QTimer::singleShot(200, this, [this]() {
+        if (tooltipWidget && !isHovering) fadeOutAnimation();
+      });
     }
   }
-
-  /*
-    if the current obj points to tooltipWidget:
-    -> When cursor enters the tooltip, we mark it as hovering so it stays visible.
-      This prevents the tooltip from disappearing when the cursor moves from
-      target widget to tooltip.
-
-    -> When cursor leaves the tooltip, we wait for a short delay (150 ms).
-      If during this time the cursor does NOT return to the target widget,
-      the tooltip will fade out and disappear.
-  */
 
   if (obj == tooltipWidget) {
-    switch (event->type()) {
-      case QEvent::Enter:
-        isHovering = true;
-        break;
-
-      case QEvent::Leave:
-        isHovering = false;
-        QTimer::singleShot(200, this, [this](){
-          if (tooltipWidget && !target->underMouse())
-            fadeOutAnimation();
-        });
-        break;
-
-      default: break;
+    if (event->type() == QEvent::Enter) {
+      isHovering = true;
+    } else if (event->type() == QEvent::Leave) {
+      isHovering = false;
+      QTimer::singleShot(200, this, [this]() {
+        if (tooltipWidget && !target->underMouse()) fadeOutAnimation();
+      });
     }
   }
 
-  if (event->type() == QEvent::ApplicationStateChange) {
-    timer.stop();
-    fadeOutAnimation();
-  }
-  
   return false;
 }
 

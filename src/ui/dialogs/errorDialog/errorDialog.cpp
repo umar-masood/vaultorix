@@ -61,13 +61,11 @@ Error::Error(const QString &text, const QString &illustrationLight, const QStrin
 
     // Theme Change Signal Slot
     connect(this, &Error::themeModeChanged, this, &Error::onThemeModeChanged);
-
-    setDarkMode(isDarkMode);
 }
 
 void Error::onThemeModeChanged(bool enable) {
     if (illustration)
-        illustration->setPixmap(QPixmap(enable ? darkIcon : lightIcon));
+        illustration->setPixmap(QPixmap(enable ? darkIcon : lightIcon).scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 void Error::setDarkMode(bool value) {
@@ -103,7 +101,7 @@ void ErrorDialogManager::create(const QString &key, const QString &text, const Q
         close(key);
     });
 
-    ed.dialog = new Dialog(ed.widget, accountWindow, false);
+    ed.dialog = new Dialog(ed.widget, accountWindow->subWindow(), false);
 
     dialogs.insert(key, ed);
 }

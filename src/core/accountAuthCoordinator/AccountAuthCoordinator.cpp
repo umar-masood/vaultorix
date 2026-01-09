@@ -10,12 +10,6 @@ AccountAuthCoordinator::AccountAuthCoordinator() {
         showCreateAccount();
     else
         showSignIn();
-
-}
-
-void AccountAuthCoordinator::show() {
-    if (accountWindow)
-        accountWindow->show();
 }
 
 bool AccountAuthCoordinator::isAccountRegistered() const {
@@ -26,7 +20,8 @@ bool AccountAuthCoordinator::isAccountRegistered() const {
 }
 
 void AccountAuthCoordinator::setAccountRegistered(bool isRegistered) {
-    settings.setValue(key, isRegistered);
+    if (!settings.contains(key)) 
+        settings.setValue(key, isRegistered);
 }  
 
 void AccountAuthCoordinator::showSignIn() {
@@ -36,29 +31,6 @@ void AccountAuthCoordinator::showSignIn() {
     }
 
     accountSignIn = std::make_unique<AccountSignIn>();
-
-    if (accountWindow) 
-        accountWindow->setRightWidget(accountSignIn.get());
-}
-
-void AccountAuthCoordinator::showOTP(const QString &email, const QString &username, const QString &fullName) {
-    if (accountOTP) {
-        accountOTP = nullptr;
-        accountOTP->setParent(nullptr);
-    }
-
-    accountOTP = std::make_unique<AccountOTP>();
-
-    if (getOTP) {
-        getOTP = nullptr;
-        getOTP->setParent(nullptr);
-    }
-
-    getOTP = std::make_unique<GetOTP>();
-    getOTP->setAccountOTPObjectWithDetails(accountOTP.get(), email, username, fullName);
-
-    if (accountWindow) 
-        accountWindow->setRightWidget(accountOTP.get());
 }
 
 void AccountAuthCoordinator::showCreateAccount() {
@@ -67,7 +39,7 @@ void AccountAuthCoordinator::showCreateAccount() {
         accountCreate->setParent(nullptr);
     }
 
-    accountCreate = std::make_unique<AccountCreate>(nullptr, accountWindow.get()); // Here, we have passed accountWindow pointer because inside AccountCreate class we have used a dailog box for terms and conditions. To make it a child of parent (SubWindow)
+    accountCreate = std::make_unique<AccountCreate>(nullptr, accountWindow.get()); // Here, we have passed accountWindow pointer becuase inside AccountCreate class we have used a dailog box for terms and conditions. To make it a child of parent (SubWindow)
     
     accountWindow->setRightWidget(accountCreate.get());
 
@@ -79,12 +51,4 @@ void AccountAuthCoordinator::showCreateAccount() {
     accountCreateManager = std::make_unique<AccountCreationManager>(accountWindow.get()); // Similarly, accountWindow is also passed here for dialogs parenting.
     accountCreateManager->setAccountCreateObject(accountCreate.get());
 
-    // Connecting signal slot
-    QObject::connect(accountCreateManager.get(), &AccountCreationManager::credentialsStoredSuccessfully, [this]() { onCredentialsStoredSuccessfully(); });
-
-}
-
-void AccountAuthCoordinator::onCredentialsStoredSuccessfully() {
-    showOTP(accountCreate->emailField()->text(), accountCreate->usernameField()->text(), accountCreate->nameField()->text());
-    setAccountRegistered(true);
 }

@@ -65,8 +65,6 @@ add_executable(Vaultorix
     src/core/validators/usernameValidator/UsernameValidator.cpp
     src/core/validators/validatorUtils/ValidatorUtils.cpp
     src/core/validators/nameValidator/NameValidator.cpp
-    ## Coordinator
-    src/core/accountAuthCoordinator/AccountAuthCoordinator.cpp
     ## Managers
     src/core/accountCreationManager/AccountCreationManager.cpp
     src/core/accountSignInManager/AccountSignInManager.cpp
