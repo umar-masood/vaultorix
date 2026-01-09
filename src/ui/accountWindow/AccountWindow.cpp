@@ -64,16 +64,18 @@ QFont BulletPoint::font() const {
 }
 
 /* ---------------- Account Window ---------------- */
-AccountWindow::AccountWindow(QWidget *rightWidget, QObject *parent, const QVector<QWidget *> &subWidgets) : QObject(parent), rightWidget(rightWidget) {
+AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent, const QVector<QWidget *> &subWidgets) 
+               : SubWindow(QSize(1000, 720), parent, true, true), rightWidget(rightWidget) {
    init();
 }
 
 void AccountWindow::setDarkMode(bool value) {
+   if (isDarkMode == value)
+      return;
+
    isDarkMode = value;
    emit themeModeChanged(isDarkMode);
 }
-
-SubWindow *AccountWindow::subWindow() const { return w; }
 
 void AccountWindow::setRightWidget(QWidget *widget) {
    if (!widget || !right)
@@ -112,22 +114,18 @@ void AccountWindow::setRightWidget(QWidget *widget) {
    QMetaObject::invokeMethod(widget, "setDarkMode", Qt::DirectConnection, Q_ARG(bool, isDarkMode));
 }
 
-void AccountWindow::show() { if (w) w->show(); }
 void AccountWindow::init() {
-   if (w) return;
-
-   // SubWindow Creation
-   w = new SubWindow(QSize(1000, 720), nullptr, true, true);
-   w->setWindowTitle("Vaultorix");
-   w->setWindowIcon(QIcon(":/icons/AppBranding/app-icon.png"));
+   // Window Information
+   this->setWindowTitle("Vaultorix");
+   this->setWindowIcon(QIcon(":/icons/AppBranding/app-icon.png"));
 
    // Main Layout
-   mainLayout = new QHBoxLayout(w->contentArea());
+   mainLayout = new QHBoxLayout(this->contentArea());
    mainLayout->setContentsMargins(0, 0, 0, 0);
    mainLayout->setSpacing(0);
 
    // TitleBar Area
-   QWidget *titleBar = w->titleBarArea();
+   QWidget *titleBar = this->titleBarArea();
 
    // Theme Mode Button
    themeMode = new Button(titleBar);
@@ -227,7 +225,7 @@ void AccountWindow::init() {
 }
 
 void AccountWindow::onthemeModeChanged(bool enable) {
-   if (w) w->setDarkMode(enable);
+   SubWindow::setDarkMode(enable);
 
    if (themeMode) {
       themeMode->setDarkMode(enable);

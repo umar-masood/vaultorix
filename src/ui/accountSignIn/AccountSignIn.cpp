@@ -3,7 +3,8 @@
 /* ------------  Account Sign In -------------------- */
 AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
-   
+   setFocusPolicy(Qt::StrongFocus);
+
    // Main Icon
    illustration = new Label(true);
    illustration->setFixedSize(QSize(150, 150));

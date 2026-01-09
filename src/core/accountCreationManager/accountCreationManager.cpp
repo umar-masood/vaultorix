@@ -41,7 +41,7 @@ void AccountCreationManager::setupConnections() {
     connect(this, &AccountCreationManager::validationDone, this, &AccountCreationManager::onValidationDone);
     connect(accountCreate->termsConditionsWidget(), &CheckWithBtn::boxChecked, this, &AccountCreationManager::onTCBoxCheck);
     connect(accountCreate->createAccountButton(), &Button::clicked, this, &AccountCreationManager::onCreateAccBtnClicked);
-    connect(this, &AccountCreationManager::credentialsStoredSuccessfully, this, &AccountCreationManager::onCredentialsStoredSuccessfully);
+    //connect(this, &AccountCreationManager::credentialsStoredSuccessfully, this, &AccountCreationManager::onCredentialsStoredSuccessfully);
     connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &AccountCreationManager::onErrorDialogActionBtnClicked);
 }
 
@@ -189,9 +189,4 @@ void AccountCreationManager::updateCreateAccBtnState(bool isEnabled, const QStri
 
 void AccountCreationManager::onErrorDialogActionBtnClicked(const QString &key) {
     // future use
-}
-
-void AccountCreationManager::onCredentialsStoredSuccessfully() {
-    qDebug() << "Credentials stored successfully!";
-    QApplication::quit();
 }

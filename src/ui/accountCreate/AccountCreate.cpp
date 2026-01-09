@@ -58,6 +58,7 @@ void CustomTextField::setDarkMode(bool value) {
 // Terms & Conditions Widget
 CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
+   setFocusPolicy(Qt::StrongFocus);
 
    // Create checkbox
    _checkbox = new CheckBox("I agree to our");
@@ -133,7 +134,7 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
 
    // Terms & Conditions Popup
    termsConditionsDialogWidget = new TermsConditions;
-   termsConditionsDialog = new Dialog(termsConditionsDialogWidget, accountWindow->subWindow(), true);
+   termsConditionsDialog = new Dialog(termsConditionsDialogWidget, accountWindow, true);
    accountWindow->setSubWidgets({termsConditionsDialogWidget, termsConditionsDialog});
    
    connect(_termsConditionsWidget, &CheckWithBtn::onButtonClicked, this, [=]() { termsConditionsDialog->show(); });
