@@ -190,7 +190,7 @@ void GetOTP::onMaxLimitReached() {
 
 void GetOTP::onVerifyClicked() {
     ao->verifyButton()->setEnabled(false);
-    ao->verifyButton()->setText("Verifying...");
+    ao->verifyButton()->setText("");
 
     bool ok = ov->verifyOTP(currOtp, cEmail);
 
