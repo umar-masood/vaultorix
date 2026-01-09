@@ -14,18 +14,16 @@
 #include <QObject>
 #include <memory>
 
-class AccountAuthCoordinator {
+class AccountAuthCoordinator : public QObject {
+    Q_OBJECT
+
     public:
-    AccountAuthCoordinator();
-    ~AccountAuthCoordinator();
+    AccountAuthCoordinator(QObject *parent = nullptr);
     void show();
     
     private:
     QSettings settings;
     const QString key = "account/registered";
-
-    void setAccountRegistered(bool isRegistered);
-    bool isAccountRegistered() const;
 
     std::unique_ptr<AccountWindow> accountWindow;
 
@@ -37,11 +35,13 @@ class AccountAuthCoordinator {
     std::unique_ptr<AccountCreationManager> accountCreateManager;
     std::unique_ptr<GetOTP> getOTP;
 
-    // Slots
-    void onCredentialsStoredSuccessfully();
-    
-    
+    void setAccountRegistered(bool isRegistered);
+    bool isAccountRegistered() const;
+
     void showOTP(const QString &email, const QString &username, const QString &fullName);
     void showSignIn();
     void showCreateAccount();
+
+    // Slots
+    void onCredentialsStoredSuccessfully();
 };

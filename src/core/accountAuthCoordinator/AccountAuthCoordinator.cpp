@@ -1,7 +1,7 @@
 #include "AccountAuthCoordinator.h"
 
 /* ---------- Account Auth Coordinator ----------- */
-AccountAuthCoordinator::AccountAuthCoordinator() {
+AccountAuthCoordinator::AccountAuthCoordinator(QObject *parent) {
     // Account Window
     accountWindow = std::make_unique<AccountWindow>();
 
@@ -31,7 +31,7 @@ void AccountAuthCoordinator::setAccountRegistered(bool isRegistered) {
 void AccountAuthCoordinator::showSignIn() {
     if (accountSignIn) {
         accountSignIn = nullptr;
-        accountSignIn->setParent(nullptr);
+        accountSignIn.reset();
     }
 
     accountSignIn = std::make_unique<AccountSignIn>();
@@ -43,14 +43,14 @@ void AccountAuthCoordinator::showSignIn() {
 void AccountAuthCoordinator::showOTP(const QString &email, const QString &username, const QString &fullName) {
     if (accountOTP) {
         accountOTP = nullptr;
-        accountOTP->setParent(nullptr);
+        accountOTP.reset();
     }
 
     accountOTP = std::make_unique<AccountOTP>();
 
     if (getOTP) {
         getOTP = nullptr;
-        getOTP->setParent(nullptr);
+        getOTP.reset();
     }
 
     getOTP = std::make_unique<GetOTP>();
@@ -63,7 +63,7 @@ void AccountAuthCoordinator::showOTP(const QString &email, const QString &userna
 void AccountAuthCoordinator::showCreateAccount() {
     if (accountCreate) {
         accountCreate = nullptr;
-        accountCreate->setParent(nullptr);
+        accountCreate.reset();
     }
 
     accountCreate = std::make_unique<AccountCreate>(nullptr, accountWindow.get()); // Here, we have passed accountWindow pointer because inside AccountCreate class we have used a dailog box for terms and conditions. To make it a child of parent (SubWindow)    
@@ -71,7 +71,7 @@ void AccountAuthCoordinator::showCreateAccount() {
 
     if (accountCreateManager) {
         accountCreateManager = nullptr;
-        accountCreateManager->setParent(nullptr);
+        accountCreateManager.reset();
     }
 
     accountCreateManager = std::make_unique<AccountCreationManager>(accountWindow.get()); // Similarly, accountWindow is also passed here for dialogs parenting.
