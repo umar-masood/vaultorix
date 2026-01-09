@@ -1,19 +1,10 @@
 #include "RoundedBox.h"
 
-RoundedBox::RoundedBox(const QString &txt, QWidget *parent, bool isToolTip) : QWidget(nullptr), isDarkMode(false), text(txt), _isToolTip(isToolTip) {
-    Qt::WindowFlags flags = Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint;
-
-    if (isToolTip) {
-        flags |= Qt::ToolTip;           
-        setAttribute(Qt::WA_ShowWithoutActivating);
-        setFocusPolicy(Qt::NoFocus);
-    } else {
-        flags |= Qt::WindowStaysOnTopHint;
-        flags |= Qt::Tool;   
-    }
-
-    setWindowFlags(flags);
+RoundedBox::RoundedBox(const QString &txt, QWidget *parent) : QWidget(nullptr), isDarkMode(false), text(txt), useAsToolTip(false) {
+    setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
+    setWindowFlag(Qt::Tool);
+    setAsToolTip(false);
 }
 
 void RoundedBox::setDarkMode(bool value) {
@@ -22,7 +13,7 @@ void RoundedBox::setDarkMode(bool value) {
 }
 
 void RoundedBox::setAsToolTip(bool value) {
-    _isToolTip = value;
+    useAsToolTip = value;
     update();
 }
 
@@ -63,7 +54,7 @@ void RoundedBox::paintEvent(QPaintEvent *event) {
     painter.drawPath(path);
 
     // Text
-    if (_isToolTip) {
+    if (useAsToolTip) {
         QFont font;
         font.setPointSize(9);
         font.setFamily("Segoe UI");
