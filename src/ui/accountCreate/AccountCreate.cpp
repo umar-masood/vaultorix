@@ -94,8 +94,9 @@ CheckBox* CheckWithBtn::checkBox() const { return _checkbox; }
 // AccountCreate Implementation
 AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
+   setFocusPolicy(Qt::StrongFocus);
 
-   // Heading
+   // Heading  
    heading = new QLabel("Create an Account");
    heading->setAttribute(Qt::WA_TranslucentBackground);
    heading->setFixedSize(QSize(276, 36));
@@ -133,7 +134,7 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
 
    // Terms & Conditions Popup
    termsConditionsDialogWidget = new TermsConditions;
-   termsConditionsDialog = new Dialog(termsConditionsDialogWidget, accountWindow->subWindow(), true);
+   termsConditionsDialog = new Dialog(termsConditionsDialogWidget, accountWindow, true);
    accountWindow->setSubWidgets({termsConditionsDialogWidget, termsConditionsDialog});
    
    connect(_termsConditionsWidget, &CheckWithBtn::onButtonClicked, this, [=]() { termsConditionsDialog->show(); });

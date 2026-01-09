@@ -78,7 +78,6 @@ class AccountCreationManager : public QObject {
     void onTCBoxCheck(bool checked);
     void onCreateAccBtnClicked();
     void onErrorDialogActionBtnClicked(const QString &key);
-    void onCredentialsStoredSuccessfully();
 
     signals:
     void validationDone(bool isValidationDone);
