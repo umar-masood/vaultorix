@@ -193,6 +193,7 @@ void AccountCreate::setDarkMode(bool value) {
       field->setDarkMode(isDarkMode);
 
    if (_termsConditionsWidget) _termsConditionsWidget->setDarkMode(isDarkMode);
+   if (termsConditionsDialog) termsConditionsDialog->setDarkMode(isDarkMode);
 }
 
 Button* AccountCreate::createAccountButton() const { return createAccBtn; }
