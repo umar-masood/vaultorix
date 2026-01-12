@@ -5,7 +5,6 @@ Button::Button(const QString &text, QWidget *parent) : QPushButton(text, parent)
 Button::Button(QWidget *parent) : QPushButton(parent) { init(); }
 
 void Button::init() {
-  setCursor(Qt::PointingHandCursor);
   setFocusPolicy(Qt::NoFocus);
 
   // Shadow Effect
@@ -347,6 +346,8 @@ void Button::hideEvent(QHideEvent *event) {
 void Button::enterEvent(QEnterEvent *event) {
   isHover = true;
 
+  setCursor(Qt::PointingHandCursor);
+
   if (isShadowEnabled && !isIconOnly()) {
     if (!isSecondary) 
       shadow_color = QColor::fromString("#008EDE");
@@ -379,6 +380,7 @@ void Button::enterEvent(QEnterEvent *event) {
 
 void Button::leaveEvent(QEvent *event) {
   isHover = false;
+  setCursor(Qt::ArrowCursor);
 
   if (isShadowEnabled) {
     animate->setStartValue(effect->blurRadius());
