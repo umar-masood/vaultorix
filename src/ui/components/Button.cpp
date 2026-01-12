@@ -346,8 +346,6 @@ void Button::hideEvent(QHideEvent *event) {
 void Button::enterEvent(QEnterEvent *event) {
   isHover = true;
 
-  setCursor(Qt::PointingHandCursor);
-
   if (isShadowEnabled && !isIconOnly()) {
     if (!isSecondary) 
       shadow_color = QColor::fromString("#008EDE");
@@ -380,7 +378,6 @@ void Button::enterEvent(QEnterEvent *event) {
 
 void Button::leaveEvent(QEvent *event) {
   isHover = false;
-  setCursor(Qt::ArrowCursor);
 
   if (isShadowEnabled) {
     animate->setStartValue(effect->blurRadius());
