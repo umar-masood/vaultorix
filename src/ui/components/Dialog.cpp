@@ -25,6 +25,7 @@ void Overlay::paintEvent(QPaintEvent *event) {
 
 Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool closeBtn) : SubWindow(centralWidget->size(), parent, closeBtn, false), contentWidget(centralWidget) {
    setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
+   setWindowModality(Qt::WindowModal);
    setFocusPolicy(Qt::StrongFocus);
 
    if (parent) {
@@ -36,7 +37,9 @@ Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool closeBtn) : SubWind
 }
 
 void Dialog::setDarkMode(bool value) {
-   if (isDarkMode == value) return;
+   if (isDarkMode == value) 
+      return;
+   
    isDarkMode = value;
    SubWindow::setDarkMode(isDarkMode);
 }
