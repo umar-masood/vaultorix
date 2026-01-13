@@ -60,7 +60,7 @@ class CheckWithBtn : public QWidget {
    void boxChecked(bool checked);
 };
 
-/*  ------------------------- Account Create Main Widget ------------------ */
+/*  ------------------------- Account Create ------------------ */
 class AccountCreate : public QWidget {
    Q_OBJECT
 
