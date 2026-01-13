@@ -110,9 +110,10 @@ class AccountCreate : public QWidget {
    // Password Rules Validator
    PwdRulesWidget *_passwordValidatorWidget = nullptr;
 
-   // Terms & Conditions
+   // Terms & Conditions Cosent Widget
    CheckWithBtn *_termsConditionsWidget = nullptr;
 
+   // Terms & Conditions Dialog
    Dialog *termsConditionsDialog = nullptr;
    TermsConditions *termsConditionsDialogWidget = nullptr;
 
