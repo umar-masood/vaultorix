@@ -1,6 +1,8 @@
 #include "AccountSignIn.h"
 
-/* ------------  Account Sign In -------------------- */
+/* ========================================================================================= 
+                              ACCOUNT SIGN IN IMPLEMENTATION              
+   ========================================================================================= */
 AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
    setFocusPolicy(Qt::StrongFocus);
@@ -65,8 +67,8 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    cancelBtn->setFontProperties("Segoe UI", 11, true, false);
    connect(cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
 
-   // Sign up Redirect Widget
-   redirectToSignUpWidget = new TextWithBtn(nullptr, "Don't have an account?", "Create an account", QSize(110,12), false);
+   // Sign up page redirect widget
+   _redirectToSignUpWidget = new TextWithBtn(nullptr, "Don't have an account?", "Create an account", QSize(110,12), false);
 
    // Main Layout
    layout = new QVBoxLayout(this);
@@ -93,35 +95,37 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    layout->addWidget(cancelBtn, 0, Qt::AlignHCenter);
    
    layout->addSpacing(20);
-   layout->addWidget(redirectToSignUpWidget, 0, Qt::AlignHCenter);
+   layout->addWidget(_redirectToSignUpWidget, 0, Qt::AlignHCenter);
    layout->addStretch();
 
+   // Initial Theme
    setDarkMode(false);
 }
 
+/* --------------------  Setters  -----------------  */
 void AccountSignIn::setDarkMode(bool value) {
    isDarkMode = value;
+ 
+   // Header (Account Sign In)
+   heading->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
+
+   // Cancel Button
+   cancelBtn->setDarkMode(isDarkMode);
+
+   // Username TextField
+   username->setIconPaths(userIcon, userIcon);
+   username->setDarkMode(isDarkMode);
    
-   if (heading) 
-      heading->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
-
-   if (cancelBtn) 
-      cancelBtn->setDarkMode(isDarkMode);
-
-   if (username) {
-      username->setIconPaths(userIcon, userIcon);
-      username->setDarkMode(isDarkMode);
-   }
-
-   if (password) {
-      password->setIconPaths(passwordIcon,passwordIcon);
-      password->setDarkMode(isDarkMode);
-   }
-
-   if (redirectToSignUpWidget) 
-      redirectToSignUpWidget->text()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black")); 
+   // Password TextField
+   password->setIconPaths(passwordIcon,passwordIcon);
+   password->setDarkMode(isDarkMode);
+   
+   // Redirect to Sign Up page widget
+   _redirectToSignUpWidget->text()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black")); 
 }
 
-TextField *AccountSignIn::usernameField() const { return username; }
-TextField *AccountSignIn::passwordField() const { return password; }
-Button* AccountSignIn::signInButton() const { return signInBtn; }  
+/* --------------------  Getters  -----------------  */
+TextField* AccountSignIn::usernameField() const { return username; }
+TextField* AccountSignIn::passwordField() const { return password; }
+TextWithBtn *AccountSignIn::redirectToSignUpWidget() const { return _redirectToSignUpWidget; }
+Button *AccountSignIn::signInButton() const { return signInBtn; }

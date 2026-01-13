@@ -14,6 +14,7 @@ class AccountSignIn : public QWidget {
    Q_INVOKABLE void setDarkMode(bool value);
    TextField* usernameField() const;
    TextField* passwordField() const;
+   TextWithBtn* redirectToSignUpWidget() const;
    Button* signInButton() const;
 
    private:
@@ -49,7 +50,7 @@ class AccountSignIn : public QWidget {
    Button *cancelBtn = nullptr;
 
    // For Sign up if it doesn't have an active account
-   TextWithBtn *redirectToSignUpWidget = nullptr;
+   TextWithBtn *_redirectToSignUpWidget = nullptr;
 
    // Main Layout
    QVBoxLayout *layout = nullptr;
