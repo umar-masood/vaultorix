@@ -55,7 +55,6 @@ class CheckWithBtn : public QWidget {
    Button *_button = nullptr;
 
    signals:
-   void themeModeChanged(bool enable);
    void onButtonClicked();
    void boxChecked(bool checked);
 };

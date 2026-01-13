@@ -42,6 +42,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
 
    // Forgot Password Field
    forgotPwd = new Button("Forgot Password?");
+   forgotPwd->setCursor(Qt::PointingHandCursor);
    forgotPwd->setDisplayMode(Button::TextOnly);
    forgotPwd->setFixedSize(QSize(110, 18));
    forgotPwd->setHyperLink(true);
@@ -51,6 +52,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
 
    // Sign In Button
    signInBtn = new Button("Sign in");
+   signInBtn->setCursor(Qt::PointingHandCursor);
    signInBtn->setDisplayMode(Button::TextOnly);
    signInBtn->setFixedSize(QSize(360, 36));
    signInBtn->setGradientColor(true, "#008EDE", "#15F2FF");
@@ -61,6 +63,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
 
    // Cancel Button
    cancelBtn = new Button("Cancel");
+   cancelBtn->setCursor(Qt::PointingHandCursor);
    cancelBtn->setDisplayMode(Button::TextOnly);
    cancelBtn->setSecondary(true);
    cancelBtn->setFixedSize(QSize(360, 36));

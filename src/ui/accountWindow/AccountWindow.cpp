@@ -20,6 +20,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
 
    // Theme Mode Button
    themeMode = new Button(titleBar);
+   themeMode->setCursor(Qt::PointingHandCursor);
    themeMode->setSecondary(true);
    themeMode->setIconSize(QSize(16,16));
    themeMode->setDisplayMode(Button::IconOnly);

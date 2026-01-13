@@ -38,6 +38,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
 
    // Verify Button
    _verifyBtn = new Button("Verify");
+   _verifyBtn->setCursor(Qt::PointingHandCursor);
    _verifyBtn->setDisplayMode(Button::TextOnly);
    _verifyBtn->setFixedSize(QSize(360, 36));
    _verifyBtn->setGradientColor(true, "#008EDE", "#15F2FF");
@@ -48,6 +49,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
 
    // Cancel Button
    _cancelBtn = new Button("Cancel");
+   _cancelBtn->setCursor(Qt::PointingHandCursor);
    _cancelBtn->setDisplayMode(Button::TextOnly);
    _cancelBtn->setSecondary(true);
    _cancelBtn->setFixedSize(QSize(360, 36));

@@ -44,4 +44,5 @@ class AccountAuthCoordinator : public QObject {
 
     // Slots
     void onCredentialsStoredSuccessfully();
+
 };

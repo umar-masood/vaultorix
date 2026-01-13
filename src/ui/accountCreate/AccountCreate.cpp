@@ -67,6 +67,7 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
 
    // Create Account Button
    createAccBtn = new Button;
+   createAccBtn->setCursor(Qt::PointingHandCursor);
    createAccBtn->setDisplayMode(Button::TextOnly);
    createAccBtn->setFixedSize(QSize(360, 36));
    createAccBtn->setLoaderButton(true);
@@ -247,6 +248,7 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
 
    // Button
    _button = new Button;
+   _button->setCursor(Qt::PointingHandCursor);
    _button->setParent(this);
    _button->setDisplayMode(Button::TextOnly);
    _button->setFixedSize(QSize(160, 12));
@@ -259,17 +261,19 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    // Signals Slots
    connect(_button, &Button::clicked, this, [this]() { emit onButtonClicked(); });
    connect(_checkbox, &CheckBox::toggled, this, [this](bool checked) { emit boxChecked(checked); });
-   connect(this, &CheckWithBtn::themeModeChanged, this, [this](bool enable) { if (_checkbox) _checkbox->setDarkMode(enable); });
    
    // Setting fixed size
-   setFixedSize(QSize((_checkbox->width() + _button->width() + 5), 22));
+   setFixedSize(QSize((_checkbox->width() + _button->width() + 5), 22));   
 }
 
 /* --------------------  Setters  -----------------  */
 void CheckWithBtn::setDarkMode(bool value) {
-   if (isDarkMode == value) return;
+   if (isDarkMode == value) 
+      return;
+   
    isDarkMode = value;
-   emit themeModeChanged(isDarkMode);
+
+   _checkbox->setDarkMode(isDarkMode); 
 }
 
 /* --------------------  Getters  -----------------  */

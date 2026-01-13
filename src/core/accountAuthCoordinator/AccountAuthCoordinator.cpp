@@ -35,9 +35,13 @@ void AccountAuthCoordinator::showSignIn() {
     }
 
     accountSignIn = std::make_unique<AccountSignIn>();
-    
+    accountSignInManager = std::make_unique<AccountSignInManager>();
+    accountSignInManager->setAccountSignInObject(accountSignIn.get());
+
     if (accountWindow) 
         accountWindow->setRightWidget(accountSignIn.get());
+
+    connect(accountSignIn->redirectToSignUpWidget(), &TextWithBtn::buttonClicked, this, &AccountAuthCoordinator::showCreateAccount);
 }
 
 void AccountAuthCoordinator::showOTP(const QString &email, const QString &username, const QString &fullName) {
@@ -78,7 +82,7 @@ void AccountAuthCoordinator::showCreateAccount() {
     accountCreateManager->setAccountCreateObject(accountCreate.get());
 
     // Connecting signal slot
-    QObject::connect(accountCreateManager.get(), &AccountCreationManager::credentialsStoredSuccessfully, [this]() { onCredentialsStoredSuccessfully(); });
+    connect(accountCreateManager.get(), &AccountCreationManager::credentialsStoredSuccessfully, this, [this]() { onCredentialsStoredSuccessfully(); });
 }
 
 void AccountAuthCoordinator::onCredentialsStoredSuccessfully() {

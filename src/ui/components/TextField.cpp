@@ -60,6 +60,7 @@ void TextField::setClearButton(bool value) {
 
     if (clearButton && !clear) {
         clear = new Button("", this);
+        clear->setCursor(Qt::PointingHandCursor);
         clear->setShadow(false);
         clear->setDisplayMode(Button::IconOnly);
         clear->setIconSize(this->textFieldIconSize);
@@ -88,6 +89,7 @@ void TextField::setPasswordTextField(bool value) {
 
     if (passwordButton && !password && !clearButton) {
         password = new Button("", this);
+        password->setCursor(Qt::PointingHandCursor);
         password->setShadow(false);
         password->setDisplayMode(Button::IconOnly);
         password->setIconSize(this->textFieldIconSize);

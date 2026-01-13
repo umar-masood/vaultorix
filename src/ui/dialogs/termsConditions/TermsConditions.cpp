@@ -31,11 +31,13 @@ TermsConditions::TermsConditions(QWidget *parent) : QWidget(parent) {
    layout->addWidget(termsConds, 0, Qt::AlignCenter);
    layout->addStretch();
 
-   connect(this, &TermsConditions::themeModeChanged, this, [this](bool enable) { scrollBar->setDarkMode(enable); });
+   setDarkMode(isDarkMode);
 }
 
 void TermsConditions::setDarkMode(bool value) {
-   if (isDarkMode == value) return;
+   if (isDarkMode == value) 
+      return;
+
    isDarkMode = value;
-   emit themeModeChanged(isDarkMode);
+   scrollBar->setDarkMode(isDarkMode);
 }
