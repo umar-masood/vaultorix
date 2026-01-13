@@ -1,175 +1,12 @@
 #include "AccountOTP.h"
 
-/* -------   OTP Widget ----------------  */
-OTPWidget::OTPWidget(QWidget *parent) : QWidget(parent) {
-   setAttribute(Qt::WA_TranslucentBackground);
-   setFixedSize(QSize(360, 60));
-   setFocusPolicy(Qt::StrongFocus);
-
-   // Layout
-   auto *layout = new QHBoxLayout(this);
-   layout->addStretch();
-   layout->setSpacing(0);
-
-   // Font
-   QFont font;
-   font.setFamily("Segoe UI");
-   font.setBold(true);
-   font.setPointSize(22);
-
-   // Boxes
-   for (int i = 0; i < boxes; i++) {
-      auto *box = new QLabel;
-      box->setFont(font);
-      box->setAlignment(Qt::AlignCenter);
-      box->setStyleSheet(normalStyle);
-      box->setFixedSize(QSize(46, 46));
-      box->setContentsMargins(0, 0, 0, 3);
-      OTPBoxes.append(box);
-      layout->addWidget(box);
-      if (i < 4)
-         layout->addSpacing(28);
-   }
-
-   layout->addStretch();
-
-   updateStyles();
-   updateHighlight();
-}
-
-void OTPWidget::setDarkMode(bool value) {
-   isDarkMode = value;
-   updateStyles();
-   updateHighlight();
-}
-
-void OTPWidget::keyPressEvent(QKeyEvent *event) {
-   const int n = OTPBoxes.size();
-   if ((event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9) ||
-      (event->key() >= Qt::Key_A && event->key() <= Qt::Key_Z))
-   {
-      QString text = event->text().toUpper();
-      if (!text.isEmpty() && currentIndex >= 0 && currentIndex < n) {
-         OTPBoxes[currentIndex]->setText(text);
-         currentIndex++;
-         if (currentIndex >= n)
-            currentIndex = n - 1;
-         updateHighlight();
-      }
-
-      if (currentIndex == n - 1 && !OTPBoxes[n - 1]->text().isEmpty()) {
-         QString c;
-         for (auto *i : OTPBoxes)
-            c.append(i->text());
-         emit OTPcompleted(c);
-      }
-
-   } else if (event->key() == Qt::Key_Backspace) {
-      if (currentIndex >= 0 && currentIndex < n) {
-         if (!OTPBoxes[currentIndex]->text().isEmpty()) {
-            OTPBoxes[currentIndex]->clear();
-         } else {
-            if (currentIndex > 0)
-               currentIndex--;
-            OTPBoxes[currentIndex]->clear();
-            updateHighlight();
-         }
-      }
-   }
-}
-
-void OTPWidget::updateStyles() {
-   bg_color_normal = isDarkMode ? "#2D2D2D" : "#FBFBFB";
-   bg_color_focused = isDarkMode ? "#1F1F1F" : "#FFFFFF";
-   text_color = isDarkMode ? "white" : "black";
-   border_color = isDarkMode ? "#4D4D4D" : "#CCCCCC";
-
-   normalStyle = QString(
-                     "background-color: %1; border-radius: 7px; border: 1px solid %2; color: %3;")
-                     .arg(bg_color_normal)
-                     .arg(border_color)
-                     .arg(text_color);
-
-   focusedStyle = QString(
-                      "background-color: %1; border: 2px solid #109AC7; border-radius: 7px; color: %2;")
-                      .arg(bg_color_focused)
-                      .arg(text_color);
-
-   disabledStyle = QString(
-                     "background-color: %1; border-radius: 7px; border: 1px solid %2; color: gray;")
-                     .arg(bg_color_normal)
-                     .arg(border_color);
-}
-
-void OTPWidget::updateHighlight() {
-   for (int i = 0; i < OTPBoxes.size(); i++) {
-      if (!isEnabled()) 
-         OTPBoxes[i]->setStyleSheet(disabledStyle);
-      else if (i == currentIndex)
-         OTPBoxes[i]->setStyleSheet(focusedStyle);
-      else
-         OTPBoxes[i]->setStyleSheet(normalStyle);
-   }
-}
-
-void OTPWidget::setEnabled(bool enabled) {
-   QWidget::setEnabled(enabled);
-   updateStyles();
-   updateHighlight();
-}
-
-void OTPWidget::showEvent(QShowEvent *event) {
-   QWidget::showEvent(event);
-   this->setFocus(Qt::OtherFocusReason);
-}
-
-/* Resend OTP Widget */
-TextWithBtn::TextWithBtn(QWidget *parent, const QString &text, const QString &hyperlinkText, const QSize &hyperlinkSize, bool useTimer) : QWidget(parent) {
-   setAttribute(Qt::WA_TranslucentBackground);
-
-   // Text 
-   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, text, Qt::AlignHCenter);
-   _text->setStyleSheet("color: black;");
-   _text->setParent(this);
-   _text->setFixedSize(136, 22);
-   _text->move(0,0);
-
-   // Resend Button
-   _button = new Button(this);
-   _button->setDisplayMode(Button::TextOnly);
-   _button->setFixedSize(hyperlinkSize);
-   _button->setHyperLink(true);
-   _button->setText(hyperlinkText);
-   _button->setFontProperties("Segoe UI", 10, false, false);
-   _button->setHyperLinkColors("#008EDE", "#15F2FF");
-   _button->move(_text->width() + 4, 2);
-
-   connect(_button, &Button::clicked, this, [this]() { emit onButtonClicked(); });
-
-   setFixedSize(QSize(_text->width() + _button->width() + 2, 18));
-
-   // Timer Label
-   if (useTimer) {
-      _timer = new Label(false, "Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
-      _timer->setStyleSheet("color: black;");
-      _timer->setParent(this);
-      _timer->setFixedSize(36, 22);
-      _timer->move(_text->width() + _button->width() + 4,0);   
-
-      setFixedSize(QSize(_text->width() + _button->width() + _timer->width() + 2, 18));
-   }
-}
-
-// Getters of Resend OTP Widget
-Label* TextWithBtn::text() const { return _text; }
-Button * TextWithBtn::button() const { return _button; }
-Label *TextWithBtn::timer() const { return _timer; }
-
-/* AccountOTP Main Widget Implementation */
+/* ========================================================================================= 
+                              ACCOUNT OTP IMPLEMENTATION              
+   ========================================================================================= */
 AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
 
-   // Main Icon of OTP at the top
+   // Illustration of OTP at the top
    illustration = new Label(true);
    illustration->setFixedSize(QSize(106, 106));
    illustration->setPixmap(QPixmap(":/icons/AccountOTP/otp.png").scaled(106, 106, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -197,7 +34,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
 
    // Resend OTP Widget (Resend Text + Button + Timer)
    _resendOtpWidget = new TextWithBtn(nullptr, "Didn`t receive the OTP?", "Resend", QSize(50,12), true);
-   connect(_resendOtpWidget, &TextWithBtn::onButtonClicked, this, [this]() { emit resendClicked(); });
+   connect(_resendOtpWidget, &TextWithBtn::buttonClicked, this, [this]() { emit resendClicked(); });
 
    // Verify Button
    _verifyBtn = new Button("Verify");
@@ -239,15 +76,25 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    setLayout(layout);
 
    // Theme Mode 
-   connect(this, &AccountOTP::themeModeChanged, this, &AccountOTP::onThemeModeChanged);
+   setDarkMode(isDarkMode);
 }
 
-// Getters of AccountOTP Main Widget
-OTPWidget* AccountOTP::otpWidget() const { return _otpWidget; } // Return OTP Widget (for retrieving entered OTP) in backend
-Button* AccountOTP::verifyButton() const { return _verifyBtn; } // Return Verify Button for updating its properties in backend
-TextWithBtn* AccountOTP::resendOtpWidget() const { return _resendOtpWidget; } // Return Resend OTP Widget for updating its properties in backend
-AnimatedLabel* AccountOTP::message() const { return _message; } // Return Message Label for displaying error messages in backend
+/* --------------------  Getters  -----------------  */
+/**
+ * @return OTP widget which contains 5 input boxes
+ */
+OTPWidget* AccountOTP::otpWidget() const { return _otpWidget; } 
+Button* AccountOTP::verifyButton() const { return _verifyBtn; } 
+/**
+ * @return Resend OTP widget which contains a resend button for again requesting OTP
+ */
+TextWithBtn* AccountOTP::resendOtpWidget() const { return _resendOtpWidget; } 
+/**
+ * @brief It is a Label inside of Account OTP widget, which is used for displaying error messages
+ */
+AnimatedLabel* AccountOTP::message() const { return _message; }
 
+/* --------------------  Setters  -----------------  */
 void AccountOTP::onEmailEntered(const QString &email) {
    QString e = email;
    int idx = e.indexOf('@');
@@ -263,18 +110,195 @@ void AccountOTP::setEmail(const QString &email) {
 }
 
 void AccountOTP::setDarkMode(bool value) {
-   if (isDarkMode == value) return;
+   if (isDarkMode == value) 
+      return;
+
    isDarkMode = value;
-   emit themeModeChanged(isDarkMode);
+
+   // Header (Verify with OTP) 
+   heading->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
+
+   // Cancel Button
+   _cancelBtn->setDarkMode(isDarkMode);
+
+   // Resend OTP widget (text + button + timer)
+   _resendOtpWidget->text()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black")); 
+   _resendOtpWidget->timer()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black")); 
+   
+   // OTP code input box widgets
+   _otpWidget->setDarkMode(isDarkMode);
 }
 
-void AccountOTP::onThemeModeChanged(bool enable) {
-   if (heading) heading->setStyleSheet(QString("color: %1;").arg(enable ? "white" : "black"));
-   if (_cancelBtn) _cancelBtn->setDarkMode(enable);
-   if (_resendOtpWidget) {
-      _resendOtpWidget->text()->setStyleSheet(QString("color: %1").arg(enable ? "white" : "black")); 
-      _resendOtpWidget->timer()->setStyleSheet(QString("color: %1").arg(enable ? "white" : "black")); 
-   } 
+/* ========================================================================================= 
+                           CUSTOMIZED WIDGETS FOR ABOVE CLASS             
+   ========================================================================================= */
 
-   if (_otpWidget) _otpWidget->setDarkMode(enable);
+/* ---------------- OTP Widget ------------------------  */
+OTPWidget::OTPWidget(QWidget *parent) : QWidget(parent) {
+   setAttribute(Qt::WA_TranslucentBackground);
+   setFixedSize(QSize(360, 60));
+   setFocusPolicy(Qt::StrongFocus);
+
+   // Layout
+   auto *layout = new QHBoxLayout(this);
+   layout->addStretch();
+   layout->setSpacing(0);
+
+   // Font
+   QFont font;
+   font.setFamily("Segoe UI");
+   font.setBold(true);
+   font.setPointSize(22);
+
+   // Boxes
+   for (int i = 0; i < boxes; i++) {
+      auto *box = new QLabel;
+      box->setFont(font);
+      box->setAlignment(Qt::AlignCenter);
+      box->setStyleSheet(normalStyle);
+      box->setFixedSize(QSize(46, 46));
+      box->setContentsMargins(0, 0, 0, 3);
+      OTPBoxes.append(box);
+      layout->addWidget(box);
+      if (i < 4)
+         layout->addSpacing(28);
+   }
+
+   layout->addStretch();
+
+   updateStyles();
+   updateHighlight();
 }
+
+/* --------------------  Overrided Event Methods  -----------------  */
+void OTPWidget::keyPressEvent(QKeyEvent *event) {
+   const int n = OTPBoxes.size();
+   if ((event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9) ||
+      (event->key() >= Qt::Key_A && event->key() <= Qt::Key_Z))
+   {
+      QString text = event->text().toUpper();
+      if (!text.isEmpty() && currentIndex >= 0 && currentIndex < n) {
+         OTPBoxes[currentIndex]->setText(text);
+         currentIndex++;
+         if (currentIndex >= n)
+            currentIndex = n - 1;
+         updateHighlight();
+      }
+
+      if (currentIndex == n - 1 && !OTPBoxes[n - 1]->text().isEmpty()) {
+         QString c;
+         for (auto *i : OTPBoxes)
+            c.append(i->text());
+         emit OTPcompleted(c);
+      }
+
+   } else if (event->key() == Qt::Key_Backspace) {
+      if (currentIndex >= 0 && currentIndex < n) {
+         if (!OTPBoxes[currentIndex]->text().isEmpty()) {
+            OTPBoxes[currentIndex]->clear();
+         } else {
+            if (currentIndex > 0)
+               currentIndex--;
+            OTPBoxes[currentIndex]->clear();
+            updateHighlight();
+         }
+      }
+   }
+}
+
+void OTPWidget::showEvent(QShowEvent *event) {
+   QWidget::showEvent(event);
+   this->setFocus(Qt::OtherFocusReason);
+}
+
+/* --------------------  Setters  -----------------  */
+void OTPWidget::updateStyles() {
+   bg_color_normal = isDarkMode ? "#2D2D2D" : "#FBFBFB";
+   bg_color_focused = isDarkMode ? "#1F1F1F" : "#FFFFFF";
+   text_color = isDarkMode ? "white" : "black";
+   border_color = isDarkMode ? "#4D4D4D" : "#CCCCCC";
+
+   normalStyle = QString(
+                     "background-color: %1; border-radius: 7px; border: 1px solid %2; color: %3;")
+                     .arg(bg_color_normal)
+                     .arg(border_color)
+                     .arg(text_color);
+
+   focusedStyle = QString(
+                      "background-color: %1; border: 2px solid #109AC7; border-radius: 7px; color: %2;")
+                      .arg(bg_color_focused)
+                      .arg(text_color);
+
+   disabledStyle = QString(
+                     "background-color: %1; border-radius: 7px; border: 1px solid %2; color: gray;")
+                     .arg(bg_color_normal)
+                     .arg(border_color);
+}
+
+void OTPWidget::updateHighlight() {
+   for (int i = 0; i < OTPBoxes.size(); i++) {
+      if (!isEnabled()) 
+         OTPBoxes[i]->setStyleSheet(disabledStyle);
+      else if (i == currentIndex)
+         OTPBoxes[i]->setStyleSheet(focusedStyle);
+      else
+         OTPBoxes[i]->setStyleSheet(normalStyle);
+   }
+}
+
+void OTPWidget::setDarkMode(bool value) {
+   isDarkMode = value;
+   updateStyles();
+   updateHighlight();
+}
+
+void OTPWidget::setEnabled(bool enabled) {
+   QWidget::setEnabled(enabled);
+   updateStyles();
+   updateHighlight();
+}
+
+/* ------------------------ Text with Button Widget (Used in Account OTP for resend OTP) ------------------------ */
+TextWithBtn::TextWithBtn(QWidget *parent, const QString &text, 
+                        const QString &hyperlinkText, const QSize &hyperlinkSize,
+                        bool useTimer) : QWidget(parent) {
+   setAttribute(Qt::WA_TranslucentBackground);
+
+   // Text 
+   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, text, Qt::AlignHCenter);
+   _text->setStyleSheet("color: black;");
+   _text->setParent(this);
+   _text->setFixedSize(136, 22);
+   _text->move(0,0);
+
+   // Resend Button
+   _button = new Button(this);
+   _button->setDisplayMode(Button::TextOnly);
+   _button->setFixedSize(hyperlinkSize);
+   _button->setHyperLink(true);
+   _button->setText(hyperlinkText);
+   _button->setFontProperties("Segoe UI", 10, false, false);
+   _button->setHyperLinkColors("#008EDE", "#15F2FF");
+   _button->move(_text->width() + 4, 2);
+
+   // Signal Slot
+   connect(_button, &Button::clicked, this, [this]() { emit buttonClicked(); });
+
+   setFixedSize(QSize(_text->width() + _button->width() + 2, 18));
+
+   // Timer Label
+   if (useTimer) {
+      _timer = new Label(false, "Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
+      _timer->setStyleSheet("color: black;");
+      _timer->setParent(this);
+      _timer->setFixedSize(36, 22);
+      _timer->move(_text->width() + _button->width() + 4,0);   
+
+      setFixedSize(QSize(_text->width() + _button->width() + _timer->width() + 2, 18));
+   }
+}
+
+/* --------------------  Getters  -----------------  */
+Label* TextWithBtn::text() const { return _text; }
+Button * TextWithBtn::button() const { return _button; }
+Label *TextWithBtn::timer() const { return _timer; }

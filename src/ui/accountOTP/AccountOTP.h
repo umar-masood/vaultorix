@@ -10,7 +10,7 @@
 #include "../components/Button.h"
 #include "../components/Label.h"
 
-/* ---------------- OTP Widget ----------------- */
+/* ---------------- OTP Input Boxs Widget ----------------- */
 class OTPWidget : public QWidget {
    Q_OBJECT
 
@@ -55,7 +55,7 @@ class OTPWidget : public QWidget {
    void updateHighlight();
 };
 
-/* -----------------  Custom Text with Button ------------------ */
+/* ----------------- Text with Button ------------------ */
 class TextWithBtn : public QWidget {
    Q_OBJECT
 
@@ -68,16 +68,18 @@ class TextWithBtn : public QWidget {
    private:
    // Text Label
    Label *_text = nullptr;
+
    // Timer Label
    Label *_timer = nullptr;
+   
    // Resend Button
    Button *_button = nullptr;
 
    signals:
-   void onButtonClicked();
+   void buttonClicked();
 };
 
-/* -------------- Account OTP ---------------------------- */
+/* ------------------- Account OTP ------------------------ */
 class AccountOTP : public QWidget {
    Q_OBJECT
 
@@ -121,8 +123,7 @@ class AccountOTP : public QWidget {
    // Main Layout
    QVBoxLayout *layout = nullptr;
 
-   // Slots
-   void onThemeModeChanged(bool enable);
+   // Slot
    void onEmailEntered(const QString &email);
 
    signals:
@@ -130,5 +131,4 @@ class AccountOTP : public QWidget {
    void resendClicked();
    void verifyClicked();
    void cancelClicked();
-   void themeModeChanged(bool enable);
 };
