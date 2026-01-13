@@ -98,7 +98,10 @@ class AccountCreate : public QWidget {
    CustomTextField *email = nullptr;
    QWidget *emailWidget = nullptr;
 
-   // To hold all field widgets for easy access
+   // Holds all labels inside fields widgets
+   QVector<QLabel *> labels;
+
+   // Hold all field widgets 
    QVector<QWidget *> fieldsWidgets;
 
    // Layout
@@ -117,9 +120,10 @@ class AccountCreate : public QWidget {
    Button *createAccBtn = nullptr;
 
    // Helper Functions
-   CustomTextField *Field(const QString &placeholderText = "", bool useCheck = false);
-   QWidget *LabeledField(const QString labelName = "", CustomTextField *currField = nullptr);
+   CustomTextField *createTextField(const QString &placeholderText = "", bool useCheck = false);
+   QWidget *createLabeledTextFieldWidget(const QString labelName = "", CustomTextField *currField = nullptr);
    QFont font(const QString &family = "Segoe UI", int fontSize = 10, QFont::Weight weight = QFont::Medium);
+   void addLabelsInsideFieldsWidgets();
 
    signals:
    void onNameEntered();

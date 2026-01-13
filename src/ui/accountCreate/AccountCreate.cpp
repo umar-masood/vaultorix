@@ -1,97 +1,8 @@
 #include "AccountCreate.h"
 
-// CustomTextField Implementation
-CustomTextField::CustomTextField(bool useCheck, QWidget *parent) : TextField(parent) {
-   if (useCheck) {
-      setSpacingRight(true);
-      checkIcon = new QLabel(this);
-      checkIcon->setAttribute(Qt::WA_TranslucentBackground);
-      checkIcon->setFixedSize(QSize(20, 20));
-      
-      QTimer::singleShot(0, this, [this]() {
-         int x = width() - (checkIcon->width() + 12);
-         int y = (height() - checkIcon->height()) / 2;
-         checkIcon->move(x, y); 
-      });
-
-      tooltip = new ToolTip;
-
-      setUnchecked();
-   }
-}
-
-void CustomTextField::setTooltip(const QString &tooltipText) {
-   if (tooltipText.isEmpty()) {
-      if (tooltip) {
-         tooltip->hide();
-         tooltip->setTargetWidget(nullptr);
-      }
-      hasTip = false;
-      return;
-   }
-
-   if (tooltip) {
-      tooltip->setTargetWidget(checkIcon);
-      tooltip->setText(tooltipText);
-   }
-
-   hasTip = true;
-}
-
-
-void CustomTextField::setChecked() {
-   if (checkIcon)
-      checkIcon->setPixmap(QPixmap(checked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-}
-
-void CustomTextField::setUnchecked() {
-   if (checkIcon)
-      checkIcon->setPixmap(QPixmap(unchecked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-}
-
-void CustomTextField::setDarkMode(bool value) {
-   TextField::setDarkMode(value);
-   if (tooltip)
-      tooltip->setDarkMode(value);
-}
-
-// Terms & Conditions Widget
-CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
-   setAttribute(Qt::WA_TranslucentBackground);
-
-   // Create checkbox
-   _checkbox = new CheckBox("I agree to our");
-   _checkbox->setParent(this);
-   _checkbox->move(0, 0); 
-
-   // Create button
-   _button = new Button;
-   _button->setParent(this);
-   _button->setDisplayMode(Button::TextOnly);
-   _button->setFixedSize(QSize(160, 12));
-   _button->setHyperLink(true);
-   _button->setText("Terms & Conditions");
-   _button->setFontProperties("Segoe UI", 10, false, false);
-   _button->setHyperLinkColors("#008EDE", "#15F2FF");
-   _button->move(_checkbox->width() + 4, 4); 
-
-   connect(_button, &Button::clicked, this, [this]() { emit onButtonClicked(); });
-   connect(_checkbox, &CheckBox::toggled, this, [this](bool checked) { emit boxChecked(checked); });
-   connect(this, &CheckWithBtn::themeModeChanged, this, [this](bool enable) { if (_checkbox) _checkbox->setDarkMode(enable); });
-   
-   setFixedSize(QSize((_checkbox->width() + _button->width() + 5), 22));
-}
-
-void CheckWithBtn::setDarkMode(bool value) {
-   if (isDarkMode == value) return;
-   isDarkMode = value;
-   emit themeModeChanged(isDarkMode);
-}
-
-Button* CheckWithBtn::button() const { return _button; }
-CheckBox* CheckWithBtn::checkBox() const { return _checkbox; }
-
-// AccountCreate Implementation
+/* ========================================================================================= 
+                              ACCOUNT CREATE IMPLEMENTATION              
+   ========================================================================================= */
 AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
    setFocusPolicy(Qt::StrongFocus);
@@ -104,39 +15,40 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    heading->setFont(font("Inter", 22, QFont::Bold));
 
    // Name
-   name = Field("Enter your full name", true);
+   name = createTextField("Enter your full name", true);
    name->setContextMenu(true);
-   nameWidget = LabeledField("Full Name", name);
+   nameWidget = createLabeledTextFieldWidget("Full Name", name);
 
    // Username
-   username = Field("Enter unique username", true);
+   username = createTextField("Enter unique username", true);
    username->setContextMenu(false);
-   usernameWidget = LabeledField("Username", username);
+   usernameWidget = createLabeledTextFieldWidget("Username", username);
 
    // Email
-   email = Field("Enter your email-address", true);
+   email = createTextField("Enter your email-address", true);
    email->setContextMenu(false);
-   emailWidget = LabeledField("Email-Address", email);
+   emailWidget = createLabeledTextFieldWidget("Email-Address", email);
 
    // Password
-   password = Field("Enter strong password");
+   password = createTextField("Enter strong password");
    password->setContextMenu(false);
    password->setPasswordTextField(true);
-   passwordWidget = LabeledField("Password", password);
+   passwordWidget = createLabeledTextFieldWidget("Password", password);
 
+   // Adding all field widgets to a vector
    fieldsWidgets = {nameWidget, usernameWidget, emailWidget, passwordWidget};
 
    // Validator
    _passwordValidatorWidget = new PwdRulesWidget;
 
-   // Agreement
+   // T&Cs Consent Widget
    _termsConditionsWidget = new CheckWithBtn;
 
    // Terms & Conditions Popup
    termsConditionsDialogWidget = new TermsConditions;
    termsConditionsDialog = new Dialog(termsConditionsDialogWidget, accountWindow, true);
    accountWindow->setSubWidgets({termsConditionsDialogWidget, termsConditionsDialog});
-   
+   // Signal Slot of T&Cs Dialog
    connect(_termsConditionsWidget, &CheckWithBtn::onButtonClicked, this, [=]() { termsConditionsDialog->show(); });
 
    // Layout
@@ -168,52 +80,61 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    layout->addWidget(createAccBtn, 0, Qt::AlignLeft);
    layout->addStretch();
 
+   // Setting layout on widget
    setLayout(layout);
+
+   // Adding labels (present inside fields widgets) to a vector
+   addLabelsInsideFieldsWidgets();
+
+   // Initial theme
    setDarkMode(isDarkMode);
 }
 
+/* --------------------  Setters  -----------------  */
 void AccountCreate::setDarkMode(bool value) {
    isDarkMode = value;
 
-   QVector<QLabel *> labels;
-   for (auto *widget : fieldsWidgets) {
-      QLabel *label = widget->findChild<QLabel *>();
-      if (label)
-         labels.append(label);
-   }
-
-   labels.append(heading);
-
-   QString labelColor = isDarkMode ? "white" : "black";
+   // Labels (Email, Username, Password show above each TextField) inside field widgets
    for (auto *label : labels)
-      label->setStyleSheet(QString("color: %1;").arg(labelColor));
+      label->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
 
-   QVector<CustomTextField *> textFields = {name, username, password, email};
-   for (auto *field : textFields)
+   // TextFields inside fields widgets such as emailWidget, usernameWidget etc.
+   for (auto *field : {name, username, password, email})
       field->setDarkMode(isDarkMode);
 
-   if (_termsConditionsWidget) _termsConditionsWidget->setDarkMode(isDarkMode);
-   if (termsConditionsDialog) termsConditionsDialog->setDarkMode(isDarkMode);
+   // T&Cs Consent Widget (CheckBox + Button to T&Cs dialog)
+   _termsConditionsWidget->setDarkMode(isDarkMode);
+
+   // Terms and Conditions Dialog Box Theme Handling
+   termsConditionsDialogWidget->setDarkMode(isDarkMode);
+   termsConditionsDialog->setDarkMode(isDarkMode);
 }
 
+/* ------------------  Getters -------------------  */
 Button* AccountCreate::createAccountButton() const { return createAccBtn; }
-
 CustomTextField *AccountCreate::nameField() const { return name; }
 CustomTextField *AccountCreate::usernameField() const { return username; }
 CustomTextField *AccountCreate::passwordField() const { return password; }
 CustomTextField *AccountCreate::emailField() const { return email; }
-
+/**
+ * @return A widget contains a checkbox and hyperlink button to the terms and conditions dialog box
+ */
 CheckWithBtn *AccountCreate::termsConditionsWidget() const { return _termsConditionsWidget; }
+/**
+ * @return Password rules widget such as it must have eight digits, one uppercase and one lowercase letter etc.
+ */
 PwdRulesWidget * AccountCreate::passwordValidatorWidget() const { return _passwordValidatorWidget; }
 
-CustomTextField *AccountCreate::Field(const QString &placeholderText, bool useCheck) {
+/* --------------------  Helpers  -----------------  */
+CustomTextField *AccountCreate::createTextField(const QString &placeholderText, bool useCheck) {
    auto *field = new CustomTextField(useCheck);
    field->setPlaceholderText(placeholderText);
    field->setFixedSize(QSize(360, 36));
+   field->setDarkMode(isDarkMode);
    return field;
 }
 
-QWidget *AccountCreate::LabeledField(const QString labelName, CustomTextField *currField) {
+QWidget *AccountCreate::createLabeledTextFieldWidget(const QString labelName, CustomTextField *currField) {
    auto *widget = new QWidget;
    widget->setFixedSize(currField->width(), 60);
    widget->setAttribute(Qt::WA_TranslucentBackground);
@@ -241,3 +162,116 @@ QFont AccountCreate::font(const QString &family , int fontSize, QFont::Weight we
    font.setWeight(weight);
    return font;
 }
+
+void AccountCreate::addLabelsInsideFieldsWidgets() {
+   for (auto *widget : fieldsWidgets) {
+      auto *label = widget->findChild<QLabel *>();
+      if (label) 
+         labels.append(label);
+   }   
+   
+   // Added heading (Create Account) inside labels vector for color changing
+   labels.append(heading);
+}
+
+/* ========================================================= 
+             CUSTOMIZED WIDGETS FOR ABOVE CLASS               
+   ========================================================= */
+
+/* ------------------  CUSTOM TEXT FIELD ------------------- */
+CustomTextField::CustomTextField(bool useCheck, QWidget *parent) : TextField(parent) {
+   if (useCheck) {
+      setSpacingRight(true);
+
+      // Check Icon
+      checkIcon = new QLabel(this);
+      checkIcon->setAttribute(Qt::WA_TranslucentBackground);
+      checkIcon->setFixedSize(QSize(20, 20));
+      
+      QTimer::singleShot(0, this, [this]() {
+         int x = width() - (checkIcon->width() + 12);
+         int y = (height() - checkIcon->height()) / 2;
+         checkIcon->move(x, y); 
+      });
+
+      // ToolTip showing over check icon inside textfield
+      tooltip = new ToolTip;
+
+      // Initially set unchecked
+      setUnchecked();
+   }
+}
+
+/* --------------------  Setters  -----------------  */
+void CustomTextField::setTooltip(const QString &tooltipText) {
+   if (tooltipText.isEmpty()) {
+      if (tooltip) {
+         tooltip->hide();
+         tooltip->setTargetWidget(nullptr);
+      }
+      hasTip = false;
+      return;
+   }
+
+   if (tooltip) {
+      tooltip->setTargetWidget(checkIcon);
+      tooltip->setText(tooltipText);
+   }
+
+   hasTip = true;
+}
+
+
+void CustomTextField::setChecked() {
+   if (checkIcon) checkIcon->setPixmap(QPixmap(checked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
+void CustomTextField::setUnchecked() {
+   if (checkIcon) checkIcon->setPixmap(QPixmap(unchecked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
+void CustomTextField::setDarkMode(bool value) {
+   TextField::setDarkMode(value);
+   if (tooltip)
+      tooltip->setDarkMode(value);
+}
+
+/* ------------------  CHECKBOX WITH HYPERLINK BUTTON CUSTOM WIDGET ------------------- */
+CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
+   setAttribute(Qt::WA_TranslucentBackground);
+
+   // Checkbox
+   _checkbox = new CheckBox("I agree to our");
+   _checkbox->setParent(this);
+   _checkbox->move(0, 0); 
+
+   // Button
+   _button = new Button;
+   _button->setParent(this);
+   _button->setDisplayMode(Button::TextOnly);
+   _button->setFixedSize(QSize(160, 12));
+   _button->setHyperLink(true);
+   _button->setText("Terms & Conditions");
+   _button->setFontProperties("Segoe UI", 10, false, false);
+   _button->setHyperLinkColors("#008EDE", "#15F2FF");
+   _button->move(_checkbox->width() + 4, 4); 
+
+   // Signals Slots
+   connect(_button, &Button::clicked, this, [this]() { emit onButtonClicked(); });
+   connect(_checkbox, &CheckBox::toggled, this, [this](bool checked) { emit boxChecked(checked); });
+   connect(this, &CheckWithBtn::themeModeChanged, this, [this](bool enable) { if (_checkbox) _checkbox->setDarkMode(enable); });
+   
+   // Setting fixed size
+   setFixedSize(QSize((_checkbox->width() + _button->width() + 5), 22));
+}
+
+/* --------------------  Setters  -----------------  */
+void CheckWithBtn::setDarkMode(bool value) {
+   if (isDarkMode == value) return;
+   isDarkMode = value;
+   emit themeModeChanged(isDarkMode);
+}
+
+/* --------------------  Getters  -----------------  */
+Button* CheckWithBtn::button() const { return _button; }
+CheckBox* CheckWithBtn::checkBox() const { return _checkbox; }
