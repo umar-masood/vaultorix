@@ -1,120 +1,14 @@
 #include "AccountWindow.h"
-
-/* ---------------- Branding ---------------- */
-Branding::Branding(QWidget *parent) : QWidget(parent) {
-   setFixedSize(QSize(220, 60));
-   setAttribute(Qt::WA_TranslucentBackground);
-   logo = QPixmap(":/icons/AppBranding/app-icon.png").scaled(54, 50, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-}
-
-void Branding::paintEvent(QPaintEvent *) {
-   QPainter painter(this);
-   painter.setRenderHints(QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-   painter.drawPixmap(2, 2, logo);
-
-   QFont font;
-   font.setPixelSize(30);
-   font.setWeight(QFont::Bold);
-   font.setFamily("Inter");
-
-   painter.setFont(font);
-   painter.setPen(QColor("white"));
-   painter.drawText(logo.width() + 13, 30, "Vaultorix");
-
-   font.setPixelSize(12);
-   font.setWeight(QFont::Medium);
-   font.setFamily("Segoe UI");
-
-   painter.setFont(font);
-   painter.setPen(QColor("white"));
-   painter.drawText(logo.width() + 14, 46, "Simple  Powerful  Secure");
-}
-
-/* ---------------- Bullet Point ---------------- */
-BulletPoint::BulletPoint(const QString &text, const QString &iconPath, QWidget *parent) : QLabel(parent), text(text) {
-   setAttribute(Qt::WA_TranslucentBackground);
-   icon = QPixmap(iconPath).scaled(22, 22, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-   setFixedSize(22 + 12 + QFontMetrics(font()).horizontalAdvance(text), 22);
-}
-
-void BulletPoint::paintEvent(QPaintEvent *) {
-   QPainter painter(this);
-   painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-
-   QRect rec(0, 1, 20, 20);
-   if (!icon.isNull()) {
-      int xPos = rec.x() + (rec.width() - icon.width()) / 2;
-      int yPos = rec.y() + (rec.height() - icon.height()) / 2;
-      painter.drawPixmap(xPos, yPos, icon);
-   }
-
-   painter.setFont(font());
-   painter.setPen(QPen(QColor("white")));
-
-   QRect textRec(rec.right() + 13, 0, width() - rec.width() - 12, height());
-   painter.drawText(textRec, Qt::AlignVCenter | Qt::AlignLeft, text);
-}
-
-QFont BulletPoint::font() const {
-   QFont fnt;
-   fnt.setPixelSize(16);
-   fnt.setFamily("Segoe UI");
-   fnt.setWeight(QFont::DemiBold);
-   return fnt;
-}
-
-/* ---------------- Account Window ---------------- */
-AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent, const QVector<QWidget *> &subWidgets) : SubWindow(QSize(1000, 720), parent, true, true), rightWidget(rightWidget)  {
-   init();
-}
-
-void AccountWindow::setDarkMode(bool value) {
-   if (isDarkMode == value)
-      return;
-
-   isDarkMode = value;
-   emit themeModeChanged(isDarkMode);
-}
-
-void AccountWindow::setRightWidget(QWidget *widget) {
-   if (!widget || !right)
-      return;
-
-   // Hide and Delete if there's already existed right widget
-   if (this->rightWidget) {
-      entireLayoutRight->removeWidget(this->rightWidget);
-      this->rightWidget->hide();
-   }
-
-   this->rightWidget = widget;
-
-   // Smooth Opacity Effect
-   SmoothOpacity *effect = new SmoothOpacity;
-   effect->setOpacity(0.0);
-   rightWidget->setGraphicsEffect(effect);
-
-   // Adding Right Widget into the layout
-   entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
-
-   // Opacity Effect Animation
-   QPropertyAnimation *ani = new QPropertyAnimation(effect, "opacity", rightWidget);
-   ani->setEasingCurve(QEasingCurve::InOutQuad);
-   ani->setDuration(600);
-   ani->setStartValue(0.0);
-   ani->setEndValue(1.0);
-   ani->start(QAbstractAnimation::DeleteWhenStopped);
-   connect(ani, &QPropertyAnimation::finished, [=](){
-      ani->deleteLater();
-      rightWidget->setGraphicsEffect(nullptr); 
-   });
-
-   QMetaObject::invokeMethod(widget, "setDarkMode", Qt::DirectConnection, Q_ARG(bool, isDarkMode));
-}
-
-void AccountWindow::init() {
+/* ========================================================================================= 
+                              ACCOUNT WINDOW IMPLEMENTATION              
+   ========================================================================================= */
+AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
+                           const QVector<QWidget *> &subWidgets) : 
+                           SubWindow(QSize(1000, 720), parent, true, true), rightWidget(rightWidget) 
+{
    // Window Information
-   this->setWindowTitle("Vaultorix");
-   this->setWindowIcon(QIcon(":/icons/AppBranding/app-icon.png"));
+   setWindowTitle("Vaultorix");
+   setWindowIcon(QIcon(":/icons/AppBranding/app-icon.png"));
 
    // Main Layout
    mainLayout = new QHBoxLayout(contentArea());
@@ -218,21 +112,69 @@ void AccountWindow::init() {
    mainLayout->addWidget(right);
 
    // Theme Connection
-   connect(this, &AccountWindow::themeModeChanged, this, &AccountWindow::onthemeModeChanged);
+   connect(this, &AccountWindow::themeModeChanged, this, &AccountWindow::onthemeModeChanged);   
+}
+
+/* --------------------  Setters  -----------------  */
+void AccountWindow::setDarkMode(bool value) {
+   if (isDarkMode == value)
+      return;
+
+   isDarkMode = value;
+   emit themeModeChanged(isDarkMode);
+}
+
+void AccountWindow::setRightWidget(QWidget *widget) {
+   if (!widget || !right)
+      return;
+
+   // Hide and Delete if there's already existed right widget
+   if (this->rightWidget) {
+      entireLayoutRight->removeWidget(this->rightWidget);
+      this->rightWidget->hide();
+   }
+
+   // Assign new widget to right widget
+   this->rightWidget = widget;
+
+   // Smooth Opacity Effect
+   SmoothOpacity *effect = new SmoothOpacity;
+   effect->setOpacity(0.0);
+   rightWidget->setGraphicsEffect(effect);
+
+   // Adding Right Widget into the layout
+   entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
+
+   // Opacity Effect Animation
+   QPropertyAnimation *ani = new QPropertyAnimation(effect, "opacity", rightWidget);
+   ani->setEasingCurve(QEasingCurve::InOutQuad);
+   ani->setDuration(600);
+   ani->setStartValue(0.0);
+   ani->setEndValue(1.0);
+   ani->start(QAbstractAnimation::DeleteWhenStopped);
+   connect(ani, &QPropertyAnimation::finished, [=](){
+      ani->deleteLater();
+      rightWidget->setGraphicsEffect(nullptr); 
+   });
+
+   // Invoking theme mode method of right widget
+   QMetaObject::invokeMethod(widget, "setDarkMode", Qt::DirectConnection, Q_ARG(bool, isDarkMode));
 }
 
 void AccountWindow::onthemeModeChanged(bool enable) {
+   // Calling Base class member function of theme
    SubWindow::setDarkMode(enable);
 
-   if (themeMode) {
-      themeMode->setDarkMode(enable);
-      themeButtonTip->setDarkMode(enable);
-      enable ? themeMode->setIconPaths(darkModeIcon, darkModeIcon) : themeMode->setIconPaths(lightModeIcon, lightModeIcon);
-   }
-
+   // Theme Mode Button
+   themeMode->setDarkMode(enable);
+   themeButtonTip->setDarkMode(enable);
+   enable ? themeMode->setIconPaths(darkModeIcon, darkModeIcon) : themeMode->setIconPaths(lightModeIcon, lightModeIcon);
+   
+   // Right widget
    if (rightWidget)
       QMetaObject::invokeMethod(rightWidget, "setDarkMode", Q_ARG(bool, enable));
 
+   // Subwidgets (dialogs etc)
    for (auto *subWidget : subWidgets) 
       QMetaObject::invokeMethod(subWidget, "setDarkMode", Q_ARG(bool, enable));
 }
@@ -241,4 +183,76 @@ void AccountWindow::setSubWidgets(const QVector<QWidget *> subWidgets) {
    for (QWidget *w : subWidgets) 
       if (!this->subWidgets.contains(w)) 
          this->subWidgets.append(w);
+}
+
+/* ========================================================================================= 
+                           CUSTOMIZED WIDGETS FOR ABOVE CLASS             
+   ========================================================================================= */
+
+/* ---------------- Branding ---------------- */
+Branding::Branding(QWidget *parent) : QWidget(parent) {
+   setFixedSize(QSize(220, 60));
+   setAttribute(Qt::WA_TranslucentBackground);
+
+   logo = QPixmap(":/icons/AppBranding/app-icon.png").scaled(54, 50, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+}
+
+void Branding::paintEvent(QPaintEvent *) {
+   QPainter painter(this);
+   painter.setRenderHints(QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+   painter.drawPixmap(2, 2, logo);
+
+   QFont font;
+   font.setPixelSize(30);
+   font.setWeight(QFont::Bold);
+   font.setFamily("Inter");
+
+   painter.setFont(font);
+   painter.setPen(QColor("white"));
+   painter.drawText(logo.width() + 13, 30, "Vaultorix");
+
+   font.setPixelSize(12);
+   font.setWeight(QFont::Medium);
+   font.setFamily("Segoe UI");
+
+   painter.setFont(font);
+   painter.setPen(QColor("white"));
+   painter.drawText(logo.width() + 14, 46, "Simple  Powerful  Secure");
+}
+
+/* ---------------- Bullet Point ---------------- */
+BulletPoint::BulletPoint(const QString &text, const QString &iconPath, QWidget *parent) : QLabel(parent), text(text) {
+   setAttribute(Qt::WA_TranslucentBackground);
+
+   // Icon 
+   icon = QPixmap(iconPath).scaled(22, 22, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+   setFixedSize(22 + 12 + QFontMetrics(font()).horizontalAdvance(text), 22);
+}
+
+void BulletPoint::paintEvent(QPaintEvent *) {
+   QPainter painter(this);
+   painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+
+   QRect rec(0, 1, 20, 20);
+   if (!icon.isNull()) {
+      int xPos = rec.x() + (rec.width() - icon.width()) / 2;
+      int yPos = rec.y() + (rec.height() - icon.height()) / 2;
+      painter.drawPixmap(xPos, yPos, icon);
+   }
+
+   painter.setFont(font());
+   painter.setPen(QPen(QColor("white")));
+
+   QRect textRec(rec.right() + 13, 0, width() - rec.width() - 12, height());
+   painter.drawText(textRec, Qt::AlignVCenter | Qt::AlignLeft, text);
+}
+
+/* --------------------  Getters  -----------------  */
+QFont BulletPoint::font() const {
+   QFont fnt;
+   fnt.setPixelSize(16);
+   fnt.setFamily("Segoe UI");
+   fnt.setWeight(QFont::DemiBold);
+   return fnt;
 }

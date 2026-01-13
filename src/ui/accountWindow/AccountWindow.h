@@ -26,12 +26,13 @@ class Branding : public QWidget {
    QPixmap logo;
 };
 
-/* ---------------- BulletPoint Widget ---------------- */
+/* ---------------- Bullet Point Widget ---------------- */
 class BulletPoint : public QLabel {
    Q_OBJECT
 
    public:
-   explicit BulletPoint(const QString &text, const QString &iconPath, QWidget *parent = nullptr);
+   explicit BulletPoint(const QString &text, const QString &iconPath,
+                        QWidget *parent = nullptr);
 
    protected:
    void paintEvent(QPaintEvent *event) override;
@@ -47,12 +48,14 @@ class BulletPoint : public QLabel {
    QString text;
 };
 
-/* ---------------- AccountWindow ---------------- */
+/* ---------------- Account Window ---------------- */
 class AccountWindow : public SubWindow {
    Q_OBJECT
 
    public:
-   explicit AccountWindow(QWidget *rightWidget = nullptr, QWidget *parent = nullptr, const QVector<QWidget *> &dialogs = {});
+   explicit AccountWindow(QWidget *rightWidget = nullptr, QWidget *parent = nullptr, 
+                           const QVector<QWidget *> &dialogs = {});
+
    void setDarkMode(bool value);
    void setRightWidget(QWidget *rightWidget);
    void setSubWidgets(const QVector<QWidget *> subWidgets = {});
@@ -61,7 +64,6 @@ class AccountWindow : public SubWindow {
    void themeModeChanged(bool enable);
 
    private:
-   void init();
    void onthemeModeChanged(bool enable);
 
    // Theme Mode Flag
