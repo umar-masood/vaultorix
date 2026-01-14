@@ -16,7 +16,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    mainLayout->setSpacing(0);
 
    // TitleBar Area
-   QWidget *titleBar = titleBarArea();
+   QWidget *titleBar = this->titleBar();
 
    // Theme Mode Button
    themeMode = new Button(titleBar);

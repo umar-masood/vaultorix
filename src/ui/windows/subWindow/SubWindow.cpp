@@ -3,7 +3,58 @@
 SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimizeButton) : QWidget(parent), hasCloseBtn(closeButton), hasMinimizeBtn(minimizeButton) {
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setFixedSize(size);
-    setupTitleBar();
+
+     // Content Area
+    _contentArea = new QWidget(this);
+    _contentArea->setGeometry(0,0, width(), height());
+    _contentArea->setContentsMargins(0, 0, 0, 0);
+    _contentArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _contentArea->setAttribute(Qt::WA_TranslucentBackground);
+
+    // Title Bar
+    _titleBar = new QWidget(this);
+    _titleBar->setGeometry(0, 3, width(), 30);
+    _titleBar->setContentsMargins(0, 0, 0, 0);
+    _titleBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    _titleBar->setAttribute(Qt::WA_TranslucentBackground);
+
+    // Close Button
+    if (hasCloseBtn) {
+        closeBtn = windowButton();
+        closeBtn->setParent(_titleBar);
+        closeBtnTip = new ToolTip(closeBtn, "Close");
+        connect(closeBtn, &Button::clicked, this, &SubWindow::onCloseClicked);
+    }
+
+    // Minimze Button
+    if (hasMinimizeBtn) {
+        minimizeBtn = windowButton();
+        minimizeBtn->setParent(_titleBar);
+        minimizeBtnTip = new ToolTip(minimizeBtn, "Minimize");
+        connect(minimizeBtn, &Button::clicked, this, &SubWindow::onMinimizedClicked);
+    }
+
+    hwnd = reinterpret_cast<HWND>(winId());
+
+    // Apply Icons
+    applyThemedIcons();
+
+    // Buttons Position
+    int x = _titleBar->width() - 26 - 5;
+    int y = (_titleBar->height() - 26) / 2;
+
+    _titleBar->raise();
+
+    if (closeBtn) {
+        closeBtn->move(x, y);
+        closeBtn->raise();
+    }
+
+    if (minimizeBtn) {
+        minimizeBtn->move(x - minimizeBtn->width() - 5, y);
+        minimizeBtn->raise();
+    }
+    
     applyDWMEffects();
 }
 
@@ -130,63 +181,11 @@ void SubWindow::paintEvent(QPaintEvent *event) {
 Button* SubWindow::windowButton() {
     Button *b = new Button;
     b->setSecondary(true);
+    b->setCursor(Qt::PointingHandCursor);
     b->setIconSize(QSize(16,16));
     b->setDisplayMode(Button::IconOnly);
     b->setFixedSize(QSize(26, 26));
     return b;
-}
-
-void SubWindow::setupTitleBar() {
-    // Content Area
-    _contentArea = new QWidget(this);
-    _contentArea->setGeometry(0,0, width(), height());
-    _contentArea->setContentsMargins(0, 0, 0, 0);
-    _contentArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    _contentArea->setAttribute(Qt::WA_TranslucentBackground);
-
-    // Title Bar
-    _titleBarArea = new QWidget(this);
-    _titleBarArea->setGeometry(0, 3, width(), 30);
-    _titleBarArea->setContentsMargins(0, 0, 0, 0);
-    _titleBarArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    _titleBarArea->setAttribute(Qt::WA_TranslucentBackground);
-
-    // Close Button
-    if (hasCloseBtn) {
-        closeBtn = windowButton();
-        closeBtn->setParent(_titleBarArea);
-        closeBtnTip = new ToolTip(closeBtn, "Close");
-        connect(closeBtn, &Button::clicked, this, &SubWindow::onCloseClicked);
-    }
-
-    // Minimze Button
-    if (hasMinimizeBtn) {
-        minimizeBtn = windowButton();
-        minimizeBtn->setParent(_titleBarArea);
-        minimizeBtnTip = new ToolTip(minimizeBtn, "Minimize");
-        connect(minimizeBtn, &Button::clicked, this, &SubWindow::onMinimizedClicked);
-    }
-
-    hwnd = reinterpret_cast<HWND>(winId());
-
-    // Apply Icons
-    applyThemedIcons();
-
-    // Buttons Position
-    int x = _titleBarArea->width() - 26 - 5;
-    int y = (_titleBarArea->height() - 26) / 2;
-
-    _titleBarArea->raise();
-
-    if (closeBtn) {
-        closeBtn->move(x, y);
-        closeBtn->raise();
-    }
-
-    if (minimizeBtn) {
-        minimizeBtn->move(x - minimizeBtn->width() - 5, y);
-        minimizeBtn->raise();
-    }
 }
 
 void SubWindow::onCloseClicked() { ::SendMessage(hwnd, WM_CLOSE, 0, 0); }
@@ -209,7 +208,7 @@ bool SubWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr 
 void SubWindow::showEvent(QShowEvent *event) { applyDWMEffects(); }
 void SubWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
-        if (_titleBarArea && _titleBarArea->geometry().contains(event->pos())) {
+        if (_titleBar && _titleBar->geometry().contains(event->pos())) {
             for (auto *widget : {closeBtn, minimizeBtn}) 
                 if (widget && widget->geometry().contains(event->pos())) 
                     return;
@@ -236,5 +235,5 @@ void SubWindow::mouseReleaseEvent(QMouseEvent *event) {
     QWidget::mouseReleaseEvent(event);
 }
 
-QWidget* SubWindow::titleBarArea() const { return _titleBarArea; }
+QWidget* SubWindow::titleBar() const { return _titleBar; }
 QWidget* SubWindow::contentArea() const { return _contentArea; }
