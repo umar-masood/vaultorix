@@ -28,8 +28,9 @@ class AccountSignInManager : public QObject {
     private:
     // API Crendentials
     const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
-    const QString API_URL = "https://www.umarcreations.site/check-credentials";
-    
+    //const QString API_URL = "https://www.umarcreations.site/check-credentials";
+    const QString API_URL = "http://127.0.0.1:8000/check-credentials";
+
     // Current Account Window
     AccountWindow *accountWindow = nullptr;
 
@@ -58,5 +59,9 @@ class AccountSignInManager : public QObject {
     // Slots
     void onSignInClicked();
     void onCancelClicked() const;
-    void onErrorDialogActionBtnClicked(const QString &key);
+    void onErrorDialogActionBtnClicked(const QString &key); 
+    
+    // Signals
+    signals:
+    void verificationNeeded(const QString &name, const QString &email, const QString &username);
 };

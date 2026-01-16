@@ -73,24 +73,30 @@ void AccountSignInManager::verifyCredentials() {
         QJsonObject obj = jsonDoc.object();
         message = obj["message"].toString();
         statusCode = obj["status_code"].toInt();
+        qDebug() << message << statusCode;
+
+        QString name, email, username;
+        if (obj.contains("fullname") && obj.contains("email") && obj.contains("username")) {
+            name = obj["fullname"].toString();
+            email = obj["email"].toString();
+            username = obj["username"].toString();
+                    qDebug() << name << email; // Debugging
+
+        }
 
         switch (statusCode) {
-            case 200:
+            case 200: {
                 updateSignInBtnState(false, "Signed In");
                 as->usernameField()->setText("");
                 as->passwordField()->setText("");
-                break;
-            case 400:  
-                handleSignInError("InvalidCredentials", true);
-                break;
-            case 403:
-                handleSignInError("MaxAttempts");
-                break;
-            case 511: 
-                handleSignInError("AccessDenied");
-                break;
-            default: 
-                handleSignInError("SomethingWentWrong", true);
+            }
+            break;
+
+            case 400:  handleSignInError("InvalidCredentials", true);         break;
+            case 403:  handleSignInError("MaxAttempts");                      break;
+            case 511:  handleSignInError("AccessDenied");                     break;
+            case 513:  emit verificationNeeded(name, email, username);        break;
+            default:   handleSignInError("SomethingWentWrong", true);
         }
     });
 }
