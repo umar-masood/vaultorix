@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../ui/accountCreate/AccountCreate.h"
-#include "../accountCreationManager/AccountCreationManager.h"
+#include "../accountCreateManager/AccountCreateManager.h"
 
 #include "../../ui/accountOTP/AccountOTP.h"
 #include "../validators/OTPValidator/OTPValidator.h"
@@ -22,17 +22,29 @@ class AccountAuthCoordinator : public QObject {
     void show();
     
     private:
+    // Settings
     QSettings settings;
     const QString key = "account/registered";
 
+    // Account Window
     std::unique_ptr<AccountWindow> accountWindow;
 
+    // Account Sign In
     std::unique_ptr<AccountSignIn> accountSignIn;
+
+    // Account Create
     std::unique_ptr<AccountCreate> accountCreate;
+
+    // Account OTP
     std::unique_ptr<AccountOTP> accountOTP;
 
+    // Account Sign In Manager
     std::unique_ptr<AccountSignInManager> accountSignInManager;
-    std::unique_ptr<AccountCreationManager> accountCreateManager;
+
+    // Account Creation Manager
+    std::unique_ptr<AccountCreateManager> accountCreateManager;
+
+    // GetOTP
     std::unique_ptr<GetOTP> getOTP;
 
     void setAccountRegistered(bool isRegistered);
@@ -44,5 +56,6 @@ class AccountAuthCoordinator : public QObject {
 
     // Slots
     void onCredentialsStoredSuccessfully();
-
+    void onVerificationNeeded(const QString &name, const QString &email, const QString &username);
+    void onOTPVerified(bool isVerified);
 };
