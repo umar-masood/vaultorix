@@ -9,11 +9,11 @@
 
 #include <QSettings>
 
-class AccountCreationManager : public QObject {
+class AccountCreateManager : public QObject {
     Q_OBJECT
 
     public:
-    explicit AccountCreationManager(AccountWindow *accountWindow = nullptr, QObject *parent = nullptr);
+    explicit AccountCreateManager(AccountWindow *accountWindow = nullptr, QObject *parent = nullptr);
     void setAccountCreateObject(AccountCreate* accountCreateObj);
 
     private:

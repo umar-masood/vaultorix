@@ -1,7 +1,10 @@
-#include "AccountCreationManager.h"
+#include "AccountCreateManager.h"
 #include <QDebug>
 
-AccountCreationManager::AccountCreationManager(AccountWindow *accountWindow, QObject *parent) : QObject(parent), accountWindow(accountWindow) {
+/* ========================================================================================= 
+                              ACCOUNT CREATE MANAGER            
+   ========================================================================================= */
+AccountCreateManager::AccountCreateManager(AccountWindow *accountWindow, QObject *parent) : QObject(parent), accountWindow(accountWindow) {
     // Validators
     emailValidator = new GetEmail(this);
     usernameValidator = new GetUsername(this);
@@ -21,31 +24,37 @@ AccountCreationManager::AccountCreationManager(AccountWindow *accountWindow, QOb
     errorDialogManager = new ErrorDialogManager(accountWindow, this);
 }
 
-void AccountCreationManager::setAccountCreateObject(AccountCreate *accountCreateObj) {
-    if (!accountCreateObj) return;
+void AccountCreateManager::setAccountCreateObject(AccountCreate *accountCreateObj) {
+    // If account create pointer does not initialized
+    if (!accountCreateObj) 
+        return;
+    
+    // Initializing account create poimter
     accountCreate = accountCreateObj;
     
+    // Giving account create pointer to these member functions
     emailValidator->setAccountCreateObject(accountCreate);
     usernameValidator->setAccountCreateObject(accountCreate);
     pwdValidator->setAccountCreateObject(accountCreate);
     nameValidator->setAccountCreateObject(accountCreate);
 
+    // Signal Slot Connections
     setupConnections();
 }
 
-void AccountCreationManager::setupConnections() {
-    connect(usernameValidator, &GetUsername::usernameValidated, this, &AccountCreationManager::onUsernameValidated);
-    connect(emailValidator, &GetEmail::emailValidated, this, &AccountCreationManager::onEmailValidated);
-    connect(pwdValidator, &GetPassword::pwdValidated, this, &AccountCreationManager::onPwdValidated);
-    connect(nameValidator, &GetName::nameValidated, this, &AccountCreationManager::onNameValidated);
-    connect(this, &AccountCreationManager::validationDone, this, &AccountCreationManager::onValidationDone);
-    connect(accountCreate->termsConditionsWidget(), &CheckWithBtn::boxChecked, this, &AccountCreationManager::onTCBoxCheck);
-    connect(accountCreate->createAccountButton(), &Button::clicked, this, &AccountCreationManager::onCreateAccBtnClicked);
-    // connect(this, &AccountCreationManager::credentialsStoredSuccessfully, this, &AccountCreationManager::onCredentialsStoredSuccessfully);
-    connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &AccountCreationManager::onErrorDialogActionBtnClicked);
+void AccountCreateManager::setupConnections() {
+    connect(usernameValidator, &GetUsername::usernameValidated, this, &AccountCreateManager::onUsernameValidated);
+    connect(emailValidator, &GetEmail::emailValidated, this, &AccountCreateManager::onEmailValidated);
+    connect(pwdValidator, &GetPassword::pwdValidated, this, &AccountCreateManager::onPwdValidated);
+    connect(nameValidator, &GetName::nameValidated, this, &AccountCreateManager::onNameValidated);
+    connect(this, &AccountCreateManager::validationDone, this, &AccountCreateManager::onValidationDone);
+    connect(accountCreate->termsConditionsWidget(), &CheckWithBtn::boxChecked, this, &AccountCreateManager::onTCBoxCheck);
+    connect(accountCreate->createAccountButton(), &Button::clicked, this, &AccountCreateManager::onCreateAccBtnClicked);
+    connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &AccountCreateManager::onErrorDialogActionBtnClicked);
 }
 
-void AccountCreationManager::checkValidationStatus() {
+// Check validation status for enable/disable create account button
+void AccountCreateManager::checkValidationStatus() {
     for (auto it = validationStatus.begin(); it != validationStatus.end(); ++it) {
         if (!it->second) {
             emit validationDone(false);
@@ -55,7 +64,8 @@ void AccountCreationManager::checkValidationStatus() {
     emit validationDone(true);
 }
 
-QJsonObject AccountCreationManager::getCredentials() {
+// Preparing json data for request
+QJsonObject AccountCreateManager::getCredentials() {
     QJsonObject userObj;
     userObj["full_name"] = accountCreate->nameField()->text();
     userObj["username"] = accountCreate->usernameField()->text();
@@ -66,10 +76,7 @@ QJsonObject AccountCreationManager::getCredentials() {
 
     QJsonObject deviceObj;
     deviceObj["device_name"] = deviceInfo.getDeviceName();
-    deviceObj["device_id"] = getDeviceIdLocally();
-
-    qDebug() << getDeviceIdLocally();
-    
+    deviceObj["device_id"] = getDeviceIdLocally();    
     deviceObj["os_type"] = deviceInfo.getOSName();
     deviceObj["os_version"] = deviceInfo.getProductVersion();
     deviceObj["kernel_version"] = deviceInfo.getKernelVersion();
@@ -85,7 +92,8 @@ QJsonObject AccountCreationManager::getCredentials() {
     return mainObj;
 }
 
-void AccountCreationManager::storeCredentials() {
+// Calling api for storing user credentials
+void AccountCreateManager::storeCredentials() {
     // QUrl url(API_URL);
     QUrl url("http://127.0.0.1:8000/store-credentials");
     QNetworkRequest request(url);
@@ -134,59 +142,65 @@ void AccountCreationManager::storeCredentials() {
     });
 }
 
-void AccountCreationManager::handleCreateAccError(const QString &errorName, bool createAccButtonEnabled, const QString &createAccButtonText) {
+// Handling error dialogs and create account button status update
+void AccountCreateManager::handleCreateAccError(const QString &errorName, bool createAccButtonEnabled, const QString &createAccButtonText) {
     errorDialogManager->show(errorName); 
     updateCreateAccBtnState(createAccButtonEnabled, createAccButtonText);
 }
 
-void AccountCreationManager::storeDeviceId() {
+// Store device unique identifier in registry
+void AccountCreateManager::storeDeviceId() {
     if (!settings->contains("deviceId"))
         settings->setValue("deviceId", deviceInfo.getDeviceId());
 }
 
-QString AccountCreationManager::getDeviceIdLocally() const {
+// Get device unique identifier in registry
+QString AccountCreateManager::getDeviceIdLocally() const {
     return settings->value("deviceId").toString();
 }
 
-void AccountCreationManager::onUsernameValidated(bool isValid) {
+// Slots
+void AccountCreateManager::onUsernameValidated(bool isValid) {
     validationStatus["username"] = isValid;
     checkValidationStatus();
 }
 
-void AccountCreationManager::onEmailValidated(bool isValid) {
+void AccountCreateManager::onEmailValidated(bool isValid) {
     validationStatus["email"] = isValid;
     checkValidationStatus();
 }
 
-void AccountCreationManager::onPwdValidated(bool isValid) {
+void AccountCreateManager::onPwdValidated(bool isValid) {
     validationStatus["password"] = isValid;
     checkValidationStatus();
 }
 
-void AccountCreationManager::onNameValidated(bool isValid) {
+void AccountCreateManager::onNameValidated(bool isValid) {
     validationStatus["fullName"] = isValid;
     checkValidationStatus();
 }
 
-void AccountCreationManager::onValidationDone(bool isValidationDone) {
+void AccountCreateManager::onValidationDone(bool isValidationDone) {
     accountCreate->createAccountButton()->setEnabled(isValidationDone);
 }
 
-void AccountCreationManager::onTCBoxCheck(bool checked) {
+void AccountCreateManager::onTCBoxCheck(bool checked) {
     validationStatus["acceptedTC"] = checked;
     checkValidationStatus();
 }
 
-void AccountCreationManager::onCreateAccBtnClicked() {
+void AccountCreateManager::onCreateAccBtnClicked() {
     storeCredentials();
     updateCreateAccBtnState(false, "");
 }
 
-void AccountCreationManager::updateCreateAccBtnState(bool isEnabled, const QString &text) {
+void AccountCreateManager::onErrorDialogActionBtnClicked(const QString &key) {
+    // future use
+}
+
+// Helper - Updating create account button state
+void AccountCreateManager::updateCreateAccBtnState(bool isEnabled, const QString &text) {
     accountCreate->createAccountButton()->setEnabled(isEnabled);
     accountCreate->createAccountButton()->setText(text);
 }
 
-void AccountCreationManager::onErrorDialogActionBtnClicked(const QString &key) {
-    // future use
-}
