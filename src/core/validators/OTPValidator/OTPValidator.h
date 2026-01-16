@@ -17,7 +17,10 @@
 #include <QDebug>
 
 #include <iostream>
+
+#include "../../../ui/accountWindow/AccountWindow.h"
 #include "../../../ui/accountOTP/AccountOTP.h"
+#include "../../../ui/dialogs/errorDialog/ErrorDialog.h"
 
 /* ------------------ OTP Validator ------------- */
 class OTPValidator : public QObject {
@@ -26,14 +29,15 @@ class OTPValidator : public QObject {
     public:
     OTPValidator(QObject *parent = nullptr);
     int sendOTP(const QString &fullName, const QString &username, const QString &email);
-    bool verifyOTP(const QString &otp, const QString &email);
+    bool verifyOTP(const QString &otp, const QString &email, const QString &username);
 
     private:
     // Network Manager
     QNetworkAccessManager *manager = nullptr;
 
     // API Credentials
-    const QString API_URL = "https://www.umarcreations.site/";
+    // const QString API_URL = "https://www.umarcreations.site/"; for testing
+    const QString API_URL = "http://127.0.0.1:8000/";
     const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
     
     // API Response
@@ -50,11 +54,11 @@ class GetOTP : public QObject {
     Q_OBJECT
 
     public:
-    explicit GetOTP(QObject *parent = nullptr);
+    explicit GetOTP(AccountWindow *ac = nullptr, QObject *parent = nullptr);
     bool setAccountOTPObjectWithDetails(AccountOTP *ao, const QString &email, const QString &username, const QString &name);
 
     signals:
-    void otpVerified(bool value); // Emits verification result: True = verified
+    void OTPVerified(bool isVerified); // Emits verification result: True = verified
     void maxLimitReached();       // Emits when resend limit (HTTP 429) reached
     void somethingWrong();       // Emits when (HTTP 400) got
 
@@ -74,6 +78,9 @@ class GetOTP : public QObject {
     QTimer *timer = nullptr;
     QString timeString;
 
+    // Error Dialog
+    ErrorDialogManager *errorManager = nullptr;
+    
     // Helper Methods
     void resendOtpWithTimer();
     void disableControls(QString btnText);
@@ -82,7 +89,7 @@ class GetOTP : public QObject {
     void onResendClicked();
     void onMaxLimitReached();
     void onVerifyClicked();
-    void onCancelClicked();
+    void onCancelClicked() const;
     void onTimeout();
     void onSomethingWrong();
 };

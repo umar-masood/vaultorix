@@ -55,7 +55,7 @@ int OTPValidator::sendOTP(const QString &fullName, const QString &username, cons
     return status_code;
 }
 
-bool OTPValidator::verifyOTP(const QString &otp, const QString &email) {
+bool OTPValidator::verifyOTP(const QString &otp, const QString &email, const QString &username) {
     QNetworkRequest request(API_URL + "verifyOtp");
     request.setRawHeader("accept", "application/json");
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -63,6 +63,7 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email) {
     // Verification OTP Data
     QJsonObject obj;
     obj["email"] = email;
+    obj["username"] = username;
     obj["otp"] = otp;
 
     QJsonDocument doc(obj);
@@ -90,6 +91,7 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email) {
 
     QJsonObject rObj = r.object();
     isVerified = rObj["isVerified"].toBool();
+    qDebug() << rObj["message"].toString();
 
     qDebug() << "OTP Verified: " << isVerified;
 
@@ -98,11 +100,14 @@ bool OTPValidator::verifyOTP(const QString &otp, const QString &email) {
 }
 
 /* ----------------------  Get OTP  ---------------------------- */
-GetOTP::GetOTP(QObject *parent) : QObject(parent) {
+GetOTP::GetOTP(AccountWindow *ac, QObject *parent) : QObject(parent) {
     ov = new OTPValidator(this); // Initializing OTP Validator class
 
     timer = new QTimer(this); // Initializing OTP Timer
     connect(timer, &QTimer::timeout, this, &GetOTP::onTimeout);
+
+    // Error Dialog Manager
+    errorManager = new ErrorDialogManager(ac);
 }
 
 bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, const QString &email, const QString &username, const QString &name) {
@@ -158,7 +163,7 @@ void GetOTP::onResendClicked() {
         return;
     }
 
-    // In case if we got error from server after clicking on resend button
+    // In case if we get an error from the server after clicking on resend button
     if (code == 500 || code == 502 || code == -1 || code == 400 || code == 512) {
         emit somethingWrong();
         return;
@@ -192,7 +197,7 @@ void GetOTP::onVerifyClicked() {
     ao->verifyButton()->setEnabled(false);
     ao->verifyButton()->setText("");
 
-    bool ok = ov->verifyOTP(currOtp, cEmail);
+    bool ok = ov->verifyOTP(currOtp, cEmail, cUserName);
 
     if (!ok) {  // If the otp is incorrect or expired
         ao->verifyButton()->setText("Verify");
@@ -201,10 +206,10 @@ void GetOTP::onVerifyClicked() {
     } else {
         disableControls("Verified");
     }
-    emit otpVerified(ok);
+    emit OTPVerified(ok);
 }
 
-void GetOTP::onCancelClicked() { QApplication::quit(); }
+void GetOTP::onCancelClicked() const { QApplication::quit(); }
 
 void GetOTP::onTimeout() {
     totalSecs--;
@@ -223,16 +228,21 @@ void GetOTP::onTimeout() {
     ao->resendOtpWidget()->timer()->setText(timeString);
 }
 
-void GetOTP::onSomethingWrong() { disableControls("Verify"); }
+void GetOTP::onSomethingWrong() { 
+    errorManager->show("SomethingWentWrong"); // Show error dialog if there is an error received from server
+    disableControls("Verify"); // Disable verify button
+}
 
 void GetOTP::disableControls(QString btnText) {
     ao->verifyButton()->setText(btnText);
-    ao->verifyButton()->setEnabled(false);              // Disabled the verify button after successful OTP matching
-    ao->resendOtpWidget()->button()->setEnabled(false); // Disabled the resend button when otp is verified
-    ao->resendOtpWidget()->timer()->hide();     // hides the timer
+    ao->verifyButton()->setEnabled(false);              // Disables the verify button after successful OTP matching
+    ao->resendOtpWidget()->button()->setEnabled(false); // Disables the resend button when otp is verified
+    ao->resendOtpWidget()->timer()->hide();     // Hides the timer
     ao->message()->setAnimatedText("");
 
-    if (timer) timer->stop();
+    if (timer) 
+        timer->stop();
+
     ao->otpWidget()->setEnabled(false);
 }
 
