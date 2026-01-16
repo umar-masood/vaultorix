@@ -14,7 +14,7 @@ namespace DialogUtils {
     const QString wrongCredentialsText = "The email or password you entered is incorrect. Please try again.";
     const QString unknownDeviceText = "This account is linked to another device and can't be used here for security reasons.";
     const QString somethingWentWrongText = "Something went wrong. Please try again.";
-    const QString maxAttemptsText = "Maximum invalid sign-in attempts limit reached. Please try again after 24 hours.";
+    const QString maxAttemptsText = "Maximum invalid attempts limit reached. Please try again after 24 hours.";
     const QString accessDeniedText = "We have blocked access to your account from this device for security reasons.";
     const QString timeoutText = "Request tmeout. Please check your internet connection and try again.";
     const QString futherAttemptBlockedText = "You cannot create multiple accounts on same device.";
