@@ -68,7 +68,7 @@ add_executable(Vaultorix
     ## Coordinator
     src/core/accountAuthCoordinator/AccountAuthCoordinator.cpp
     ## Managers
-    src/core/accountCreationManager/AccountCreationManager.cpp
+    src/core/accountCreateManager/AccountCreateManager.cpp
     src/core/accountSignInManager/AccountSignInManager.cpp
     ## Device Info
     src/core/deviceInfo/DeviceInfo.cpp
