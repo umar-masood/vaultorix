@@ -1,7 +1,10 @@
 #include "ErrorDialog.h"
 
 /* -------------- Error Widget ----------------- */
-Error::Error(const QString &text, const QString &illustrationLight, const QString &illustrationDark, QWidget *parent) : QWidget(parent), lightIcon(illustrationLight), darkIcon(illustrationDark) {
+Error::Error(const QString &text, const QString &illustrationLight,
+            const QString &illustrationDark, QWidget *parent) : 
+            QWidget(parent), lightIcon(illustrationLight), darkIcon(illustrationDark) 
+{
     
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -59,22 +62,15 @@ Error::Error(const QString &text, const QString &illustrationLight, const QStrin
     layout->addWidget(actionBtn, 0, Qt::AlignCenter);
     layout->addStretch();
 
-    // Theme Change Signal Slot
-    connect(this, &Error::themeModeChanged, this, &Error::onThemeModeChanged);
+    // Theme Mode
     setDarkMode(isDarkMode);
 }
 
-void Error::onThemeModeChanged(bool enable) {
-    if (illustration)
-        illustration->setPixmap(QPixmap(enable ? darkIcon : lightIcon));
-}
-
 void Error::setDarkMode(bool value) {
-    if (isDarkMode == value) 
-        return;
-
     isDarkMode = value;
-    emit themeModeChanged(isDarkMode); 
+    
+    if (illustration)
+        illustration->setPixmap(QPixmap(isDarkMode ? darkIcon : lightIcon));
 }
 
 Button* Error::actionButton() { return actionBtn; }
@@ -96,33 +92,33 @@ ErrorDialogManager::ErrorDialogManager(AccountWindow *window, QObject *parent) :
 }
 
 void ErrorDialogManager::create(const QString &key, const QString &text, const QString &actionButtonText, const QString &iconPath) {
-    ErrorDialog ed;
-    ed.widget = new Error(text, iconPath, iconPath);
-    ed.widget->actionButton()->setText(actionButtonText);
-    connect(ed.widget->actionButton(), &Button::clicked, this, [this, key]() {
+    auto *ed = new ErrorDialog;
+    ed->widget = new Error(text, iconPath, iconPath);
+    ed->widget->actionButton()->setText(actionButtonText);
+    connect(ed->widget->actionButton(), &Button::clicked, this, [this, key]() {
         emit actionTriggered(key);
         close(key);
     });
 
-    ed.dialog = new Dialog(ed.widget, accountWindow, false);
+    ed->dialog = new Dialog(ed->widget, accountWindow, false);
 
     dialogs.insert(key, ed);
 }
 
 void ErrorDialogManager::show(const QString &key) {
-    if (dialogs.contains(key) && dialogs[key].dialog) 
-        dialogs[key].dialog->show();    
+    if (dialogs.contains(key) && dialogs[key]->dialog) 
+        dialogs[key]->dialog->show();    
 }
 
 void ErrorDialogManager::close(const QString &key) {
-    if (dialogs.contains(key) && dialogs[key].dialog) 
-        dialogs[key].dialog->close();
+    if (dialogs.contains(key) && dialogs[key]->dialog) 
+        dialogs[key]->dialog->close();
 }
 
 QList<QWidget *> ErrorDialogManager::allWidgets() const {
     QList<QWidget *> widgets;
     for (const auto &d : dialogs) 
-        widgets << d.widget << d.dialog;
+        widgets << d->widget << d->dialog;
     
     return widgets;
 }

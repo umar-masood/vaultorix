@@ -26,9 +26,6 @@ class Error : public QWidget {
     Q_INVOKABLE void setDarkMode(bool value);
     Button* actionButton();
 
-    signals:
-    void themeModeChanged(bool enable);
-
     private:
     // Theme Mode Flag
     bool isDarkMode = false;
@@ -49,9 +46,6 @@ class Error : public QWidget {
     QString lightIcon;
     QString darkIcon;
     QSize size;
-
-    // Slot
-    void onThemeModeChanged(bool enable);
 };
 
 /* ---------- Error Dialog Manager for handling multiple errors ------------ */
@@ -78,7 +72,7 @@ class ErrorDialogManager : public QObject {
     AccountWindow *accountWindow = nullptr;
 
     // Map to stored different Error Dialogs for efficiency
-    QMap<QString, ErrorDialog> dialogs;
+    QMap<QString, ErrorDialog*> dialogs;
 
     // Helper Function to create error dialog box
     void create(const QString &key, const QString &text, const QString &actionButtonText, const QString &iconPath);
