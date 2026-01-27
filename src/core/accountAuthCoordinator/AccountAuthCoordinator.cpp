@@ -72,7 +72,7 @@ void AccountAuthCoordinator::showOTP(const QString &email, const QString &userna
     }
 
     // Make new get OTP pointer 
-    getOTP = std::make_unique<GetOTP>();
+    getOTP = std::make_unique<GetOTP>(accountWindow.get());
     getOTP->setAccountOTPObjectWithDetails(accountOTP.get(), email, username, fullName);
 
     // If account window exists
@@ -94,6 +94,9 @@ void AccountAuthCoordinator::showCreateAccount() {
     // Make new account create
     accountCreate = std::make_unique<AccountCreate>(nullptr, accountWindow.get()); // Here, we have passed accountWindow pointer because inside AccountCreate class we have used a dailog box for terms and conditions. To make it a child of parent (SubWindow)    
     accountWindow->setRightWidget(accountCreate.get());
+
+    // Signal Slot of redirecting to Sign In page from Sign Up page.
+    connect(accountCreate->redirectToSignInWidget(), &TextWithBtn::buttonClicked, this, &AccountAuthCoordinator::showSignIn);
 
     // If account create manager already exists
     if (accountCreateManager) {
