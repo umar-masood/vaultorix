@@ -235,6 +235,7 @@ void GetEmail::onUnableToCheckEmailAvailability() {
         network request by calling isEmailAvailable() recursively.*/
         ac->emailField()->setUnchecked();
         ac->emailField()->setTooltip("Failed to check email availability.");
+
         retryAttempts = 0; // Resetting conter
 
         ValidatorUtils::cleanupMemory(text); // We're clearning the memory when max retry attempts limit reached
@@ -269,7 +270,15 @@ void GetEmail::onTimeout() {
     } else {
         // if it is False (Invalid Email), thus we don`t need to check its availability anymore.
         ac->emailField()->setUnchecked();
-        ac->emailField()->setTooltip("Invalid email-address");
+        ac->emailField()->setTooltip(
+            "Invalid email address.\n\n"
+            "Please ensure that:\n"
+            "• The email format is correct\n"
+            "• No invalid or spam characters are used\n"
+            "• The domain name is valid\n"
+            "• The email address is unique"
+        );
+
         qDebug() << "Email is not Valid: " << text << "\n";
 
         emit emailValidated(false);    
