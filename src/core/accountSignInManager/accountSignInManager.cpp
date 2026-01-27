@@ -80,8 +80,6 @@ void AccountSignInManager::verifyCredentials() {
             name = obj["fullname"].toString();
             email = obj["email"].toString();
             username = obj["username"].toString();
-                    qDebug() << name << email; // Debugging
-
         }
 
         switch (statusCode) {
