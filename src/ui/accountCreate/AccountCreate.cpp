@@ -129,6 +129,7 @@ CustomTextField *AccountCreate::nameField() const { return name; }
 CustomTextField *AccountCreate::usernameField() const { return username; }
 CustomTextField *AccountCreate::passwordField() const { return password; }
 CustomTextField *AccountCreate::emailField() const { return email; }
+TextWithBtn * AccountCreate::redirectToSignInWidget() const { return _redirectToSignInWidget; }
 /**
  * @return A widget contains a checkbox and hyperlink button to the terms and conditions dialog box
  */

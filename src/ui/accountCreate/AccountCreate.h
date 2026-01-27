@@ -72,6 +72,7 @@ class AccountCreate : public QWidget {
    CustomTextField* usernameField() const;
    CustomTextField* passwordField() const;
    CustomTextField* emailField() const;
+   TextWithBtn* redirectToSignInWidget() const;
    CheckWithBtn* termsConditionsWidget() const;
    PwdRulesWidget* passwordValidatorWidget() const;
    
