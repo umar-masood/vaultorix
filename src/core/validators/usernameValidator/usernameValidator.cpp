@@ -226,13 +226,22 @@ void GetUsername::onTimeout() {
     bool ok = usernameValidator->isValidUsername(text);
     
     if (ok) {
-        qDebug() << "Username is Valid: " << text << "\n";
+        qDebug() << "Username is valid: " << text << "\n";
         ac->usernameField()->setTooltip("");
         
         usernameValidator->isUsernameAvailable(text);
     } else {
         ac->usernameField()->setUnchecked();
-        ac->usernameField()->setTooltip("Invalid username.");
+        ac->usernameField()->setTooltip(
+        "Invalid username.\n\n"
+        "Please ensure that:\n"
+        "• 3-20 characters, starting with a letter\n"
+        "• Letters, numbers, . _ - only\n"
+        "• Cannot start or end with . _ -\n"
+        "• No excessive character repetition\n"
+        "• Must not be reserved"
+        );
+
         qDebug() << "Username is not Valid: " << text << "\n";
 
         emit usernameValidated(false); 
