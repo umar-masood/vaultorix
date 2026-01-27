@@ -60,7 +60,13 @@ class TextWithBtn : public QWidget {
    Q_OBJECT
 
    public:
-   explicit TextWithBtn(QWidget *parent = nullptr, const QString &text = "", const QString &hyperlinkText = "", const QSize &hyperlinkSize = QSize(), bool useTimer = false);
+   explicit TextWithBtn(const QString &promptText = "",
+                        const QSize &promptTextSize = QSize(), 
+                        const QString &hyperlinkText = "", 
+                        const QSize &hyperlinkSize = QSize(), 
+                        bool hasTimer = false,
+                        QWidget *parent = nullptr);
+                     
    Label* text() const;
    Button* button() const;
    Label* timer() const;
@@ -78,6 +84,7 @@ class TextWithBtn : public QWidget {
    signals:
    void buttonClicked();
 };
+
 
 /* ------------------- Account OTP ------------------------ */
 class AccountOTP : public QWidget {

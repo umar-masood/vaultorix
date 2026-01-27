@@ -33,7 +33,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _message->setFixedWidth(324);
 
    // Resend OTP Widget (Resend Text + Button + Timer)
-   _resendOtpWidget = new TextWithBtn(nullptr, "Didn`t receive the OTP?", "Resend", QSize(50,12), true);
+   _resendOtpWidget = new TextWithBtn("Didn`t receive the OTP?", QSize(136, 22), "Resend", QSize(50,12), true);
    connect(_resendOtpWidget, &TextWithBtn::buttonClicked, this, [this]() { emit resendClicked(); });
 
    // Verify Button
@@ -103,12 +103,15 @@ void AccountOTP::onEmailEntered(const QString &email) {
    if (idx > 3) 
       for (int i = 3; i < idx; i++)  
          e[i] = '*';
-   text->setText(QString("To ensure your security, please enter the One-Time Password (OTP) sent to your registered email-address (%1) below.").arg(e));
+
+   if (email.isEmpty())
+      text->setText("");
+   else
+      text->setText(QString("To ensure your security, please enter the One-Time Password (OTP) sent to your registered email-address (%1) below.").arg(e));
 }
 
 void AccountOTP::setEmail(const QString &email) {
-   if (!email.isEmpty()) 
-      emit emailEntered(email);
+   emit emailEntered(email);
 }
 
 void AccountOTP::setDarkMode(bool value) {
@@ -261,16 +264,20 @@ void OTPWidget::setEnabled(bool enabled) {
 }
 
 /* ------------------------ Text with Button Widget (Used in Account OTP for resend OTP) ------------------------ */
-TextWithBtn::TextWithBtn(QWidget *parent, const QString &text, 
-                        const QString &hyperlinkText, const QSize &hyperlinkSize,
-                        bool useTimer) : QWidget(parent) {
+TextWithBtn::TextWithBtn(const QString &promptText,
+                        const QSize &promptTextSize,
+                        const QString &hyperlinkText, 
+                        const QSize &hyperlinkSize,
+                        bool hasTimer,
+                        QWidget *parent) : QWidget(parent) 
+{
    setAttribute(Qt::WA_TranslucentBackground);
 
    // Text 
-   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, text, Qt::AlignHCenter);
+   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, promptText, Qt::AlignHCenter);
    _text->setStyleSheet("color: black;");
    _text->setParent(this);
-   _text->setFixedSize(136, 22);
+   _text->setFixedSize(promptTextSize);
    _text->move(0,0);
 
    // Resend Button
@@ -289,7 +296,7 @@ TextWithBtn::TextWithBtn(QWidget *parent, const QString &text,
    setFixedSize(QSize(_text->width() + _button->width() + 2, 18));
 
    // Timer Label
-   if (useTimer) {
+   if (hasTimer) {
       _timer = new Label(false, "Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
       _timer->setStyleSheet("color: black;");
       _timer->setParent(this);
