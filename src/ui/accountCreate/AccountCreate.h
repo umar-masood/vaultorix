@@ -7,6 +7,7 @@
 #include "../dialogs/termsConditions/TermsConditions.h"
 #include "../components/Dialog.h"
 #include "../accountWindow/AccountWindow.h"
+#include "../accountOTP/AccountOTP.h"
 #include <QLabel>
 
 /* -------------- Customized TextField --------------- */
@@ -118,6 +119,9 @@ class AccountCreate : public QWidget {
 
    // Create Account Button
    Button *createAccBtn = nullptr;
+
+   // Redirect to Sign In page widget
+   TextWithBtn *_redirectToSignInWidget = nullptr;
 
    // Helper Functions
    CustomTextField *createTextField(const QString &placeholderText = "", bool useCheck = false);

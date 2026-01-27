@@ -53,16 +53,18 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
 
    // Layout
    layout = new QVBoxLayout;
+   layout->setSpacing(0);
+   layout->setContentsMargins(0, 0, 0, 0);
    layout->addWidget(heading, 0, Qt::AlignHCenter);
-   layout->addSpacing(20);
+   layout->addSpacing(16);
 
    for (auto *widget : fieldsWidgets) {
       layout->addWidget(widget, 0 , Qt::AlignHCenter);
-      layout->addSpacing(10);
+      layout->addSpacing(12);
    }
 
    layout->addWidget(_passwordValidatorWidget, 0, Qt::AlignLeft);
-   layout->addSpacing(10);
+   layout->addSpacing(12);
    layout->addWidget(_termsConditionsWidget, 0, Qt::AlignLeft);
 
    // Create Account Button
@@ -77,8 +79,15 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    createAccBtn->setFontProperties("Segoe UI", 11, true, false);
    createAccBtn->setEnabled(false);
 
-   layout->addSpacing(20);
+   // Redirect to Sign In page widget
+   _redirectToSignInWidget = new TextWithBtn("Already have an account?", QSize(150, 22), "Sign In", QSize(46,20), false);
+   _redirectToSignInWidget->button()->move(_redirectToSignInWidget->text()->width() + 4, -2); // Used manual movement to proper align it with prompt text of this widget.
+
+   layout->addSpacing(18);
    layout->addWidget(createAccBtn, 0, Qt::AlignLeft);
+   layout->addSpacing(16);
+   layout->addWidget(_redirectToSignInWidget, 0, Qt::AlignCenter);
+   layout->addSpacing(10);
    layout->addStretch();
 
    // Setting layout on widget
@@ -109,6 +118,9 @@ void AccountCreate::setDarkMode(bool value) {
    // Terms and Conditions Dialog Box Theme Handling
    termsConditionsDialogWidget->setDarkMode(isDarkMode);
    termsConditionsDialog->setDarkMode(isDarkMode);
+     
+   // Redirect to Sign In page widget
+   _redirectToSignInWidget->text()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black")); 
 }
 
 /* ------------------  Getters -------------------  */
