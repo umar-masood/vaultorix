@@ -71,7 +71,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    connect(cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
 
    // Sign up page redirect widget
-   _redirectToSignUpWidget = new TextWithBtn(nullptr, "Don't have an account?", "Create an account", QSize(110,12), false);
+   _redirectToSignUpWidget = new TextWithBtn("Don't have an account?", QSize(136,22), "Create an account", QSize(110,12), false);
 
    // Main Layout
    layout = new QVBoxLayout(this);
