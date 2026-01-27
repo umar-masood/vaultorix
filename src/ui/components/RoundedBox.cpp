@@ -1,6 +1,6 @@
 #include "RoundedBox.h"
 
-RoundedBox::RoundedBox(const QString &txt, QWidget *parent, bool isToolTip) : QWidget(nullptr), isDarkMode(false), text(txt), _isToolTip(isToolTip) {
+RoundedBox::RoundedBox(const QString &text, QWidget *parent, bool isToolTip) : QWidget(nullptr), isDarkMode(false), text(text), _isToolTip(isToolTip) {
     Qt::WindowFlags flags = Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint;
 
     if (isToolTip) {
@@ -70,6 +70,6 @@ void RoundedBox::paintEvent(QPaintEvent *event) {
         painter.setFont(font);
         painter.setPen(isDarkMode ? QColor("#F0F0F0") : QColor("#000000"));
         QRect text_area(12, 0, width() - 24, height());
-        painter.drawText(text_area, Qt::AlignCenter | Qt::TextWordWrap, text);
+        painter.drawText(text_area, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap, text);
     }
 }
