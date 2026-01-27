@@ -148,7 +148,7 @@ bool GetOTP::setAccountOTPObjectWithDetails(AccountOTP *ao, const QString &email
     }
     
     // If some server error occurs
-    if (status_code == 500 || status_code == 502 || status_code == 512 || status_code == 400 || status_code == -1) {
+    if (status_code == 500 || status_code == 512 || status_code == 400 || status_code == -1) {
         emit somethingWrong();
         return false;
     }
@@ -230,6 +230,7 @@ void GetOTP::onTimeout() {
 
 void GetOTP::onSomethingWrong() { 
     errorManager->show("SomethingWentWrong"); // Show error dialog if there is an error received from server
+    ao->setEmail("");
     disableControls("Verify"); // Disable verify button
 }
 
