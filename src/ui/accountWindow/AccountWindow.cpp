@@ -103,7 +103,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
 
    // Right Side Layout
    entireLayoutRight = new QVBoxLayout(right);
-   entireLayoutRight->setContentsMargins(30, 30, 30, 30);
+   entireLayoutRight->setContentsMargins(30, 10, 30, 10);
    entireLayoutRight->setSpacing(0);
    if (rightWidget)
       entireLayoutRight->addWidget(rightWidget, 0, Qt::AlignCenter);
