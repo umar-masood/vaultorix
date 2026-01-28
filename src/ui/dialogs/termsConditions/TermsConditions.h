@@ -3,8 +3,8 @@
 #include <QTextBrowser>
 
 #include "../../windows/subWindow/SubWindow.h"
-#include "../../accountOTP/AccountOTP.h"
-#include "../../accountWindow/AccountWindow.h"
+#include "../../account/accountOTP/AccountOTP.h"
+#include "../../account/accountWindow/AccountWindow.h"
 #include "../../components/ScrollBar.h"
 
 class TermsConditions : public QWidget {

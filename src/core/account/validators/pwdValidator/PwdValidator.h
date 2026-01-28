@@ -5,9 +5,9 @@
 #include <unordered_map>
 #include <list>
 
-#include "../../../ui/pwdRulesWidget/PwdRulesWidget.h"
-#include "../../../ui/accountCreate/AccountCreate.h"
-#include "../validatorUtils/validatorUtils.h"
+#include "../../../../ui/account/pwdRulesWidget/PwdRulesWidget.h"
+#include "../../../../ui/account/accountCreate/AccountCreate.h"
+#include "../validatorUtils/ValidatorUtils.h"
 
 class PwdValidator : public QObject{
 

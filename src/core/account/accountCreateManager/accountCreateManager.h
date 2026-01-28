@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../validators/emailValidator/emailValidator.h"
-#include "../validators/usernameValidator/usernameValidator.h"
-#include "../validators/pwdValidator/pwdValidator.h"
-#include "../validators/nameValidator/nameValidator.h"
-#include "../../ui/dialogs/errorDialog/ErrorDialog.h"
-#include "../deviceInfo/deviceInfo.h"
+#include "../validators/emailValidator/EmailValidator.h"
+#include "../validators/usernameValidator/UsernameValidator.h"
+#include "../validators/pwdValidator/PwdValidator.h"
+#include "../validators/nameValidator/NameValidator.h"
+#include "../../../ui/dialogs/errorDialog/ErrorDialog.h"
+#include "../deviceInfo/DeviceInfo.h"
 
 #include <QSettings>
 

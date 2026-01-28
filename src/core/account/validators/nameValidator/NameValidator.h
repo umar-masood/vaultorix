@@ -2,8 +2,8 @@
 
 #include <QRegularExpression>
 
-#include "../../../ui/accountCreate/AccountCreate.h"
-#include "../validatorUtils/validatorUtils.h"
+#include "../../../../ui/account/accountCreate/AccountCreate.h"
+#include "../validatorUtils/ValidatorUtils.h"
 
 /* -------------- Name Validator --------------- */
 class NameValidator {

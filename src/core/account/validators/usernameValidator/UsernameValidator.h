@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../ui/accountCreate/AccountCreate.h"
-#include "../validatorUtils/validatorUtils.h"
+#include "../../../../ui/account/accountCreate/AccountCreate.h"
+#include "../validatorUtils/ValidatorUtils.h"
 
 #include <unordered_set>
 #include <fstream>

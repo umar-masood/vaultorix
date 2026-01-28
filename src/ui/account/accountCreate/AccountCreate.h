@@ -1,11 +1,11 @@
 #pragma once
-#include "../components/TextField.h" 
+#include "../../components/TextField.h" 
 #include "../pwdRulesWidget/PwdRulesWidget.h"
-#include "../components/CheckBox.h"
-#include "../components/Button.h"
-#include "../components/ToolTip.h"
-#include "../dialogs/termsConditions/TermsConditions.h"
-#include "../components/Dialog.h"
+#include "../../components/CheckBox.h"
+#include "../../components/Button.h"
+#include "../../components/ToolTip.h"
+#include "../../dialogs/termsConditions/TermsConditions.h"
+#include "../../components/Dialog.h"
 #include "../accountWindow/AccountWindow.h"
 #include "../accountOTP/AccountOTP.h"
 #include <QLabel>

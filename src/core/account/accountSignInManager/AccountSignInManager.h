@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../../ui/accountSignIn/AccountSignIn.h"
-#include "../../ui/accountWindow/AccountWindow.h"
-#include "../validators/validatorUtils/validatorUtils.h"
-#include "../../ui/dialogs/errorDialog/ErrorDialog.h"
-#include "../../ui/components/Dialog.h"
+#include "../../../ui/account/accountSignIn/AccountSignIn.h"
+#include "../../../ui/account/accountWindow/AccountWindow.h"
+#include "../validators/validatorUtils/ValidatorUtils.h"
+#include "../../../ui/dialogs/errorDialog/ErrorDialog.h"
+#include "../../../ui/components/Dialog.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>

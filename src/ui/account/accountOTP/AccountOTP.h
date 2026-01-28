@@ -7,8 +7,8 @@
 #include <QKeyEvent>
 #include <QShowEvent>
 
-#include "../components/Button.h"
-#include "../components/Label.h"
+#include "../../components/Button.h"
+#include "../../components/Label.h"
 
 /* ---------------- OTP Input Boxs Widget ----------------- */
 class OTPWidget : public QWidget {

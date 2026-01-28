@@ -2,7 +2,7 @@
 
 #include "../../components/Dialog.h"
 #include "../dialogUtils/DialogsUtils.h"
-#include "../../accountWindow/AccountWindow.h"
+#include "../../account/accountWindow/AccountWindow.h"
 #include "../../windows/subWindow/SubWindow.h"
 #include "../../components/Button.h"
 #include "../../components/Text.h"

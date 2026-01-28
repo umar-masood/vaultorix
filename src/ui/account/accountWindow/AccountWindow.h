@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../windows/subWindow/SubWindow.h"
-#include "../components/TextField.h"
-#include "../components/Button.h"
-#include "../components/Dialog.h"
-#include "../components/Seperator.h"
-#include "../components/ToolTip.h"
+#include "../../windows/subWindow/SubWindow.h"
+#include "../../components/TextField.h"
+#include "../../components/Button.h"
+#include "../../components/Dialog.h"
+#include "../../components/Seperator.h"
+#include "../../components/ToolTip.h"
 
 #include <QVBoxLayout>
 #include <QVector>

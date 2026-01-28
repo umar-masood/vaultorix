@@ -1,4 +1,4 @@
-#include "./core/accountAuthCoordinator/AccountAuthCoordinator.h"
+#include "./core/account/accountAuthCoordinator/AccountAuthCoordinator.h"
 
 int main(int argc, char *argv[])
 {

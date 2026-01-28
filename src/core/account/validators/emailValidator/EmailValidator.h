@@ -11,8 +11,8 @@
 #include <QJsonParseError>
 #include <QJsonObject>
 
-#include "../../../ui/accountCreate/AccountCreate.h"
-#include "../validatorUtils/validatorUtils.h"
+#include "../../../../ui/account/accountCreate/AccountCreate.h"
+#include "../validatorUtils/ValidatorUtils.h"
 
 /* ---------------------------   Email Validator -------------------------  */
 class EmailValidator : public QObject {

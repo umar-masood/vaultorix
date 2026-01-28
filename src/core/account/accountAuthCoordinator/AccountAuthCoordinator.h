@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../../ui/accountCreate/AccountCreate.h"
+#include "../../../ui/account/accountCreate/AccountCreate.h"
 #include "../accountCreateManager/AccountCreateManager.h"
 
-#include "../../ui/accountOTP/AccountOTP.h"
+#include "../../../ui/account/accountOTP/AccountOTP.h"
 #include "../validators/OTPValidator/OTPValidator.h"
-#include "../../ui/accountWindow/AccountWindow.h"
+#include "../../../ui/account/accountWindow/AccountWindow.h"
 
-#include "../../ui/accountSignIn/AccountSignIn.h"
+#include "../../../ui/account/accountSignIn/AccountSignIn.h"
 #include "../accountSignInManager/AccountSignInManager.h"
 
 #include <QSettings>

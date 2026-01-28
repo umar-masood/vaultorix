@@ -18,9 +18,9 @@
 
 #include <iostream>
 
-#include "../../../ui/accountWindow/AccountWindow.h"
-#include "../../../ui/accountOTP/AccountOTP.h"
-#include "../../../ui/dialogs/errorDialog/ErrorDialog.h"
+#include "../../../../ui/account/accountWindow/AccountWindow.h"
+#include "../../../../ui/account/accountOTP/AccountOTP.h"
+#include "../../../../ui/dialogs/errorDialog/ErrorDialog.h"
 
 /* ------------------ OTP Validator ------------- */
 class OTPValidator : public QObject {

@@ -14,16 +14,16 @@ add_executable(Vaultorix
     src/ui/windows/subWindow/SubWindow.cpp
 
     # Account Window
-    src/ui/accountWindow/AccountWindow.cpp
+    src/ui/account/accountWindow/AccountWindow.cpp
     
     # Account Create
-    src/ui/accountCreate/AccountCreate.cpp
+    src/ui/account/accountCreate/AccountCreate.cpp
     
     # Account OTP
-    src/ui/accountOTP/AccountOTP.cpp
+    src/ui/account/accountOTP/AccountOTP.cpp
 
     # Account Sign In
-    src/ui/accountSignIn/AccountSignIn.cpp
+    src/ui/account/accountSignIn/AccountSignIn.cpp
 
     # Terms & Conditions
     src/ui/dialogs/termsConditions/TermsConditions.cpp
@@ -35,7 +35,7 @@ add_executable(Vaultorix
     src/ui/dialogs/dialogUtils/DialogsUtils.cpp
 
     # Pwd Validator
-    src/ui/pwdRulesWidget/pwdRulesWidget.cpp
+    src/ui/account/pwdRulesWidget/pwdRulesWidget.cpp
     
     # UI Components
     src/ui/components/Button.cpp
@@ -59,19 +59,19 @@ add_executable(Vaultorix
 
     # Core
     ## Validators
-    src/core/validators/emailValidator/EmailValidator.cpp
-    src/core/validators/pwdValidator/PwdValidator.cpp
-    src/core/validators/OTPValidator/OTPValidator.cpp
-    src/core/validators/usernameValidator/UsernameValidator.cpp
-    src/core/validators/validatorUtils/ValidatorUtils.cpp
-    src/core/validators/nameValidator/NameValidator.cpp
+    src/core/account/validators/emailValidator/EmailValidator.cpp
+    src/core/account/validators/pwdValidator/PwdValidator.cpp
+    src/core/account/validators/OTPValidator/OTPValidator.cpp
+    src/core/account/validators/usernameValidator/UsernameValidator.cpp
+    src/core/account/validators/validatorUtils/ValidatorUtils.cpp
+    src/core/account/validators/nameValidator/NameValidator.cpp
     ## Coordinator
-    src/core/accountAuthCoordinator/AccountAuthCoordinator.cpp
+    src/core/account/accountAuthCoordinator/AccountAuthCoordinator.cpp
     ## Managers
-    src/core/accountCreateManager/AccountCreateManager.cpp
-    src/core/accountSignInManager/AccountSignInManager.cpp
+    src/core/account/accountCreateManager/AccountCreateManager.cpp
+    src/core/account/accountSignInManager/AccountSignInManager.cpp
     ## Device Info
-    src/core/deviceInfo/DeviceInfo.cpp
+    src/core/account/deviceInfo/DeviceInfo.cpp
 
     # Entry Point of App
     src/main.cpp
