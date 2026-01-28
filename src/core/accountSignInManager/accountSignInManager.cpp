@@ -86,7 +86,9 @@ void AccountSignInManager::verifyCredentials() {
             case 200: {
                 updateSignInBtnState(false, "Signed In");
                 as->usernameField()->setText("");
+                as->usernameField()->setEnabled(false);
                 as->passwordField()->setText("");
+                as->passwordField()->setEnabled(false);
             }
             break;
 

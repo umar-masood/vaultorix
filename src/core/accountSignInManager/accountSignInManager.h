@@ -28,8 +28,8 @@ class AccountSignInManager : public QObject {
     private:
     // API Crendentials
     const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
-    //const QString API_URL = "https://www.umarcreations.site/check-credentials";
-    const QString API_URL = "http://127.0.0.1:8000/check-credentials";
+    //const QString API_URL = "https://www.umarcreations.site/verify-credentials";
+    const QString API_URL = "http://127.0.0.1:8000/verify-credentials";
 
     // Current Account Window
     AccountWindow *accountWindow = nullptr;

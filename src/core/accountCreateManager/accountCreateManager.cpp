@@ -130,7 +130,7 @@ void AccountCreateManager::storeCredentials() {
         QJsonObject obj = doc.object();
         statusCode = obj["status_code"].toInt();
         message = obj["message"].toString();
-
+        qDebug() << statusCode << message;
         if (statusCode == 200) 
             emit credentialsStoredSuccessfully(); 
         else if (statusCode == 403) 
