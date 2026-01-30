@@ -70,8 +70,8 @@ class AccountWindow : public SubWindow {
    bool isDarkMode = false;
 
    // Icon Paths
-   const QString darkModeIcon = ":/icons/AccountWindow/darkMode.svg";
-   const QString lightModeIcon = ":/icons/AccountWindow/lightMode.svg";
+   const QString darkModeIcon = ":/icons/accountWindow/darkMode.svg";
+   const QString lightModeIcon = ":/icons/accountWindow/lightMode.svg";
 
    // Seperator for titlbar controls
    Seperator *seperator = nullptr;

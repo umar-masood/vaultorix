@@ -10,7 +10,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    // Main Icon
    illustration = new Label(true);
    illustration->setFixedSize(QSize(150, 150));
-   illustration->setPixmap(QPixmap(":/icons/AccountSignIn/sign-in.png").scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   illustration->setPixmap(QPixmap(":/icons/accountSignIn/sign-in.png").scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation));
    illustration->setScaledContents(true);
 
    // Heading

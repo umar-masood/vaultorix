@@ -1,14 +1,14 @@
 #include "DialogsUtils.h"
 
 namespace DialogUtils {
-    const QString noInternetIcon = ":/icons/Dialogs/noInternet.png";
-    const QString wrongCredentialsIcon = ":/icons/Dialogs/wrongCredentials.png";
-    const QString unknownDeviceIcon = ":/icons/Dialogs/unknownDevice.png";
-    const QString somethingWentWrongIcon = ":/icons/Dialogs/somethingWentWrong.png";
-    const QString maxAttemptsIcon = ":/icons/Dialogs/maxLimitReached.png";
-    const QString accessDeniedIcon = ":/icons/Dialogs/accessDenied.png"; 
-    const QString timeoutIcon = ":/icons/Dialogs/timeout.png";
-    const QString futherAttemptBlockedIcon = ":/icons/Dialogs/accessDenied.png";
+    const QString noInternetIcon = ":/icons/dialogs/noInternet.png";
+    const QString wrongCredentialsIcon = ":/icons/dialogs/wrongCredentials.png";
+    const QString unknownDeviceIcon = ":/icons/dialogs/unknownDevice.png";
+    const QString somethingWentWrongIcon = ":/icons/dialogs/somethingWentWrong.png";
+    const QString maxAttemptsIcon = ":/icons/dialogs/maxLimitReached.png";
+    const QString accessDeniedIcon = ":/icons/dialogs/accessDenied.png"; 
+    const QString timeoutIcon = ":/icons/dialogs/timeout.png";
+    const QString futherAttemptBlockedIcon = ":/icons/dialogs/accessDenied.png";
 
     const QString noInternetText = "You're offline. We couldn't connect to the internet. Check your connection and try again.";
     const QString wrongCredentialsText = "The email or password you entered is incorrect. Please try again.";

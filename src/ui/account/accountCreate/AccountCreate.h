@@ -31,8 +31,8 @@ class CustomTextField : public TextField {
    bool hasTip = false;
    
    // Icon Paths
-   const QString checked = ":/icons/AccountCreate/checked.svg";
-   const QString unchecked = ":/icons/AccountCreate/unchecked.svg";
+   const QString checked = ":/icons/accountCreate/checked.svg";
+   const QString unchecked = ":/icons/accountCreate/unchecked.svg";
 };
 
 /* ------------------ CheckBox with Button (In this case for Terms & Conditions Acceptance) -------------- */

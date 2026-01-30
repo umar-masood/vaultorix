@@ -7,8 +7,8 @@ RuleItem::RuleItem(const QString &ruleTxt, QWidget *parent) : QWidget(parent) {
 
    text = ruleTxt;
 
-   iconChecked = QPixmap(":/icons/AccountCreate/checked.svg").scaled(iconSize, iconSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-   iconUnchecked = QPixmap(":/icons/AccountCreate/unchecked.svg").scaled(iconSize, iconSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+   iconChecked = QPixmap(":/icons/accountCreate/checked.svg").scaled(iconSize, iconSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+   iconUnchecked = QPixmap(":/icons/accountCreate/unchecked.svg").scaled(iconSize, iconSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
    font.setFamily("Segoe UI");
    font.setPointSize(10);

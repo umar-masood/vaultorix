@@ -11,6 +11,7 @@ add_executable(Vaultorix
     # User Interface
 
     # Windows
+    src/ui/windows/window/Window.cpp
     src/ui/windows/subWindow/SubWindow.cpp
 
     # Account Window
@@ -65,11 +66,14 @@ add_executable(Vaultorix
     src/core/account/validators/usernameValidator/UsernameValidator.cpp
     src/core/account/validators/validatorUtils/ValidatorUtils.cpp
     src/core/account/validators/nameValidator/NameValidator.cpp
+
     ## Coordinator
     src/core/account/accountAuthCoordinator/AccountAuthCoordinator.cpp
+
     ## Managers
     src/core/account/accountCreateManager/AccountCreateManager.cpp
     src/core/account/accountSignInManager/AccountSignInManager.cpp
+    
     ## Device Info
     src/core/account/deviceInfo/DeviceInfo.cpp
 

@@ -22,8 +22,8 @@ class AccountSignIn : public QWidget {
    bool isDarkMode = false;
    
    // Icon Paths
-   const QString userIcon = ":/icons/AccountSignIn/user.svg";
-   const QString passwordIcon = ":/icons/AccountSignIn/password.svg";
+   const QString userIcon = ":/icons/accountSignIn/user.svg";
+   const QString passwordIcon = ":/icons/accountSignIn/password.svg";
 
    // Illustration
    Label *illustration = nullptr;

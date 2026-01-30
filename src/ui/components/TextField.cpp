@@ -251,13 +251,13 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
     const bool hasSelection = this->hasSelectedText();
 
     static const QHash<QString , QString> icons = {
-        { "Copy", ":/icons/ComponentsIcons/copy.svg" },
-        { "Cut", ":/icons/ComponentsIcons/cut.svg" },
-        { "Paste", ":/icons/ComponentsIcons/paste.svg" },
-        { "Delete", ":/icons/ComponentsIcons/delete.svg" },
-        { "Select All", ":/icons/ComponentsIcons/select-all.svg" },
-        { "Undo", ":/icons/ComponentsIcons/undo.svg" },
-        { "Redo", ":/icons/ComponentsIcons/redo.svg" }
+        { "Copy", ":/icons/components/copy.svg" },
+        { "Cut", ":/icons/components/cut.svg" },
+        { "Paste", ":/icons/components/paste.svg" },
+        { "Delete", ":/icons/components/delete.svg" },
+        { "Select All", ":/icons/components/select-all.svg" },
+        { "Undo", ":/icons/components/undo.svg" },
+        { "Redo", ":/icons/components/redo.svg" }
     };
 
     if (hasSelection) {

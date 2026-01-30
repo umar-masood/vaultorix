@@ -9,7 +9,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    // Illustration of OTP at the top
    illustration = new Label(true);
    illustration->setFixedSize(QSize(106, 106));
-   illustration->setPixmap(QPixmap(":/icons/AccountOTP/otp.png").scaled(106, 106, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   illustration->setPixmap(QPixmap(":/icons/accountOTP/otp.png").scaled(106, 106, Qt::KeepAspectRatio, Qt::SmoothTransformation));
    illustration->setScaledContents(true);
 
    // Main Heading
