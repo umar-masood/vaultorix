@@ -127,7 +127,7 @@ QColor Button::getBackgroundColor() const {
   QColor disabledPrimary     = "#B0E0FF";
   QColor normalSecondary     = isDarkMode ? "#2D2D2D" : "#FBFBFB";
   QColor normalPrimary       = "#008EDE";
-  QColor hoverSecondary      = isDarkMode ? "#323232" : "#F6F6F6";
+  QColor hoverSecondary      = isDarkMode ? "#323232" : "#F0F0F0";
   QColor hoverPrimary        = "#1BB3E6";
   QColor pressedSecondary    = isDarkMode ? "#1F1F1F" : "#FFFFFF";
   QColor pressedPrimary      = "#109AC7";

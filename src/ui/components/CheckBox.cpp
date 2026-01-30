@@ -51,7 +51,7 @@ void CheckBox::paintEvent(QPaintEvent *) {
    if (isChecked()) 
       bg_color = isHover ? QColor("#1BB3E6") : QColor("#0191DF");
    else if (isHover) 
-      bg_color = isDarkMode ? QColor("#323232") : QColor("#F6F6F6");
+      bg_color = isDarkMode ? QColor("#323232") : QColor("#F0F0F0");
    else 
       bg_color = isDarkMode ? QColor("#2D2D2D") : QColor("#FBFBFB");
     
