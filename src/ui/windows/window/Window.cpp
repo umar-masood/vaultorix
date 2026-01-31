@@ -11,6 +11,7 @@ void Window::setDarkMode(bool value) {
         b->setDarkMode(isDarkMode);
 
     applyThemedIcons();
+    applyStyleSheet();
     update(); 
 }
 
@@ -35,10 +36,10 @@ void Window::applyThemedIcons() {
 
     update();
 }
-
 void Window::applyStyleSheet() {
-    _mainTitleBar->setStyleSheet("background-color: transparent;");
-    _contentArea->setStyleSheet("background-color: transparent;");
+    QString stylesheet = QString("background-color: %1;").arg(isDarkMode ? "#1F1F1F" : "#FFFFFF");
+    _mainTitleBar->setStyleSheet(stylesheet);
+    _contentArea->setStyleSheet(stylesheet);
 }
 
 void Window::applyDWMEffects() {
@@ -75,7 +76,7 @@ Button * Window::createWindowButton() {
     b->setSecondary(true);
     b->setIconSize(QSize(16,16));
     b->setDisplayMode(Button::IconOnly);
-    b->setFixedSize(QSize(30, 30));
+    b->setFixedSize(QSize(26, 26));
     return b;
 }
 
@@ -118,7 +119,7 @@ void Window::setupWindow() {
     _mainTitleBarLayout->addWidget(maximizeBtn, 0, Qt::AlignRight);
     _mainTitleBarLayout->addSpacing(4);
     _mainTitleBarLayout->addWidget(closeBtn, 0, Qt::AlignRight);
-    _mainTitleBarLayout->addSpacing(4);
+    _mainTitleBarLayout->addSpacing(10);
 
     /* Window Handle ID */
     hwnd = reinterpret_cast<HWND>(winId());
@@ -128,11 +129,13 @@ void Window::setupWindow() {
    _contentArea = new QWidget(this);
    _contentArea->setContentsMargins(0, 0, 0, 0);
    _contentArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
+   setInteractiveTitleBarWidget(_contentArea);
+   
    /* Entire Layout */
    entireLayout = new QVBoxLayout;
    entireLayout->setContentsMargins(0, 0, 0, 0);
    entireLayout->setSpacing(0);
+   entireLayout->addSpacing(4);
    entireLayout->addWidget(_mainTitleBar, 0, Qt::AlignTop);
    entireLayout->addWidget(_contentArea, 0);
    setLayout(entireLayout);

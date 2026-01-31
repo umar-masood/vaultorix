@@ -153,7 +153,7 @@ void TextField::paintEvent(QPaintEvent *event) {
     pen.setJoinStyle(Qt::RoundJoin);
     painter.setPen(pen);
 
-    QColor bg_color = (isFocused) ? (isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF")) :
+    QColor bg_color = (isFocused) ? (isDarkMode ? QColor("#2c2c2c") : QColor("#FFFFFF")) :
                         isHover ? (isDarkMode ? QColor("#323232") : QColor("#F0F0F0")) :
                         (isDarkMode ? QColor("#2D2D2D") : QColor("#FBFBFB"));
 

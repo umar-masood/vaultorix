@@ -44,6 +44,9 @@ public:
   void setEndColor(const QColor &c);
   void setLoaderButton(bool value);
   void setText(const QString &text);
+  void setBorderHidden(bool value);
+  void setNormalBackgroundTransparent(bool value);
+  void adjustFontXY(int x, int y);
 
   protected:
   void paintEvent(QPaintEvent *event) override;
@@ -66,7 +69,12 @@ private:
   bool isBold = false;
   bool isItalic = false;
   bool isLoaderBtn = false;
+  bool isBorderHidden = false;
+  bool isNormalBackgroundTransparent = false;
   
+  // Font Adjustment
+  int x = 0, y = 0;
+
   bool isDisabledState() const;
   bool isHoverState() const;
   bool isNormalState() const;

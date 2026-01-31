@@ -25,7 +25,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    themeMode->setIconSize(QSize(16,16));
    themeMode->setDisplayMode(Button::IconOnly);
    themeMode->setFixedSize(QSize(26, 26));
-   themeMode->setIconPaths(lightModeIcon, lightModeIcon);
+   themeMode->setIconPaths(darkModeIcon, darkModeIcon);
    connect(themeMode, &Button::clicked, this, [this](){
       isDarkMode = !isDarkMode;
       emit themeModeChanged(isDarkMode);
@@ -169,7 +169,7 @@ void AccountWindow::onthemeModeChanged(bool enable) {
    // Theme Mode Button
    themeMode->setDarkMode(enable);
    themeButtonTip->setDarkMode(enable);
-   enable ? themeMode->setIconPaths(darkModeIcon, darkModeIcon) : themeMode->setIconPaths(lightModeIcon, lightModeIcon);
+   enable ? themeMode->setIconPaths(lightModeIcon, lightModeIcon) : themeMode->setIconPaths(darkModeIcon, darkModeIcon);
    
    // Right widget
    if (rightWidget)

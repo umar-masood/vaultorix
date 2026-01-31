@@ -14,6 +14,19 @@ add_executable(Vaultorix
     src/ui/windows/window/Window.cpp
     src/ui/windows/subWindow/SubWindow.cpp
 
+    # Vault Window
+    src/ui/vault/vaultWindow/VaultWindow.cpp
+    ## Toolbar
+    src/ui/vault/toolbar/Toolbar.cpp
+    ## User
+    src/ui/vault/user/User.cpp
+    ## Empty State Widget
+    src/ui/vault/emptyStateWidget/EmptyStateWidget.cpp
+    ## View 
+    src/ui/vault/view/View.cpp
+    ## Statusbar
+    src/ui/vault/statusbar/Statusbar.cpp
+
     # Account Window
     src/ui/account/accountWindow/AccountWindow.cpp
     

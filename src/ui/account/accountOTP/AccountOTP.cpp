@@ -219,7 +219,7 @@ void OTPWidget::showEvent(QShowEvent *event) {
 /* --------------------  Setters  -----------------  */
 void OTPWidget::updateStyles() {
    bg_color_normal = isDarkMode ? "#2D2D2D" : "#FBFBFB";
-   bg_color_focused = isDarkMode ? "#1F1F1F" : "#FFFFFF";
+   bg_color_focused = isDarkMode ? "#2c2c2c" : "#FFFFFF";
    text_color = isDarkMode ? "white" : "black";
    border_color = isDarkMode ? "#4D4D4D" : "#CCCCCC";
 

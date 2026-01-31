@@ -48,7 +48,7 @@ void RoundedBox::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
 
     // Colors
-    QColor BG = isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF");
+    QColor BG = isDarkMode ? QColor("#2c2c2c") : QColor("#FFFFFF");
     QColor BR = "#AFAFAF";
 
     QPainter painter(this);

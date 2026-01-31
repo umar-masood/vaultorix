@@ -37,5 +37,15 @@
     <file>icons/dialogs/maxLimitReached.png</file>
     <file>icons/dialogs/accessDenied.png</file>
     <file>icons/dialogs/timeout.png</file>
+    <file>icons/vaultWindow/decrypt.svg</file>
+    <file>icons/vaultWindow/delete.svg</file>
+    <file>icons/vaultWindow/encrypt.svg</file>
+    <file>icons/vaultWindow/import.svg</file>
+    <file>icons/vaultWindow/open.svg</file>
+    <file>icons/vaultWindow/restore.svg</file>
+    <file>icons/vaultWindow/search.svg</file>
+    <file>icons/vaultWindow/sign-out.svg</file>
+    <file>icons/vaultWindow/folder-illustration-dark.svg</file>
+    <file>icons/vaultWindow/folder-illustration-light.svg</file>
   </qresource>
 </RCC>

@@ -1,0 +1,85 @@
+#pragma once
+
+#include <QWidget>
+#include "../../components/Button.h"
+#include "../../components/ToolTip.h"
+#include "../user/User.h"
+#include <QHBoxLayout>
+#include <QList>
+#include <QMap>
+
+/* ---------------------  Toolbar ---------------------- */
+class Toolbar : public QWidget {
+    Q_OBJECT
+
+    public:
+    Toolbar(QWidget *parent = nullptr);
+    void setDarkMode(bool enable);
+
+    Button* importButton() const;
+    Button* restoreButton() const;
+    Button* openButton() const;
+    Button* deleteButton() const;
+    Button* encryptButton() const;
+    Button* decryptButton() const;
+
+    private:
+    // Theme Mode
+    bool isDarkMode = false;
+
+    // Main Layout
+    QHBoxLayout *layout = nullptr;
+
+    // Import Action
+    Button *import_btn = nullptr;
+    // ToolTip
+    ToolTip *import_btn_tip = nullptr;
+
+    // Encrypt Action
+    Button *encrypt_btn = nullptr;
+    // ToolTip
+    ToolTip *encrypt_btn_tip = nullptr;
+
+    // Decrypt Action
+    Button *decrypt_btn = nullptr;
+    // ToolTip
+    ToolTip *decrypt_btn_tip = nullptr;
+
+    // Open Action
+    Button *open_btn = nullptr;
+    // ToolTip
+    ToolTip *open_btn_tip = nullptr;
+
+    // Delete Action
+    Button *delete_btn = nullptr;
+    // ToolTip
+    ToolTip *delete_btn_tip = nullptr;
+
+    // Restore Action
+    Button *restore_btn = nullptr;
+    // ToolTip
+    ToolTip *restore_btn_tip = nullptr;
+
+    // User Profile Widget
+    User *user_widget = nullptr;
+    
+    // Helpers
+    Button* createButton(const QString &text);
+
+    // Icons
+    QMap<QString, QString> icons = {
+        {"Decrypt", ":/icons/vaultWindow/decrypt.svg" },
+        {"Encrypt", ":/icons/vaultWindow/encrypt.svg" },
+        {"Delete" , ":/icons/vaultWindow/delete.svg" },
+        {"Import" , ":/icons/vaultWindow/import.svg" },
+        {"Open" , ":/icons/vaultWindow/open.svg" },
+        {"Restore" , ":/icons/vaultWindow/restore.svg"},
+    };
+
+    // List of Actions
+    QList<Button *> actions;
+
+    protected:
+    void paintEvent(QPaintEvent *event) override;
+
+};

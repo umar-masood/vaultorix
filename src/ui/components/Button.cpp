@@ -118,6 +118,10 @@ void Button::setText(const QString &text) {
   QPushButton::setText(text);
 }
 
+void Button::setBorderHidden(bool value) { isBorderHidden = value; }
+void Button::setNormalBackgroundTransparent(bool value) { isNormalBackgroundTransparent = value; }
+void Button::adjustFontXY(int x, int y) { this->x = x; this->y = y; update(); }
+
 QColor Button::getStartColor() const { return QColor(color1); }
 QColor Button::getEndColor() const { return QColor(color2); }
 
@@ -125,11 +129,18 @@ QColor Button::getBackgroundColor() const {
   // Colors
   QColor disabledSecondary   = isDarkMode ? "#555555" : "#E0E0E0";
   QColor disabledPrimary     = "#B0E0FF";
+  
   QColor normalSecondary     = isDarkMode ? "#2D2D2D" : "#FBFBFB";
   QColor normalPrimary       = "#008EDE";
+
+  if (isNormalBackgroundTransparent) {
+    normalSecondary = Qt::transparent;
+    normalPrimary = Qt::transparent;
+  }
+
   QColor hoverSecondary      = isDarkMode ? "#323232" : "#F0F0F0";
   QColor hoverPrimary        = "#1BB3E6";
-  QColor pressedSecondary    = isDarkMode ? "#1F1F1F" : "#FFFFFF";
+  QColor pressedSecondary    = isDarkMode ? "#2c2c2c" : "#FFFFFF";
   QColor pressedPrimary      = "#109AC7";
 
   if (isDisabledState()) 
@@ -159,7 +170,7 @@ QColor Button::getTextColor() const {
 void Button::drawBorder(QPainter &painter) {
   bool showBorder = isSecondary && !isIconOnly();
 
-  if (!showBorder || isGradient || isHyperLink)
+  if (!showBorder || isGradient || isHyperLink || isBorderHidden)
     painter.setPen(Qt::NoPen);
   else {
     QPen pen(isDarkMode ? "#4D4D4D" : "#CCCCCC");
@@ -203,10 +214,10 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
     int iconH = isUnicodeIcon ? unicodeIconSize : pixmap.height();
     int iconW = isUnicodeIcon ? unicodeIconSize : pixmap.width();
     int iconY = (height() - iconH) / 2;
-    int textX = iconX + iconW + spacing;
-    int textY = 0;
+    int textX = x != 0 ? x : iconX + iconW + spacing;
+    int textY = y != 0 ? y : 0;
     int buttonWidth = iconX + iconW + spacing + textW + 2 * spacing;
- 
+    qDebug() << textX << textY;
     if (!customSize.isValid()) 
       QPushButton::setFixedSize(buttonWidth, 36);
 
@@ -257,12 +268,11 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
     int buttonWidth = hspacing + textW + hspacing;
     int buttonHeight = vSpacing + pixmap.height() + gap + textH + vSpacing;
 
-    if (customSize.isValid()) {
+    if (customSize.isValid()) 
       setFixedSize(customSize);
-    } else {
+    else 
       QPushButton::setFixedSize(buttonWidth, buttonHeight);
-    }
-
+    
     if (isUnicodeIcon)
       painter.drawText(QRect(0, vSpacing, width(), unicodeIconSize + 4), Qt::AlignCenter, unicodeIcon);
     else {
