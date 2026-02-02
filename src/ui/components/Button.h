@@ -37,16 +37,20 @@ public:
   void setShadow(bool value);
   void setHyperLink(bool value);
   void setHyperLinkColors(const QColor &normalState, const QColor &hoverState);
-  void setFontProperties(const QString &family, int pointSize, bool bold = false, bool italic = false);
+  void setFontProperties(const QString &family, int pointSize, QFont::Weight weight = QFont::Normal, bool italic = false);
   void setGradientColor(bool enable, const QString &hex1, const QString &hex2);
   void setHoverGradientColor(const QString &hex);
   void setStartColor(const QColor &c);
   void setEndColor(const QColor &c);
   void setLoaderButton(bool value);
   void setText(const QString &text);
-  void setBorderHidden(bool value);
+  void setBorderTransparent(bool value);
   void setNormalBackgroundTransparent(bool value);
-  void adjustFontXY(int x, int y);
+  void setCheckedButtonIcon(const QString &iconPath);
+  void setPrimaryButtonIcon(const QString &iconPath);
+  void setFontXY(int x, int y);
+
+  QSize iconSize() const;
 
   protected:
   void paintEvent(QPaintEvent *event) override;
@@ -66,10 +70,9 @@ private:
   bool isUnicodeIcon = false;
   bool isGradient = false;
   bool isHyperLink = false;
-  bool isBold = false;
   bool isItalic = false;
   bool isLoaderBtn = false;
-  bool isBorderHidden = false;
+  bool isBorderTransparent = false;
   bool isNormalBackgroundTransparent = false;
   
   // Font Adjustment
@@ -91,13 +94,17 @@ private:
 
   QColor getBackgroundColor() const;
   QColor getTextColor() const;
+  QPixmap getPixmap() const;
+  QFont getFont() const;
 
   // Icons
-  QString lightIcon;
-  QString darkIcon;
+  QPixmap _lightIcon;
+  QPixmap _darkIcon;
+  QPixmap primaryButtonIcon;
+  QPixmap checkedButtonIcon;
 
   // Icons Size
-  QSize IconSize = QSize(20, 20);
+  QSize _iconSize = QSize(20, 20);
   QString unicodeIcon;
   int unicodeIconSize = 16;
 
@@ -121,6 +128,7 @@ private:
   // Font 
   QString fontFamily = "Segoe UI";
   int fontSize = 11;
+  QFont::Weight fontWeight = QFont::Normal;
 
   // Loader
   SpinnerProgress *spinner = nullptr;

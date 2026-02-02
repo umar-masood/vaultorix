@@ -6,36 +6,33 @@ void TextField::setShadow(bool value) { hasShadow = value; }
 
 void TextField::setDarkMode(bool value) {
     isDarkMode = value;
+    if (clear) clear->setDarkMode(isDarkMode); 
+    if (password) password->setDarkMode(isDarkMode);
     updateStyle();
 }
 
 void TextField::setFixedSize(QSize s) {
     int finalWidth = std::max(s.width(), minWidth);
-    int finalHeight = fixedHeight;
+    int finalHeight = s.height();
     QLineEdit::setFixedSize(finalWidth, finalHeight);
 }
 
 
 void TextField::setTextFieldIcon(bool value) {
-    textFieldIcon = value;
+    hasTextFieldIcon = value;
     updateStyle();
 }
 
-void TextField::setTextFieldIconSize(QSize s) { if (textFieldIcon) textFieldIconSize = s; }
+void TextField::setTextFieldIconSize(QSize s) { if (hasTextFieldIcon) textFieldIconSize = s; }
 
 void TextField::setIconPaths(const QString &lightIcon, const QString &darkIcon) {
-    if (textFieldIcon) {
+    if (hasTextFieldIcon) {
         light_icon = lightIcon;
         dark_icon = darkIcon;
     } else {
         light_icon.clear();
         dark_icon.clear();
     }
-}
-
-void TextField::setDropDownPadding(bool value) {
-    dropDownPadding = value;
-    updateStyle();
 }
 
 void TextField::setReadOnly(bool value) {
@@ -48,17 +45,16 @@ void TextField::setEnabled(bool value) {
     QLineEdit::setEnabled(value);
 }
 
-void TextField::setContextMenu(bool value) { cxtMenu = value; }
+void TextField::setContextMenu(bool value) { hasContextMenu = value; }
 void TextField::setFontProperties(const QString &family, int pointSize, bool bold, bool italic) {
     isItalic = italic; isBold = bold; fontSize = pointSize; fontFamily = family;
     updateStyle(); 
 }
 
-void TextField::setSpacingRight(bool value) { rightSpacing = value; }
 void TextField::setClearButton(bool value) {
-    clearButton = value;
+    hasClearButton = value;
 
-    if (clearButton && !clear) {
+    if (hasClearButton && !clear) {
         clear = new Button("", this);
         clear->setCursor(Qt::PointingHandCursor);
         clear->setShadow(false);
@@ -67,7 +63,7 @@ void TextField::setClearButton(bool value) {
         clear->setFixedSize(QSize(28, 28));
         clear->setIconPaths(clearIcon, clearIcon);
         clear->setEnabled(isEnabled);
-        buttonPositioning(clear);
+        positionButton(clear);
         
         clear->raise();
         clear->hide();
@@ -85,9 +81,9 @@ void TextField::setClearButton(bool value) {
 }
 
 void TextField::setPasswordTextField(bool value) {
-    passwordButton = value;
+    hasPasswordButton = value;
 
-    if (passwordButton && !password && !clearButton) {
+    if (hasPasswordButton && !password && !hasClearButton) {
         password = new Button("", this);
         password->setCursor(Qt::PointingHandCursor);
         password->setShadow(false);
@@ -96,7 +92,7 @@ void TextField::setPasswordTextField(bool value) {
         password->setFixedSize(QSize(28, 28));
         password->setEnabled(isEnabled);
         this->setEchoMode(QLineEdit::Password);
-        buttonPositioning(password);
+        positionButton(password);
 
         password->hide();
         password->setIconPaths(eyeClosedIcon, eyeClosedIcon);
@@ -126,19 +122,35 @@ void TextField::setPasswordTextField(bool value) {
     update();
 }
 
-void TextField::resizeEvent(QResizeEvent *event) {
-    QLineEdit::resizeEvent(event);
-    buttonPositioning(clear);
-    buttonPositioning(password);
+void TextField::setPadding(int left, int top, int right, int bottom) {
+    _left = left; 
+    _right = right, 
+    _bottom = bottom, 
+    _top = top;
+    updateStyle();
 }
 
-void TextField::buttonPositioning(Button *button) {
+void TextField::setTextSelectedBackgroundColor(const QString &hex) { _selected_text_background_color = hex; updateStyle(); }
+void TextField::setTextSelectionColor(const QString &hex) { _selected_text_color = hex; updateStyle(); }
+void TextField::setTextColor(const QString &hex) { _text_color = hex; updateStyle(); }
+void TextField::setPlaceHolderTextColor(const QString &hex) { _placeholder_text_color = hex; updateStyle(); }
+
+void TextField::resizeEvent(QResizeEvent *event) {
+    QLineEdit::resizeEvent(event);
+    positionButton(clear);
+    positionButton(password);
+}
+
+void TextField::positionButton(Button *button) {
     if (button) {
         int x = width() - (12 + button->width()) + 3;
         int y = (height() - button->height()) / 2;
         button->move(x, y);
     }
 }
+
+void TextField::setBorderTransparent(bool value) { isBorderTransparent = value; }
+void TextField::setNormalBackgroundTransparent(bool value) { isBackgroundTransparent = value; }
 
 void TextField::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
@@ -148,14 +160,27 @@ void TextField::paintEvent(QPaintEvent *event) {
 
     QPen pen;
     pen.setWidthF(isFocused ? 1.0 : 0.5);
-    pen.setColor(isFocused ? QColor("#0191DF") : (isDarkMode ? QColor("#4D4D4D") : QColor("#CCCCCC")));
+
+    QColor border_color;
+    if (isBorderTransparent) 
+        border_color = Qt::transparent;
+    else
+        border_color = isFocused ? QColor("#0191DF") : (isDarkMode ? QColor("#4D4D4D") : QColor("#CCCCCC"));
+
+    pen.setColor(border_color);
     pen.setStyle(Qt::SolidLine);
     pen.setJoinStyle(Qt::RoundJoin);
     painter.setPen(pen);
+    QColor bg_color;
 
-    QColor bg_color = (isFocused) ? (isDarkMode ? QColor("#2c2c2c") : QColor("#FFFFFF")) :
-                        isHover ? (isDarkMode ? QColor("#323232") : QColor("#F0F0F0")) :
-                        (isDarkMode ? QColor("#2D2D2D") : QColor("#FBFBFB"));
+    if (isFocused)
+        bg_color = isDarkMode ? QColor("#242424") : QColor("#FFFFFF");
+    else if (isHover)
+        bg_color = isDarkMode ? QColor("#323232") : QColor("#F0F0F0");
+    else if (isBackgroundTransparent)
+        bg_color = Qt::transparent;
+    else
+        bg_color = isDarkMode ? QColor("#2D2D2D") : QColor("#FBFBFB");
 
     painter.setBrush(bg_color);
 
@@ -163,7 +188,7 @@ void TextField::paintEvent(QPaintEvent *event) {
     path.addRoundedRect(rec, 6, 6);
     painter.drawPath(path);
 
-    if (textFieldIcon) {
+    if (hasTextFieldIcon) {
         QString iconPath = isDarkMode ? dark_icon : light_icon;
         if (!iconPath.isEmpty()) {
             QPixmap pixmap(iconPath);
@@ -180,7 +205,7 @@ void TextField::paintEvent(QPaintEvent *event) {
 }
 
 void TextField::keyPressEvent(QKeyEvent *event) {
-    if (!cxtMenu && event->modifiers() & Qt::ControlModifier) {
+    if (!hasContextMenu && event->modifiers() & Qt::ControlModifier) {
         switch(event->key()) {
             case Qt::Key_C:
             case Qt::Key_V:
@@ -239,7 +264,7 @@ void TextField::focusOutEvent(QFocusEvent *event) {
 }
 
 void TextField::contextMenuEvent(QContextMenuEvent *event) {
-    if (!cxtMenu) return;
+    if (!hasContextMenu) return;
 
     menu = new Menu(this);
     menu->setMaxVisibleItems(12);
@@ -250,27 +275,17 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
     const bool hasText = !this->text().isEmpty();
     const bool hasSelection = this->hasSelectedText();
 
-    static const QHash<QString , QString> icons = {
-        { "Copy", ":/icons/components/copy.svg" },
-        { "Cut", ":/icons/components/cut.svg" },
-        { "Paste", ":/icons/components/paste.svg" },
-        { "Delete", ":/icons/components/delete.svg" },
-        { "Select All", ":/icons/components/select-all.svg" },
-        { "Undo", ":/icons/components/undo.svg" },
-        { "Redo", ":/icons/components/redo.svg" }
-    };
-
     if (hasSelection) {
-        menu->addAction({ "Copy", false, icons["Copy"], icons["Copy"], "Ctrl + C" });
-        menu->addAction({ "Cut", false, icons["Cut"],  icons["Cut"], "Ctrl + X" });
-        menu->addAction({ "Delete", false, icons["Delete"], icons["Delete"], "Delete" });
+        menu->addAction({ "Copy",    false,  "Ctrl + C",  icons["Copy"],    icons["Copy"] });
+        menu->addAction({ "Cut",     false,  "Ctrl + X",  icons["Cut"],     icons["Cut"] });
+        menu->addAction({ "Delete",  false,  "Delete",    icons["Delete"],  icons["Delete"] });
     }
 
-    menu->addAction({ "Paste", false, icons["Paste"], icons["Paste"], "Ctrl + V" });
+    menu->addAction({ "Paste", false, "Ctrl + V", icons["Paste"], icons["Paste"]});
     
-    if (hasText && !hasSelection) menu->addAction({ "Select All", false, icons["Select All"], icons["Select All"], "Ctrl + A" });
-    if (this->isUndoAvailable()) menu->addAction({ "Undo", false, icons["Undo"], icons["Undo"], "Ctrl + Z" });
-    if (this->isRedoAvailable()) menu->addAction({ "Redo", false, icons["Redo"], icons["Redo"], "Ctrl + Y" });
+    if (hasText && !hasSelection) menu->addAction({ "Select All",  false,  "Ctrl + A",  icons["Select All"],  icons["Select All"]});
+    if (this->isUndoAvailable())  menu->addAction({ "Undo",        false,  "Ctrl + Z",  icons["Undo"],        icons["Undo"]});
+    if (this->isRedoAvailable())  menu->addAction({ "Redo",        false,  "Ctrl + Y",  icons["Redo"],        icons["Redo"] });
 
     connect(menu, &Menu::itemClicked, this, [=]() {
         QString action = menu->clickedItemText();
@@ -288,9 +303,16 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
     menu->move(event->globalPos());
 }
 
+bool TextField::event(QEvent *event) {
+    if (event->type() == QEvent::WindowActivate && !hasFocus()) 
+        clearFocus(); 
+    
+    return QLineEdit::event(event);
+}
+
 void TextField::init() {
     setFixedSize(QSize(0, 0));
-    setFocusPolicy(Qt::StrongFocus);
+    setFocusPolicy(Qt::ClickFocus);
     updateStyle();
     
     effect = new SmoothShadow(this);
@@ -307,19 +329,6 @@ void TextField::init() {
 }
 
 void TextField::updateStyle() {
-    if (clear) clear->setDarkMode(isDarkMode); 
-    if (password) password->setDarkMode(isDarkMode);
-
-    QString txt_color = isDarkMode ? "#FFFFFF" : "#000000";
-    QString selection_bg = "#32CCFE";
-    QString selected_txt = "#FFFFFF";
-    QString placeholder_color = isDarkMode ? "#757575" : "#ACABAB";
-    int padding_left = textFieldIcon ? (12 + 20 + 12) - 3 : 12;
-    int padding_right = (clearButton || rightSpacing || passwordButton || dropDownPadding) ? (24 + 28) - 9 : 12;
-
-    QString fontWeight = isBold ? "bold" : "normal";
-    QString fontStyle = isItalic ? "italic" : "normal";
-
     QString styleSheet = QString(R"(
       QLineEdit {
         font-family: '%1';
@@ -336,18 +345,21 @@ void TextField::updateStyle() {
         placeholder-text-color: %8;
         padding-left: %9px;
         padding-right: %10px;
-        padding-bottom: 2px;
+        padding-bottom: %11px;
+        padding-top: %12px;
       })")
         .arg(fontFamily)
         .arg(fontSize)
-        .arg(fontWeight)
-        .arg(fontStyle)
-        .arg(txt_color)
-        .arg(selection_bg)
-        .arg(selected_txt)
-        .arg(placeholder_color)
-        .arg(padding_left)
-        .arg(padding_right);
+        .arg(isBold ? "bold" : "normal")
+        .arg(isItalic ? "italic" : "normal")
+        .arg(!_text_color.isEmpty() ? _text_color : (isDarkMode ? "#FFFFFF" : "#000000"))
+        .arg(!_selected_text_background_color.isEmpty() ? _selected_text_background_color : "#32CCFE")
+        .arg(!_selected_text_color.isEmpty() ? _selected_text_color : "#FFFFFF")
+        .arg(!_placeholder_text_color.isEmpty() ? _placeholder_text_color : (isDarkMode ? "#757575" : "#ACABAB"))
+        .arg(_left != 0 ? _left : (hasTextFieldIcon ? (12 + 20 + 12) - 3 : 12))
+        .arg(_right != 0 ? _right : ((hasClearButton || hasPasswordButton) ? (24 + 28) - 9 : 12))
+        .arg(_bottom != 0 ? _bottom : 2)
+        .arg(_top != 0 ? _top : 0);
 
     setStyleSheet(styleSheet);
 }

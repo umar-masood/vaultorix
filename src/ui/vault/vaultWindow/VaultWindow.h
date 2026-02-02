@@ -12,6 +12,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
+
 /* --------------------- Vault Main Window --------------------------- */
 class VaultWindow : public Window {
     Q_OBJECT

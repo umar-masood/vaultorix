@@ -43,7 +43,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _verifyBtn->setFixedSize(QSize(360, 36));
    _verifyBtn->setGradientColor(true, "#008EDE", "#15F2FF");
    _verifyBtn->setHoverGradientColor("#008EDE");
-   _verifyBtn->setFontProperties("Segoe UI", 11, true, false);
+   _verifyBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    _verifyBtn->setLoaderButton(true);
    connect(_verifyBtn, &Button::clicked, this, [this]() { emit verifyClicked(); });
 
@@ -53,7 +53,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _cancelBtn->setDisplayMode(Button::TextOnly);
    _cancelBtn->setSecondary(true);
    _cancelBtn->setFixedSize(QSize(360, 36));
-   _cancelBtn->setFontProperties("Segoe UI", 11, true, false);
+   _cancelBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    connect(_cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
 
    // Main Layout
@@ -219,7 +219,7 @@ void OTPWidget::showEvent(QShowEvent *event) {
 /* --------------------  Setters  -----------------  */
 void OTPWidget::updateStyles() {
    bg_color_normal = isDarkMode ? "#2D2D2D" : "#FBFBFB";
-   bg_color_focused = isDarkMode ? "#2c2c2c" : "#FFFFFF";
+   bg_color_focused = isDarkMode ? "#242424" : "#FFFFFF";
    text_color = isDarkMode ? "white" : "black";
    border_color = isDarkMode ? "#4D4D4D" : "#CCCCCC";
 
@@ -286,7 +286,7 @@ TextWithBtn::TextWithBtn(const QString &promptText,
    _button->setFixedSize(hyperlinkSize);
    _button->setHyperLink(true);
    _button->setText(hyperlinkText);
-   _button->setFontProperties("Segoe UI", 10, false, false);
+   _button->setFontProperties("Segoe UI", 10);
    _button->setHyperLinkColors("#008EDE", "#15F2FF");
    _button->move(_text->width() + 4, 2);
 

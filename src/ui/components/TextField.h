@@ -27,12 +27,17 @@ class TextField : public QLineEdit {
   void setIconPaths(const QString &lightIcon = "", const QString &darkIcon = "");
   void setClearButton(bool value);
   void setPasswordTextField(bool value);
-  void setDropDownPadding(bool value);
+  void setPadding(int left = 0, int top = 0, int right = 0, int bottom = 0);
+  void setTextSelectedBackgroundColor(const QString &hex);
+  void setPlaceHolderTextColor(const QString &hex);
+  void setTextSelectionColor(const QString &hex);
+  void setTextColor(const QString &hex);
   void setReadOnly(bool value);
   void setEnabled(bool value);
   void setFontProperties(const QString &family, int pointSize = 12, bool bold = false, bool italic = false);
-  void setSpacingRight(bool value);
   void setContextMenu(bool value);
+  void setBorderTransparent(bool value);
+  void setNormalBackgroundTransparent(bool value);
 
   protected:
   void paintEvent(QPaintEvent *event) override;
@@ -42,30 +47,49 @@ class TextField : public QLineEdit {
   void focusOutEvent(QFocusEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
   void contextMenuEvent(QContextMenuEvent *event) override;
+  bool event(QEvent *event);
   void resizeEvent(QResizeEvent *event) override;
-
 
   private:
   void init();
   void updateStyle();
-  void buttonPositioning(Button *button);
+  void positionButton(Button *button);
 
   // States
   bool isHover = false;
   bool isFocused = false;
   bool isDarkMode = false;
+
   bool hasShadow = false;
-  bool textFieldIcon = false;
-  bool clearButton = false;
-  bool passwordButton = false;
+  bool hasTextFieldIcon = false;
+  bool hasClearButton = false;
+  bool hasPasswordButton = false;
+  bool hasContextMenu = true;
+
   bool isPasswordVisible = false;
-  bool dropDownPadding = false;
   bool isReadOnly = false;
   bool isEnabled = true;
   bool isBold = false;
   bool isItalic = false;
-  bool rightSpacing = false;
-  bool cxtMenu = true;
+  bool isBorderTransparent = false;
+  bool isBackgroundTransparent = false;
+
+  // Padding
+  int _left = 0, _right = 0, _top = 0, _bottom = 0;
+
+  // Text Colors
+  QString _selected_text_color, _selected_text_background_color, _text_color, _placeholder_text_color;
+
+  // Context Menu Icons
+  const QHash<QString , QString> icons = {
+    { "Copy",       ":/icons/components/copy.svg" },
+    { "Cut",        ":/icons/components/cut.svg" },
+    { "Paste",      ":/icons/components/paste.svg" },
+    { "Delete",     ":/icons/components/delete.svg" },
+    { "Select All", ":/icons/components/select-all.svg" },
+    { "Undo",       ":/icons/components/undo.svg" },
+    { "Redo",       ":/icons/components/redo.svg" }
+  };
 
   // Graphics
   SmoothShadow *effect = nullptr;

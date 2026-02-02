@@ -46,7 +46,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    forgotPwd->setDisplayMode(Button::TextOnly);
    forgotPwd->setFixedSize(QSize(110, 18));
    forgotPwd->setHyperLink(true);
-   forgotPwd->setFontProperties("Segoe UI", 10, false, false);
+   forgotPwd->setFontProperties("Segoe UI", 10);
    forgotPwd->setHyperLinkColors("#008EDE", "#15F2FF");
    connect(forgotPwd, &Button::clicked, this, [this]() { emit forgotPwdClicked(); });
 
@@ -57,7 +57,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    signInBtn->setFixedSize(QSize(360, 36));
    signInBtn->setGradientColor(true, "#008EDE", "#15F2FF");
    signInBtn->setHoverGradientColor("#008EDE");
-   signInBtn->setFontProperties("Segoe UI", 11, true, false);
+   signInBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    signInBtn->setLoaderButton(true);
    connect(signInBtn, &Button::clicked, this, [this]() { emit signInClicked(); });
 
@@ -67,7 +67,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    cancelBtn->setDisplayMode(Button::TextOnly);
    cancelBtn->setSecondary(true);
    cancelBtn->setFixedSize(QSize(360, 36));
-   cancelBtn->setFontProperties("Segoe UI", 11, true, false);
+   cancelBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    connect(cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
 
    // Sign up page redirect widget

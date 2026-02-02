@@ -31,7 +31,7 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
     QRect fullRec = option.rect;
     painter->setPen(Qt::NoPen);
     painter->setBrush(current);
-    painter->drawRoundedRect(fullRec, 6, 6);
+    painter->drawRoundedRect(fullRec.adjusted(2,2,-2,-2), 6, 6); // Adjusted for small spacing between items
 
     // Fetching Data from Index
     QString text = index.data(Qt::DisplayRole).toString();

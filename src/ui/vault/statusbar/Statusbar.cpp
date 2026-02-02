@@ -54,7 +54,7 @@ void Statusbar::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
 
-    painter.setBrush(QBrush(isDarkMode ? "#252424" : "#F9F9F9"));
+    painter.setBrush(QBrush(isDarkMode ? "#262626" : "#F9F9F9"));
     painter.setPen(Qt::NoPen);
     painter.drawRoundedRect(rect(), 6, 6);
 }

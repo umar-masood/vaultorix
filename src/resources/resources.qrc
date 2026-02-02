@@ -47,5 +47,10 @@
     <file>icons/vaultWindow/sign-out.svg</file>
     <file>icons/vaultWindow/folder-illustration-dark.svg</file>
     <file>icons/vaultWindow/folder-illustration-light.svg</file>
+    <file>icons/vaultWindow/filter.svg</file>
+    <file>icons/vaultWindow/layout-grid.svg</file>
+    <file>icons/vaultWindow/layout-grid-checked.svg</file>
+    <file>icons/vaultWindow/layout-list-checked.svg</file>
+    <file>icons/vaultWindow/layout-list.svg</file>
   </qresource>
 </RCC>

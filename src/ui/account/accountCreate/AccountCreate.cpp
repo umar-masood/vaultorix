@@ -76,7 +76,7 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    createAccBtn->setGradientColor(true, "#008EDE", "#15F2FF");
    createAccBtn->setHoverGradientColor("#008EDE");
    createAccBtn->setText("Create Account");
-   createAccBtn->setFontProperties("Segoe UI", 11, true, false);
+   createAccBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    createAccBtn->setEnabled(false);
 
    // Redirect to Sign In page widget
@@ -195,13 +195,14 @@ void AccountCreate::addLabelsInsideFieldsWidgets() {
 /* ------------------  CUSTOM TEXT FIELD ------------------- */
 CustomTextField::CustomTextField(bool useCheck, QWidget *parent) : TextField(parent) {
    if (useCheck) {
-      setSpacingRight(true);
 
       // Check Icon
       checkIcon = new QLabel(this);
       checkIcon->setAttribute(Qt::WA_TranslucentBackground);
       checkIcon->setFixedSize(QSize(20, 20));
       
+      setPadding(0, 0, checkIcon->width() + 24);
+
       QTimer::singleShot(0, this, [this]() {
          int x = width() - (checkIcon->width() + 12);
          int y = (height() - checkIcon->height()) / 2;
@@ -267,7 +268,7 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    _button->setFixedSize(QSize(160, 12));
    _button->setHyperLink(true);
    _button->setText("Terms & Conditions");
-   _button->setFontProperties("Segoe UI", 10, false, false);
+   _button->setFontProperties("Segoe UI", 10);
    _button->setHyperLinkColors("#008EDE", "#15F2FF");
    _button->move(_checkbox->width() + 4, 4); 
 

@@ -44,14 +44,14 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   // Sign out Button
   sign_out_btn = new Button("Sign out");
   sign_out_btn->setCursor(Qt::PointingHandCursor);
-  sign_out_btn->adjustFontXY(0, -1);
+  sign_out_btn->setFontXY(0, -1);
   sign_out_btn->setGradientColor(true, "#fd612d", "#f12b2b");
   sign_out_btn->setHoverGradientColor("#ff3939");
   sign_out_btn->setFontProperties("Segoe UI", 10);
   sign_out_btn->setIconSize(QSize(16,16));
   sign_out_btn->setDisplayMode(Button::IconText);
   sign_out_btn->setFixedSize(QSize(100, 26));
-  sign_out_btn->setIconPaths(signOutIcon, signOutIcon);
+  sign_out_btn->setPrimaryButtonIcon(signOutIcon);
   setInteractiveTitleBarWidget(sign_out_btn);
 
   // ToolTip of sign out button
@@ -63,7 +63,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   titlebar_layout->setSpacing(0);
   titlebar_layout->setContentsMargins(0, 0, 0, 0);
 
-  titlebar_layout->addSpacing(12);
+  titlebar_layout->addSpacing(13);
   titlebar_layout->addWidget(app_icon, 0, Qt::AlignLeft);
   titlebar_layout->addSpacing(10);
   titlebar_layout->addWidget(app_name, 0, Qt::AlignLeft);

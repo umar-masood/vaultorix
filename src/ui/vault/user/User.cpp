@@ -54,7 +54,7 @@ void User::paintEvent(QPaintEvent *event) {
     // Background
     QColor bg_color;
     if (isPressed)
-        bg_color = isDarkMode ? "#2c2c2c" : "#FFFFFF";
+        bg_color = isDarkMode ? "#242424" : "#FFFFFF";
     else if (isHover)
         bg_color = isDarkMode ? "#323232" : "#F0F0F0";
     else if (!isEnabled())

@@ -91,7 +91,7 @@ Button* Toolbar::createButton(const QString &text) {
     btn->setIconSize(QSize(24,24));
     btn->setSecondary(true);
     btn->setFontProperties("Segoe UI", 10);
-    btn->setBorderHidden(true);
+    btn->setBorderTransparent(true);
     btn->setIconPaths(icons[text], icons[text]);
     btn->setNormalBackgroundTransparent(true);
     return btn;
@@ -101,7 +101,7 @@ void Toolbar::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
 
-    painter.setBrush(QBrush(isDarkMode ? "#252424" : "#F9F9F9"));
+    painter.setBrush(QBrush(isDarkMode ? "#262626" : "#F9F9F9"));
     painter.setPen(Qt::NoPen);
     painter.drawRoundedRect(rect(), 6, 6);
 }
