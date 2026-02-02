@@ -1,9 +1,9 @@
 #pragma once
+#include "../../components/Label.h"
+#include "../../components/Seperator.h"
 
 #include <QWidget>
 #include <QHBoxLayout>
-#include "../../components/Label.h"
-#include "../../components/Seperator.h"
 #include <QPaintEvent>
 #include <QPainter>
 

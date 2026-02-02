@@ -60,6 +60,7 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     layout->addStretch();
     layout->addWidget(user_widget, 0, Qt::AlignVCenter | Qt::AlignRight);
 
+    // Initial Theme
     setDarkMode(isDarkMode);
 }
 
@@ -67,15 +68,15 @@ void Toolbar::setDarkMode(bool enable) {
     isDarkMode = enable;
 
     // User Profile Widget Theme
-    user_widget->setDarkMode(enable);
+    user_widget->setDarkMode(isDarkMode);
     
     // Actions Buttons Theme
     for (auto action : actions) 
-        action->setDarkMode(enable);
+        action->setDarkMode(isDarkMode);
 
     // Actions Tooltips Theme
     for (auto tip : {import_btn_tip ,encrypt_btn_tip ,decrypt_btn_tip ,open_btn_tip ,delete_btn_tip ,restore_btn_tip})
-        tip->setDarkMode(enable);
+        tip->setDarkMode(isDarkMode);
 }
 
 Button* Toolbar::decryptButton() const { return decrypt_btn; }
@@ -83,9 +84,10 @@ Button* Toolbar::encryptButton() const { return encrypt_btn; }
 Button* Toolbar::deleteButton() const { return delete_btn; }
 Button* Toolbar::openButton() const { return open_btn; }
 Button* Toolbar::importButton() const { return import_btn; }
+Button *Toolbar::restoreButton() const { return restore_btn; }
 
 Button* Toolbar::createButton(const QString &text) {
-    Button *btn = new Button(text);
+    auto *btn = new Button(text);
     btn->setFixedSize(QSize(70, 58));
     btn->setDisplayMode(Button::TextUnderIcon);
     btn->setIconSize(QSize(24,24));
@@ -101,8 +103,9 @@ void Toolbar::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
 
+    // Background
     painter.setBrush(QBrush(isDarkMode ? "#262626" : "#F9F9F9"));
     painter.setPen(Qt::NoPen);
-    painter.drawRoundedRect(rect(), 6, 6);
+    painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../components/Label.h"
+
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QPaintEvent>

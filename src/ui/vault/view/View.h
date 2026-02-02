@@ -2,10 +2,9 @@
 
 #include "../emptyStateWidget/EmptyStateWidget.h"
 #include "../../components/TextField.h"
-#include "../../components/ComboBox.h"
-#include "../../components/Button.h"
-#include "../../components/Popup.h"
-#include "./ViewModeToggle.h"
+#include "../../components/ButtonMenu.h"
+#include "../../components/ViewModeToggle.h"
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QWidget>
@@ -21,7 +20,7 @@ class View : public QWidget {
 
     protected:
     void paintEvent(QPaintEvent *event) override;
-    
+
     private:
     // Flags
     bool isDarkMode = false;
@@ -32,12 +31,22 @@ class View : public QWidget {
     // Action Toolbar Layout
     QHBoxLayout *actionToolbarLayout = nullptr;
 
+    // Seperator Color
+    QColor separatorColor;
+    int separatorHeight = 2;
+
     // View Mode Toggle
     ViewModeToggle *view_mode = nullptr;
+
+    // Filter Button Menu
+    ButtonMenu *filterButtonMenu = nullptr;
+    // Icons
+    const QString filterIcon   = ":/icons/vaultWindow/filter.svg";
+    const QString dropdownIcon = ":/icons/components/arrow-down.svg";
 
     // Search Box
     TextField *search_box = nullptr;
     
     // Main Layout
-    QVBoxLayout *layout = nullptr;
+    QVBoxLayout *_layout = nullptr;
 };

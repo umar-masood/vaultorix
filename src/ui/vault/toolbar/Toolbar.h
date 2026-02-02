@@ -1,12 +1,13 @@
 #pragma once
 
-#include <QWidget>
 #include "../../components/Button.h"
 #include "../../components/ToolTip.h"
 #include "../user/User.h"
+
 #include <QHBoxLayout>
 #include <QList>
 #include <QMap>
+#include <QWidget>
 
 /* ---------------------  Toolbar ---------------------- */
 class Toolbar : public QWidget {
@@ -68,12 +69,12 @@ class Toolbar : public QWidget {
 
     // Icons
     QMap<QString, QString> icons = {
-        {"Decrypt", ":/icons/vaultWindow/decrypt.svg" },
-        {"Encrypt", ":/icons/vaultWindow/encrypt.svg" },
-        {"Delete" , ":/icons/vaultWindow/delete.svg" },
-        {"Import" , ":/icons/vaultWindow/import.svg" },
-        {"Open" , ":/icons/vaultWindow/open.svg" },
-        {"Restore" , ":/icons/vaultWindow/restore.svg"},
+        {"Decrypt",   ":/icons/vaultWindow/decrypt.svg" },
+        {"Encrypt",   ":/icons/vaultWindow/encrypt.svg" },
+        {"Delete" ,   ":/icons/vaultWindow/delete.svg" },
+        {"Import" ,   ":/icons/vaultWindow/import.svg" },
+        {"Open" ,     ":/icons/vaultWindow/open.svg" },
+        {"Restore",  ":/icons/vaultWindow/restore.svg"},
     };
 
     // List of Actions
@@ -81,5 +82,4 @@ class Toolbar : public QWidget {
 
     protected:
     void paintEvent(QPaintEvent *event) override;
-
 };

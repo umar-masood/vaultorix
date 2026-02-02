@@ -48,9 +48,9 @@ public:
   void setNormalBackgroundTransparent(bool value);
   void setCheckedButtonIcon(const QString &iconPath);
   void setPrimaryButtonIcon(const QString &iconPath);
+  /** @warning Button Display Mode should be IconOnly or IconText*/
+  void setRightSideIcon(const QString &iconLight, const QString &iconDark);
   void setFontXY(int x, int y);
-
-  QSize iconSize() const;
 
   protected:
   void paintEvent(QPaintEvent *event) override;
@@ -74,6 +74,7 @@ private:
   bool isLoaderBtn = false;
   bool isBorderTransparent = false;
   bool isNormalBackgroundTransparent = false;
+  bool hasRightSideIcon = false;
   
   // Font Adjustment
   int x = 0, y = 0;
@@ -98,10 +99,7 @@ private:
   QFont getFont() const;
 
   // Icons
-  QPixmap _lightIcon;
-  QPixmap _darkIcon;
-  QPixmap primaryButtonIcon;
-  QPixmap checkedButtonIcon;
+  QPixmap _lightIcon, _darkIcon, primaryButtonIcon, checkedButtonIcon, _rightSideLightIcon, _rightSideDarkIcon;
 
   // Icons Size
   QSize _iconSize = QSize(20, 20);

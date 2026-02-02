@@ -124,6 +124,25 @@ void Button::setPrimaryButtonIcon(const QString &iconPath) {
   }
 }
 
+void Button::setRightSideIcon(const QString &iconLight, const QString &iconDark) {
+  if (displayMode == Button::IconOnly || displayMode == Button::IconText) {
+    hasRightSideIcon = true;
+
+    if (!iconLight.isEmpty()) {
+      _rightSideLightIcon.load(iconLight);
+      _rightSideLightIcon = _rightSideLightIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+
+    if (!iconDark.isEmpty()) {
+      _rightSideDarkIcon.load(iconDark);
+      _rightSideDarkIcon = _rightSideDarkIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+  } else {
+    qWarning() << "Error: setRightSideIcon() -> Button display mode is not correct.";
+    return;
+  }
+}
+
 void Button::setHoverGradientColor(const QString &hex) { hoverColor = QColor(hex); }
 void Button::setStartColor(const QColor &c) { color1 = c.name(); update(); }
 void Button::setEndColor(const QColor &c) { color2 = c.name(); update(); }
@@ -132,7 +151,6 @@ void Button::setLoaderButton(bool value) { isLoaderBtn = value; }
 void Button::setBorderTransparent(bool value) { isBorderTransparent = value; }
 void Button::setNormalBackgroundTransparent(bool value) { isNormalBackgroundTransparent = value; }
 void Button::setFontXY(int x, int y) { this->x = x; this->y = y; update(); }
-QSize Button::iconSize() const { return _iconSize; }
 
 void Button::setText(const QString &text) {
   if (isLoaderBtn && spinner) {
@@ -153,7 +171,6 @@ bool Button::isNormalState() const { return !isHover && !isPressed; }
 bool Button::isPressedState() const { return isPressed; }
 bool Button::isIconOnly() const { return displayMode == IconOnly; }
 
-Q
 QColor Button::getStartColor() const { return QColor(color1); }
 QColor Button::getEndColor() const { return QColor(color2); }
 
@@ -282,7 +299,7 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
     int iconY = (height() - iconH) / 2;
     int textX = x != 0 ? x : iconX + iconW + spacing;
     int textY = y != 0 ? y : 0;
-    int buttonWidth = iconX + iconW + spacing + textW + 2 * spacing;
+    int buttonWidth = iconX + (hasRightSideIcon ? (2 * iconW + 2 * spacing) : (iconW + spacing)) + textW + 2 * spacing;
   
     if (!customSize.isValid()) 
       QPushButton::setFixedSize(buttonWidth, 36);
@@ -294,6 +311,9 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
       painter.drawText(QRect(iconX, 0, unicodeIconSize + 4, height()), Qt::AlignCenter, unicodeIcon);
     else
       painter.drawPixmap(iconX, iconY, pixmap);
+
+    if (hasRightSideIcon) 
+      painter.drawPixmap((width() - 10 - iconW), iconY, (isDarkMode ? _rightSideDarkIcon : _rightSideLightIcon)); 
 
     break;
   }

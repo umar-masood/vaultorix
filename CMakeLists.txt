@@ -24,8 +24,6 @@ add_executable(Vaultorix
     src/ui/vault/emptyStateWidget/EmptyStateWidget.cpp
     ## View 
     src/ui/vault/view/View.cpp
-    ### View Mode Toggle
-    src/ui/vault/view/ViewModeToggle.cpp
     ## Statusbar
     src/ui/vault/statusbar/Statusbar.cpp
 
@@ -73,6 +71,8 @@ add_executable(Vaultorix
     src/ui/components/Label.cpp
     src/ui/components/Text.cpp
     src/ui/components/Popup.cpp
+    src/ui/components/ButtonMenu.cpp
+    src/ui/components/ViewModeToggle.cpp
 
     # Core
     # Validators

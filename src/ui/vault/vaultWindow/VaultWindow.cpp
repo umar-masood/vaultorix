@@ -10,11 +10,10 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   // App Icon
   app_icon = new Label(true);
   app_icon->setFixedSize(QSize(26, 24));
-  app_icon->setPixmap(QPixmap(appIcon).scaled(26, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-  app_icon->setScaledContents(true);
+  app_icon->setPixmap(QPixmap(appIcon).scaled(24, 22, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
   // App Name
-  app_name = new Label(false, "Inter", 12, QFont::Normal, false, "Vaultorix");
+  app_name = new Label(false, "Segoe UI", 11, QFont::Normal, false, "Vaultorix");
    
   // Seperator
   seperator = new Seperator(nullptr, 18, 1, Qt::Vertical);
@@ -45,8 +44,8 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   sign_out_btn = new Button("Sign out");
   sign_out_btn->setCursor(Qt::PointingHandCursor);
   sign_out_btn->setFontXY(0, -1);
-  sign_out_btn->setGradientColor(true, "#fd612d", "#f12b2b");
-  sign_out_btn->setHoverGradientColor("#ff3939");
+  sign_out_btn->setGradientColor(true, "#FF59CD", "#FF3727");
+  sign_out_btn->setHoverGradientColor("#FF3727");
   sign_out_btn->setFontProperties("Segoe UI", 10);
   sign_out_btn->setIconSize(QSize(16,16));
   sign_out_btn->setDisplayMode(Button::IconText);

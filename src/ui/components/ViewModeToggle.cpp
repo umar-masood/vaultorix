@@ -9,10 +9,18 @@ ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
     list_view_btn->setIconPaths( ":/icons/vaultWindow/layout-list.svg", ":/icons/vaultWindow/layout-list.svg");
     list_view_btn->setCheckedButtonIcon( ":/icons/vaultWindow/layout-list-checked.svg");
 
+    // ToolTip
+    list_view_tip = new ToolTip(list_view_btn);
+    list_view_tip->setText("List View");
+
     // Grid View Button
     grid_view_btn = createButton();
     grid_view_btn->setIconPaths( ":/icons/vaultWindow/layout-grid.svg", ":/icons/vaultWindow/layout-grid.svg");
     grid_view_btn->setCheckedButtonIcon( ":/icons/vaultWindow/layout-grid-checked.svg");
+
+    // ToolTip
+    grid_view_tip = new ToolTip(grid_view_btn);
+    grid_view_tip->setText("Grid View");
 
     // Button Group
     group = new QButtonGroup(this);
@@ -54,8 +62,13 @@ Button* ViewModeToggle::createButton() {
 
 void ViewModeToggle::setDarkMode(bool enable) {
     isDarkMode = enable;
-    list_view_btn->setDarkMode(enable);
-    grid_view_btn->setDarkMode(enable);
+
+    list_view_btn->setDarkMode(isDarkMode);
+    list_view_tip->setDarkMode(isDarkMode);
+
+    grid_view_btn->setDarkMode(isDarkMode);
+    grid_view_tip->setDarkMode(isDarkMode);
+
     update();
 }
 
@@ -66,12 +79,12 @@ void ViewModeToggle::paintEvent(QPaintEvent *event) {
     painter.setRenderHints(QPainter::Antialiasing);
 
     QPen pen;
-    pen.setWidthF(0.5);
+    pen.setWidthF(0.3);
     pen.setColor(isDarkMode ? QColor("#4D4D4D") : QColor("#CCCCCC"));
     pen.setStyle(Qt::SolidLine);
     pen.setJoinStyle(Qt::RoundJoin);
     painter.setPen(pen);
 
     painter.setBrush(isDarkMode ? QColor("#2D2D2D") : QColor("#FBFBFB"));
-    painter.drawRoundedRect(rect(), 6, 6);
+    painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
 }

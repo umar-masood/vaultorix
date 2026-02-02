@@ -39,7 +39,15 @@ class Menu : public QListView {
       const QString shortcut = QString(); 
       const QString lightIcon = QString();
       const QString darkIcon = QString();
-   };
+
+      MenuAction(const QString &actionText, const QString &actionShortcut) 
+         : text(actionText), shortcut(actionShortcut) {}
+      
+      MenuAction(const QString &actionText) : text(actionText){}
+
+      MenuAction(const QString &actionText, bool hasSubmenu, const QString &shortcutText, const QString &iconLight, const QString &iconDark) : text(actionText), hasSubMenu(hasSubmenu), shortcut(shortcutText), lightIcon(iconLight), darkIcon(iconDark) {}
+      
+   }; 
 
    explicit Menu(QWidget *parent = nullptr);
 

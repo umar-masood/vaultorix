@@ -22,6 +22,7 @@ EmptyStateWidget::EmptyStateWidget(QWidget *parent) : QWidget(parent) {
   layout->addSpacing(4);
   layout->addWidget(text, 0, Qt::AlignCenter);
 
+  // Initial theme
   setDarkMode(isDarkMode);
 }
 
@@ -45,10 +46,11 @@ void EmptyStateWidget::paintEvent(QPaintEvent *event) {
     bg_color = isDarkMode ? "#323232" : "#F0F0F0";
   else
     bg_color = Qt::transparent;
+
   painter.setBrush(QBrush(bg_color));
 
   // Drawing Rectangle
-  painter.drawRoundedRect(rect(), 12, 12);
+  painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 12, 12);
 }
 
 void EmptyStateWidget::setDarkMode(bool enable) {
@@ -83,6 +85,7 @@ void EmptyStateWidget::mouseReleaseEvent(QMouseEvent *event) {
 void EmptyStateWidget::enterEvent(QEnterEvent *event) {
   isHover = true;
   setCursor(Qt::PointingHandCursor);
+
   QWidget::enterEvent(event);
   update();
 }
@@ -90,6 +93,7 @@ void EmptyStateWidget::enterEvent(QEnterEvent *event) {
 void EmptyStateWidget::leaveEvent(QEvent *event) {
   isHover = false;
   setCursor(Qt::ArrowCursor);
+  
   QWidget::leaveEvent(event);
   update();
 }

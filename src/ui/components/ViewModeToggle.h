@@ -4,7 +4,9 @@
 #include <QButtonGroup>
 #include <QHBoxLayout>
 #include <QPainter>
-#include "../../components/Button.h"
+
+#include "ToolTip.h"
+#include "Button.h"
 
 class ViewModeToggle : public QWidget {
     Q_OBJECT
@@ -31,7 +33,12 @@ class ViewModeToggle : public QWidget {
 
     // Buttons
     Button *list_view_btn = nullptr;
+    // ToolTip
+    ToolTip *list_view_tip = nullptr;
+
     Button *grid_view_btn = nullptr;
+    // ToolTip
+    ToolTip *grid_view_tip = nullptr;
 
     // Layout
     QHBoxLayout *layout = nullptr;

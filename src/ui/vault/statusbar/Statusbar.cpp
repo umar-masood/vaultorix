@@ -29,6 +29,7 @@ Statusbar::Statusbar(QWidget *parent) : QWidget(parent) {
     layout->addWidget(total_size, 0, Qt::AlignVCenter);
     layout->addStretch();
 
+    // Initial Theme
     setDarkMode(isDarkMode);
 }
 
@@ -37,7 +38,7 @@ void Statusbar::setDarkMode(bool enable) {
     
     // Labels
     for (auto label : {total_items, selected_items, total_size})
-        label->setStyleSheet(QString("color: %1;").arg(enable ? "white" : "black"));
+        label->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
 
     update();
 }
@@ -54,8 +55,9 @@ void Statusbar::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
 
+    // Background
     painter.setBrush(QBrush(isDarkMode ? "#262626" : "#F9F9F9"));
     painter.setPen(Qt::NoPen);
-    painter.drawRoundedRect(rect(), 6, 6);
+    painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
 }
 

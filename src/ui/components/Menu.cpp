@@ -8,23 +8,20 @@ MenuItem::MenuItem(const QIcon &icon, const QString &text, const QString &shortc
 Menu::Menu(QWidget *parent) : QListView(parent), _maxVisibleItems(8) {
     setItemSize(QSize(150, 36));
     setMouseTracking(true);
+    init();
 }
 
 void Menu::init() {
     // Popup
     popup = new RoundedBox();
     popup->hide();
-    popup->setDarkMode(isDarkMode);
 
     // Delegate
     delegate = new Delegate(itemSize());
     delegate->setAsMenu(true);
-    delegate->setIconic(isIconic);
-    delegate->setDarkMode(isDarkMode);
 
     // Vertical Scroll Bar
     vScroll = new ScrollBar(Qt::Vertical);
-    vScroll->setDarkMode(isDarkMode);
 
     // List Properties
     setModel(&model);
@@ -56,8 +53,6 @@ void Menu::init() {
     animation = new QPropertyAnimation(smooth_opacity, "opacity");
     animation->setEasingCurve(QEasingCurve::InOutQuad);
     animation->setDuration(300);
-
-    fadeIn();
 
     // Installing Event Filter
     qApp->installEventFilter(this);
@@ -105,7 +100,8 @@ bool Menu::eventFilter(QObject *o, QEvent *event) {
 }
 
 void Menu::addAction(const MenuAction &menuAction) {
-    MenuItem *item = new MenuItem(QIcon(isDarkMode ? menuAction.darkIcon : menuAction.lightIcon), menuAction.text, menuAction.shortcut, menuAction.hasSubMenu);
+    MenuItem *item = new MenuItem(QIcon(isDarkMode ? menuAction.darkIcon : menuAction.lightIcon), 
+                                 menuAction.text, menuAction.shortcut, menuAction.hasSubMenu);
 
     if (!menuAction.shortcut.isEmpty() && menuAction.hasSubMenu) {
         qCritical() << "Using both shortcut and submenu is not allowed.";
@@ -205,8 +201,8 @@ QPoint Menu::adjustXY(const QSize &s, const QPoint &p, const QRect &screenGeo, b
 
 void Menu::hide() { fadeOut(); }
 void Menu::show() {
-    init();
     updateMenu();
+    fadeIn();
 }
 
 void Menu::showAt(QWidget *anchorWidget) {
@@ -259,8 +255,18 @@ int Menu::clickedItemIndex() const { return _clickedItemIndex; }
 void Menu::setItemSize(QSize size) { _itemSize = size.expandedTo(QSize(150, 30)); }
 QSize Menu::itemSize() { return _itemSize; }
 
-void Menu::setIconic(bool value) { isIconic = value; }
-void Menu::setDarkMode(bool value) { isDarkMode = value; }
+void Menu::setIconic(bool value) { 
+    isIconic = value; 
+    delegate->setIconic(isIconic);
+}
+
+void Menu::setDarkMode(bool value) { 
+    isDarkMode = value; 
+    popup->setDarkMode(isDarkMode);
+    delegate->setDarkMode(isDarkMode);
+    vScroll->setDarkMode(isDarkMode);
+}
+
 void Menu::setParentMenu(Menu *parentMenu) { this->parentMenu = parentMenu; }
 
 void Menu::setMaxVisibleItems(int items) { _maxVisibleItems = items; }

@@ -54,12 +54,13 @@ void RoundedBox::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
     painter.setBrush(BG);
+
     QPen pen(BR);
     pen.setWidthF(0.2);
     painter.setPen(pen);
 
     QPainterPath path;
-    path.addRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
+    path.addRoundedRect(rect().adjusted(2, 2, -2, -2), 6, 6);
     painter.drawPath(path);
 
     // Text
