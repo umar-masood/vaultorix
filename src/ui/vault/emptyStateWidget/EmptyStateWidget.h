@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../components/Label.h"
+#include "../../../resources/IllustrationManager.h" 
 
 #include <QVBoxLayout>
 #include <QWidget>
@@ -33,8 +34,6 @@ class EmptyStateWidget : public QWidget {
     bool isHover = false;
 
     // Illustration
-    const QString illustrationPathLight = ":/icons/vaultWindow/folder-illustration-light.svg";
-    const QString illustrationPathDark = ":/icons/vaultWindow/folder-illustration-dark.svg";
     Label *illustration = nullptr;
 
     // Text

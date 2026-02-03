@@ -2,6 +2,7 @@
 
 #include "../../components/Button.h"
 #include "../../components/ToolTip.h"
+#include "../../../resources/IconManager.h"
 #include "../user/User.h"
 
 #include <QHBoxLayout>
@@ -65,17 +66,15 @@ class Toolbar : public QWidget {
     User *user_widget = nullptr;
     
     // Helpers
-    Button* createButton(const QString &text);
+    Button* createButton(const QString &text, const QString &iconPath);
 
     // Icons
-    QMap<QString, QString> icons = {
-        {"Decrypt",   ":/icons/vaultWindow/decrypt.svg" },
-        {"Encrypt",   ":/icons/vaultWindow/encrypt.svg" },
-        {"Delete" ,   ":/icons/vaultWindow/delete.svg" },
-        {"Import" ,   ":/icons/vaultWindow/import.svg" },
-        {"Open" ,     ":/icons/vaultWindow/open.svg" },
-        {"Restore",  ":/icons/vaultWindow/restore.svg"},
-    };
+    const QString DecryptIcon   = IconManager::icon(Icons::Decrypt);
+    const QString EncryptIcon   = IconManager::icon(Icons::Encrypt);
+    const QString DeleteIcon    = IconManager::icon(Icons::FileDelete);
+    const QString ImportIcon    = IconManager::icon(Icons::Import);
+    const QString OpenIcon      = IconManager::icon(Icons::Open);
+    const QString RestoreIcon   = IconManager::icon(Icons::Restore);
 
     // List of Actions
     QList<Button *> actions;

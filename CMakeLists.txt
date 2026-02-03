@@ -45,9 +45,6 @@ add_executable(Vaultorix
     # Error Dialogs
     src/ui/dialogs/errorDialog/ErrorDialog.cpp
 
-    # Dialogs Utils
-    src/ui/dialogs/dialogUtils/DialogsUtils.cpp
-
     # Pwd Validator
     src/ui/account/pwdRulesWidget/pwdRulesWidget.cpp
     
@@ -97,6 +94,10 @@ add_executable(Vaultorix
     src/main.cpp
 
     # Resources
+    src/resources/Icons.h
+    src/resources/IconManager.cpp
+    src/resources/Illustrations.h
+    src/resources/IllustrationManager.cpp
     src/resources/resources.qrc
 )
 

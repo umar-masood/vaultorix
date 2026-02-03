@@ -57,7 +57,7 @@ void EmptyStateWidget::setDarkMode(bool enable) {
   isDarkMode = enable;
   
   // Illustration Change
-  illustration->setPixmap(QPixmap(enable ? illustrationPathDark : illustrationPathLight)
+  illustration->setPixmap(QPixmap(enable ? IllustrationManager::illustration(Illustrations::FolderDark) :  IllustrationManager::illustration(Illustrations::FolderLight))
                         .scaled(140, 140, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
   // Text theme

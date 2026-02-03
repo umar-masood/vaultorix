@@ -212,10 +212,10 @@ void GetEmail::onEmailChanged(const QString &text) {
 
 void GetEmail::onEmailAvailable(bool isAvailable) {
     if (isAvailable) {
-        ac->emailField()->setChecked();
+        ac->emailField()->setValid();
         ac->emailField()->setTooltip("Email-address is available");
     } else {
-        ac->emailField()->setUnchecked();
+        ac->emailField()->setInvalid();
         ac->emailField()->setTooltip("Email-address already exists");
     }
     
@@ -229,11 +229,11 @@ void GetEmail::onUnableToCheckEmailAvailability() {
         retryAttempts++;
         emailValidator->isEmailAvailable(text); // It will call recursively isEmailAvailable() to check weather that entered email is available
     } else {
-        /* if the retryAttempts limit reached, setUnchecked(), 
+        /* if the retryAttempts limit reached, setInvalid(), 
         set update tooltip text and update retryAttempts to 0 , so that 
         next time, when user entered text is changed then it will again check email availability in case of failure in handling
         network request by calling isEmailAvailable() recursively.*/
-        ac->emailField()->setUnchecked();
+        ac->emailField()->setInvalid();
         ac->emailField()->setTooltip("Failed to check email availability.");
 
         retryAttempts = 0; // Resetting conter
@@ -250,7 +250,7 @@ void GetEmail::onTimeout() {
     
     // In case if there's no text in the TextField
     if (text.isEmpty()) {
-        ac->emailField()->setUnchecked(); 
+        ac->emailField()->setInvalid(); 
         ac->emailField()->setTooltip(""); // No tooltip will show when it is set to empty string
         return;
     }
@@ -269,7 +269,7 @@ void GetEmail::onTimeout() {
         emailValidator->isEmailAvailable(text); // Check weather this email exists in DB
     } else {
         // if it is False (Invalid Email), thus we don`t need to check its availability anymore.
-        ac->emailField()->setUnchecked();
+        ac->emailField()->setInvalid();
         ac->emailField()->setTooltip(
             "Invalid email address.\n\n"
             "Please ensure that:\n"

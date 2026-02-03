@@ -4,7 +4,9 @@ CheckBox::CheckBox(const QString &text, QWidget *parent) : QWidget(parent), text
 {
    setAttribute(Qt::WA_TranslucentBackground);
    setAttribute(Qt::WA_Hover);
-   pixmap = QPixmap(":/icons/components/checkbox.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+   pixmap = QPixmap(IconManager::icon(Icons::Check)).scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
    setFixedSize(20 + 12 + QFontMetrics(font()).horizontalAdvance(text), 22);
 }
 
@@ -59,9 +61,9 @@ void CheckBox::paintEvent(QPaintEvent *) {
    painter.drawRoundedRect(rec, 6, 6);
 
    if (!pixmap.isNull() && isChecked()) {
-   int xPos = rec.x() + (rec.width() - pixmap.width()) / 2;
-   int yPos = rec.y() + (rec.height() - pixmap.height()) / 2;
-   painter.drawPixmap(xPos, yPos, pixmap);
+      int xPos = rec.x() + (rec.width() - pixmap.width()) / 2;
+      int yPos = rec.y() + (rec.height() - pixmap.height()) / 2;
+      painter.drawPixmap(xPos, yPos, pixmap);
    }
 
    painter.setFont(font());
@@ -71,22 +73,19 @@ void CheckBox::paintEvent(QPaintEvent *) {
    painter.drawText(textRec, text);
 }
 
-void CheckBox::enterEvent(QEnterEvent *event)
-{
+void CheckBox::enterEvent(QEnterEvent *event) {
    isHover = true;
    QWidget::enterEvent(event);
    update();
 }
 
-void CheckBox::leaveEvent(QEvent *event)
-{
+void CheckBox::leaveEvent(QEvent *event) {
    isHover = false;
    QWidget::leaveEvent(event);
    update();
 }
 
-void CheckBox::mousePressEvent(QMouseEvent *event)
-{
+void CheckBox::mousePressEvent(QMouseEvent *event) {
    setChecked(!_isChecked);
    QWidget::mousePressEvent(event);
 }

@@ -3,6 +3,7 @@
 #include "Button.h"
 #include "Menu.h"
 #include "SmoothShadow.h"
+#include "../../resources/IconManager.h"
 
 #include <QResizeEvent>
 #include <QFocusEvent>
@@ -80,27 +81,24 @@ class TextField : public QLineEdit {
   // Text Colors
   QString _selected_text_color, _selected_text_background_color, _text_color, _placeholder_text_color;
 
-  // Context Menu Icons
-  const QHash<QString , QString> icons = {
-    { "Copy",       ":/icons/components/copy.svg" },
-    { "Cut",        ":/icons/components/cut.svg" },
-    { "Paste",      ":/icons/components/paste.svg" },
-    { "Delete",     ":/icons/components/delete.svg" },
-    { "Select All", ":/icons/components/select-all.svg" },
-    { "Undo",       ":/icons/components/undo.svg" },
-    { "Redo",       ":/icons/components/redo.svg" }
-  };
+  // Icons
+  const QString CopyIcon      =  IconManager::icon(Icons::Copy);
+  const QString CutIcon       =  IconManager::icon(Icons::Cut);
+  const QString PasteIcon     =  IconManager::icon(Icons::Paste);
+  const QString DeleteIcon    =  IconManager::icon(Icons::MenuDelete);
+  const QString SelectAllIcon =  IconManager::icon(Icons::SelectAll);
+  const QString UndoIcon      =  IconManager::icon(Icons::Undo);
+  const QString RedoIcon      =  IconManager::icon(Icons::Redo);
+  const QString ShowIcon      =  IconManager::icon(Icons::Show);     
+  const QString HideIcon      =  IconManager::icon(Icons::Hide);   
+  const QString ClearIcon     =  IconManager::icon(Icons::Clear);   
 
   // Graphics
   SmoothShadow *effect = nullptr;
   QPropertyAnimation *animate = nullptr;
 
-  // Icons
-  QString light_icon;
-  QString dark_icon;
-  const QString eyeIcon = ":/icons/components/eye.svg";
-  const QString eyeClosedIcon = ":/icons/components/eye-closed.svg";
-  const QString clearIcon = ":/icons/components/x.svg";
+  // TextField Icons
+  QString light_icon, dark_icon;
   QSize textFieldIconSize = QSize(20, 20);
 
   // Buttons

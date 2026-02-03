@@ -188,10 +188,10 @@ void GetUsername::onUsernameChanged(const QString &text) {
 
 void GetUsername::onUsernameAvailable(bool isAvailable) {
     if (isAvailable) {
-        ac->usernameField()->setChecked();
+        ac->usernameField()->setValid();
         ac->usernameField()->setTooltip("Username is available.");
     } else {
-        ac->usernameField()->setUnchecked();
+        ac->usernameField()->setInvalid();
         ac->usernameField()->setTooltip("Username is already taken.\nPlease use another.");
     }
     emit usernameValidated(isAvailable);
@@ -202,7 +202,7 @@ void GetUsername::onUnableToCheckUsernameAvailability() {
         retryAttempts++;
         usernameValidator->isUsernameAvailable(text);
     } else {
-        ac->usernameField()->setUnchecked();
+        ac->usernameField()->setInvalid();
         ac->usernameField()->setTooltip("Failed to check username availability.");
         retryAttempts = 0;
 
@@ -217,7 +217,7 @@ void GetUsername::onTimeout() {
     text = ac->usernameField()->text().toUtf8();
 
     if (text.isEmpty()) {
-        ac->usernameField()->setUnchecked();
+        ac->usernameField()->setInvalid();
         ac->usernameField()->setTooltip("");
         return;
     }
@@ -231,7 +231,7 @@ void GetUsername::onTimeout() {
         
         usernameValidator->isUsernameAvailable(text);
     } else {
-        ac->usernameField()->setUnchecked();
+        ac->usernameField()->setInvalid();
         ac->usernameField()->setTooltip(
         "Invalid username.\n\n"
         "Please ensure that:\n"

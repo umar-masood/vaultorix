@@ -4,6 +4,7 @@
 #include "../../components/Label.h"
 #include "../../components/Seperator.h"
 #include "../../components/ToolTip.h"
+#include "../../../resources/IconManager.h"
 
 #include "../statusbar/Statusbar.h"
 #include "../view/View.h"
@@ -27,7 +28,6 @@ class VaultWindow : public Window {
 
     // App name & icon
     Label *app_icon = nullptr;
-    const QString appIcon = ":/icons/appBranding/app-icon.png";
     Label *app_name = nullptr;
 
     // Seperator for titlebar controls
@@ -38,10 +38,11 @@ class VaultWindow : public Window {
     // ToolTip
     ToolTip *theme_mode_btn_tip = nullptr;
 
-    // Icon Paths
-    const QString darkModeIcon = ":/icons/accountWindow/darkMode.svg";
-    const QString lightModeIcon = ":/icons/accountWindow/lightMode.svg";
-
+    // Icons   
+    const QString AppIcon       = IconManager::icon(Icons::AppIcon);
+    const QString DarkModeIcon  = IconManager::icon(Icons::DarkMode);
+    const QString LightModeIcon = IconManager::icon(Icons::LightMode);
+    
     // Flag
     bool isDarkMode = false;
  
@@ -49,9 +50,6 @@ class VaultWindow : public Window {
     Button *sign_out_btn = nullptr;
     // ToolTip
     ToolTip *sign_out_btn_tip = nullptr;
-
-    // Icon Path
-    const QString signOutIcon = ":/icons/vaultWindow/sign-out.svg";
 
     // Content Area
     // Main Layout

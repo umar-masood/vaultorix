@@ -39,5 +39,6 @@ void TermsConditions::setDarkMode(bool value) {
       return;
 
    isDarkMode = value;
+   
    scrollBar->setDarkMode(isDarkMode);
 }

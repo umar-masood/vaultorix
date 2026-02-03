@@ -80,13 +80,13 @@ ErrorDialogManager::ErrorDialogManager(AccountWindow *window, QObject *parent) :
 
     if (!accountWindow) return;
 
-    create("InvalidCredentials", wrongCredentialsText, "Retry", wrongCredentialsIcon);
-    create("MaxAttempts", maxAttemptsText, "OK", maxAttemptsIcon);
-    create("SomethingWentWrong", somethingWentWrongText, "Retry", somethingWentWrongIcon);
-    create("AccessDenied", accessDeniedText, "OK", accessDeniedIcon);
-    create("RequestTimeout", timeoutText, "Retry", timeoutIcon);
-    create("FurtherAttemptBlocked", futherAttemptBlockedText, "OK", futherAttemptBlockedIcon);
-    create("NoInternet", noInternetText, "Retry", noInternetIcon);
+    create("InvalidCredentials",       "The email or password you entered is incorrect. Please try again.",                         "Retry",    WrongCredentialsIllustration);
+    create("MaxAttempts",              "Maximum invalid attempts limit reached. Please try again after 24 hours.",                  "OK",       MaxLimitReachedIllustration);
+    create("SomethingWentWrong",       "Something went wrong. Please try again.",                                                   "Retry",    SomethingWentWrongIllustration);
+    create("AccessDenied",             "We have blocked access to your account from this device for security reasons.",             "OK",       AccessDeniedIllustration);
+    create("RequestTimeout",           "Request tmeout. Please check your internet connection and try again.",                      "Retry",    TimeoutIllustration);
+    create("FurtherAttemptBlocked",    "You cannot create multiple accounts on same device.",                                       "OK",       AccessDeniedIllustration);
+    create("NoInternet",               "You're offline. We couldn't connect to the internet. Check your connection and try again.", "Retry",    NoInternetIllustration);
 
     accountWindow->setSubWidgets(allWidgets());
 }

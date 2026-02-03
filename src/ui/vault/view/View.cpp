@@ -9,8 +9,8 @@ View::View(QWidget *parent) : QWidget(parent) {
     // Menu Button (for testing)
     filterButtonMenu = new ButtonMenu(this);
     filterButtonMenu->setDisplayMode(Button::IconText);
-    filterButtonMenu->setIconPaths(filterIcon, filterIcon);
-    filterButtonMenu->setRightSideIcon(dropdownIcon, dropdownIcon);
+    filterButtonMenu->setIconPaths(FilterIcon, FilterIcon);
+    filterButtonMenu->setRightSideIcon(ArrowDownIcon, ArrowDownIcon);
     filterButtonMenu->setFontProperties("Segoe UI", 10);
     filterButtonMenu->setText("Filter");
     filterButtonMenu->setFontXY(0, -1);
@@ -27,7 +27,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     search_box->setClearButton(true);
     search_box->setTextFieldIcon(true);
     search_box->setTextFieldIconSize(QSize(18, 18));
-    search_box->setIconPaths(":/icons/vaultWindow/search.svg", ":/icons/vaultWindow/search.svg");
+    search_box->setIconPaths(SearchIcon, SearchIcon);
 
     // View Mode Toggle 
     view_mode = new ViewModeToggle;

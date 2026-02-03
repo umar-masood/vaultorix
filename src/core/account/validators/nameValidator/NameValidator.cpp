@@ -50,7 +50,7 @@ void GetName::onTimeout() {
     QByteArray text = ac->nameField()->text().toUtf8();
 
     if (text.isEmpty()) {
-        ac->nameField()->setUnchecked();
+        ac->nameField()->setInvalid();
         ac->nameField()->setTooltip("");
         return;
     }
@@ -63,10 +63,10 @@ void GetName::onTimeout() {
     ValidatorUtils::cleanupMemory(text);
 
     if (ok) {
-        ac->nameField()->setChecked();
+        ac->nameField()->setValid();
         ac->nameField()->setTooltip("Valid full name");
     } else {
-        ac->nameField()->setUnchecked();
+        ac->nameField()->setInvalid();
         ac->nameField()->setTooltip("Invalid full name");
     }
 }

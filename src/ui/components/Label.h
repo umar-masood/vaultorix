@@ -41,7 +41,6 @@ class AnimatedLabel : public QLabel {
 
    void setAnimatedText(const QString &text);
 
-   protected:
    void show();
    void hide();
 

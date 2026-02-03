@@ -23,7 +23,7 @@ void Overlay::paintEvent(QPaintEvent *event) {
    painter.drawPath(path);
 }
 
-Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool closeBtn) : SubWindow(centralWidget->size(), parent, closeBtn, false), contentWidget(centralWidget) {
+Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool hasCloseButton) : SubWindow(centralWidget->size(), parent, hasCloseButton, false), contentWidget(centralWidget) {
    setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
    setWindowModality(Qt::WindowModal);
    setFocusPolicy(Qt::StrongFocus);

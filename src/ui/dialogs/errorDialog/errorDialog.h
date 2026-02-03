@@ -1,17 +1,15 @@
 #pragma once
 
 #include "../../components/Dialog.h"
-#include "../dialogUtils/DialogsUtils.h"
 #include "../../account/accountWindow/AccountWindow.h"
 #include "../../windows/subWindow/SubWindow.h"
 #include "../../components/Button.h"
 #include "../../components/Text.h"
+#include "../../../resources/IllustrationManager.h"
 
 #include <QObject>
 #include <QMap>
 #include <QList>
-
-using namespace DialogUtils;
 
 /*  ----- Error Widget for using inside dialog ------------ */
 class Error : public QWidget {
@@ -43,8 +41,7 @@ class Error : public QWidget {
     QVBoxLayout *layout = nullptr;
 
     // Icon Paths
-    QString lightIcon;
-    QString darkIcon;
+    QString lightIcon, darkIcon;
     QSize size;
 };
 
@@ -67,6 +64,15 @@ class ErrorDialogManager : public QObject {
         Error *widget = nullptr;
         Dialog *dialog = nullptr;
     };
+
+    // Icons
+    const QString NoInternetIllustration                = IllustrationManager::illustration(Illustrations::NoInternet);    
+    const QString WrongCredentialsIllustration          = IllustrationManager::illustration(Illustrations::WrongCredentials);
+    const QString UnknownDeviceIllustration             = IllustrationManager::illustration(Illustrations::UnknownDevice);
+    const QString SomethingWentWrongIllustration        = IllustrationManager::illustration(Illustrations::SomethingWentWrong);
+    const QString MaxLimitReachedIllustration           = IllustrationManager::illustration(Illustrations::MaxLimitReached);
+    const QString AccessDeniedIllustration              = IllustrationManager::illustration(Illustrations::AccessDenied); 
+    const QString TimeoutIllustration                   = IllustrationManager::illustration(Illustrations::Timeout); 
 
     // Stores the current accountWindow
     AccountWindow *accountWindow = nullptr;

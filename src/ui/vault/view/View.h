@@ -4,6 +4,7 @@
 #include "../../components/TextField.h"
 #include "../../components/ButtonMenu.h"
 #include "../../components/ViewModeToggle.h"
+#include "../../../resources/IconManager.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -40,9 +41,11 @@ class View : public QWidget {
 
     // Filter Button Menu
     ButtonMenu *filterButtonMenu = nullptr;
+
     // Icons
-    const QString filterIcon   = ":/icons/vaultWindow/filter.svg";
-    const QString dropdownIcon = ":/icons/components/arrow-down.svg";
+    const QString FilterIcon    = IconManager::icon(Icons::Filter);
+    const QString ArrowDownIcon = IconManager::icon(Icons::ArrowDown);
+    const QString SearchIcon    = IconManager::icon(Icons::Search);
 
     // Search Box
     TextField *search_box = nullptr;

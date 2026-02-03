@@ -4,6 +4,8 @@
 #include "../../components/TextField.h"
 #include "../../components/Label.h"
 #include "../accountOTP/AccountOTP.h"
+#include "../../../resources/IconManager.h"
+#include "../../../resources/IllustrationManager.h"
 
 /* ---------------- Account Sign in ------------------  */
 class AccountSignIn : public QWidget {
@@ -20,10 +22,10 @@ class AccountSignIn : public QWidget {
    private:
    // Theme Mode Flag
    bool isDarkMode = false;
-   
-   // Icon Paths
-   const QString userIcon = ":/icons/accountSignIn/user.svg";
-   const QString passwordIcon = ":/icons/accountSignIn/password.svg";
+
+   // Icons
+   QString UserIcon = IconManager::icon(Icons::UserAvator);
+   QString KeyIcon = IconManager::icon(Icons::Key);
 
    // Illustration
    Label *illustration = nullptr;

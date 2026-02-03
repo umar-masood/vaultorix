@@ -94,7 +94,7 @@ void ComboBox::setDropDownButton() {
     dropdown->setCursor(Qt::PointingHandCursor);
     dropdown->setIconSize(QSize(20, 20));
     dropdown->setFixedSize(QSize(28, 28));
-    dropdown->setIconPaths(arrowDown, arrowDown);
+    dropdown->setIconPaths(ArrowDown, ArrowDown);
     dropdown->raise();    
     positionDropDownButton();
 }

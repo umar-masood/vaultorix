@@ -8,7 +8,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
 {
    // Window Information
    setWindowTitle("Vaultorix");
-   setWindowIcon(QIcon(":/icons/appBranding/app-icon.png"));
+   setWindowIcon(QIcon(IconManager::icon(Icons::AppIcon)));
 
    // Main Layout
    mainLayout = new QHBoxLayout(contentArea());
@@ -25,7 +25,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    themeMode->setIconSize(QSize(16,16));
    themeMode->setDisplayMode(Button::IconOnly);
    themeMode->setFixedSize(QSize(26, 26));
-   themeMode->setIconPaths(darkModeIcon, darkModeIcon);
+   themeMode->setIconPaths(DarkModeIcon, DarkModeIcon);
    connect(themeMode, &Button::clicked, this, [this](){
       isDarkMode = !isDarkMode;
       emit themeModeChanged(isDarkMode);
@@ -67,11 +67,11 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    tagline->setFont(font);
 
    // Features Bullet Points
-   point1 = new BulletPoint("AES-256 encryption trusted worldwide", ":/icons/appBranding/lock.svg");
-   point2 = new BulletPoint("Quick file encryption & decryption", ":/icons/appBranding/folder.svg");
-   point3 = new BulletPoint("Two-factor authentication by default ", ":/icons/appBranding/2FA.svg");
-   point4 = new BulletPoint("Auto-Lock for maximum privacy", ":/icons/appBranding/timer.svg");
-   point5 = new BulletPoint("Backup & recovery on the way", ":/icons/appBranding/backup.svg");
+   point1 = new BulletPoint("AES-256 encryption trusted worldwide",   IconManager::icon(Icons::Lock));
+   point2 = new BulletPoint("Quick file encryption & decryption",     IconManager::icon(Icons::Folder));
+   point3 = new BulletPoint("Two-factor authentication by default ",  IconManager::icon(Icons::TwoFactorAuth));
+   point4 = new BulletPoint("Auto-Lock for maximum privacy",          IconManager::icon(Icons::Timer));
+   point5 = new BulletPoint("Backup & recovery on the way",           IconManager::icon(Icons::Backup));
    points = {point1, point2, point3, point4, point5};
 
    // left Side Layout
@@ -92,7 +92,8 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    illustration->setAttribute(Qt::WA_TranslucentBackground);
    illustration->setFixedSize(QSize(340, 320));
    illustration->setAlignment(Qt::AlignCenter);
-   illustration->setPixmap(QPixmap(":/icons/appBranding/illustration.png").scaled(QSize(340, 320), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   illustration->setPixmap(QPixmap(IllustrationManager::illustration(Illustrations::AppBranding))
+                           .scaled(QSize(340, 320), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
    entireLayoutLeft->addSpacing(16);
    entireLayoutLeft->addWidget(illustration, 0, Qt::AlignCenter);
@@ -169,7 +170,7 @@ void AccountWindow::onthemeModeChanged(bool enable) {
    // Theme Mode Button
    themeMode->setDarkMode(enable);
    themeButtonTip->setDarkMode(enable);
-   enable ? themeMode->setIconPaths(lightModeIcon, lightModeIcon) : themeMode->setIconPaths(darkModeIcon, darkModeIcon);
+   enable ? themeMode->setIconPaths(LightModeIcon, LightModeIcon) : themeMode->setIconPaths(DarkModeIcon, DarkModeIcon);
    
    // Right widget
    if (rightWidget)
@@ -195,7 +196,7 @@ Branding::Branding(QWidget *parent) : QWidget(parent) {
    setFixedSize(QSize(220, 60));
    setAttribute(Qt::WA_TranslucentBackground);
 
-   logo = QPixmap(":/icons/appBranding/app-icon.png").scaled(54, 50, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+   logo = QPixmap(IconManager::icon(Icons::AppIcon)).scaled(54, 50, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 }
 
 void Branding::paintEvent(QPaintEvent *) {

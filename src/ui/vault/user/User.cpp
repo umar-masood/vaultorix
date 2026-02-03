@@ -3,7 +3,7 @@
 User::User(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_Hover);
   setFixedSize(210, 58);
-  setAvator(QPixmap("C:/Users/umara/Downloads/App (1).png"), 36);
+  setAvator(QPixmap("C:/Users/umara/Downloads/Icons/avator.jpg"), 36);
 }
 
 void User::setDarkMode(bool enable) { isDarkMode = enable; update(); }

@@ -10,7 +10,8 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    // Main Icon
    illustration = new Label(true);
    illustration->setFixedSize(QSize(150, 150));
-   illustration->setPixmap(QPixmap(":/icons/accountSignIn/sign-in.png").scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   illustration->setPixmap(QPixmap(IllustrationManager::illustration(Illustrations::SignIn))
+                           .scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation));
    illustration->setScaledContents(true);
 
    // Heading
@@ -48,7 +49,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    forgotPwd->setHyperLink(true);
    forgotPwd->setFontProperties("Segoe UI", 10);
    forgotPwd->setHyperLinkColors("#008EDE", "#15F2FF");
-   connect(forgotPwd, &Button::clicked, this, [this]() { emit forgotPwdClicked(); });
+   connect(forgotPwd, &Button::clicked, this,  &AccountSignIn::forgotPwdClicked);
 
    // Sign In Button
    signInBtn = new Button("Sign in");
@@ -59,7 +60,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    signInBtn->setHoverGradientColor("#008EDE");
    signInBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    signInBtn->setLoaderButton(true);
-   connect(signInBtn, &Button::clicked, this, [this]() { emit signInClicked(); });
+   connect(signInBtn, &Button::clicked, this, &AccountSignIn::signInClicked);
 
    // Cancel Button
    cancelBtn = new Button("Cancel");
@@ -68,7 +69,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    cancelBtn->setSecondary(true);
    cancelBtn->setFixedSize(QSize(360, 36));
    cancelBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
-   connect(cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
+   connect(cancelBtn, &Button::clicked, this,  &AccountSignIn::cancelClicked);
 
    // Sign up page redirect widget
    _redirectToSignUpWidget = new TextWithBtn("Don't have an account?", QSize(136,22), "Create an account", QSize(110,12), false);
@@ -116,11 +117,11 @@ void AccountSignIn::setDarkMode(bool value) {
    cancelBtn->setDarkMode(isDarkMode);
 
    // Username TextField
-   username->setIconPaths(userIcon, userIcon);
+   username->setIconPaths(UserIcon, UserIcon);
    username->setDarkMode(isDarkMode);
    
    // Password TextField
-   password->setIconPaths(passwordIcon,passwordIcon);
+   password->setIconPaths(KeyIcon, KeyIcon);
    password->setDarkMode(isDarkMode);
    
    // Redirect to Sign Up page widget

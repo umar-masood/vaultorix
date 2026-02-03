@@ -7,6 +7,7 @@
 #include <QKeyEvent>
 #include <QShowEvent>
 
+#include "../../../resources/IllustrationManager.h"
 #include "../../components/Button.h"
 #include "../../components/Label.h"
 
@@ -40,15 +41,10 @@ class OTPWidget : public QWidget {
    QVector<QLabel *> OTPBoxes;
 
    // StyleSheets for different states
-   QString normalStyle;
-   QString focusedStyle;
-   QString disabledStyle;
+   QString normalStyle, focusedStyle, disabledStyle;
 
    // Different State Colors
-   QString bg_color_normal;
-   QString bg_color_focused;
-   QString text_color;
-   QString border_color;
+   QString bg_color_normal, bg_color_focused, text_color, border_color;
 
    // Helper Methods 
    void updateStyles();
@@ -60,9 +56,9 @@ class TextWithBtn : public QWidget {
    Q_OBJECT
 
    public:
-   explicit TextWithBtn(const QString &promptText = "",
+   explicit TextWithBtn(const QString &promptText = QString(),
                         const QSize &promptTextSize = QSize(), 
-                        const QString &hyperlinkText = "", 
+                        const QString &hyperlinkText =  QString(), 
                         const QSize &hyperlinkSize = QSize(), 
                         bool hasTimer = false,
                         QWidget *parent = nullptr);

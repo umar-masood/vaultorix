@@ -140,8 +140,8 @@ CheckWithBtn *AccountCreate::termsConditionsWidget() const { return _termsCondit
 PwdRulesWidget * AccountCreate::passwordValidatorWidget() const { return _passwordValidatorWidget; }
 
 /* --------------------  Helpers  -----------------  */
-CustomTextField *AccountCreate::createTextField(const QString &placeholderText, bool useCheck) {
-   auto *field = new CustomTextField(useCheck);
+CustomTextField *AccountCreate::createTextField(const QString &placeholderText, bool hasValidity) {
+   auto *field = new CustomTextField(hasValidity);
    field->setPlaceholderText(placeholderText);
    field->setFixedSize(QSize(360, 36));
    field->setDarkMode(isDarkMode);
@@ -193,27 +193,27 @@ void AccountCreate::addLabelsInsideFieldsWidgets() {
    ========================================================= */
 
 /* ------------------  CUSTOM TEXT FIELD ------------------- */
-CustomTextField::CustomTextField(bool useCheck, QWidget *parent) : TextField(parent) {
-   if (useCheck) {
+CustomTextField::CustomTextField(bool hasValidity, QWidget *parent) : TextField(parent) {
+   if (hasValidity) {
 
       // Check Icon
-      checkIcon = new QLabel(this);
-      checkIcon->setAttribute(Qt::WA_TranslucentBackground);
-      checkIcon->setFixedSize(QSize(20, 20));
+      validityIcon = new QLabel(this);
+      validityIcon->setAttribute(Qt::WA_TranslucentBackground);
+      validityIcon->setFixedSize(QSize(20, 20));
       
-      setPadding(0, 0, checkIcon->width() + 24);
+      setPadding(0, 0, validityIcon->width() + 24);
 
       QTimer::singleShot(0, this, [this]() {
-         int x = width() - (checkIcon->width() + 12);
-         int y = (height() - checkIcon->height()) / 2;
-         checkIcon->move(x, y); 
+         int x = width() - (validityIcon->width() + 12);
+         int y = (height() - validityIcon->height()) / 2;
+         validityIcon->move(x, y); 
       });
 
       // ToolTip showing over check icon inside textfield
       tooltip = new ToolTip;
 
-      // Initially set unchecked
-      setUnchecked();
+      // Initially set invalid
+      setInvalid();
    }
 }
 
@@ -229,7 +229,7 @@ void CustomTextField::setTooltip(const QString &tooltipText) {
    }
 
    if (tooltip) {
-      tooltip->setTargetWidget(checkIcon);
+      tooltip->setTargetWidget(validityIcon);
       tooltip->setText(tooltipText);
    }
 
@@ -237,12 +237,14 @@ void CustomTextField::setTooltip(const QString &tooltipText) {
 }
 
 
-void CustomTextField::setChecked() {
-   if (checkIcon) checkIcon->setPixmap(QPixmap(checked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+void CustomTextField::setValid() {
+   if (validityIcon) 
+      validityIcon->setPixmap(QPixmap(IconManager::icon(Icons::Valid)).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
-void CustomTextField::setUnchecked() {
-   if (checkIcon) checkIcon->setPixmap(QPixmap(unchecked).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+void CustomTextField::setInvalid() {
+   if (validityIcon) 
+      validityIcon->setPixmap(QPixmap(IconManager::icon(Icons::Invalid)).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 void CustomTextField::setDarkMode(bool value) {

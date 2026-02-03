@@ -8,6 +8,8 @@
 #include "../../components/Dialog.h"
 #include "../accountWindow/AccountWindow.h"
 #include "../accountOTP/AccountOTP.h"
+#include "../../../resources/IconManager.h"
+
 #include <QLabel>
 
 /* -------------- Customized TextField --------------- */
@@ -15,24 +17,20 @@ class CustomTextField : public TextField {
    Q_OBJECT
 
    public:
-   explicit CustomTextField(bool useCheck = false, QWidget *parent = nullptr);
-   void setChecked();
-   void setUnchecked();
+   explicit CustomTextField(bool hasValidity = false, QWidget *parent = nullptr);
+   void setValid();
+   void setInvalid();
    void setDarkMode(bool value) override;
    void setTooltip(const QString &tooltipText);
 
    private:
-   // Check Icon
-   QLabel *checkIcon = nullptr;
-   
-   // ToolTop showing on Check Icon
+   // Validity Icon
+   QLabel *validityIcon = nullptr;
+   // ToolTip
    ToolTip *tooltip = nullptr;
+   
    // Flag
    bool hasTip = false;
-   
-   // Icon Paths
-   const QString checked = ":/icons/accountCreate/checked.svg";
-   const QString unchecked = ":/icons/accountCreate/unchecked.svg";
 };
 
 /* ------------------ CheckBox with Button (In this case for Terms & Conditions Acceptance) -------------- */
@@ -125,7 +123,7 @@ class AccountCreate : public QWidget {
    TextWithBtn *_redirectToSignInWidget = nullptr;
 
    // Helper Functions
-   CustomTextField *createTextField(const QString &placeholderText = "", bool useCheck = false);
+   CustomTextField *createTextField(const QString &placeholderText = "", bool hasValidity = false);
    QWidget *createLabeledTextFieldWidget(const QString labelName = "", CustomTextField *currField = nullptr);
    QFont font(const QString &family = "Segoe UI", int fontSize = 10, QFont::Weight weight = QFont::Medium);
    void addLabelsInsideFieldsWidgets();

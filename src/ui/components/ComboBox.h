@@ -8,6 +8,7 @@
 #include "ScrollBar.h"
 #include "Delegate.h"
 #include "Popup.h"
+#include "../../resources/IconManager.h"
 
 #include <QObject>
 #include <QEvent>
@@ -31,11 +32,7 @@ class ComboBox : public TextField {
     public:
     explicit ComboBox(QWidget *parent = nullptr);
 
-    struct ComboItem {
-        QString text;
-        QString lightIcon = "";
-        QString darkIcon = "";
-    };
+    struct ComboItem { QString text; QString lightIcon = ""; QString darkIcon = ""; };
 
     void setIconic(bool value);
     void setEditable(bool value);
@@ -88,7 +85,7 @@ class ComboBox : public TextField {
   
     // Dropdown Button
     Button *dropdown = nullptr;
-    const QString arrowDown = ":/icons/components/arrow-down.svg";
+    const QString ArrowDown = IconManager::icon(Icons::ArrowDown);
 
     // Rounded Popup
     Popup *popup = nullptr;

@@ -5,38 +5,38 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     // Import Action
-    import_btn = createButton("Import");
+    import_btn = createButton("Import", ImportIcon);
 
     // ToolTip
     import_btn_tip = new ToolTip(import_btn);
     import_btn_tip->setText("Import files into the vault");
 
     // Encrypt Action
-    encrypt_btn = createButton("Encrypt");
+    encrypt_btn = createButton("Encrypt", EncryptIcon);
     // ToolTip
     encrypt_btn_tip = new ToolTip(encrypt_btn);
     encrypt_btn_tip->setText("Encrypt the selected file");
 
     // Decrypt Action
-    decrypt_btn = createButton("Decrypt");
+    decrypt_btn = createButton("Decrypt", DecryptIcon);
     // ToolTip
     decrypt_btn_tip = new ToolTip(decrypt_btn);
     decrypt_btn_tip->setText("Decrypt the selected file");
 
     // Open Action
-    open_btn = createButton("Open");
+    open_btn = createButton("Open", OpenIcon);
     // ToolTip
     open_btn_tip = new ToolTip(open_btn);
     open_btn_tip->setText("Open the selected file");
 
     // Delete Action
-    delete_btn = createButton("Delete");
+    delete_btn = createButton("Delete", DeleteIcon);
     // ToolTip
     delete_btn_tip = new ToolTip(delete_btn);
     delete_btn_tip->setText("Permanently delete the selected file");
 
     // Restore Action
-    restore_btn = createButton("Restore");
+    restore_btn = createButton("Restore", RestoreIcon);
     // ToolTip
     restore_btn_tip = new ToolTip(restore_btn);
     restore_btn_tip->setText("Remove the selected file from vault and return to its original location");
@@ -86,7 +86,7 @@ Button* Toolbar::openButton() const { return open_btn; }
 Button* Toolbar::importButton() const { return import_btn; }
 Button *Toolbar::restoreButton() const { return restore_btn; }
 
-Button* Toolbar::createButton(const QString &text) {
+Button* Toolbar::createButton(const QString &text, const QString &iconPath) {
     auto *btn = new Button(text);
     btn->setFixedSize(QSize(70, 58));
     btn->setDisplayMode(Button::TextUnderIcon);
@@ -94,7 +94,7 @@ Button* Toolbar::createButton(const QString &text) {
     btn->setSecondary(true);
     btn->setFontProperties("Segoe UI", 10);
     btn->setBorderTransparent(true);
-    btn->setIconPaths(icons[text], icons[text]);
+    btn->setIconPaths(iconPath, iconPath);
     btn->setNormalBackgroundTransparent(true);
     return btn;
 }

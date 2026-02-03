@@ -3,14 +3,14 @@
 VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   // Window Properties
   setWindowTitle("Vaultorix");
-  setWindowIcon(QIcon(appIcon));
+  setWindowIcon(QIcon(AppIcon));
   setMinimumSize(QSize(1000,600));
 
   // Title Bar
   // App Icon
   app_icon = new Label(true);
   app_icon->setFixedSize(QSize(26, 24));
-  app_icon->setPixmap(QPixmap(appIcon).scaled(24, 22, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+  app_icon->setPixmap(QPixmap(AppIcon).scaled(24, 22, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
   // App Name
   app_name = new Label(false, "Segoe UI", 11, QFont::Normal, false, "Vaultorix");
@@ -50,7 +50,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   sign_out_btn->setIconSize(QSize(16,16));
   sign_out_btn->setDisplayMode(Button::IconText);
   sign_out_btn->setFixedSize(QSize(100, 26));
-  sign_out_btn->setPrimaryButtonIcon(signOutIcon);
+  sign_out_btn->setPrimaryButtonIcon(IconManager::icon(Icons::SignOut));
   setInteractiveTitleBarWidget(sign_out_btn);
 
   // ToolTip of sign out button
@@ -110,7 +110,7 @@ void VaultWindow::onthemeModeChanged(bool enable) {
 
   // Theme Mode Button
   theme_mode_btn->setDarkMode(enable);
-  enable ? theme_mode_btn->setIconPaths(lightModeIcon, lightModeIcon) : theme_mode_btn->setIconPaths(darkModeIcon, darkModeIcon);
+  enable ? theme_mode_btn->setIconPaths(LightModeIcon, LightModeIcon) : theme_mode_btn->setIconPaths(DarkModeIcon, DarkModeIcon);
   theme_mode_btn_tip->setDarkMode(enable);
 
   // Toolbar theme

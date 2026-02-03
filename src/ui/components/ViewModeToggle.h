@@ -7,6 +7,7 @@
 
 #include "ToolTip.h"
 #include "Button.h"
+#include "../../resources/IconManager.h"
 
 class ViewModeToggle : public QWidget {
     Q_OBJECT
@@ -39,6 +40,12 @@ class ViewModeToggle : public QWidget {
     Button *grid_view_btn = nullptr;
     // ToolTip
     ToolTip *grid_view_tip = nullptr;
+
+    // Icons
+    const QString ListViewIcon          = IconManager::icon(Icons::ListView);
+    const QString ListViewCheckedIcon   = IconManager::icon(Icons::ListViewChecked);
+    const QString GridViewIcon          = IconManager::icon(Icons::GridView);
+    const QString GridViewCheckedIcon   = IconManager::icon(Icons::GridViewChecked);
 
     // Layout
     QHBoxLayout *layout = nullptr;

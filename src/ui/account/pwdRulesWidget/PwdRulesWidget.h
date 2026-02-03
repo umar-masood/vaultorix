@@ -7,27 +7,28 @@
 #include <QVBoxLayout>
 #include <QFont>
 
+#include "../../../resources/IconManager.h"
+
 class RuleItem : public QWidget {
     Q_OBJECT
 
     public:
     RuleItem(const QString &ruleTxt, QWidget *parent = nullptr);
-    void setChecked();
-    void setUnchecked();
+    void setValid();
+    void setInvalid();
 
     protected:
     void paintEvent(QPaintEvent *event) override;
 
     private:
     // Flag to check validity of each rule
-    bool checkedState = false;
+    bool validityState = false;
 
     // Icon Size 
     const int iconSize = 20;
 
     // Different Icons for different states
-    QPixmap iconChecked;
-    QPixmap iconUnchecked;
+    QPixmap validIcon, invalidIcon;
 
     // Text Color Codes
     QString uncoloredText = "#8D8D8D";

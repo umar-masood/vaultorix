@@ -6,8 +6,8 @@ ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
     // List View Button
     list_view_btn = createButton();
     list_view_btn->setChecked(true);
-    list_view_btn->setIconPaths( ":/icons/vaultWindow/layout-list.svg", ":/icons/vaultWindow/layout-list.svg");
-    list_view_btn->setCheckedButtonIcon( ":/icons/vaultWindow/layout-list-checked.svg");
+    list_view_btn->setIconPaths(ListViewIcon, ListViewIcon);
+    list_view_btn->setCheckedButtonIcon(ListViewCheckedIcon);
 
     // ToolTip
     list_view_tip = new ToolTip(list_view_btn);
@@ -15,8 +15,8 @@ ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
 
     // Grid View Button
     grid_view_btn = createButton();
-    grid_view_btn->setIconPaths( ":/icons/vaultWindow/layout-grid.svg", ":/icons/vaultWindow/layout-grid.svg");
-    grid_view_btn->setCheckedButtonIcon( ":/icons/vaultWindow/layout-grid-checked.svg");
+    grid_view_btn->setIconPaths(GridViewIcon, GridViewIcon);
+    grid_view_btn->setCheckedButtonIcon(GridViewCheckedIcon);
 
     // ToolTip
     grid_view_tip = new ToolTip(grid_view_btn);

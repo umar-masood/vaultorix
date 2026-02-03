@@ -34,11 +34,11 @@ bool PwdValidator::isValidPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules) {
             hasSpecial = true;
     }
 
-    hasLength ? pwdRules->atLeastEight()->setChecked() : pwdRules->atLeastEight()->setUnchecked();
-    hasUpper ? pwdRules->atLeastOneUpperCaseChar()->setChecked() : pwdRules->atLeastOneUpperCaseChar()->setUnchecked();
-    hasLower ? pwdRules->atLeastOneLowerCaseChar()->setChecked() : pwdRules->atLeastOneLowerCaseChar()->setUnchecked();
-    hasDigit ? pwdRules->atLeastOneDigit()->setChecked() : pwdRules->atLeastOneDigit()->setUnchecked();
-    hasSpecial ? pwdRules->atLeastOneSpecialChar()->setChecked() : pwdRules->atLeastOneSpecialChar()->setUnchecked();
+    hasLength ? pwdRules->atLeastEight()->setValid() : pwdRules->atLeastEight()->setInvalid();
+    hasUpper ? pwdRules->atLeastOneUpperCaseChar()->setValid() : pwdRules->atLeastOneUpperCaseChar()->setInvalid();
+    hasLower ? pwdRules->atLeastOneLowerCaseChar()->setValid() : pwdRules->atLeastOneLowerCaseChar()->setInvalid();
+    hasDigit ? pwdRules->atLeastOneDigit()->setValid() : pwdRules->atLeastOneDigit()->setInvalid();
+    hasSpecial ? pwdRules->atLeastOneSpecialChar()->setValid() : pwdRules->atLeastOneSpecialChar()->setInvalid();
 
     for (int i = 0; i < pwdBytes.size(); i++) 
         pwdBytes[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(pwdBytes[i])));
@@ -48,7 +48,7 @@ bool PwdValidator::isValidPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules) {
 
     if (weakPwds.empty()) {
         ValidatorUtils::cleanupMemory(pwdStd);
-        pwdRules->strongPassword()->setUnchecked();
+        pwdRules->strongPassword()->setInvalid();
         qDebug() << "Weak password list is not loaded.\n";
         return false; // If weak password list is not loaded, we cannot check for weak passwords
     }
@@ -57,7 +57,7 @@ bool PwdValidator::isValidPwd(QByteArray &pwdBytes, PwdRulesWidget *pwdRules) {
     ValidatorUtils::cleanupMemory(pwdStd);
 
     bool isStrongPwd = hasLength && hasUpper && hasLower && hasDigit && hasSpecial && notWeak;
-    isStrongPwd ? pwdRules->strongPassword()->setChecked() : pwdRules->strongPassword()->setUnchecked();
+    isStrongPwd ? pwdRules->strongPassword()->setValid() : pwdRules->strongPassword()->setInvalid();
 
     return isStrongPwd;
 }

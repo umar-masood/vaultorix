@@ -6,14 +6,20 @@ void TextField::setShadow(bool value) { hasShadow = value; }
 
 void TextField::setDarkMode(bool value) {
     isDarkMode = value;
-    if (clear) clear->setDarkMode(isDarkMode); 
-    if (password) password->setDarkMode(isDarkMode);
+
+    if (clear) 
+        clear->setDarkMode(isDarkMode); 
+
+    if (password) 
+        password->setDarkMode(isDarkMode);
+
     updateStyle();
 }
 
 void TextField::setFixedSize(QSize s) {
     int finalWidth = std::max(s.width(), minWidth);
     int finalHeight = s.height();
+
     QLineEdit::setFixedSize(finalWidth, finalHeight);
 }
 
@@ -61,7 +67,7 @@ void TextField::setClearButton(bool value) {
         clear->setDisplayMode(Button::IconOnly);
         clear->setIconSize(this->textFieldIconSize);
         clear->setFixedSize(QSize(28, 28));
-        clear->setIconPaths(clearIcon, clearIcon);
+        clear->setIconPaths(ClearIcon, ClearIcon);
         clear->setEnabled(isEnabled);
         positionButton(clear);
         
@@ -95,23 +101,25 @@ void TextField::setPasswordTextField(bool value) {
         positionButton(password);
 
         password->hide();
-        password->setIconPaths(eyeClosedIcon, eyeClosedIcon);
+        password->setIconPaths(HideIcon, HideIcon);
 
         connect(password, &Button::pressed, this, [this]() {
             isPasswordVisible = !isPasswordVisible;
+
             if (isPasswordVisible) {
-                password->setIconPaths(eyeIcon, eyeIcon);
+                password->setIconPaths(ShowIcon, ShowIcon);
                 this->setEchoMode(QLineEdit::Normal);
             } else {
-                password->setIconPaths(eyeClosedIcon, eyeClosedIcon);
+                password->setIconPaths(HideIcon, HideIcon);
                 this->setEchoMode(QLineEdit::Password);
             }
         });
 
         connect(this, &QLineEdit::textChanged, this, [this](const QString &text) {
             password->setVisible(isFocused && !text.isEmpty());
+
             if (isPasswordVisible) {
-                password->setIconPaths(eyeClosedIcon, eyeClosedIcon);
+                password->setIconPaths(HideIcon, HideIcon);
                 this->setEchoMode(QLineEdit::Password);
                 isPasswordVisible = false;
             }
@@ -127,6 +135,7 @@ void TextField::setPadding(int left, int top, int right, int bottom) {
     _right = right, 
     _bottom = bottom, 
     _top = top;
+
     updateStyle();
 }
 
@@ -171,6 +180,7 @@ void TextField::paintEvent(QPaintEvent *event) {
     pen.setStyle(Qt::SolidLine);
     pen.setJoinStyle(Qt::RoundJoin);
     painter.setPen(pen);
+
     QColor bg_color;
 
     if (isFocused)
@@ -264,7 +274,8 @@ void TextField::focusOutEvent(QFocusEvent *event) {
 }
 
 void TextField::contextMenuEvent(QContextMenuEvent *event) {
-    if (!hasContextMenu) return;
+    if (!hasContextMenu) 
+        return;
 
     menu = new Menu(this);
     menu->setMaxVisibleItems(12);
@@ -276,26 +287,26 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
     const bool hasSelection = this->hasSelectedText();
 
     if (hasSelection) {
-        menu->addAction({ "Copy",    false,  "Ctrl + C",  icons["Copy"],    icons["Copy"] });
-        menu->addAction({ "Cut",     false,  "Ctrl + X",  icons["Cut"],     icons["Cut"] });
-        menu->addAction({ "Delete",  false,  "Delete",    icons["Delete"],  icons["Delete"] });
+        menu->addAction({ "Copy",    false,  "Ctrl + C",  CopyIcon,    CopyIcon });
+        menu->addAction({ "Cut",     false,  "Ctrl + X",  CutIcon,     CutIcon });
+        menu->addAction({ "Delete",  false,  "Delete",    DeleteIcon,  DeleteIcon });
     }
 
-    menu->addAction({ "Paste", false, "Ctrl + V", icons["Paste"], icons["Paste"]});
+    menu->addAction({ "Paste", false, "Ctrl + V", PasteIcon, PasteIcon});
     
-    if (hasText && !hasSelection) menu->addAction({ "Select All",  false,  "Ctrl + A",  icons["Select All"],  icons["Select All"]});
-    if (this->isUndoAvailable())  menu->addAction({ "Undo",        false,  "Ctrl + Z",  icons["Undo"],        icons["Undo"]});
-    if (this->isRedoAvailable())  menu->addAction({ "Redo",        false,  "Ctrl + Y",  icons["Redo"],        icons["Redo"] });
+    if (hasText && !hasSelection) menu->addAction({ "Select All",  false,  "Ctrl + A",  SelectAllIcon,  SelectAllIcon});
+    if (this->isUndoAvailable())  menu->addAction({ "Undo",        false,  "Ctrl + Z",  UndoIcon,       UndoIcon});
+    if (this->isRedoAvailable())  menu->addAction({ "Redo",        false,  "Ctrl + Y",  RedoIcon,       RedoIcon});
 
     connect(menu, &Menu::itemClicked, this, [=]() {
         QString action = menu->clickedItemText();
-        if (action == "Copy") this->copy();
-        else if (action == "Cut") this->cut();
-        else if (action == "Paste") this->paste();
-        else if (action == "Delete") this->del();
-        else if (action == "Select All") this->selectAll();
-        else if (action == "Undo") this->undo();
-        else if (action == "Redo") this->redo();
+        if (action == "Copy") copy();
+        else if (action == "Cut") cut();
+        else if (action == "Paste") paste();
+        else if (action == "Delete") del();
+        else if (action == "Select All") selectAll();
+        else if (action == "Undo") undo();
+        else if (action == "Redo") redo();
         else qDebug() << "Unknown context menu action:" << action;
     });
 

@@ -106,11 +106,12 @@ void Popup::setMaxVisibleItems(int items) {
 }
 
 void Popup::setDarkMode(bool value) {
-    if (vScroll) vScroll->setDarkMode(value);
+    if (vScroll) 
+        vScroll->setDarkMode(value);
+
     RoundedBox::setDarkMode(value);
 }
 
 QListView* Popup::list() const {
-    if (_list) 
-        return _list;
+    return _list;
 }

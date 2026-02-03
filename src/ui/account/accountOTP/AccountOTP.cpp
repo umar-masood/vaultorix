@@ -9,7 +9,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    // Illustration of OTP at the top
    illustration = new Label(true);
    illustration->setFixedSize(QSize(106, 106));
-   illustration->setPixmap(QPixmap(":/icons/accountOTP/otp.png").scaled(106, 106, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+   illustration->setPixmap(QPixmap(IllustrationManager::illustration(Illustrations::Otp)).scaled(106, 106, Qt::KeepAspectRatio, Qt::SmoothTransformation));
    illustration->setScaledContents(true);
 
    // Main Heading
@@ -34,7 +34,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
 
    // Resend OTP Widget (Resend Text + Button + Timer)
    _resendOtpWidget = new TextWithBtn("Didn`t receive the OTP?", QSize(136, 22), "Resend", QSize(50,12), true);
-   connect(_resendOtpWidget, &TextWithBtn::buttonClicked, this, [this]() { emit resendClicked(); });
+   connect(_resendOtpWidget, &TextWithBtn::buttonClicked, this, &AccountOTP::resendClicked);
 
    // Verify Button
    _verifyBtn = new Button("Verify");
@@ -45,7 +45,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _verifyBtn->setHoverGradientColor("#008EDE");
    _verifyBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    _verifyBtn->setLoaderButton(true);
-   connect(_verifyBtn, &Button::clicked, this, [this]() { emit verifyClicked(); });
+   connect(_verifyBtn, &Button::clicked, this,  &AccountOTP::verifyClicked);
 
    // Cancel Button
    _cancelBtn = new Button("Cancel");
@@ -54,7 +54,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _cancelBtn->setSecondary(true);
    _cancelBtn->setFixedSize(QSize(360, 36));
    _cancelBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
-   connect(_cancelBtn, &Button::clicked, this, [this]() { emit cancelClicked(); });
+   connect(_cancelBtn, &Button::clicked, this,  &AccountOTP::cancelClicked);
 
    // Main Layout
    layout = new QVBoxLayout;
@@ -291,7 +291,7 @@ TextWithBtn::TextWithBtn(const QString &promptText,
    _button->move(_text->width() + 4, 2);
 
    // Signal Slot
-   connect(_button, &Button::clicked, this, [this]() { emit buttonClicked(); });
+   connect(_button, &Button::clicked, this, &TextWithBtn::buttonClicked);
 
    setFixedSize(QSize(_text->width() + _button->width() + 2, 18));
 

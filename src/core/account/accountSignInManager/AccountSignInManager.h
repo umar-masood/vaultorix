@@ -16,8 +16,6 @@
 #include <QByteArray>
 #include <QMap>
 
-using namespace DialogUtils;
-
 class AccountSignInManager : public QObject {
     Q_OBJECT
     
