@@ -20,7 +20,7 @@ enum Icons {
     
     ArrowDown           = 0x13,
     ArrowRight          = 0x14,
-    Check               = 0x15,
+    CheckBox_Check      = 0x15,
     
     Cut                 = 0x16,
     Copy                = 0x17,
@@ -48,5 +48,8 @@ enum Icons {
     ListViewChecked     = 0x38,
 
     GridView            = 0x39,
-    GridViewChecked     = 0x40
+    GridViewChecked     = 0x40,
+
+    Delegate_Check      = 0x41,
+    Dot                 = 0x42
 };

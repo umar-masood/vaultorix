@@ -6,7 +6,6 @@
     <file>icons/arrow-down.svg</file>
     <file>icons/arrow-right.svg</file>
     <file>icons/backup.svg</file>
-    <file>icons/check.png</file>
     <file>icons/copy.svg</file>
     <file>icons/cut.svg</file>
     <file>icons/darkMode.svg</file>
@@ -52,5 +51,8 @@
     <file>illustrations/unknownDevice.png</file>
     <file>illustrations/wrongCredentials.png</file>
     <file>illustrations/appBranding.png</file>
+    <file>icons/checkbox-check.svg</file>
+    <file>icons/delegate-check.svg</file>
+    <file>icons/dot.svg</file>
   </qresource>
 </RCC>

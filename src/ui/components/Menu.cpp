@@ -17,15 +17,15 @@ void Menu::init() {
     popup->hide();
 
     // Delegate
-    delegate = new Delegate(itemSize());
-    delegate->setAsMenu(true);
+    _delegate = new Delegate(itemSize());
+    _delegate->setAsMenu(true);
 
     // Vertical Scroll Bar
     vScroll = new ScrollBar(Qt::Vertical);
 
     // List Properties
-    setModel(&model);
-    setItemDelegate(delegate);
+    setModel(&_model);
+    setItemDelegate(_delegate);
     setAutoScroll(true);
     setViewMode(QListView::ListMode);
     setSelectionMode(QAbstractItemView::NoSelection);
@@ -108,12 +108,12 @@ void Menu::addAction(const MenuAction &menuAction) {
         return;
     }
 
-    model.appendRow(item);
+    _model.appendRow(item);
 }
 
 void Menu::removeAction(int index) {
     if (index != -1) {
-        model.removeRow(index);
+        _model.removeRow(index);
         subMenus.remove(index);
 
         QMap<int, Menu*> updatedSubMenus;
@@ -133,13 +133,13 @@ void Menu::removeAction(int index) {
 }
 
 void Menu::clearAll() {
-    model.clear();
+    _model.clear();
     update();
 }
 
 void Menu::updateMenu() {
     int itemsHeight = sizeHintForRow(0);
-    int totalItems = model.rowCount(); 
+    int totalItems = _model.rowCount(); 
     
     if (totalItems <= 0) 
         return;
@@ -155,8 +155,8 @@ void Menu::updateMenu() {
 void Menu::setHoveredIndex(const QModelIndex &index) {
     hoveredIndex = index;
     
-    if (delegate) 
-        delegate->setHoveredIndex(index);
+    if (_delegate) 
+        _delegate->setHoveredIndex(index);
     
     update();
 }
@@ -257,13 +257,13 @@ QSize Menu::itemSize() { return _itemSize; }
 
 void Menu::setIconic(bool value) { 
     isIconic = value; 
-    delegate->setIconic(isIconic);
+    _delegate->setIconic(isIconic);
 }
 
 void Menu::setDarkMode(bool value) { 
     isDarkMode = value; 
     popup->setDarkMode(isDarkMode);
-    delegate->setDarkMode(isDarkMode);
+    _delegate->setDarkMode(isDarkMode);
     vScroll->setDarkMode(isDarkMode);
 }
 
@@ -271,6 +271,19 @@ void Menu::setParentMenu(Menu *parentMenu) { this->parentMenu = parentMenu; }
 
 void Menu::setMaxVisibleItems(int items) { _maxVisibleItems = items; }
 int Menu::maxVisibleItems() const { return _maxVisibleItems; }
+
+Delegate *Menu::delegate() const { return _delegate; }
+
+QModelIndex Menu::itemIndex(const QString &itemText) {
+    for (int row = 0; row < _model.rowCount(); ++row) {
+        QModelIndex idx = _model.index(row, 0);
+        if (_model.data(idx).toString() == itemText)
+            return idx;
+    }
+
+    qWarning() << "Item is not found in model of menu";
+    return QModelIndex();
+}
 
 void Menu::mouseMoveEvent(QMouseEvent *event) {
     const QModelIndex index = indexAt(event->position().toPoint());
@@ -335,6 +348,8 @@ void Menu::leaveEvent(QEvent *event) {
 
 void Menu::onItemClicked(const QModelIndex &index) {
     int idx = index.row();
+
+    _delegate->setActiveIndex(index); // Passing it for dot or check indicator
 
     bool hasSubMenu = index.data(Qt::UserRole + 2).toBool();
     if (hasSubMenu) 

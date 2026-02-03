@@ -13,6 +13,7 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QVBoxLayout>
+#include <QAbstractItemModel>
 #include <QAbstractItemView>
 #include <QAbstractScrollArea>
 #include <QPropertyAnimation>
@@ -99,6 +100,9 @@ class Menu : public QListView {
    void setMaxVisibleItems(int items);
    int maxVisibleItems() const;
 
+   Delegate* delegate() const;
+   QModelIndex itemIndex(const QString &itemText);
+
    signals:
    void itemClicked();
 
@@ -139,10 +143,10 @@ class Menu : public QListView {
    RoundedBox *popup = nullptr;
 
    // Delegate
-   Delegate *delegate = nullptr;
+   Delegate *_delegate = nullptr;
 
    // Model
-   QStandardItemModel model;
+   QStandardItemModel _model;
 
    // Layout
    QVBoxLayout *layout = nullptr;

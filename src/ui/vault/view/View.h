@@ -19,6 +19,11 @@ class View : public QWidget {
     explicit View(QWidget *parent = nullptr);
     void setDarkMode(bool enable);
 
+    TextField* searchBox() const;
+    ButtonMenu* filterMenu() const;
+    ViewModeToggle* viewMode() const;
+    EmptyStateWidget* emptyStateWidget() const;
+
     protected:
     void paintEvent(QPaintEvent *event) override;
 

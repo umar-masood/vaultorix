@@ -21,8 +21,10 @@ QString IconManager::icon(Icons icon) {
    
         case Icons::ArrowDown:         return ":/icons/arrow-down.svg";
         case Icons::ArrowRight:        return ":/icons/arrow-right.svg";
-        case Icons::Check:             return ":/icons/check.png";
-   
+
+        case Icons::CheckBox_Check:    return ":/icons/checkbox-check.svg";
+        case Icons::Delegate_Check:    return ":/icons/delegate-check.svg";
+
         case Icons::Cut:               return ":/icons/cut.svg";
         case Icons::Copy:              return ":/icons/copy.svg";
         case Icons::MenuDelete:        return ":/icons/menuDelete.svg";
@@ -54,6 +56,8 @@ QString IconManager::icon(Icons icon) {
         
         case Icons::GridView:          return ":/icons/gridView.svg";
         case Icons::GridViewChecked:   return ":/icons/gridViewChecked.svg";
+
+        case Icons::Dot:               return ":/icons/dot.svg";
 
     }
 

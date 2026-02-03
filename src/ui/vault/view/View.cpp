@@ -14,11 +14,13 @@ View::View(QWidget *parent) : QWidget(parent) {
     filterButtonMenu->setFontProperties("Segoe UI", 10);
     filterButtonMenu->setText("Filter");
     filterButtonMenu->setFontXY(0, -1);
+    filterButtonMenu->menu()->delegate()->setSelectionDotIndicator(true);
     filterButtonMenu->menu()->addAction({"All file types"});
     filterButtonMenu->menu()->addAction({"Documents"});
     filterButtonMenu->menu()->addAction({"Pictures"});
     filterButtonMenu->menu()->addAction({"Music"});
     filterButtonMenu->menu()->addAction({"Videos"});
+    filterButtonMenu->menu()->delegate()->setActiveIndex(filterButtonMenu->menu()->itemIndex("All file types")); // Setting Default one
 
     // Search Box
     search_box = new TextField;
@@ -91,3 +93,8 @@ void View::setDarkMode(bool enable) {
     
     update();
 }
+
+TextField* View::searchBox() const { return search_box; }
+ButtonMenu* View::filterMenu()  const { return filterButtonMenu; }
+ViewModeToggle* View::viewMode() const { return view_mode; }
+EmptyStateWidget* View::emptyStateWidget() const { return empty_state; }

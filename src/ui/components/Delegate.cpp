@@ -7,6 +7,19 @@ void Delegate::setIconic(bool value) { isIconic = value; }
 void Delegate::setAsMenu(bool value) { isMenu = value; }
 void Delegate::setDelegateSize(QSize size) { m_itemSize = size; }
 void Delegate::setHoveredIndex(const QModelIndex &index) { hoveredIndex = index; }
+void Delegate::setSelectionDotIndicator(bool enable) { 
+    hasDotIndicator = enable; 
+    if (hasCheckIndicator)
+        hasCheckIndicator = false;
+}
+
+void Delegate::setSelectionCheckIndicator(bool enable) { 
+    hasCheckIndicator = enable; 
+    if (hasDotIndicator)
+        hasDotIndicator = false;
+}
+
+void Delegate::setActiveIndex(const QModelIndex &index) { activeIndex = index; }
 
 void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     painter->save();
@@ -41,10 +54,30 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
 
     // Icon geometry
     const QSize IconSize = QSize(18, 18);
-    const int iconX = 12;
-    int iconY;
+    int iconX = 12;
+    int iconY = fullRec.y() + (fullRec.height() - IconSize.height()) / 2;
+    
+    // Drawing Dot Indicator
+    bool isActive = (index == activeIndex);
+    if (hasDotIndicator && isActive) {
+        painter->drawPixmap(iconX, iconY, QPixmap(IconManager::icon(Icons::Dot))
+                            .scaled(IconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
 
-    const int tX = isIconic ? (iconX + IconSize.width() + 12) : iconX;
+    // Drawing Check Indicator
+    if (hasCheckIndicator && isActive) {
+        painter->drawPixmap(iconX, iconY, QPixmap(IconManager::icon(Icons::Delegate_Check))
+                            .scaled(IconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+
+    int tX = iconX;
+
+    if (isIconic)
+        tX += IconSize.width() + 12;
+
+    if (hasDotIndicator || hasCheckIndicator)
+        tX += IconSize.width() + 12;
+
     const int tY = fullRec.y() - 1;
 
     // Shortcut width based on content
@@ -64,7 +97,10 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
 
     if (!icon.isNull() && isIconic) {
         QPixmap pixmap = icon.pixmap(IconSize);
-        iconY = fullRec.y() + (fullRec.height() - IconSize.height()) / 2;
+
+        if (hasCheckIndicator || hasDotIndicator) 
+            iconX = 12 + IconSize.width() + 12;
+
         painter->drawPixmap(iconX, iconY, pixmap);
     }
 
@@ -84,7 +120,7 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
     QColor _NormalLight = Qt::black;
     QColor _NormalDark = Qt::white;
     QColor _Selected = QColor::fromString("#0191DF");
-    QColor _current = (option.state & QStyle::State_Selected) ? _Selected : (isDarkMode ? _NormalDark : _NormalLight);
+    QColor _current = isSelected ? _Selected : (isDarkMode ? _NormalDark : _NormalLight);
 
     painter->setPen(_current);
     painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, elidedText);
@@ -96,6 +132,7 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
         painter->setPen(color);
         painter->drawText(shortcutRect, Qt::AlignRight | Qt::AlignVCenter, shortcutText);
     }
+
     painter->restore();
 }
 
