@@ -59,6 +59,55 @@ QString IconManager::icon(Icons icon) {
 
         case Icons::Dot:               return ":/icons/dot.svg";
 
+        case Icons::XLight:            return ":/icons/xLight.svg";
+        case Icons::XDark:             return ":/icons/xDark.svg";
+   
+        case Icons::EncryptLight:      return ":/icons/encryptLight.svg";
+        case Icons::EncryptDark:       return ":/icons/encryptDark.svg";
+        
+        case Icons::DecryptLight:      return ":/icons/decryptLight.svg";
+        case Icons::DecryptDark:       return ":/icons/decryptDark.svg";
+
+        case Icons::File_AI:           return ":/icons/fileTypes/AI.svg";
+        case Icons::File_AVI:          return ":/icons/fileTypes/AVI.svg";
+        case Icons::File_BMP:          return ":/icons/fileTypes/BMP.svg";
+        case Icons::File_CRD:          return ":/icons/fileTypes/CRD.svg";
+        case Icons::File_CSV:          return ":/icons/fileTypes/CSV.svg";
+        case Icons::File_DLL:          return ":/icons/fileTypes/DLL.svg";
+        case Icons::File_DOC:          return ":/icons/fileTypes/DOC.svg";
+        case Icons::File_DOCX:         return ":/icons/fileTypes/DOCX.svg";
+        case Icons::File_DWG:          return ":/icons/fileTypes/DWG.svg";
+        case Icons::File_EPS:          return ":/icons/fileTypes/EPS.svg";
+        case Icons::File_EXE:          return ":/icons/fileTypes/EXE.svg";
+        case Icons::File_FLV:          return ":/icons/fileTypes/FLV.svg";
+        case Icons::File_GIF:          return ":/icons/fileTypes/GIFF.svg";
+        case Icons::File_HTML:         return ":/icons/fileTypes/HTML.svg";
+        case Icons::File_ISO:          return ":/icons/fileTypes/ISO.svg";
+        case Icons::File_JAVA:         return ":/icons/fileTypes/JAVA.svg";
+        case Icons::File_JPG:          return ":/icons/fileTypes/JPG.svg";
+        case Icons::File_MDB:          return ":/icons/fileTypes/MDB.svg";
+        case Icons::File_MID:          return ":/icons/fileTypes/MID.svg";
+        case Icons::File_MOV:          return ":/icons/fileTypes/MOV.svg";
+        case Icons::File_MP3:          return ":/icons/fileTypes/MP3.svg";
+        case Icons::File_MP4:          return ":/icons/fileTypes/MP4.svg";
+        case Icons::File_MPEG:         return ":/icons/fileTypes/MPEG.svg";
+        case Icons::File_PDF:          return ":/icons/fileTypes/PDF.svg";
+        case Icons::File_PNG:          return ":/icons/fileTypes/PNG.svg";
+        case Icons::File_PPT:          return ":/icons/fileTypes/PPT.svg";
+        case Icons::File_PS:           return ":/icons/fileTypes/PS.svg";
+        case Icons::File_PSD:          return ":/icons/fileTypes/PSD.svg";
+        case Icons::File_PUB:          return ":/icons/fileTypes/PUB.svg";
+        case Icons::File_RAR:          return ":/icons/fileTypes/RAR.svg";
+        case Icons::File_RAW:          return ":/icons/fileTypes/RAW.svg";
+        case Icons::File_RSS:          return ":/icons/fileTypes/RSS.svg";
+        case Icons::File_SVG:          return ":/icons/fileTypes/SVG.svg";
+        case Icons::File_TIFF:         return ":/icons/fileTypes/TIFF.svg";
+        case Icons::File_TXT:          return ":/icons/fileTypes/TXT.svg";
+        case Icons::File_WAV:          return ":/icons/fileTypes/WAV.svg";
+        case Icons::File_WMA:          return ":/icons/fileTypes/WMA.svg";
+        case Icons::File_XML:          return ":/icons/fileTypes/XML.svg";
+        case Icons::File_XSL:          return ":/icons/fileTypes/XSL.svg";
+        case Icons::File_ZIP:          return ":/icons/fileTypes/ZIP.svg";
     }
 
     qWarning("The requested icon is not found");

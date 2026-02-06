@@ -24,6 +24,8 @@ add_executable(Vaultorix
     src/ui/vault/emptyStateWidget/EmptyStateWidget.cpp
     ## View 
     src/ui/vault/view/View.cpp
+    ### View Delegate
+    src/ui/vault/view/ViewDelegate.cpp
     ## Statusbar
     src/ui/vault/statusbar/Statusbar.cpp
 

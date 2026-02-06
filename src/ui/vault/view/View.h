@@ -5,7 +5,11 @@
 #include "../../components/ButtonMenu.h"
 #include "../../components/ViewModeToggle.h"
 #include "../../../resources/IconManager.h"
+#include "./ViewDelegate.h"
+#include "../../components/ScrollBar.h"
 
+#include <QListView>
+#include <QStandardItemModel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QWidget>
@@ -34,12 +38,14 @@ class View : public QWidget {
     // Empty State Widget
     EmptyStateWidget *empty_state = nullptr;
 
-    // Action Toolbar Layout
-    QHBoxLayout *actionToolbarLayout = nullptr;
-
-    // Seperator Color
+    // Seperator Color, Height
     QColor separatorColor;
     int separatorHeight = 2;
+
+    // Wrapper (View Action Toolbar)
+    QWidget *view_toolbar_wrapper = nullptr;
+    // Wrapper Action Toolbar Layout
+    QHBoxLayout *wrapper_layout = nullptr;
 
     // View Mode Toggle
     ViewModeToggle *view_mode = nullptr;
@@ -55,6 +61,19 @@ class View : public QWidget {
     // Search Box
     TextField *search_box = nullptr;
     
+    // Items View List
+    QListView *_list = nullptr;
+
+    // Model
+    QStandardItemModel _model;
+    
+    // Scroll Bars
+    ScrollBar *vScroll = nullptr;
+    ScrollBar *hScroll = nullptr;
+
+    // Items View Delegate
+    ViewDelegate *_delegate = nullptr;
+
     // Main Layout
     QVBoxLayout *_layout = nullptr;
 };

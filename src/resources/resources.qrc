@@ -54,5 +54,51 @@
     <file>icons/checkbox-check.svg</file>
     <file>icons/delegate-check.svg</file>
     <file>icons/dot.svg</file>
+    <file>icons/xDark.svg</file>
+    <file>icons/xLight.svg</file>
+    <file>icons/encryptDark.svg</file>
+    <file>icons/encryptLight.svg</file>
+    <file>icons/decryptDark.svg</file>
+    <file>icons/decryptLight.svg</file>
+    <file>icons/fileTypes/AVI.svg</file>
+    <file>icons/fileTypes/AI.svg</file>
+    <file>icons/fileTypes/BMP.svg</file>
+    <file>icons/fileTypes/CSV.svg</file>
+    <file>icons/fileTypes/CRD.svg</file>
+    <file>icons/fileTypes/DLL.svg</file>
+    <file>icons/fileTypes/DOC.svg</file>
+    <file>icons/fileTypes/DOCX.svg</file>
+    <file>icons/fileTypes/DWG.svg</file>
+    <file>icons/fileTypes/EPS.svg</file>
+    <file>icons/fileTypes/EXE.svg</file>
+    <file>icons/fileTypes/FLV.svg</file>
+    <file>icons/fileTypes/HTML.svg</file>
+    <file>icons/fileTypes/GIFF.svg</file>
+    <file>icons/fileTypes/ISO.svg</file>
+    <file>icons/fileTypes/JAVA.svg</file>
+    <file>icons/fileTypes/JPG.svg</file>
+    <file>icons/fileTypes/MDB.svg</file>
+    <file>icons/fileTypes/MID.svg</file>
+    <file>icons/fileTypes/MOV.svg</file>
+    <file>icons/fileTypes/MP3.svg</file>
+    <file>icons/fileTypes/MP4.svg</file>
+    <file>icons/fileTypes/PDF.svg</file>
+    <file>icons/fileTypes/MPEG.svg</file>
+    <file>icons/fileTypes/PNG.svg</file>
+    <file>icons/fileTypes/PPT.svg</file>
+    <file>icons/fileTypes/PS.svg</file>
+    <file>icons/fileTypes/PSD.svg</file>
+    <file>icons/fileTypes/RAR.svg</file>
+    <file>icons/fileTypes/RAW.svg</file>
+    <file>icons/fileTypes/PUB.svg</file>
+    <file>icons/fileTypes/RSS.svg</file>
+    <file>icons/fileTypes/TIFF.svg</file>
+    <file>icons/fileTypes/TXT.svg</file>
+    <file>icons/fileTypes/WAV.svg</file>
+    <file>icons/fileTypes/XML.svg</file>
+    <file>icons/fileTypes/XSL.svg</file>
+    <file>icons/fileTypes/SVG.svg</file>
+    <file>icons/fileTypes/ZIP.svg</file>
+    <file>icons/fileTypes/WMA.svg</file>
   </qresource>
 </RCC>

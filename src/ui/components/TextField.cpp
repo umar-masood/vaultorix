@@ -314,13 +314,6 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
     menu->move(event->globalPos());
 }
 
-bool TextField::event(QEvent *event) {
-    if (event->type() == QEvent::WindowActivate && !hasFocus()) 
-        clearFocus(); 
-    
-    return QLineEdit::event(event);
-}
-
 void TextField::init() {
     setFixedSize(QSize(0, 0));
     setFocusPolicy(Qt::ClickFocus);

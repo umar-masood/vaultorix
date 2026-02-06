@@ -26,7 +26,7 @@ void Menu::init() {
     // List Properties
     setModel(&_model);
     setItemDelegate(_delegate);
-    setAutoScroll(true);
+    setAutoScroll(true);    
     setViewMode(QListView::ListMode);
     setSelectionMode(QAbstractItemView::NoSelection);
     setResizeMode(QListView::Adjust);

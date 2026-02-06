@@ -48,7 +48,6 @@ class TextField : public QLineEdit {
   void focusOutEvent(QFocusEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
   void contextMenuEvent(QContextMenuEvent *event) override;
-  bool event(QEvent *event);
   void resizeEvent(QResizeEvent *event) override;
 
   private:
