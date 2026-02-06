@@ -20,6 +20,7 @@ class VaultWindow : public Window {
 
     public:
     explicit VaultWindow(QWidget *parent = nullptr);
+    Statusbar* statusbar() const;
 
     private:
     // Title Bar
@@ -62,7 +63,7 @@ class VaultWindow : public Window {
     View *view = nullptr;
 
     // Statusbar
-    Statusbar *statusbar = nullptr;
+    Statusbar *_statusbar = nullptr;
 
     signals:
     void themeModeChanged(bool enable);

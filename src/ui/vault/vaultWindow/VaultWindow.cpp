@@ -84,7 +84,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   view = new View;
 
   // Statusbar
-  statusbar = new Statusbar;
+  _statusbar = new Statusbar;
 
   // Layout
   content_layout = new QVBoxLayout(contentArea());
@@ -95,7 +95,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   content_layout->addSpacing(4);
   content_layout->addWidget(view);
   content_layout->addSpacing(4);
-  content_layout->addWidget(statusbar);
+  content_layout->addWidget(_statusbar);
 
   // Inital Theme
   emit themeModeChanged(false);
@@ -120,8 +120,10 @@ void VaultWindow::onthemeModeChanged(bool enable) {
   view->setDarkMode(enable);
   
   // Statusbar theme
-  statusbar->setDarkMode(enable);
+  _statusbar->setDarkMode(enable);
 
   // Sign out Button
   sign_out_btn_tip->setDarkMode(enable);
 }
+
+Statusbar* VaultWindow::statusbar() const { return _statusbar; }

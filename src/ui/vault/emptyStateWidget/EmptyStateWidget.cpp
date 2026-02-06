@@ -1,6 +1,9 @@
 #include "EmptyStateWidget.h"
 
 EmptyStateWidget::EmptyStateWidget(QWidget *parent) : QWidget(parent) {
+  setAttribute(Qt::WA_Hover, true);  
+  setMouseTracking(true);             
+  setAttribute(Qt::WA_TransparentForMouseEvents, false);
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setFixedSize(QSize(240, 240));
 

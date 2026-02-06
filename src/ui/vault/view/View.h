@@ -15,6 +15,7 @@
 #include <QWidget>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QResizeEvent>
 
 class View : public QWidget {
     Q_OBJECT
@@ -26,10 +27,11 @@ class View : public QWidget {
     TextField* searchBox() const;
     ButtonMenu* filterMenu() const;
     ViewModeToggle* viewMode() const;
-    EmptyStateWidget* emptyStateWidget() const;
+    EmptyStateWidget* emptyStateWidget() const; 
 
     protected:
     void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
     private:
     // Flags
@@ -76,4 +78,8 @@ class View : public QWidget {
 
     // Main Layout
     QVBoxLayout *_layout = nullptr;
+
+    // Helpers
+    void updateEmptyState();
+    void updateEmptyStatePosition();
 };
