@@ -2,6 +2,7 @@
 
 Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowMinMaxButtonsHint);
+
     setupWindow();
 }
 

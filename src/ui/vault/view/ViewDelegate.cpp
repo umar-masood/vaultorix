@@ -24,6 +24,7 @@ ViewDelegate::ViewDelegate(QObject *parent) :
                     cbSize(20, 20),
                     statusIconSize(16, 16),
                     fileThumbIconSize(40,46),
+                    _viewMode(ItemsViewMode::ListMode),
                     cbPixmap(QPixmap((IconManager::icon(Icons::CheckBox_Check))).scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation)) {}
 
 void ViewDelegate::setDarkMode(bool enable) {
@@ -45,7 +46,7 @@ QSize ViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
     if (_viewMode == ItemsViewMode::ListMode) 
         return QSize(option.rect.width(), _itemHeight); // List View
     else 
-        return QSize(140, 80); // Grid View
+        return QSize(258, 210); // Grid View
 }
 
 void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
@@ -61,6 +62,9 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
     // Main Font
     QFont font("Segoe UI", 10);
+
+    // List or Grid View Mode
+    bool isListViewMode = (_viewMode == ItemsViewMode::ListMode);
 
     /* ----------------------- Drawing Item Hover ------------------ */
     painter->setPen(Qt::NoPen);
@@ -90,20 +94,23 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
        brushColor = isDarkMode  ?   QColor("#2D2D2D") : QColor("#FBFBFB");
 
     painter->setBrush(brushColor);
-    painter->drawRoundedRect(cbRect, 6, 6);
 
-    // Pixmap
-    if (!cbPixmap.isNull() && isSelected) {
-        int xPos = cbRect.x() + (cbRect.width() - cbPixmap.width()) / 2;
-        int yPos = cbRect.y() + (cbRect.height() - cbPixmap.height()) / 2;
-        painter->drawPixmap(xPos, yPos, cbPixmap);
+    if (isListViewMode) {
+        painter->drawRoundedRect(cbRect, 6, 6);
+
+        // Pixmap
+        if (!cbPixmap.isNull() && isSelected) {
+            int xPos = cbRect.x() + (cbRect.width() - cbPixmap.width()) / 2;
+            int yPos = cbRect.y() + (cbRect.height() - cbPixmap.height()) / 2;
+            painter->drawPixmap(xPos, yPos, cbPixmap);
+        }
     }
 
     /* ----------------- File Thumbnail -----------------*/
-    const int thumbW = 120;
-    int thumbH = itemRect.height() - 12;
-    int thumbX = cbRect.right() + spacing;
-    int thumbY = itemRect.y() + (itemRect.height() - thumbH) / 2;
+    int thumbW = isListViewMode ? 120 : (itemRect.width() - 14);
+    int thumbH = isListViewMode ? (itemRect.height() - 12) : 120;
+    int thumbX = isListViewMode ? (cbRect.right() + spacing) : (itemRect.x() + (itemRect.width() - thumbW) / 2);
+    int thumbY = isListViewMode ? (itemRect.y() + (itemRect.height() - thumbH) / 2) : (itemRect.y() + 8);
 
     QRect thumbnailRect(thumbX, thumbY, thumbW, thumbH);
 
@@ -128,22 +135,43 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
     /* ----------------- File Title -------------------- */
     QString fileTitle = index.data(ItemDelegateRoles::FileTitle).toString();
-    // Title Rect
-    int titleW = itemRect.width() * 0.40;
-    int titleH = itemRect.height() - 4;
-    int titleX = thumbnailRect.right() + spacing;
-    int titleY = itemRect.y();
-    QRect titleRect(titleX, titleY, titleW, titleH);
 
+    int titleW = isListViewMode ? (itemRect.width() * 0.40) : (itemRect.width() - 16);
+    int titleH = itemRect.height() - 4;
+    int titleX = isListViewMode ? (thumbnailRect.right() + spacing) : (itemRect.x() + (itemRect.width() - titleW) / 2);
+    int titleY = isListViewMode ? itemRect.y() : (thumbnailRect.bottom() + 14);
+    
     // Font
     font.setWeight(QFont::Normal);
     painter->setFont(font);
 
+    QFontMetrics fm(font);
+
+    if (!isListViewMode)
+        titleH = fm.height() + 2;
+    
+    // Title Rect
+    QRect titleRect(titleX, titleY, titleW, titleH);
+
     // Pen Color
     painter->setPen(isDarkMode ? Qt::white : Qt::black);
 
+    // Text Alignment Flags
+    Qt::TextFlag textFlags;
+    Qt::Alignment alignmentFlags;
+    if (isListViewMode) {
+        alignmentFlags = Qt::AlignLeft | Qt::AlignVCenter;
+        textFlags = Qt::TextWordWrap;
+    } else {
+        alignmentFlags = Qt::AlignCenter;
+        textFlags = Qt::TextSingleLine;
+    }
+
+    // Elided Text for Grid Mode
+    QString elidedTitleTxt = fm.elidedText(fileTitle, Qt::ElideRight, titleW);
+
     // Drawing Text
-    painter->drawText(titleRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap, fileTitle);
+    painter->drawText(titleRect, alignmentFlags | textFlags, isListViewMode ? fileTitle : elidedTitleTxt);
 
     /* ----------------- File Type Tag ------------ */
     QString type = (index.data(ItemDelegateRoles::FileType).toString()).toUpper();
@@ -158,20 +186,22 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     // Border
     painter->setPen(Qt::NoPen);
 
-    // Background
-    painter->setBrush(isDarkMode ? "#1F3A5F" : "#D1E7FF");
-    painter->drawRoundedRect(typeRect, 6, 6);
-    
-    // Font
-    font.setWeight(QFont::DemiBold);
-    painter->setFont(font);
+    if (isListViewMode) {
+        // Background
+        painter->setBrush(isDarkMode ? "#1F3A5F" : "#D1E7FF");
+        painter->drawRoundedRect(typeRect, 6, 6);
+        
+        // Font
+        font.setWeight(QFont::DemiBold);
+        painter->setFont(font);
 
-    // Text Color
-    painter->setPen(isDarkMode ? "#8CC1FF" : "#3A7BD5");
+        // Text Color
+        painter->setPen(isDarkMode ? "#8CC1FF" : "#3A7BD5");
 
-    // Drawing Text
-    QRect typeTxtRect(typeX + 2, typeRect.y(), typeW - 4, typeH - 2);
-    painter->drawText(typeTxtRect, Qt::AlignVCenter | Qt::AlignHCenter, type);
+        // Drawing Text
+        QRect typeTxtRect(typeX + 2, typeRect.y(), typeW - 4, typeH - 2);
+        painter->drawText(typeTxtRect, Qt::AlignVCenter | Qt::AlignHCenter, type);
+    }
 
     /* ----------------- File Size ------------ */
     QString fileSize = index.data(ItemDelegateRoles::FileSize).toString().toUpper();
@@ -186,12 +216,14 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
     // Elided Text
     QString elidedFileSizeTxt = QFontMetrics(font).elidedText(fileSize, Qt::ElideRight, sizeW);
+    
+    if (isListViewMode) {
+        // Text Color
+        painter->setPen("#6B7280");
 
-    // Text Color
-    painter->setPen("#6B7280");
-
-    // Drawing Text
-    painter->drawText(sizeTxtRect, Qt::AlignVCenter | Qt::AlignLeft, elidedFileSizeTxt);
+        // Drawing Text
+        painter->drawText(sizeTxtRect, Qt::AlignVCenter | Qt::AlignLeft, elidedFileSizeTxt);
+    }
 
     /* ----------------- File Date Modified ------------ */
     QString dateModified = index.data(ItemDelegateRoles::DateModified).toString();
@@ -207,11 +239,13 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     // Elided Text
     QString elidedDateModifiedTxt = QFontMetrics(font).elidedText(dateModified, Qt::ElideRight, dateModifiedW);
 
-    // Text Color
-    painter->setPen("#6B7280");
+    if (isListViewMode) {
+        // Text Color
+        painter->setPen("#6B7280");
 
-    // Drawing Text
-    painter->drawText(dateModifiedTxtRect, Qt::AlignVCenter | Qt::AlignLeft, elidedDateModifiedTxt);
+        // Drawing Text
+        painter->drawText(dateModifiedTxtRect, Qt::AlignVCenter | Qt::AlignLeft, elidedDateModifiedTxt);
+    }
 
     /* ----------------- Encryption/Decryption ------------ */
     bool isEncrypted = (index.data(ItemDelegateRoles::EncryptionStatus)).toBool();
@@ -222,8 +256,8 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     // Rect 
     const int statusH = 24;
     const int statusW = 102;
-    int statusX = dateModifiedTxtRect.right() + spacing;
-    int statusY = itemRect.y() + (itemRect.height() - statusH) / 2;
+    int statusX = isListViewMode ? (dateModifiedTxtRect.right() + spacing) : (itemRect.x() + (itemRect.width() - statusW) / 2);
+    int statusY = isListViewMode ? (itemRect.y() + (itemRect.height() - statusH) / 2) : (titleRect.bottom() + 14); 
     QRect statusRect(statusX, statusY, statusW, statusH);
 
     // Border

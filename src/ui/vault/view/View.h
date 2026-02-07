@@ -71,7 +71,6 @@ class View : public QWidget {
     
     // Scroll Bars
     ScrollBar *vScroll = nullptr;
-    ScrollBar *hScroll = nullptr;
 
     // Items View Delegate
     ViewDelegate *_delegate = nullptr;
@@ -82,4 +81,8 @@ class View : public QWidget {
     // Helpers
     void updateEmptyState();
     void updateEmptyStatePosition();
+
+    // Slots
+    void onListViewModeSelected();
+    void onGridViewModeSelected();
 };

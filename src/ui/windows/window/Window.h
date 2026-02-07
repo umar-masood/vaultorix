@@ -9,7 +9,7 @@
 #include <QObject>
 #include <QPoint>
 #include <QSet>
-
+#include <QResizeEvent>
 class Window : public QWidget {
     Q_OBJECT
 
