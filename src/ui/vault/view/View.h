@@ -81,6 +81,7 @@ class View : public QWidget {
     // Helpers
     void updateEmptyState();
     void updateEmptyStatePosition();
+    void updateGridLayout();
 
     // Slots
     void onListViewModeSelected();

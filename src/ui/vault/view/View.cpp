@@ -81,13 +81,26 @@ View::View(QWidget *parent) : QWidget(parent) {
     _model.appendRow(new ViewItem("Notes.txt",  IconManager::icon(Icons::File_TXT),  "TXT",  "3 KB",   "12 Feb 2026", false, false));
     _model.appendRow(new ViewItem("Resume.pdf", IconManager::icon(Icons::File_PDF),  "PDF",  "210 KB", "11 Feb 2026", false, false));
     _model.appendRow(new ViewItem("Photo.jpg",  IconManager::icon(Icons::File_JPG),  "JPEG", "1.9 MB", "10 Feb 2026", false, true));
-    _model.appendRow(new ViewItem("Old project code backup is the key of success obtaining.zip", IconManager::icon(Icons::File_ZIP), "ZIP", "720 MB", "21 Jan 2026", true, false));
+    _model.appendRow(new ViewItem("Music.mp3",  IconManager::icon(Icons::File_MP3),  "MP3",  "5.4 MB", "09 Feb 2026", false, false));
+    _model.appendRow(new ViewItem("Video.mp4",  IconManager::icon(Icons::File_MP4),  "MP4",  "88 MB",  "08 Feb 2026", false, false));
+    _model.appendRow(new ViewItem("Meeting notes.txt", IconManager::icon(Icons::File_TXT), "TXT", "12 KB", "07 Feb 2026", true, false));
+    _model.appendRow(new ViewItem("Project overview.pdf", IconManager::icon(Icons::File_PDF), "PDF", "1.1 MB", "06 Feb 2026", false, false));
+    _model.appendRow(new ViewItem("Travel itinerary.pdf", IconManager::icon(Icons::File_PDF), "PDF", "380 KB", "22 Jan 2026", false, false));
+    _model.appendRow(new ViewItem("Old project code backup.zip", IconManager::icon(Icons::File_ZIP), "ZIP", "720 MB", "21 Jan 2026", true, false));
     _model.appendRow(new ViewItem("Company logo vector.ai", IconManager::icon(Icons::File_AI), "AI", "3.3 MB", "20 Jan 2026", false, false));
-    _model.appendRow(new ViewItem("Personal journal entry in conference room at night.txt", IconManager::icon(Icons::File_TXT), "TXT", "8 KB", "19 Jan 2026", true, false));
-    _model.appendRow(new ViewItem("Meeting agenda for project propesla diswj.txt", IconManager::icon(Icons::File_TXT), "TXT", "4 KB", "05 Dec 2025", false, false));
+    _model.appendRow(new ViewItem("Personal journal entry.txt", IconManager::icon(Icons::File_TXT), "TXT", "8 KB", "19 Jan 2026", true, false));
+    _model.appendRow(new ViewItem("Birthday celebration photos.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "5.8 MB", "18 Jan 2026", false, true));
+    _model.appendRow(new ViewItem("Meeting agenda.txt", IconManager::icon(Icons::File_TXT), "TXT", "4 KB", "05 Dec 2025", false, false));
     _model.appendRow(new ViewItem("Landscape photography.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "7.2 MB", "04 Dec 2025", false, false));
     _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
-    
+    _model.appendRow(new ViewItem("Meeting notes.txt", IconManager::icon(Icons::File_TXT), "TXT", "12 KB", "07 Feb 2026", true, false));
+    _model.appendRow(new ViewItem("Team photos.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "6.7 MB", "03 Jan 2026", false, false));
+    _model.appendRow(new ViewItem("Fitness tutorial.mp4", IconManager::icon(Icons::File_MP4), "MP4", "380 MB", "02 Jan 2026", false, true));
+    _model.appendRow(new ViewItem("Draft manuscript.docx", IconManager::icon(Icons::File_DOC), "DOCX", "150 KB", "01 Jan 2026", false, false));
+    _model.appendRow(new ViewItem("Landscape photo.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "7.2 MB", "04 Dec 2025", false, false));
+    _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
+    _model.appendRow(new ViewItem("Team report.docx", IconManager::icon(Icons::File_DOC), "DOCX", "112 KB", "02 Dec 2025", false, false));
+    _model.appendRow(new ViewItem("Annual calendar.psd", IconManager::icon(Icons::File_PSD), "PSD", "28 MB", "01 Dec 2025", false, false));
     _model.appendRow(new ViewItem("Notes.txt",  IconManager::icon(Icons::File_TXT),  "TXT",  "3 KB",   "12 Feb 2026", false, false));
     _model.appendRow(new ViewItem("Resume.pdf", IconManager::icon(Icons::File_PDF),  "PDF",  "210 KB", "11 Feb 2026", false, false));
     _model.appendRow(new ViewItem("Photo.jpg",  IconManager::icon(Icons::File_JPG),  "JPEG", "1.9 MB", "10 Feb 2026", false, true));
@@ -119,6 +132,26 @@ View::View(QWidget *parent) : QWidget(parent) {
     updateEmptyStatePosition();
 }
 
+void View::updateGridLayout() {
+    if (!_list || _list->viewMode() != QListView::IconMode)
+        return;
+
+    int viewportWidth = _list->viewport()->width();
+    if (viewportWidth <= 0)
+        return;
+    
+    const int minItemWidth = 258;
+    const int itemHeight = 210;
+    int spacing = _list->spacing();
+
+    int cols = qMax(1, viewportWidth / (minItemWidth + spacing)); // tells us how many cols of specificed width can be inserted
+    int totalSpacing = spacing * (cols - 1); // there will be no space after the last column;
+    int finalItemW = (viewportWidth - totalSpacing) / cols; // ditributing equally width to all cols
+
+    _list->setGridSize(QSize(finalItemW, itemHeight));
+}
+
+
 void View::onListViewModeSelected() {
     if (_delegate) {
         _delegate->setViewMode(ItemsViewMode::ListMode);
@@ -126,6 +159,7 @@ void View::onListViewModeSelected() {
     }
 
     if (_list) {
+        _list->setGridSize(QSize());
         _list->setViewMode(QListView::ListMode);
         _list->setSpacing(0);
         _list->setWrapping(false);
@@ -141,7 +175,7 @@ void View::onGridViewModeSelected() {
 
     if (_list) {
         _list->setViewMode(QListView::IconMode);
-        _list->setSpacing(4);
+        _list->setSpacing(2);
         _list->setUniformItemSizes(true);  
         _list->setResizeMode(QListView::Adjust);
         _list->setWrapping(true);  
@@ -149,6 +183,7 @@ void View::onGridViewModeSelected() {
         _list->setAcceptDrops(false);          
         _list->setDragDropMode(QAbstractItemView::NoDragDrop);  
         _list->setDefaultDropAction(Qt::IgnoreAction); 
+        updateGridLayout();
     }
 };
 
@@ -170,6 +205,7 @@ void View::updateEmptyStatePosition() {
 
 void View::resizeEvent(QResizeEvent *event) {
    updateEmptyStatePosition();
+   updateGridLayout();
    QWidget::resizeEvent(event);
 }
 
