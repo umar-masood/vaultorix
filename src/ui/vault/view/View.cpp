@@ -15,12 +15,14 @@ View::View(QWidget *parent) : QWidget(parent) {
     filterButtonMenu->setFontProperties("Segoe UI", 10);
     filterButtonMenu->setText("Filter");
     filterButtonMenu->setFontXY(0, -1);
-    filterButtonMenu->menu()->delegate()->setSelectionCheckIndicator(true);
-    filterButtonMenu->menu()->addAction({"All file types"});
-    filterButtonMenu->menu()->addAction({"Documents"});
-    filterButtonMenu->menu()->addAction({"Pictures"});
-    filterButtonMenu->menu()->addAction({"Music"});
-    filterButtonMenu->menu()->addAction({"Videos"});
+    filterButtonMenu->menu()->setItemSize(QSize(180, 36));
+    filterButtonMenu->menu()->delegate()->setSelectionDotIndicator(true);
+    filterButtonMenu->menu()->setIconic(true);
+    filterButtonMenu->menu()->addAction({"All file types",false, "", IconManager::icon(Icons::Files), IconManager::icon(Icons::Files)});
+    filterButtonMenu->menu()->addAction({"Documents", false, "",  IconManager::icon(Icons::Document), IconManager::icon(Icons::Document)});
+    filterButtonMenu->menu()->addAction({"Pictures", false, "",  IconManager::icon(Icons::Picture), IconManager::icon(Icons::Picture)});
+    filterButtonMenu->menu()->addAction({"Music", false, "",  IconManager::icon(Icons::Music), IconManager::icon(Icons::Music)});
+    filterButtonMenu->menu()->addAction({"Videos", false, "",  IconManager::icon(Icons::Video), IconManager::icon(Icons::Video)});
     filterButtonMenu->menu()->delegate()->setActiveIndex(filterButtonMenu->menu()->itemIndex("All file types")); // Setting Default one
 
     // Search Box
@@ -104,13 +106,6 @@ View::View(QWidget *parent) : QWidget(parent) {
     _model.appendRow(new ViewItem("Notes.txt",  IconManager::icon(Icons::File_TXT),  "TXT",  "3 KB",   "12 Feb 2026", false, false));
     _model.appendRow(new ViewItem("Resume.pdf", IconManager::icon(Icons::File_PDF),  "PDF",  "210 KB", "11 Feb 2026", false, false));
     _model.appendRow(new ViewItem("Photo.jpg",  IconManager::icon(Icons::File_JPG),  "JPEG", "1.9 MB", "10 Feb 2026", false, true));
-    _model.appendRow(new ViewItem("Old project code backup is the key of success obtaining.zip", IconManager::icon(Icons::File_ZIP), "ZIP", "720 MB", "21 Jan 2026", true, false));
-    _model.appendRow(new ViewItem("Company logo vector.ai", IconManager::icon(Icons::File_AI), "AI", "3.3 MB", "20 Jan 2026", false, false));
-    _model.appendRow(new ViewItem("Personal journal entry in conference room at night.txt", IconManager::icon(Icons::File_TXT), "TXT", "8 KB", "19 Jan 2026", true, false));
-    _model.appendRow(new ViewItem("Meeting agenda for project propesla diswj.txt", IconManager::icon(Icons::File_TXT), "TXT", "4 KB", "05 Dec 2025", false, false));
-    _model.appendRow(new ViewItem("Landscape photography.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "7.2 MB", "04 Dec 2025", false, false));
-    _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
-    
 
     // Layout
     _layout = new QVBoxLayout(this);

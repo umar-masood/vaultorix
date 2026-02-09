@@ -100,5 +100,11 @@ enum Icons {
     File_WMA            = 0x6D,
     File_XML            = 0x6E,
     File_XSL            = 0x6F,
-    File_ZIP            = 0x70
+    File_ZIP            = 0x70,
+
+    Files               = 0x71,
+    Picture             = 0x72,
+    Music               = 0x73,
+    Video               = 0x74,
+    Document            = 0x75
 };

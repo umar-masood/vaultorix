@@ -23,7 +23,6 @@ ViewDelegate::ViewDelegate(QObject *parent) :
                     QStyledItemDelegate(parent), 
                     cbSize(20, 20),
                     statusIconSize(16, 16),
-                    fileThumbIconSize(40,46),
                     _viewMode(ItemsViewMode::ListMode),
                     cbPixmap(QPixmap((IconManager::icon(Icons::CheckBox_Check))).scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation)) {}
 
@@ -65,6 +64,9 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
     // List or Grid View Mode
     bool isListViewMode = (_viewMode == ItemsViewMode::ListMode);
+
+    // Progress Bar 
+    bool showProgressBar = index.data(ItemDelegateRoles::ShowProgress).toBool();
 
     /* ----------------------- Drawing Item Hover ------------------ */
     painter->setPen(Qt::NoPen);
@@ -125,18 +127,30 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     painter->drawRoundedRect(thumbnailRect, 6, 6);
 
     // Drawing Icon
-    QPixmap thumbPixmap = QPixmap(index.data(ItemDelegateRoles::FileThumbnail).toString())
-                          .scaled(fileThumbIconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QSize iconSize;
 
-    int thumbIconX = thumbnailRect.x() + (thumbnailRect.width() - fileThumbIconSize.width()) / 2;
-    int thumbIconY = thumbnailRect.y() + (thumbnailRect.height() - fileThumbIconSize.height()) / 2;
+    if (isListViewMode)
+        iconSize = QSize(40, 46);     
+    else
+        iconSize = QSize(80, 92);    
+
+    QPixmap thumbPixmap = QPixmap(index.data(ItemDelegateRoles::FileThumbnail).toString())
+                      .scaled(iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    int thumbIconX = thumbnailRect.x() + (thumbnailRect.width() - iconSize.width()) / 2;
+    int thumbIconY = thumbnailRect.y() + (thumbnailRect.height() - iconSize.height()) / 2;
+
+    painter->save();
+    if (!isListViewMode && showProgressBar)
+        painter->setOpacity(0.1);
 
     painter->drawPixmap(thumbIconX, thumbIconY, thumbPixmap);
+    painter->restore();
 
     /* ----------------- File Title -------------------- */
     QString fileTitle = index.data(ItemDelegateRoles::FileTitle).toString();
 
-    int titleW = isListViewMode ? (itemRect.width() * 0.40) : (itemRect.width() - 16);
+    int titleW = isListViewMode ? (itemRect.width() * 0.30) : (itemRect.width() - 16);
     int titleH = itemRect.height() - 4;
     int titleX = isListViewMode ? (thumbnailRect.right() + spacing) : (itemRect.x() + (itemRect.width() - titleW) / 2);
     int titleY = isListViewMode ? itemRect.y() : (thumbnailRect.bottom() + 14);
@@ -318,6 +332,89 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
     // Drawing Text
     painter->drawText(statusTxtRect, Qt::AlignVCenter | Qt::AlignLeft, statusText);
+
+    /* --------------------- Progress Bar ---------------------------------- */
+
+    if (showProgressBar) {
+        const int progressW = 140;
+        const int progressH = 26;
+        int progressY = isListViewMode ? (itemRect.y() + (itemRect.height() - progressH) / 2) : (thumbnailRect.y() + (thumbnailRect.height() - progressH) / 2);
+        int progressX = isListViewMode ? (statusRect.right() + spacing) : (thumbnailRect.x() + (thumbnailRect.width() - progressW)/2);
+
+        // Main Rectangle (Progress Bar + Percentage + Text)
+        QRect progressRect(progressX, progressY, progressW, progressH);
+
+        // Progress Text Rect
+        const int progressSpacing = 7;
+        const int trackH = 4;
+        int progressTextH = fm.height();
+        int totalContentH = progressTextH + progressSpacing + trackH;
+        int contentY = progressRect.y() + (progressRect.height() - totalContentH) / 2;
+
+        QRect progressTxtRect(progressRect.x() + 2, contentY, progressRect.width(), progressTextH);
+
+        // Text Color
+        QColor progressColor =  isDecrypted ? (
+                isDarkMode ? "#44FF73" : "#0ACD3B"
+            ) : (
+                isDarkMode ? "#FF8989" : "#C71010"
+            );
+
+        painter->setPen(progressColor);
+
+        // Drawing Text
+        QString progressText;
+        if (isEncrypted) 
+            progressText = "Decrypting...";
+        
+        if (isDecrypted)
+            progressText = "Encrypting...";
+
+        painter->drawText(progressTxtRect, isListViewMode ? (Qt::AlignLeft | Qt::AlignVCenter) : (Qt::AlignCenter), progressText);
+
+        // Progress Track and Bar
+        // Track
+        painter->setPen(Qt::NoPen);
+
+        if (isListViewMode)
+            brushColor = isDarkMode ? "#1C1C1C" : "#FFFFFF";
+        else
+            brushColor = isDarkMode ? "#2D2D2D" : "#F0F0F0";
+
+        painter->setBrush(brushColor);
+
+        const int trackW = 100;
+        int trackX = progressRect.x() + 2;
+        int trackY = progressTxtRect.bottom() + progressSpacing;
+        
+        // Track Rect
+        QRect trackRec(trackX, trackY, trackW, trackH);
+
+        // Drawing Track
+        painter->drawRoundedRect(trackRec, trackH / 2, trackH / 2);
+
+        // Progress bar
+        painter->setBrush(progressColor);
+
+        // Getting current Value
+        double currentValue = index.data(ItemDelegateRoles::ProgressCurrentValue).toDouble();
+        currentValue = std::clamp(currentValue / 100, 0.0, 1.0);
+        int barWidth = int(currentValue * trackW);
+        
+        QRect barRec(trackX, trackY, barWidth, trackH);
+        painter->drawRoundedRect(barRec, trackH / 2, trackH / 2);
+
+        // Progress Percentage Text
+        painter->setPen(progressColor);
+
+        QString progressPercentText = QString::number(index.data(ItemDelegateRoles::ProgressCurrentValue).toInt()) + "%";
+        
+        // Percentage Rect
+        int percentY = trackRec.y() + (trackRec.height() - progressTextH) / 2;
+
+        QRect progressPercentRect(trackRec.right() + progressSpacing, percentY - 1, 28, progressTextH);
+        painter->drawText(progressPercentRect, Qt::AlignRight | Qt::AlignVCenter, progressPercentText);
+    }
 
     painter->restore();
 }

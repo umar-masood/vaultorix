@@ -7,17 +7,21 @@
 #include <QModelIndex>
 #include <QIcon>
 #include <QStandardItem>
-
+#include <algorithm>
+#include <QtMath>
 #include "../../../resources/IconManager.h"
+#include <QTimer>
 
 enum ItemDelegateRoles {
-    FileTitle           =   Qt::DisplayRole,
-    FileThumbnail       =   Qt::UserRole + 1,
-    FileType            =   Qt::UserRole + 2,
-    FileSize            =   Qt::UserRole + 3,
-    DateModified        =   Qt::UserRole + 4,
-    EncryptionStatus    =   Qt::UserRole + 5,
-    DecryptionStatus    =   Qt::UserRole + 6,
+    FileTitle               =   Qt::DisplayRole,
+    FileThumbnail           =   Qt::UserRole + 1,
+    FileType                =   Qt::UserRole + 2,
+    FileSize                =   Qt::UserRole + 3,
+    DateModified            =   Qt::UserRole + 4,
+    EncryptionStatus        =   Qt::UserRole + 5,
+    DecryptionStatus        =   Qt::UserRole + 6,
+    ShowProgress            =   Qt::UserRole + 7,
+    ProgressCurrentValue    =   Qt::UserRole + 8
 };
 
 enum ItemsViewMode {
@@ -26,6 +30,7 @@ enum ItemsViewMode {
 };
 
 class ViewItem : public QStandardItem {
+    
     public:
     ViewItem(const QString &title, 
             const QString &thumbnailPath,
@@ -69,7 +74,4 @@ class ViewDelegate : public QStyledItemDelegate {
 
     // Encryption Status Icon
     QSize statusIconSize;
-
-    // File Thumbnail Icon
-    QSize fileThumbIconSize;
 };

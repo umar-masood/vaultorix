@@ -100,5 +100,10 @@
     <file>icons/fileTypes/SVG.svg</file>
     <file>icons/fileTypes/ZIP.svg</file>
     <file>icons/fileTypes/WMA.svg</file>
+    <file>icons/music.svg</file>
+    <file>icons/picture.svg</file>
+    <file>icons/video.svg</file>
+    <file>icons/files.svg</file>
+    <file>icons/document.svg</file>
   </qresource>
 </RCC>

@@ -78,6 +78,9 @@ class View : public QWidget {
     // Main Layout
     QVBoxLayout *_layout = nullptr;
 
+    QTimer *progressTimer = nullptr;
+
+
     // Helpers
     void updateEmptyState();
     void updateEmptyStatePosition();
