@@ -105,5 +105,11 @@
     <file>icons/video.svg</file>
     <file>icons/files.svg</file>
     <file>icons/document.svg</file>
+    <file>icons/avator.svg</file>
+    <file>icons/info.svg</file>
+    <file>icons/bug.svg</file>
+    <file>icons/settings.svg</file>
+    <file>icons/subscription.svg</file>
+    <file>icons/account-settings.svg</file>
   </qresource>
 </RCC>

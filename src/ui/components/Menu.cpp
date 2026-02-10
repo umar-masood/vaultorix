@@ -13,7 +13,7 @@ Menu::Menu(QWidget *parent) : QListView(parent), _maxVisibleItems(8) {
 
 void Menu::init() {
     // Popup
-    popup = new RoundedBox();
+    popup = new RoundedBox(nullptr);
     popup->hide();
 
     // Delegate
@@ -60,6 +60,9 @@ void Menu::init() {
     // Item Clicked Signal Slot
     disconnect(this, &Menu::clicked, this, &Menu::onItemClicked);
     connect(this, &Menu::clicked, this, &Menu::onItemClicked);
+
+    // Initial Theme
+    setDarkMode(isDarkMode);
 }
 
 void Menu::fadeIn() {

@@ -43,6 +43,7 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
 
     // User Profile Widget
     user_widget = new User;
+    user_widget->setName("Umar Masood");
 
     // Layout
     layout = new QHBoxLayout(this);

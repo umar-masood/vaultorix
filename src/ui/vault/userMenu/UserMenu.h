@@ -1,0 +1,63 @@
+#pragma once
+
+#include "../../components/RoundedBox.h"
+#include "../../components/Button.h"
+#include "../../../resources/IconManager.h"
+#include "../../components/SmoothOpacity.h"
+
+#include <QApplication>
+#include <QVBoxLayout>
+#include <QVector>
+
+class UserMenu : public RoundedBox {
+    Q_OBJECT
+
+    public:
+    explicit UserMenu(QWidget *parent = nullptr);
+
+    void setDarkMode(bool enable);
+    void setAvator(const QPixmap &avator);
+    void setName(const QString &name);
+    void setEmail(const QString &email);
+
+    Button* accountSettingsButton() const;
+    Button* manageSubscriptionButton() const;
+    Button* preferencesButton() const;
+    Button* reportBugButton() const;
+    Button* aboutButton() const; 
+
+    protected:
+    void paintEvent(QPaintEvent *event) override;
+    bool eventFilter(QObject *o, QEvent *event) override;
+
+    private:
+    // Theme Mode Flag
+    bool isDarkMode = false;
+
+    // Data
+    QPixmap _avator;
+    QString _name;
+    QString _email;
+
+    // Option Buttons
+    Button *account_settings_btn      = nullptr;
+    Button *manage_subscription_btn   = nullptr;
+    Button *preferences_btn           = nullptr;
+    Button *report_bug_btn            = nullptr;
+    Button *about                     = nullptr;
+    
+    QVector<Button *> option_buttons;
+    
+    // Layout
+    QVBoxLayout *layout = nullptr;
+
+    // Animations Effects
+    SmoothOpacity *smooth_opacity = nullptr;
+    QPropertyAnimation *animation = nullptr;
+
+    // Helpers
+    Button* createButton(const QString &text, const QString &iconPath);
+    void fadeIn();
+    void fadeOut();
+
+};

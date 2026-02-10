@@ -68,6 +68,13 @@ QString IconManager::icon(Icons icon) {
         case Icons::DecryptLight:      return ":/icons/decryptLight.svg";
         case Icons::DecryptDark:       return ":/icons/decryptDark.svg";
 
+        case Icons::Avator:            return ":/icons/avator.svg";
+        case Icons::AccountSettings:   return ":/icons/account-settings.svg";
+        case Icons::Bug:               return ":/icons/bug.svg";
+        case Icons::Preferences:       return ":/icons/settings.svg";
+        case Icons::About:             return ":/icons/info.svg";
+        case Icons::Subscription:      return ":/icons/subscription.svg";
+
         case Icons::Files:             return ":/icons/files.svg";
         case Icons::Picture:           return ":/icons/picture.svg";
         case Icons::Video:             return ":/icons/video.svg";

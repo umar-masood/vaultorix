@@ -2,13 +2,36 @@
 
 User::User(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_Hover);
-  setFixedSize(210, 58);
-  setAvator(QPixmap("C:/Users/umara/Downloads/Icons/avator.jpg"), 36);
+  setAvator(QPixmap(IconManager::icon(Icons::Avator)), 36);
 }
 
-void User::setDarkMode(bool enable) { isDarkMode = enable; update(); }
-void User::setEmail(const QString &email) { this->email = email; }
-void User::setName(const QString &name) { this->name = name; }
+void User::setDarkMode(bool enable) { 
+  isDarkMode = enable; 
+  update(); 
+}
+
+void User::setName(const QString &name) { 
+  _name = name;
+  adjustWidgetSize();
+}
+
+void User::adjustWidgetSize() {
+  QFontMetrics fm(font());
+  int textW = fm.horizontalAdvance(_name);
+
+  const int spacing = 12;
+  int totalW = 12 + avator.width() + 12 + textW + 12;
+
+  setFixedSize(totalW, 58);
+}
+
+QFont User::font() {
+  QFont fnt;
+  fnt.setFamily("Segoe UI");
+  fnt.setPixelSize(14);
+  fnt.setWeight(QFont::Medium);
+  return fnt;
+}
 
 void User::setAvator(const QPixmap &pixmap, int size) {
   if (pixmap.isNull()) {
@@ -52,50 +75,35 @@ void User::paintEvent(QPaintEvent *event) {
   painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
   // Background
-  QColor bg_color;
+  QColor brushColor;
 
   if (isPressed)
-    bg_color = isDarkMode ? "#242424" : "#FFFFFF";
+    brushColor = isDarkMode ? "#242424" : "#FFFFFF";
   else if (isHover)
-    bg_color = isDarkMode ? "#323232" : "#F0F0F0";
+    brushColor = isDarkMode ? "#323232" : "#F0F0F0";
   else if (!isEnabled())
-    bg_color = isDarkMode ? "#555555" : "#E0E0E0";
+    brushColor = isDarkMode ? "#555555" : "#E0E0E0";
   else
-    bg_color = Qt::transparent;
+    brushColor = Qt::transparent;
 
-  painter.setBrush(bg_color);
+  painter.setBrush(brushColor);
   painter.setPen(Qt::NoPen);
   painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
 
   // Avator
-  painter.drawPixmap(QRect(12, (height() - avator.height()) / 2, 36, 36), avator);
+  int avatarY = (height() - avator.height()) / 2;
+  painter.drawPixmap(12, avatarY, avator.width(), avator.height(), avator);
 
   // Name Text
-  QFont fnt;
-  fnt.setFamily("Segoe UI");
-  fnt.setPixelSize(14);
-  fnt.setWeight(QFont::DemiBold);
-  painter.setFont(fnt);
+  painter.setFont(font());
+  painter.setPen(isDarkMode ? Qt::white : Qt::black);
 
-  // Font Metrics of Name Text
-  QFontMetrics fm(fnt);
-  int maxWidth = 138;
-  QString elidedText = fm.elidedText(name, Qt::ElideRight, maxWidth);
+  int textX = 12 + avator.width() + 12;
+  int textW = width() - textX - 12;
 
-  painter.setPen(isDarkMode ? "white" : "black");
-  painter.drawText(12 + avator.width() + 12, 26, elidedText);
+  QRect textRect(textX, 0, textW, height());
+  painter.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft, _name);
 
-  // Email Text
-  fnt.setPointSize(10);
-  fnt.setBold(false);
-  painter.setFont(fnt);
-
-  // Font Metrics of Email Text
-  fm = QFontMetrics(fnt);
-  elidedText = fm.elidedText(email, Qt::ElideRight, maxWidth);
-
-  painter.setPen(isDarkMode ? "#A4A4A4" : "#878787");
-  painter.drawText(12 + avator.width() + 12, 44, elidedText);
 }
 
 void User::mousePressEvent(QMouseEvent *event) {

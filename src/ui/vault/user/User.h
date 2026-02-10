@@ -8,6 +8,7 @@
 #include <QRect>
 #include <QPainterPath>
 #include <QFont>
+#include "../../../resources/IconManager.h"
 
 class User : public QWidget {
     Q_OBJECT
@@ -15,7 +16,6 @@ class User : public QWidget {
     public:
     explicit User(QWidget *parent = nullptr);
     void setDarkMode(bool enable);
-    void setEmail(const QString &email);
     void setName(const QString &name);
     void setAvator(const QPixmap &pixmap, int size);
 
@@ -29,7 +29,10 @@ class User : public QWidget {
     signals:
     void clicked();
 
-    private:
+    private: 
+    void adjustWidgetSize();
+    QFont font();
+    
     // Flags
     bool isDarkMode = false;
     bool isHover = false;
@@ -37,11 +40,7 @@ class User : public QWidget {
 
     // Profile Icon
     QPixmap avator;
-
+    
     // Name
-    QString name = "Umar Masood Khan";
-
-    // User Email-address
-    QString email = "umarmasood8546@gmail.com";
-
+    QString _name = "Umar Masood Khan";
 };

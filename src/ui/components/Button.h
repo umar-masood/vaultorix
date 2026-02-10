@@ -15,13 +15,12 @@
 #include <QSize>
 #include <QRect>
 
-class Button : public QPushButton
-{
+class Button : public QPushButton {
   Q_OBJECT
   Q_PROPERTY(QColor startColor READ getStartColor WRITE setStartColor)
   Q_PROPERTY(QColor endColor READ getEndColor WRITE setEndColor)
   
-public:
+  public:
   enum DisplayMode { IconOnly, TextOnly, IconText, TextUnderIcon, };
 
   explicit Button(const QString &text, QWidget *parent = nullptr);
@@ -125,7 +124,7 @@ private:
 
   // Font 
   QString fontFamily = "Segoe UI";
-  int fontSize = 11;
+  int fontSize = 10;
   QFont::Weight fontWeight = QFont::Normal;
 
   // Loader

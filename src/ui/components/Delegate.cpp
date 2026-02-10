@@ -59,16 +59,14 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
     
     // Drawing Dot Indicator
     bool isActive = (index == activeIndex);
-    if (hasDotIndicator && isActive) {
+    if (hasDotIndicator && isActive) 
         painter->drawPixmap(iconX, iconY, QPixmap(IconManager::icon(Icons::Dot))
                             .scaled(IconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
 
     // Drawing Check Indicator
-    if (hasCheckIndicator && isActive) {
+    if (hasCheckIndicator && isActive) 
         painter->drawPixmap(iconX, iconY, QPixmap(IconManager::icon(Icons::Delegate_Check))
                             .scaled(IconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
 
     int tX = iconX;
 

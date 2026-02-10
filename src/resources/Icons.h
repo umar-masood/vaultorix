@@ -106,5 +106,12 @@ enum Icons {
     Picture             = 0x72,
     Music               = 0x73,
     Video               = 0x74,
-    Document            = 0x75
+    Document            = 0x75,
+    
+    Avator              = 0x76,
+    AccountSettings     = 0x77,
+    Subscription        = 0x78,
+    Preferences         = 0x79,
+    Bug                 = 0x7A,
+    About               = 0x7B
 };
