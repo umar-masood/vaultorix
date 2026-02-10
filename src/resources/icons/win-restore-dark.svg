@@ -1,1 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><polyline points="18.69 14.17 18.69 5.36 9.95 5.36" style="fill:none; stroke:#fff; stroke-miterlimit:10; stroke-width:1.5px;"/><rect x="5.31" y="9.83" width="8.74" height="8.81" style="fill:none; stroke:#fff; stroke-miterlimit:10; stroke-width:1.5px;"/></svg>
+<svg width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 5.00006V14.0001H12V5.00006H3ZM11 13.0001H4V6.00006H11V13.0001Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M5 5.00006H6V4.00006H13V11.0001H12V12.0001H14V5.00006V3.00006H12H5V5.00006Z" fill="white"/>
+</svg>
