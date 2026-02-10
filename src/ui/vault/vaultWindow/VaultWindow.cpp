@@ -4,7 +4,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   // Window Properties
   setWindowTitle("Vaultorix");
   setWindowIcon(QIcon(AppIcon));
-  setMinimumSize(QSize(1100,700));
+  setMinimumSize(QSize(1150,700));
 
   // Title Bar
   // App Icon

@@ -73,13 +73,15 @@ void Button::setIconPaths(const QString &lightIcon, const QString &darkIcon) {
 
   // Preload pixmaps
   if (!lightIcon.isEmpty()) {
-    _lightIcon.load(lightIcon);
-    _lightIcon = _lightIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    // _lightIcon.load(lightIcon);
+    // _lightIcon = _lightIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    _lightIcon = IconManager::renderSvg(lightIcon, _iconSize);
   }
 
   if (!darkIcon.isEmpty()) {
-    _darkIcon.load(darkIcon);
-    _darkIcon = _darkIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    // _darkIcon.load(darkIcon);
+    // _darkIcon = _darkIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    _darkIcon = IconManager::renderSvg(darkIcon, _iconSize);
   }
 }
 
@@ -274,7 +276,6 @@ void Button::drawBackground(QPainter &painter, const QColor &bgColor) {
     painter.setBrush(Qt::NoBrush);
   else 
     painter.setBrush(bgColor);
-  
 
   if (!isHyperLink) {
     QPainterPath path;

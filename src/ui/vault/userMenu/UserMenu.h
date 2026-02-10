@@ -19,6 +19,7 @@ class UserMenu : public RoundedBox {
     void setAvator(const QPixmap &avator);
     void setName(const QString &name);
     void setEmail(const QString &email);
+    void showAt(QWidget *anchorWidget);
 
     Button* accountSettingsButton() const;
     Button* manageSubscriptionButton() const;
@@ -26,9 +27,11 @@ class UserMenu : public RoundedBox {
     Button* reportBugButton() const;
     Button* aboutButton() const; 
 
+    void fadeIn();
+    void fadeOut();
+
     protected:
     void paintEvent(QPaintEvent *event) override;
-    bool eventFilter(QObject *o, QEvent *event) override;
 
     private:
     // Theme Mode Flag
@@ -57,7 +60,4 @@ class UserMenu : public RoundedBox {
 
     // Helpers
     Button* createButton(const QString &text, const QString &iconPath);
-    void fadeIn();
-    void fadeOut();
-
 };

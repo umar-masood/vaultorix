@@ -16,15 +16,5 @@ int main(int argc, char *argv[])
     VaultWindow *vw = new VaultWindow;
     vw->show();
 
-    UserMenu *um = new UserMenu;
-    um->setAvator(QPixmap(
-                (IconManager::icon(Icons::Avator))
-                ).scaled(100, 100, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
-
-    um->setName("Umar Masood");
-    um->setEmail("umarmasood8546@gmail.com");
-    um->setDarkMode(true);
-    um->show();
-
     return app.exec();
 }

@@ -111,5 +111,9 @@
     <file>icons/settings.svg</file>
     <file>icons/subscription.svg</file>
     <file>icons/account-settings.svg</file>
+    <file>icons/win-minimize-light.svg</file>
+    <file>icons/win-minimize-dark.svg</file>
+    <file>icons/win-close-light.svg</file>
+    <file>icons/win-close-dark.svg</file>
   </qresource>
 </RCC>

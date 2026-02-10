@@ -113,5 +113,14 @@ enum Icons {
     Subscription        = 0x78,
     Preferences         = 0x79,
     Bug                 = 0x7A,
-    About               = 0x7B
+    About               = 0x7B,
+
+    Win_CloseLight      = 0x7C,
+    Win_CloseDark       = 0x7D,
+    Win_MinimizeLight   = 0x7E,
+    Win_MinimizeDark    = 0x7F,
+    Win_MaximizeLight   = 0x80,
+    Win_MaximizeDark    = 0x81,
+    Win_RestoreDark     = 0x82,
+    Win_RestoreLight    = 0x83
 };

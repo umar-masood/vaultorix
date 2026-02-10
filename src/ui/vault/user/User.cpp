@@ -3,10 +3,63 @@
 User::User(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_Hover);
   setAvator(QPixmap(IconManager::icon(Icons::Avator)), 36);
+
+  um = new UserMenu;
+  um->setAvator(QPixmap((IconManager::icon(Icons::Avator)))
+                .scaled(100, 100, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+
+  um->setName("Umar Masood");
+  um->setEmail("umarmasood8546@gmail.com");
+
+  connect(this, &User::clicked, this, [this](){
+    if (um)
+      um->showAt(this);
+  });
+
+  // Installing Event Filter for auto closing on outside click
+  qApp->installEventFilter(this);
+ 
+  // Initial Theme
+  setDarkMode(isDarkMode);
+}
+
+
+bool User::eventFilter(QObject *o, QEvent *event) {
+  if (!um || !um->isVisible())
+    return QWidget::eventFilter(o, event);
+
+  if (event->type() == QEvent::MouseButtonPress) {
+    QMouseEvent *me = static_cast<QMouseEvent *>(event);
+    QPoint globalPos = me->globalPosition().toPoint();
+    QWidget *clickedWidget = QApplication::widgetAt(globalPos);
+
+    // Click outside everything
+    if (!clickedWidget) {
+      um->fadeOut();
+      return QWidget::eventFilter(o, event);
+    }
+
+    bool clickedInsideMenu = um->isAncestorOf(clickedWidget);
+    bool clickedOnUser     = this->isAncestorOf(clickedWidget);
+
+    if (!clickedInsideMenu && !clickedOnUser) 
+      um->fadeOut();
+      
+  }
+
+  if (event->type() == QEvent::ApplicationDeactivate) 
+    um->fadeOut();
+  
+  return QWidget::eventFilter(o, event);
 }
 
 void User::setDarkMode(bool enable) { 
-  isDarkMode = enable; 
+  if (isDarkMode == enable)
+    return;
+
+  isDarkMode = enable;
+
+  um->setDarkMode(isDarkMode);
   update(); 
 }
 

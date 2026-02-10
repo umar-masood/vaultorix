@@ -12,10 +12,7 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     animation = new QPropertyAnimation(smooth_opacity, "opacity");
     animation->setEasingCurve(QEasingCurve::InOutQuad);
     animation->setDuration(300);
-
-    // Installing Event Filter for auto closing on outside click
-    qApp->installEventFilter(this);
-
+    
     // Option Buttons
     // Account Settings
     account_settings_btn = createButton("Account Settings", IconManager::icon(Icons::AccountSettings));
@@ -79,26 +76,41 @@ void UserMenu::fadeOut() {
     animation->start();
 }
 
-bool UserMenu::eventFilter(QObject *o, QEvent *event) {
-    if (event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-        QWidget *clickedWidget = QApplication::widgetAt(mouseEvent->globalPosition().toPoint());
+void UserMenu::showAt(QWidget *anchorWidget) {
+    fadeIn();
+    
+    if (!anchorWidget) 
+        return;
+    
+    QPoint globalPos(anchorWidget->mapToGlobal(QPoint(0,0)));
 
-        if (this->isVisible() && this->isAncestorOf(clickedWidget)) 
-            fadeOut();
-    }
+    QScreen *screen = QApplication::screenAt(globalPos);
+    if (!screen) 
+        screen = QApplication::primaryScreen();
 
-    if (event->type() == QEvent::ApplicationDeactivate)
-        if (this->isVisible())  
-            fadeOut();
+    QRect screenRect(screen->availableGeometry());  
+    QRect anchorRect(globalPos, anchorWidget->size());  
+    QSize menuSize = size();
 
-    return QObject::eventFilter(o, event);
+    QPoint abovePos(anchorRect.left(), anchorRect.top() - menuSize.height() - 4);
+    QPoint belowPos(anchorRect.left(), anchorRect.bottom() + 4);
+    QPoint finalPos;
+
+    if (screenRect.contains(QRect(belowPos, menuSize)))
+       finalPos = belowPos;
+    else if (screenRect.contains(QRect(abovePos, menuSize)))
+       finalPos = abovePos;
+    else 
+       finalPos = belowPos;
+
+    int x = std::clamp(finalPos.x(), screenRect.left(), screenRect.right() - menuSize.width());
+    int y = std::clamp(finalPos.y(), screenRect.top(), screenRect.bottom() - menuSize.height());
+
+    move(QPoint(x, y));
+    raise();
 }
 
 void UserMenu::setDarkMode(bool enable) {
-    if (isDarkMode == enable) 
-        return;
-
     isDarkMode = enable;
 
     for (auto *btn : option_buttons) 

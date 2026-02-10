@@ -81,6 +81,16 @@ QString IconManager::icon(Icons icon) {
         case Icons::Music:             return ":/icons/music.svg";
         case Icons::Document:          return ":/icons/document.svg";
 
+        
+        case Icons::Win_CloseLight:    return ":/icons/win-close-light.svg";
+        case Icons::Win_CloseDark:     return ":/icons/win-close-dark.svg";
+        case Icons::Win_MinimizeLight: return ":/icons/win-minimize-light.svg";
+        case Icons::Win_MinimizeDark:  return ":/icons/win-minimize-dark.svg";
+        case Icons::Win_MaximizeLight: return ":/icons/win-maximize-light.svg";
+        case Icons::Win_MaximizeDark:  return ":/icons/win-maximize-dark.svg";
+        case Icons::Win_RestoreLight:  return ":/icons/win-restore-light.svg";
+        case Icons::Win_RestoreDark:   return ":/icons/win-restore-dark.svg";
+
         case Icons::File_AI:           return ":/icons/fileTypes/AI.svg";
         case Icons::File_AVI:          return ":/icons/fileTypes/AVI.svg";
         case Icons::File_BMP:          return ":/icons/fileTypes/BMP.svg";
@@ -125,4 +135,23 @@ QString IconManager::icon(Icons icon) {
 
     qWarning("The requested icon is not found");
     return QString();
+}
+
+QPixmap IconManager::renderSvg(const QString &iconPath, const QSize &size) {
+    QSvgRenderer svg(iconPath);
+    if (!svg.isValid()) {
+        qWarning() << "SVG not valid or not found:" << iconPath;
+        return QPixmap();
+    }
+
+    // --- Render SVG into 16x16 pixmap ---
+    QPixmap pm(size);
+    pm.fill(Qt::transparent);
+
+    QPainter p(&pm);
+    p.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    svg.render(&p, QRectF(0, 0, pm.width(), pm.height()));
+    p.end();
+
+    return pm;
 }

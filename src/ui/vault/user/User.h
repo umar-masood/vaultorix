@@ -8,6 +8,8 @@
 #include <QRect>
 #include <QPainterPath>
 #include <QFont>
+
+#include "../userMenu/UserMenu.h"
 #include "../../../resources/IconManager.h"
 
 class User : public QWidget {
@@ -25,6 +27,7 @@ class User : public QWidget {
     void mouseReleaseEvent(QMouseEvent *event) override;
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
+    bool eventFilter(QObject *o, QEvent *event) override;
 
     signals:
     void clicked();
@@ -43,4 +46,7 @@ class User : public QWidget {
     
     // Name
     QString _name = "Umar Masood Khan";
+
+    // Menu
+    UserMenu *um = nullptr;
 };

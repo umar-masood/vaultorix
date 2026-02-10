@@ -1,6 +1,7 @@
 #pragma once
-#include <QWidget>
 #include "../../components/Button.h"
+#include "../../../resources/IconManager.h"
+
 #include <dwmapi.h>
 #include <windowsx.h>
 #include <windows.h>
@@ -10,6 +11,8 @@
 #include <QPoint>
 #include <QSet>
 #include <QResizeEvent>
+#include <QWidget>
+
 class Window : public QWidget {
     Q_OBJECT
 
@@ -28,6 +31,15 @@ class Window : public QWidget {
     bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
 
     private:
+    // Icons
+    QString closeIconLight = IconManager::icon(Icons::Win_CloseLight);
+    QString closeIconDark = IconManager::icon(Icons::Win_CloseDark);
+    QString minimizeIconLight = IconManager::icon(Icons::Win_MinimizeLight);
+    QString minimizeIconDark = IconManager::icon(Icons::Win_MinimizeDark);
+    QString maximizeIconLight = IconManager::icon(Icons::Win_MaximizeLight);
+    QString maximizeIconDark = IconManager::icon(Icons::Win_MaximizeDark);
+    QString restoreIconLight = IconManager::icon(Icons::Win_RestoreLight);
+    QString restoreIconDark = IconManager::icon(Icons::Win_RestoreDark);
 
     // Current Window Handle (ID)
     HWND hwnd;
