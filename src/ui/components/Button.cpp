@@ -40,7 +40,7 @@ void Button::setHyperLinkColors(const QColor &normalState, const QColor &hoverSt
   hyperlinkHover = hoverState;
 }
 
-void Button::setFontProperties(const QString &family, int pointSize,  QFont::Weight weight, bool italic) {
+void Button::setFontProperties(const QString &family, int pointSize, QFont::Weight weight, bool italic) {
   fontFamily = family; 
   fontSize = pointSize; 
   fontWeight = weight; 
@@ -73,13 +73,15 @@ void Button::setIconPaths(const QString &lightIcon, const QString &darkIcon) {
 
   // Preload pixmaps
   if (!lightIcon.isEmpty()) {
-    _lightIcon.load(lightIcon);
-    _lightIcon = _lightIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    // _lightIcon.load(lightIcon);
+    // _lightIcon = _lightIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    _lightIcon = IconManager::renderSvg(lightIcon, _iconSize);
   }
 
   if (!darkIcon.isEmpty()) {
-    _darkIcon.load(darkIcon);
-    _darkIcon = _darkIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    // _darkIcon.load(darkIcon);
+    // _darkIcon = _darkIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    _darkIcon = IconManager::renderSvg(darkIcon, _iconSize);
   }
 }
 
@@ -157,9 +159,8 @@ void Button::setText(const QString &text) {
     if (text.isEmpty()) {
       spinner->start();
       spinner->move((width() - spinner->width()) / 2, (height() - spinner->height()) / 2);
-    } else {
+    } else 
       spinner->stop();
-    }
   }
 
   QPushButton::setText(text);
@@ -271,11 +272,10 @@ void Button::drawBackground(QPainter &painter, const QColor &bgColor) {
     
     painter.setBrush(gradient);
 
-  } else if (isHyperLink) {
+  } else if (isHyperLink) 
     painter.setBrush(Qt::NoBrush);
-  } else {
+  else 
     painter.setBrush(bgColor);
-  }
 
   if (!isHyperLink) {
     QPainterPath path;
@@ -291,91 +291,92 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
   int textH = tSize.height();
   
   switch (displayMode) {
-  case IconText: {
-    const int spacing = 8;    
-    const int iconX = 10;
-    int iconH = isUnicodeIcon ? unicodeIconSize : pixmap.height();
-    int iconW = isUnicodeIcon ? unicodeIconSize : pixmap.width();
-    int iconY = (height() - iconH) / 2;
-    int textX = x != 0 ? x : iconX + iconW + spacing;
-    int textY = y != 0 ? y : 0;
-    int buttonWidth = iconX + (hasRightSideIcon ? (2 * iconW + 2 * spacing) : (iconW + spacing)) + textW + 2 * spacing;
-  
-    if (!customSize.isValid()) 
-      QPushButton::setFixedSize(buttonWidth, 36);
+    case IconText: {
+      const int spacing = 10;    
+      const int iconX = spacing;
 
-    QRect textRect(textX, textY, textW , height());
-    painter.drawText(textRect, Qt::AlignVCenter, text());
+      int iconH = isUnicodeIcon ? unicodeIconSize : pixmap.height();
+      int iconW = isUnicodeIcon ? unicodeIconSize : pixmap.width();
+      int iconY = (height() - iconH) / 2;
 
-    if (isUnicodeIcon)
-      painter.drawText(QRect(iconX, 0, unicodeIconSize + 4, height()), Qt::AlignCenter, unicodeIcon);
-    else
-      painter.drawPixmap(iconX, iconY, pixmap);
+      int textX = x != 0 ? x : iconX + iconW + spacing;
+      int textY = y != 0 ? y : 0;
+      
+      int buttonWidth = iconX + (hasRightSideIcon ? (2 * iconW + 2 * spacing) : (iconW + spacing)) + textW + 2 * spacing;
 
-    if (hasRightSideIcon) 
-      painter.drawPixmap((width() - 10 - iconW), iconY, (isDarkMode ? _rightSideDarkIcon : _rightSideLightIcon)); 
+      if (!customSize.isValid()) 
+        QPushButton::setFixedSize(buttonWidth, 36);
 
-    break;
-  }
+      QRect textRect(textX, textY, textW , height());
+      painter.drawText(textRect, Qt::AlignVCenter, text());
 
-  case IconOnly: {
-    if (isUnicodeIcon)
-      painter.drawText(rect(), Qt::AlignCenter, unicodeIcon);
-    else {
-      int x = (width() - pixmap.width()) / 2;
-      int y = (height() - pixmap.height()) / 2;
-      painter.drawPixmap(x, y, pixmap);
+      if (isUnicodeIcon)
+        painter.drawText(QRect(iconX, 0, unicodeIconSize + 4, height()), Qt::AlignCenter, unicodeIcon);
+      else
+        painter.drawPixmap(iconX, iconY, pixmap);
+
+      if (hasRightSideIcon) 
+        painter.drawPixmap((width() - 10 - iconW), iconY, (isDarkMode ? _rightSideDarkIcon : _rightSideLightIcon)); 
+
+      break;
     }
 
-    break;
-  }
+    case IconOnly: {
+      if (isUnicodeIcon)
+        painter.drawText(rect(), Qt::AlignCenter, unicodeIcon);
+      else {
+        int x = (width() - pixmap.width()) / 2;
+        int y = (height() - pixmap.height()) / 2;
+        painter.drawPixmap(x, y, pixmap);
+      }
 
-  case TextOnly: {
-    int padding = 12;
-    int buttonWidth = padding + textW + padding;
-
-    if (customSize.isValid()) {
-      textW = width() - 2 * padding;
-      setFixedSize(customSize);
-    } else {
-      QPushButton::setFixedSize(buttonWidth, 36);
+      break;
     }
 
-    QRect textRect = isHyperLink ? QRect(0, 0, width(), height()) : QRect(padding, 0, textW, height());
-    painter.drawText(textRect, isHyperLink ? (Qt::AlignLeft | Qt::AlignVCenter) : (Qt::AlignCenter | Qt::TextWordWrap), text());
-    break;
-  }
+    case TextOnly: {
+      int padding = 12;
+      int buttonWidth = padding + textW + padding;
 
-  case TextUnderIcon: {
-    const int hspacing = 12;
-    const int vSpacing = 6;
-    const int gap = 4;
-    
-    int textY = vSpacing + (isUnicodeIcon ? unicodeIconSize : pixmap.height()) + gap;
+      if (customSize.isValid()) {
+        textW = width() - 2 * padding;
+        setFixedSize(customSize);
+      } else 
+        QPushButton::setFixedSize(buttonWidth, 36);
 
-    int buttonWidth = hspacing + textW + hspacing;
-    int buttonHeight = vSpacing + pixmap.height() + gap + textH + vSpacing;
-
-    if (customSize.isValid()) 
-      setFixedSize(customSize);
-    else 
-      QPushButton::setFixedSize(buttonWidth, buttonHeight);
-    
-    if (isUnicodeIcon)
-      painter.drawText(QRect(0, vSpacing, width(), unicodeIconSize + 4), Qt::AlignCenter, unicodeIcon);
-    else {
-      int x = (width() - pixmap.width()) / 2;
-      painter.drawPixmap(x, vSpacing, pixmap);
+      QRect textRect = isHyperLink ? QRect(0, 0, width(), height()) : QRect(padding, 0, textW, height());
+      painter.drawText(textRect, isHyperLink ? (Qt::AlignLeft | Qt::AlignVCenter) : (Qt::AlignCenter | Qt::TextWordWrap), text());
+      break;
     }
 
-    QRect textRect(0, textY, width(), textH);  
-    painter.drawText(textRect, Qt::AlignHCenter, text());
+    case TextUnderIcon: {
+      const int hspacing = 12;
+      const int vSpacing = 6;
+      const int gap = 4;
 
-    break;
-  }
+      int textY = vSpacing + (isUnicodeIcon ? unicodeIconSize : pixmap.height()) + gap;
 
-    default: 
-    break;
+      int buttonWidth = hspacing + textW + hspacing;
+      int buttonHeight = vSpacing + pixmap.height() + gap + textH + vSpacing;
+
+      if (customSize.isValid()) 
+        setFixedSize(customSize);
+      else 
+        QPushButton::setFixedSize(buttonWidth, buttonHeight);
+
+      if (isUnicodeIcon)
+        painter.drawText(QRect(0, vSpacing, width(), unicodeIconSize + 4), Qt::AlignCenter, unicodeIcon);
+      else {
+        int x = (width() - pixmap.width()) / 2;
+        painter.drawPixmap(x, vSpacing, pixmap);
+      }
+
+      QRect textRect(0, textY, width(), textH);  
+      painter.drawText(textRect, Qt::AlignHCenter, text());
+
+      break;
+    }
+
+    default:  break;
   }
 }
 

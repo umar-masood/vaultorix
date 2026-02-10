@@ -1,7 +1,6 @@
 #include "CheckBox.h"
 
-CheckBox::CheckBox(const QString &text, QWidget *parent) : QWidget(parent), text(text)
-{
+CheckBox::CheckBox(const QString &text, QWidget *parent) : QWidget(parent), text(text) {
    setAttribute(Qt::WA_TranslucentBackground);
    setAttribute(Qt::WA_Hover);
 

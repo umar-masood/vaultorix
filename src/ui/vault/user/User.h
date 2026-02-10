@@ -9,13 +9,15 @@
 #include <QPainterPath>
 #include <QFont>
 
+#include "../userMenu/UserMenu.h"
+#include "../../../resources/IconManager.h"
+
 class User : public QWidget {
     Q_OBJECT
     
     public:
     explicit User(QWidget *parent = nullptr);
     void setDarkMode(bool enable);
-    void setEmail(const QString &email);
     void setName(const QString &name);
     void setAvator(const QPixmap &pixmap, int size);
 
@@ -25,11 +27,15 @@ class User : public QWidget {
     void mouseReleaseEvent(QMouseEvent *event) override;
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
+    bool eventFilter(QObject *o, QEvent *event) override;
 
     signals:
     void clicked();
 
-    private:
+    private: 
+    void adjustWidgetSize();
+    QFont font();
+    
     // Flags
     bool isDarkMode = false;
     bool isHover = false;
@@ -37,11 +43,10 @@ class User : public QWidget {
 
     // Profile Icon
     QPixmap avator;
-
+    
     // Name
-    QString name = "Umar Masood Khan";
+    QString _name = "Umar Masood Khan";
 
-    // User Email-address
-    QString email = "umarmasood8546@gmail.com";
-
+    // Menu
+    UserMenu *um = nullptr;
 };

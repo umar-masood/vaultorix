@@ -248,32 +248,32 @@ void ComboBox::keyPressEvent(QKeyEvent *event) {
         event->accept();
     } else {
         switch (event->key()) {
-        case Qt::Key_Up:
-        case Qt::Key_Down: {
-            QApplication::sendEvent(popup->list(), event);
-            break;
-        }
-        
-        case Qt::Key_Return:
-        case Qt::Key_Enter: {
-            int index = currentIndex();
-            if (index != -1) {
-                setCurrentItem(currentIndex());
-                popup->fadeOut();
+            case Qt::Key_Up:
+            case Qt::Key_Down: {
+                QApplication::sendEvent(popup->list(), event);
+                break;
             }
-               
-            event->accept();
-            break;
-        }
         
-        case Qt::Key_Escape:
-            if (popup->isVisible())
-                popup->fadeOut();
-            event->accept();
-        break;
-
-        default:
-            break;
+            case Qt::Key_Return:
+            case Qt::Key_Enter: {
+                int index = currentIndex();
+                if (index != -1) {
+                    setCurrentItem(currentIndex());
+                    popup->fadeOut();
+                }
+               
+                event->accept();
+                break;
+            }
+        
+            case Qt::Key_Escape: {
+                if (popup->isVisible())
+                    popup->fadeOut();
+                event->accept();
+                break;
+            }
+            
+            default:  break;
         }
     }
 }

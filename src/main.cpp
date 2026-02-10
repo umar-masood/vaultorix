@@ -1,7 +1,8 @@
 // #include "./core/account/accountAuthCoordinator/AccountAuthCoordinator.h"
 #include "./ui/vault/vaultWindow/VaultWindow.h"
 #include <QApplication>
-
+#include "./ui/vault/userMenu/UserMenu.h"
+#include "./resources/IconManager.h"
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);

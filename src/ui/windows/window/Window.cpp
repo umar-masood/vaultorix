@@ -27,16 +27,17 @@ void Window::setInteractiveTitleBarWidget(QWidget *widget) {
 }
 
 void Window::applyThemedIcons() {
-    closeBtn->setUnicodeIcon("\uE8BB", 10);
-    minimizeBtn->setUnicodeIcon("\uE921", 10);
+    closeBtn->setIconPaths(closeIconLight, closeIconDark);
+    minimizeBtn->setIconPaths(minimizeIconLight, minimizeIconDark);
 
     if (::IsZoomed(hwnd))
-        maximizeBtn->setUnicodeIcon("\uE923", 10); 
+        maximizeBtn->setIconPaths(restoreIconLight, restoreIconDark);
     else
-        maximizeBtn->setUnicodeIcon("\uE922", 10);
+        maximizeBtn->setIconPaths(maximizeIconLight, maximizeIconDark);
 
     update();
 }
+
 void Window::applyStyleSheet() {
     QString stylesheet = QString("background-color: %1;").arg(isDarkMode ? "#1F1F1F" : "#FFFFFF");
     _mainTitleBar->setStyleSheet(stylesheet);
@@ -75,7 +76,7 @@ void Window::paintEvent(QPaintEvent *event) {
 Button * Window::createWindowButton() {
     Button *b = new Button;
     b->setSecondary(true);
-    b->setIconSize(QSize(16,16));
+    b->setIconSize(QSize(18,18));
     b->setDisplayMode(Button::IconOnly);
     b->setFixedSize(QSize(26, 26));
     return b;
@@ -111,7 +112,7 @@ void Window::setupWindow() {
     setInteractiveTitleBarWidget(minimizeBtn);
     connect(minimizeBtn, &Button::clicked, this, &Window::onMinimizeClicked);
     
-    maximizeBtn = createWindowButton();
+    maximizeBtn = createWindowButton();    
     setInteractiveTitleBarWidget(maximizeBtn);
     connect(maximizeBtn, &Button::clicked, this, &Window::onMaximizeClicked);
 

@@ -106,5 +106,21 @@ enum Icons {
     Picture             = 0x72,
     Music               = 0x73,
     Video               = 0x74,
-    Document            = 0x75
+    Document            = 0x75,
+    
+    Avator              = 0x76,
+    AccountSettings     = 0x77,
+    Subscription        = 0x78,
+    Preferences         = 0x79,
+    Bug                 = 0x7A,
+    About               = 0x7B,
+
+    Win_CloseLight      = 0x7C,
+    Win_CloseDark       = 0x7D,
+    Win_MinimizeLight   = 0x7E,
+    Win_MinimizeDark    = 0x7F,
+    Win_MaximizeLight   = 0x80,
+    Win_MaximizeDark    = 0x81,
+    Win_RestoreDark     = 0x82,
+    Win_RestoreLight    = 0x83
 };

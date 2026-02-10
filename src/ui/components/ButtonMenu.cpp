@@ -5,6 +5,7 @@ ButtonMenu::ButtonMenu(QWidget *parent) : Button(parent) {
     setCursor(Qt::PointingHandCursor);
     setSecondary(true);
     setBorderTransparent(true);
+    setIconSize(QSize(18, 18));
     setNormalBackgroundTransparent(true);
 
     // Menu

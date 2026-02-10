@@ -1,6 +1,6 @@
 #include "Popup.h"
 
-Popup::Popup(QWidget *parent) : RoundedBox("", parent) {
+Popup::Popup(QWidget *parent) : RoundedBox(parent) {
     // Items List
     _list = new QListView(this);
 
