@@ -72,17 +72,12 @@ void Button::setIconPaths(const QString &lightIcon, const QString &darkIcon) {
   isUnicodeIcon = false;
 
   // Preload pixmaps
-  if (!lightIcon.isEmpty()) {
-    // _lightIcon.load(lightIcon);
-    // _lightIcon = _lightIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+  if (!lightIcon.isEmpty()) 
     _lightIcon = IconManager::renderSvg(lightIcon, _iconSize);
-  }
-
-  if (!darkIcon.isEmpty()) {
-    // _darkIcon.load(darkIcon);
-    // _darkIcon = _darkIcon.scaled(_iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+  
+  if (!darkIcon.isEmpty()) 
     _darkIcon = IconManager::renderSvg(darkIcon, _iconSize);
-  }
+  
 }
 
 void Button::setUnicodeIcon(const QString &unicode, int pointSize) {

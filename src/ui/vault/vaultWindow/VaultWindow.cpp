@@ -23,7 +23,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   theme_mode_btn = new Button;
   theme_mode_btn->setCursor(Qt::PointingHandCursor);
   theme_mode_btn->setSecondary(true);
-  theme_mode_btn->setIconSize(QSize(16,16));
+  theme_mode_btn->setIconSize(QSize(18, 18));
   theme_mode_btn->setDisplayMode(Button::IconOnly);
   theme_mode_btn->setFixedSize(QSize(26, 26));
   setInteractiveTitleBarWidget(theme_mode_btn);
@@ -47,7 +47,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   sign_out_btn->setGradientColor(true, "#bc0101", "#ff1100");
   sign_out_btn->setHoverGradientColor("#FF3727");
   sign_out_btn->setFontProperties("Segoe UI", 10);
-  sign_out_btn->setIconSize(QSize(16,16));
+  sign_out_btn->setIconSize(QSize(18, 18));
   sign_out_btn->setDisplayMode(Button::IconText);
   sign_out_btn->setFixedSize(QSize(100, 26));
   sign_out_btn->setPrimaryButtonIcon(IconManager::icon(Icons::SignOut));

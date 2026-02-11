@@ -76,7 +76,7 @@ void Window::paintEvent(QPaintEvent *event) {
 Button * Window::createWindowButton() {
     Button *b = new Button;
     b->setSecondary(true);
-    b->setIconSize(QSize(18,18));
+    b->setIconSize(QSize(18, 18));
     b->setDisplayMode(Button::IconOnly);
     b->setFixedSize(QSize(26, 26));
     return b;
