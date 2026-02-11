@@ -73,8 +73,7 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    createAccBtn->setDisplayMode(Button::TextOnly);
    createAccBtn->setFixedSize(QSize(360, 36));
    createAccBtn->setLoaderButton(true);
-   createAccBtn->setGradientColor(true, "#008EDE", "#15F2FF");
-   createAccBtn->setHoverGradientColor("#008EDE");
+   createAccBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
    createAccBtn->setText("Create Account");
    createAccBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    createAccBtn->setEnabled(false);
@@ -268,9 +267,9 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    _button->setParent(this);
    _button->setDisplayMode(Button::TextOnly);
    _button->setFixedSize(QSize(160, 12));
-   _button->setHyperLink(true);
    _button->setText("Terms & Conditions");
    _button->setFontProperties("Segoe UI", 10);
+   _button->setHyperLink(true);
    _button->setHyperLinkColors("#008EDE", "#15F2FF");
    _button->move(_checkbox->width() + 4, 4); 
 

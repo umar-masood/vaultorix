@@ -28,24 +28,23 @@ class Button : public QPushButton {
   explicit Button(QWidget *parent = nullptr);
 
   void setDisplayMode(DisplayMode mode);
-  void setIconPaths(const QString &iconLight = "", const QString &iconDark = "");
+  void setIconPaths(const QString &iconLight = QString(), const QString &iconDark = QString());
   void setUnicodeIcon(const QString &unicode, int pointSize);
   void setFixedSize(const QSize &s);
-  void setIconSize(QSize s);
-  void setDarkMode(bool value);
-  void setSecondary(bool value);
-  void setShadow(bool value);
-  void setHyperLink(bool value);
+  void setIconSize(const QSize &s);
+  void setDarkMode(bool enable);
+  void setSecondary(bool enable);
+  void setShadow(bool enable);
+  void setHyperLink(bool enable);
   void setHyperLinkColors(const QColor &normalState, const QColor &hoverState);
   void setFontProperties(const QString &family, int pointSize, QFont::Weight weight = QFont::Normal, bool italic = false);
-  void setGradientColor(bool enable, const QString &hex1, const QString &hex2);
-  void setHoverGradientColor(const QString &hex);
+  void setGradientColors(const QString &startColor, const QString &endColor, const QString &hoverColor);
   void setStartColor(const QColor &c);
   void setEndColor(const QColor &c);
-  void setLoaderButton(bool value);
+  void setLoaderButton(bool enable);
   void setText(const QString &text);
-  void setBorderTransparent(bool value);
-  void setNormalBackgroundTransparent(bool value);
+  void setBorderTransparent(bool enable);
+  void setNormalBackgroundTransparent(bool enable);
   void setCheckedButtonIcon(const QString &iconPath);
   void setPrimaryButtonIcon(const QString &iconPath);
   /** @warning Button Display Mode should be IconOnly or IconText*/
@@ -77,7 +76,7 @@ private:
   bool hasRightSideIcon = false;
   
   // Font Adjustment
-  int x = 0, y = 0;
+  int _x = 0, _y = 0;
 
   bool isDisabledState() const;
   bool isHoverState() const;
@@ -112,15 +111,23 @@ private:
 
   // Graphical Effects & Animations
   SmoothShadow *effect;
-  QColor shadow_color;
   QPropertyAnimation *animate;
 
-  // Gradient colours
-  QColor baseStart, baseEnd;   
-  QColor hoverColor;         
-  QColor color1, color2;
+  // Button Shadow Color
+  QColor shadowColor;
+
+  // Gradient Button Colors
+  QColor gradientStart, gradientEnd, hoverGradientColor, color1, color2;
   
-  // HyperLink Colors
+  // Standard Button States Colors
+  // Primary Button
+  QColor _normalPrimaryColor, _normalPrimaryHoverColor, _normalPrimaryPressedColor;
+
+  // Secondary Button
+  QColor _normalSecondaryLightModeColor, _normalSecondaryLightModeHoverColor, _normalSecondaryLightModePressedColor;
+
+
+  // HyperLink Button Colors
   QColor hyperlinkNormal, hyperlinkHover;
 
   // Font 

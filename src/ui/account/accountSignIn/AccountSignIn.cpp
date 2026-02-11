@@ -46,8 +46,8 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    forgotPwd->setCursor(Qt::PointingHandCursor);
    forgotPwd->setDisplayMode(Button::TextOnly);
    forgotPwd->setFixedSize(QSize(110, 18));
-   forgotPwd->setHyperLink(true);
    forgotPwd->setFontProperties("Segoe UI", 10);
+   forgotPwd->setHyperLink(true);
    forgotPwd->setHyperLinkColors("#008EDE", "#15F2FF");
    connect(forgotPwd, &Button::clicked, this,  &AccountSignIn::forgotPwdClicked);
 
@@ -56,8 +56,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    signInBtn->setCursor(Qt::PointingHandCursor);
    signInBtn->setDisplayMode(Button::TextOnly);
    signInBtn->setFixedSize(QSize(360, 36));
-   signInBtn->setGradientColor(true, "#008EDE", "#15F2FF");
-   signInBtn->setHoverGradientColor("#008EDE");
+   signInBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
    signInBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    signInBtn->setLoaderButton(true);
    connect(signInBtn, &Button::clicked, this, &AccountSignIn::signInClicked);

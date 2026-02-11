@@ -44,8 +44,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   sign_out_btn = new Button("Sign out");
   sign_out_btn->setCursor(Qt::PointingHandCursor);
   sign_out_btn->setFontXY(0, -1);
-  sign_out_btn->setGradientColor(true, "#bc0101", "#ff1100");
-  sign_out_btn->setHoverGradientColor("#FF3727");
+  sign_out_btn->setGradientColors("#bc0101", "#ff1100", "#FF3727");
   sign_out_btn->setFontProperties("Segoe UI", 10);
   sign_out_btn->setIconSize(QSize(18, 18));
   sign_out_btn->setDisplayMode(Button::IconText);

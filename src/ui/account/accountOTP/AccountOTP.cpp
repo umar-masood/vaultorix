@@ -41,8 +41,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _verifyBtn->setCursor(Qt::PointingHandCursor);
    _verifyBtn->setDisplayMode(Button::TextOnly);
    _verifyBtn->setFixedSize(QSize(360, 36));
-   _verifyBtn->setGradientColor(true, "#008EDE", "#15F2FF");
-   _verifyBtn->setHoverGradientColor("#008EDE");
+   _verifyBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
    _verifyBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
    _verifyBtn->setLoaderButton(true);
    connect(_verifyBtn, &Button::clicked, this,  &AccountOTP::verifyClicked);
@@ -284,9 +283,9 @@ TextWithBtn::TextWithBtn(const QString &promptText,
    _button = new Button(this);
    _button->setDisplayMode(Button::TextOnly);
    _button->setFixedSize(hyperlinkSize);
-   _button->setHyperLink(true);
    _button->setText(hyperlinkText);
    _button->setFontProperties("Segoe UI", 10);
+   _button->setHyperLink(true);
    _button->setHyperLinkColors("#008EDE", "#15F2FF");
    _button->move(_text->width() + 4, 2);
 
