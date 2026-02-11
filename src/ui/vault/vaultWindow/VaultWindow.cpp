@@ -24,6 +24,8 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   theme_mode_btn->setCursor(Qt::PointingHandCursor);
   theme_mode_btn->setSecondary(true);
   theme_mode_btn->setIconSize(QSize(18, 18));
+  theme_mode_btn->setNormalBackgroundTransparent(true);
+  theme_mode_btn->setBorderTransparent(true);
   theme_mode_btn->setDisplayMode(Button::IconOnly);
   theme_mode_btn->setFixedSize(QSize(26, 26));
   setInteractiveTitleBarWidget(theme_mode_btn);

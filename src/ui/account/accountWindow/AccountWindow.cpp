@@ -24,6 +24,8 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    themeMode->setSecondary(true);
    themeMode->setIconSize(QSize(18, 18));
    themeMode->setDisplayMode(Button::IconOnly);
+   themeMode->setNormalBackgroundTransparent(true);
+   themeMode->setBorderTransparent(true);
    themeMode->setFixedSize(QSize(26, 26));
    themeMode->setIconPaths(DarkModeIcon, DarkModeIcon);
    connect(themeMode, &Button::clicked, this, [this](){

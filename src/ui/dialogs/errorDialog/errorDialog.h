@@ -4,7 +4,7 @@
 #include "../../account/accountWindow/AccountWindow.h"
 #include "../../windows/subWindow/SubWindow.h"
 #include "../../components/Button.h"
-#include "../../components/Text.h"
+#include "../../components/Label.h"
 #include "../../../resources/IllustrationManager.h"
 
 #include <QObject>
@@ -29,13 +29,13 @@ class Error : public QWidget {
     bool isDarkMode = false;
 
     // Text Widget
-    Text *textWidget = nullptr;
+    Label *label = nullptr;
 
     // Action Button
     Button *actionBtn = nullptr;
 
     // Illustration
-    QLabel *illustration = nullptr;
+    Label *illustration = nullptr;
 
     // Main Layout
     QVBoxLayout *layout = nullptr;

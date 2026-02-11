@@ -91,6 +91,8 @@ void ComboBox::setDarkMode(bool value) {
 void ComboBox::setDropDownButton() {
     dropdown = new Button(this);
     dropdown->setDisplayMode(Button::IconOnly);
+    dropdown->setNormalBackgroundTransparent(true);
+    dropdown->setBorderTransparent(true);
     dropdown->setCursor(Qt::PointingHandCursor);
     dropdown->setIconSize(QSize(20, 20));
     dropdown->setFixedSize(QSize(28, 28));

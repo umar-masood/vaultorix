@@ -48,7 +48,6 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    forgotPwd->setFixedSize(QSize(110, 18));
    forgotPwd->setFontProperties("Segoe UI", 10);
    forgotPwd->setHyperLink(true);
-   forgotPwd->setHyperLinkColors("#008EDE", "#15F2FF");
    connect(forgotPwd, &Button::clicked, this,  &AccountSignIn::forgotPwdClicked);
 
    // Sign In Button

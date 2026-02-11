@@ -10,8 +10,8 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
 
     // Opacity Animation
     animation = new QPropertyAnimation(smooth_opacity, "opacity");
-    animation->setEasingCurve(QEasingCurve::InOutCubic);
-    animation->setDuration(500);
+    animation->setEasingCurve(QEasingCurve::InOutQuad);
+    animation->setDuration(400);
     
     // Option Buttons
     // Account Settings

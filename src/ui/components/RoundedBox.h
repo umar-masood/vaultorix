@@ -15,7 +15,6 @@ class RoundedBox : public QWidget {
     Q_OBJECT
 
     public:
-
     explicit RoundedBox(bool isToolTip = false, QWidget *parent = nullptr);
     explicit RoundedBox(QWidget *parent = nullptr);
     virtual ~RoundedBox() = default;

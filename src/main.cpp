@@ -1,6 +1,8 @@
 #include "./core/account/accountAuthCoordinator/AccountAuthCoordinator.h"
 #include "./ui/vault/vaultWindow/VaultWindow.h"
 #include <QApplication>
+
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -11,8 +13,8 @@ int main(int argc, char *argv[])
     AccountAuthCoordinator *c = new AccountAuthCoordinator(&app);
     c->show();
 
-    VaultWindow *vw = new VaultWindow;
-    vw->show();
+    // VaultWindow *vw = new VaultWindow;
+    // vw->show();
 
     return app.exec();
 }

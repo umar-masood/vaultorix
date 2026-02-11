@@ -53,6 +53,8 @@ Button* ViewModeToggle::createButton() {
     btn->setCursor(Qt::PointingHandCursor);
     btn->setSecondary(true);
     btn->setIconSize(QSize(18, 18));
+    btn->setNormalBackgroundTransparent(true);
+    btn->setBorderTransparent(true);
     btn->setDisplayMode(Button::IconOnly);
     btn->setFixedSize(QSize(28, 28));
     btn->setCheckable(true);

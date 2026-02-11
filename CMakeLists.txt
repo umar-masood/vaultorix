@@ -70,7 +70,6 @@ add_executable(Vaultorix
     src/ui/components/ToolTip.cpp
     src/ui/components/Seperator.cpp
     src/ui/components/Label.cpp
-    src/ui/components/Text.cpp
     src/ui/components/Popup.cpp
     src/ui/components/ButtonMenu.cpp
     src/ui/components/ViewModeToggle.cpp

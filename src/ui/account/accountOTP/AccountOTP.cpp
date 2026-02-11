@@ -286,7 +286,6 @@ TextWithBtn::TextWithBtn(const QString &promptText,
    _button->setText(hyperlinkText);
    _button->setFontProperties("Segoe UI", 10);
    _button->setHyperLink(true);
-   _button->setHyperLinkColors("#008EDE", "#15F2FF");
    _button->move(_text->width() + 4, 2);
 
    // Signal Slot

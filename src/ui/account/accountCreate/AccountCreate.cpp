@@ -270,7 +270,6 @@ CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
    _button->setText("Terms & Conditions");
    _button->setFontProperties("Segoe UI", 10);
    _button->setHyperLink(true);
-   _button->setHyperLinkColors("#008EDE", "#15F2FF");
    _button->move(_checkbox->width() + 4, 4); 
 
    // Signals Slots

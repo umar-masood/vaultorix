@@ -78,6 +78,10 @@ Button * Window::createWindowButton() {
     b->setSecondary(true);
     b->setIconSize(QSize(18, 18));
     b->setDisplayMode(Button::IconOnly);
+    b->setCursor(Qt::PointingHandCursor);
+    b->setBorderTransparent(true);
+    b->setNormalBackgroundTransparent(true);
+    b->setDisplayMode(Button::IconOnly);
     b->setFixedSize(QSize(26, 26));
     return b;
 }

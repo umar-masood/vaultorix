@@ -20,29 +20,27 @@ Error::Error(const QString &text, const QString &illustrationLight,
     actionBtn->setDisplayMode(Button::TextOnly);
     actionBtn->setFixedSize(QSize(316, 36));
     actionBtn->setText("Retry");
+    actionBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
     errorWidgetHeight += 36;
 
     // Illustration
     QPixmap pixmap(lightIcon);
     errorWidgetHeight += pixmap.height();
     
-    illustration = new QLabel;
-    illustration->setAttribute(Qt::WA_TranslucentBackground);
+    illustration = new Label(true);
     illustration->setFixedSize(pixmap.size() + QSize(20, 20));
-    illustration->setAlignment(Qt::AlignCenter);
     illustration->setPixmap(pixmap);
 
     // Text (only if provided)
     if (!text.isEmpty()) {
-        textWidget = new Text;
-        textWidget->setFixedSize(QSize(290, 36));
-        textWidget->setFont("Segoe UI", 10, false, false, Qt::AlignCenter);
-        textWidget->setTextColor("#8D8D8D");
-        textWidget->setWordWrap(true);
-        textWidget->setText(text);
+        label = new Label("Segoe UI", 10);
+        label->setFixedSize(QSize(290, 36));
+        label->setStyleSheet("color: #8D8D8D;");
+        label->setWordWrap(true);
+        label->setText(text);
 
         // Font Handling
-        QFontMetrics fm(textWidget->font());
+        QFontMetrics fm(label->font());
         errorWidgetHeight += 36;
     }
 
@@ -53,9 +51,9 @@ Error::Error(const QString &text, const QString &illustrationLight,
     layout->addWidget(illustration, 0, Qt::AlignCenter);
     layout->addSpacing(12);
 
-    if (textWidget) {
+    if (label) {
         layout->addStretch();
-        layout->addWidget(textWidget, 0, Qt::AlignCenter);
+        layout->addWidget(label, 0, Qt::AlignCenter);
         layout->addSpacing(12);
     }
 

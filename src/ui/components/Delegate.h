@@ -43,5 +43,4 @@ class Delegate : public QStyledItemDelegate {
     bool isMenu = true;
     bool hasDotIndicator = false;
     bool hasCheckIndicator = false;
-    
 };

@@ -187,6 +187,8 @@ Button* SubWindow::windowButton() {
     b->setCursor(Qt::PointingHandCursor);
     b->setIconSize(QSize(18, 18));
     b->setDisplayMode(Button::IconOnly);
+    b->setNormalBackgroundTransparent(true);
+    b->setBorderTransparent(true);
     b->setFixedSize(QSize(26, 26));
     return b;
 }

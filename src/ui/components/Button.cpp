@@ -21,16 +21,14 @@ void Button::init() {
   spinner = new SpinnerProgress(this);
   spinner->setIndeterminate(true);
   spinner->setFixedSize(QSize(20, 20), true);
+
+  // Loading Default Colors
+  loadDefaultColors();
 }
 
 void Button::setShadow(bool enable) {
   isShadowEnabled = enable;
   (isShadowEnabled) ? setGraphicsEffect(effect) : setGraphicsEffect(nullptr);
-}
-
-void Button::setHyperLinkColors(const QColor &normalState, const QColor &hoverState) {
-  hyperlinkNormal = normalState; 
-  hyperlinkHover = hoverState;
 }
 
 void Button::setFontProperties(const QString &family, int pointSize, QFont::Weight weight, bool italic) {
@@ -74,7 +72,7 @@ void Button::setIconPaths(const QString &lightIcon, const QString &darkIcon) {
 }
 
 void Button::setUnicodeIcon(const QString &unicode, int pointSize) {
-  unicodeIcon = unicode;
+  _unicodeIcon = unicode;
   unicodeIconSize = pointSize;
   isUnicodeIcon = true;
 
@@ -88,7 +86,7 @@ void Button::setIconSize(const QSize &s) {
 
 void Button::setFixedSize(const QSize &s) { 
   if (s.isValid()) 
-    customSize = s; 
+    _customSize = s; 
   
   QPushButton::setFixedSize(s);
 }
@@ -102,12 +100,12 @@ void Button::setDarkMode(bool enable) {
 
 void Button::setCheckedButtonIcon(const QString &iconPath) { 
   if (!iconPath.isEmpty()) 
-    checkedButtonIcon = IconManager::renderSvg(iconPath, _iconSize);
+    _checkedButtonIcon = IconManager::renderSvg(iconPath, _iconSize);
 }
 
 void Button::setPrimaryButtonIcon(const QString &iconPath) { 
   if (!iconPath.isEmpty()) 
-    primaryButtonIcon = IconManager::renderSvg(iconPath, _iconSize);
+    _primaryButtonIcon = IconManager::renderSvg(iconPath, _iconSize);
 }
 
 void Button::setRightSideIcon(const QString &iconLight, const QString &iconDark) {
@@ -136,6 +134,16 @@ void Button::setHyperLink(bool enable) {
     isSecondary = false; 
 }
 
+void Button::setColor(const ButtonStateColor &state, const QColor &color) {
+  _colors[state] = color;
+  update();
+}
+
+void Button::setTextColor(const ButtonTextColor &type, const QColor &color) {
+  _textColors[type] = color;
+  update();
+}
+
 void Button::setLoaderButton(bool enable) { isLoaderBtn = enable; }
 void Button::setBorderTransparent(bool enable) { isBorderTransparent = enable; }
 void Button::setNormalBackgroundTransparent(bool enable) { isNormalBackgroundTransparent = enable; }
@@ -157,92 +165,136 @@ void Button::setText(const QString &text) {
   QPushButton::setText(text);
 }
 
+void Button::loadDefaultColors() {
+  _colors.clear();
+
+  // Primary
+  _colors[PrimaryNormal]      = QColor("#008EDE");
+  _colors[PrimaryHover]       = QColor("#1BB3E6");
+  _colors[PrimaryPressed]     = QColor("#109AC7");
+  _colors[DisabledPrimary]    = QColor("#B0E0FF");
+
+  // Secondary Light
+  _colors[SecondaryNormalLight]   = QColor("#FBFBFB");
+  _colors[SecondaryHoverLight]    = QColor("#F0F0F0");
+  _colors[SecondaryPressedLight]  = QColor("#FFFFFF");
+  _colors[DisabledSecondaryLight] = QColor("#E0E0E0");
+
+  // Secondary Dark
+  _colors[SecondaryNormalDark]   = QColor("#2D2D2D");
+  _colors[SecondaryHoverDark]    = QColor("#323232");
+  _colors[SecondaryPressedDark]  = QColor("#242424");
+  _colors[DisabledSecondaryDark] = QColor("#555555");
+
+  // Hyperlink
+  _colors[HyperLinkNormal]       = QColor("#008EDE");
+  _colors[HyperLinkHover]        = QColor("#15F2FF");
+
+  // Text Colors
+  // Normal
+  _textColors[PrimaryText]           = QColor("#FFFFFF");
+  _textColors[SecondaryTextLight]    = QColor("#000000");
+  _textColors[SecondaryTextDark]     = QColor("#F0F0F0");
+
+  // Disabled
+  _textColors[DisabledPrimaryText]   = QColor("#FFFFFF");          
+  _textColors[DisabledSecondaryTextLight] = QColor("#9E9E9E");   
+  _textColors[DisabledSecondaryTextDark] = QColor("#777777");    
+}
+
+// ------------------------------- Getters ---------------------------------------------------------------------
 bool Button::isDisabledState() const { return !isEnabled(); }
 bool Button::isHoverState() const { return isHover && !isPressed; }
 bool Button::isNormalState() const { return !isHover && !isPressed; }
 bool Button::isPressedState() const { return isPressed; }
 bool Button::isIconOnly() const { return displayMode == IconOnly; }
 
+QColor Button::brushColor(const ButtonStateColor &state) const { return _colors.value(state, Qt::transparent); }
+QColor Button::penColor(const ButtonTextColor &type) const { return _textColors.value(type, Qt::transparent); }
+
+// For Gradient
 QColor Button::getStartColor() const { return QColor(color1); }
 QColor Button::getEndColor() const { return QColor(color2); }
 
-QColor Button::getBackgroundColor() const {
-  // Colors
-  QColor disabledSecondary   = isDarkMode ? "#555555" : "#E0E0E0";
-  QColor disabledPrimary     = "#B0E0FF";
-
-  QColor normalSecondary     = isNormalBackgroundTransparent ? (Qt::transparent) : (isDarkMode ? "#2D2D2D" : "#FBFBFB");
-  QColor normalPrimary       = isNormalBackgroundTransparent ? (Qt::transparent) : "#008EDE";
-
-  QColor hoverSecondary      = isDarkMode ? "#323232" : "#F0F0F0";
-  QColor hoverPrimary        = "#1BB3E6";
-
-  QColor pressedSecondary    = isDarkMode ? "#242424" : "#FFFFFF";
-  QColor pressedPrimary      = "#109AC7";
-  
-  QColor normalHyperLink     =  "#008EDE";
-  QColor hoverHyperLink      =  "#15F2FF";
-
+// ---------------------------------- Button Background, Border Colors, Icon (Getters) ---------------------------
+QColor Button::brush() const {
   if (isDisabledState()) 
-    return isIconOnly() ? Qt::transparent : (isSecondary ? disabledSecondary : disabledPrimary);
+    return isSecondary ? brushColor(isDarkMode ? DisabledSecondaryDark : DisabledSecondaryLight)
+                       : brushColor(DisabledPrimary);
 
-  if (isCheckable() && isChecked()) 
-    return "#109AC7";
+  if (isCheckable() && isChecked())
+    return brushColor(PrimaryPressed);
 
-  if (isNormalState()) 
-    return isIconOnly() ? Qt::transparent : (isSecondary ? normalSecondary : normalPrimary);
-  
-  if (isHoverState()) 
-    return (isSecondary || isIconOnly()) ? hoverSecondary : hoverPrimary;
-  
-  if (isPressedState() && !isCheckable()) 
-    return (isSecondary || isIconOnly()) ? pressedSecondary : pressedPrimary;
+  if (isNormalState())
+    if (isNormalBackgroundTransparent)
+      return Qt::transparent;
+    else
+      return isSecondary ? brushColor(isDarkMode ? SecondaryNormalDark : SecondaryNormalLight)
+                         : brushColor(PrimaryNormal);
 
-  return normalPrimary; 
+  if (isHoverState())
+    return (isSecondary || isIconOnly()) ? brushColor(isDarkMode ? SecondaryHoverDark : SecondaryHoverLight)
+                                         : brushColor(PrimaryHover);
+
+  if (isPressedState() && !isCheckable())
+    return (isSecondary || isIconOnly()) ? brushColor(isDarkMode ? SecondaryPressedDark : SecondaryPressedLight)
+                                         : brushColor(PrimaryPressed);
+
+  return brushColor(PrimaryNormal);
 }
 
-QColor Button::getTextColor() const {
+QColor Button::pen() const {
+  // Hyperlink button
+  if (isHyperLink)
+    return isDisabledState() ? QColor("#555555") : (isHoverState() ? brushColor(HyperLinkHover) : brushColor(HyperLinkNormal));
+
+  // Disabled button
+  if (isDisabledState())
+    if (isSecondary)
+      return isDarkMode ? penColor(DisabledSecondaryTextDark) : penColor(DisabledSecondaryTextLight);
+    else
+      return penColor(DisabledPrimaryText);
+
+  // Secondary button
   if (isSecondary)
-    return isDarkMode ? QColor("#F0F0F0") : QColor("#000000");
-  else if (isHyperLink)
-    return isDisabledState() ? QColor("#555555") : (isHoverState() ? hyperlinkHover : hyperlinkNormal);
-  else
-    return QColor("#FFFFFF");
+    return isDarkMode ? penColor(SecondaryTextDark) : penColor(SecondaryTextLight);
+
+  // Primary button
+  return penColor(PrimaryText);
 }
 
-QPixmap Button::getPixmap() const {
+QPixmap Button::pixmap() const {
   if (isUnicodeIcon)
     return QPixmap();  
 
   if (isCheckable() && isChecked())
-    return checkedButtonIcon;
+    return _checkedButtonIcon;
   else if (!isSecondary)
-    return primaryButtonIcon;
+    return _primaryButtonIcon;
   else
     return isDarkMode ? _darkIcon : _lightIcon;
 }
 
-QFont Button::getFont() const {
-  QFont font;
+QFont Button::font() const {
+  QFont fnt;
   
   if (isUnicodeIcon) {
-    font.setFamily("Segoe Fluent Icons");
-    font.setPixelSize(unicodeIconSize);
-    return font;
+    fnt.setFamily("Segoe Fluent Icons");
+    fnt.setPixelSize(unicodeIconSize);
+    return fnt;
   }
 
-  font.setFamily(fontFamily);
-  font.setPointSize(fontSize);
-  font.setWeight(fontWeight);
-  font.setItalic(isItalic);
+  fnt.setFamily(fontFamily);
+  fnt.setPointSize(fontSize);
+  fnt.setWeight(fontWeight);
+  fnt.setItalic(isItalic);
 
-  return font;
+  return fnt;
 }
 
+// ----------------------------------- Button Designing --------------------------
 void Button::drawBorder(QPainter &painter) {
-  bool showBorder = isSecondary && !isIconOnly();
-
-  if (!showBorder || isGradient || isHyperLink || isBorderTransparent)
+  if (isGradient || isHyperLink || isBorderTransparent)
     painter.setPen(Qt::NoPen);
   else {
     QPen pen(isDarkMode ? "#4D4D4D" : "#CCCCCC");
@@ -295,14 +347,14 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
       
       int buttonWidth = iconX + (hasRightSideIcon ? (2 * iconW + 2 * spacing) : (iconW + spacing)) + textW + 2 * spacing;
 
-      if (!customSize.isValid()) 
+      if (!_customSize.isValid()) 
         QPushButton::setFixedSize(buttonWidth, 36);
 
       QRect textRect(textX, textY, textW , height());
       painter.drawText(textRect, Qt::AlignVCenter, text());
 
       if (isUnicodeIcon)
-        painter.drawText(QRect(iconX, 0, unicodeIconSize + 4, height()), Qt::AlignCenter, unicodeIcon);
+        painter.drawText(QRect(iconX, 0, unicodeIconSize + 4, height()), Qt::AlignCenter, _unicodeIcon);
       else
         painter.drawPixmap(iconX, iconY, pixmap);
 
@@ -314,7 +366,7 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
 
     case IconOnly: {
       if (isUnicodeIcon)
-        painter.drawText(rect(), Qt::AlignCenter, unicodeIcon);
+        painter.drawText(rect(), Qt::AlignCenter, _unicodeIcon);
       else {
         int x = (width() - pixmap.width()) / 2;
         int y = (height() - pixmap.height()) / 2;
@@ -328,9 +380,9 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
       int padding = 12;
       int buttonWidth = padding + textW + padding;
 
-      if (customSize.isValid()) {
+      if (_customSize.isValid()) {
         textW = width() - 2 * padding;
-        setFixedSize(customSize);
+        setFixedSize(_customSize);
       } else 
         QPushButton::setFixedSize(buttonWidth, 36);
 
@@ -349,13 +401,13 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
       int buttonWidth = hspacing + textW + hspacing;
       int buttonHeight = vSpacing + pixmap.height() + gap + textH + vSpacing;
 
-      if (customSize.isValid()) 
-        setFixedSize(customSize);
+      if (_customSize.isValid()) 
+        setFixedSize(_customSize);
       else 
         QPushButton::setFixedSize(buttonWidth, buttonHeight);
 
       if (isUnicodeIcon)
-        painter.drawText(QRect(0, vSpacing, width(), unicodeIconSize + 4), Qt::AlignCenter, unicodeIcon);
+        painter.drawText(QRect(0, vSpacing, width(), unicodeIconSize + 4), Qt::AlignCenter, _unicodeIcon);
       else {
         int x = (width() - pixmap.width()) / 2;
         painter.drawPixmap(x, vSpacing, pixmap);
@@ -379,19 +431,20 @@ void Button::paintEvent(QPaintEvent *event) {
   drawBorder(painter);
 
   // Background
-  drawBackground(painter, getBackgroundColor());
+  drawBackground(painter, brush());
 
   // Font
-  painter.setFont(getFont());
+  painter.setFont(font());
 
   // Text color & opacity
-  painter.setPen(getTextColor());
+  painter.setPen(pen());
   painter.setOpacity(isPressed ? 0.6 : 1.0);
 
   // Draw icon & text
-  drawContent(painter, getPixmap());
+  drawContent(painter, pixmap());
 }
 
+// ------------------------------------ Events -------------------------------------
 void Button::mousePressEvent(QMouseEvent *event) {
   isPressed = true;
   QPushButton::mousePressEvent(event);
@@ -415,11 +468,11 @@ void Button::enterEvent(QEnterEvent *event) {
 
   if (isShadowEnabled && !isIconOnly()) {
     if (!isSecondary) 
-      shadowColor = QColor::fromString("#008EDE");
+      _shadowColor = QColor::fromString("#008EDE");
     else 
-      shadowColor = isDarkMode ? QColor::fromString("#333333") : QColor::fromString("#FFFFFF");
+      _shadowColor = isDarkMode ? QColor::fromString("#333333") : QColor::fromString("#FFFFFF");
 
-    effect->setColor(shadowColor);
+    effect->setColor(_shadowColor);
     animate->setStartValue(effect->blurRadius());
     animate->setEndValue(25);
     animate->start();

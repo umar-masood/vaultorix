@@ -15,6 +15,7 @@
 #include <QPixmap>
 #include <QSize>
 #include <QRect>
+#include <QHash>
 
 class Button : public QPushButton {
   Q_OBJECT
@@ -22,7 +23,45 @@ class Button : public QPushButton {
   Q_PROPERTY(QColor endColor READ getEndColor WRITE setEndColor)
   
   public:
-  enum DisplayMode { IconOnly, TextOnly, IconText, TextUnderIcon, };
+
+  enum DisplayMode { 
+    IconOnly, 
+    TextOnly, 
+    IconText, 
+    TextUnderIcon, 
+  };
+
+  enum ButtonStateColor {
+    PrimaryNormal,
+    PrimaryHover,
+    PrimaryPressed,
+
+    DisabledPrimary,
+
+    SecondaryNormalLight,
+    SecondaryHoverLight,
+    SecondaryPressedLight,
+
+    DisabledSecondaryLight,
+    DisabledSecondaryDark,
+
+    SecondaryNormalDark,
+    SecondaryHoverDark,
+    SecondaryPressedDark,
+
+    HyperLinkNormal,
+    HyperLinkHover,
+  };
+
+  enum ButtonTextColor {
+    PrimaryText,
+    SecondaryTextLight,
+    SecondaryTextDark,
+
+    DisabledPrimaryText,
+    DisabledSecondaryTextLight,
+    DisabledSecondaryTextDark,
+  };
 
   explicit Button(const QString &text, QWidget *parent = nullptr);
   explicit Button(QWidget *parent = nullptr);
@@ -36,7 +75,11 @@ class Button : public QPushButton {
   void setSecondary(bool enable);
   void setShadow(bool enable);
   void setHyperLink(bool enable);
-  void setHyperLinkColors(const QColor &normalState, const QColor &hoverState);
+  /**
+   * @brief Sets the background color of button
+   */
+  void setColor(const ButtonStateColor &state, const QColor &color);
+  void setTextColor(const ButtonTextColor &type, const QColor &color);
   void setFontProperties(const QString &family, int pointSize, QFont::Weight weight = QFont::Normal, bool italic = false);
   void setGradientColors(const QString &startColor, const QString &endColor, const QString &hoverColor);
   void setStartColor(const QColor &c);
@@ -51,6 +94,14 @@ class Button : public QPushButton {
   void setRightSideIcon(const QString &iconLight, const QString &iconDark);
   void setFontXY(int x, int y);
 
+  inline uint qHash(const ButtonStateColor &color, uint seed = 0) {
+    return ::qHash(static_cast<int>(color), seed);
+  }
+
+  inline uint qHash(const ButtonTextColor &color, uint seed = 0) {
+    return ::qHash(static_cast<int>(color), seed);
+  }
+
   protected:
   void paintEvent(QPaintEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
@@ -59,7 +110,7 @@ class Button : public QPushButton {
   void leaveEvent(QEvent *event) override;
   void hideEvent(QHideEvent *event) override;
 
-private:
+  private:
   // Flags
   bool isHover = false;
   bool isPressed = false;
@@ -74,66 +125,68 @@ private:
   bool isBorderTransparent = false;
   bool isNormalBackgroundTransparent = false;
   bool hasRightSideIcon = false;
-  
-  // Font Adjustment
-  int _x = 0, _y = 0;
 
+  // Button State Getters
   bool isDisabledState() const;
   bool isHoverState() const;
   bool isNormalState() const;
   bool isPressedState() const;
   bool isIconOnly() const;
 
+  // Helpers
   void init();
+  void loadDefaultColors();
   void drawBorder(QPainter &painter);
   void drawBackground(QPainter &painter, const QColor &bgColor);
   void drawContent(QPainter &painter, const QPixmap &pixmap);
 
+  // Gradient Getters
   QColor getStartColor() const;
   QColor getEndColor() const;
 
-  QColor getBackgroundColor() const;
-  QColor getTextColor() const;
-  QPixmap getPixmap() const;
-  QFont getFont() const;
+  QColor brushColor(const ButtonStateColor &state) const;
+  QColor brush() const;
+
+  QColor penColor(const ButtonTextColor &type) const;
+  QColor pen() const;
+
+  QPixmap pixmap() const;
+  QFont font() const;
 
   // Icons
-  QPixmap _lightIcon, _darkIcon, primaryButtonIcon, checkedButtonIcon, _rightSideLightIcon, _rightSideDarkIcon;
+  QPixmap _lightIcon, _darkIcon, _primaryButtonIcon, _checkedButtonIcon, _rightSideLightIcon, _rightSideDarkIcon;
 
   // Icons Size
   QSize _iconSize = QSize(20, 20);
-  QString unicodeIcon;
+  QString _unicodeIcon;
   int unicodeIconSize = 16;
 
   // Display Mode
   DisplayMode displayMode = IconText;
-  QSize customSize;
+  QSize _customSize;
 
   // Graphical Effects & Animations
   SmoothShadow *effect;
   QPropertyAnimation *animate;
 
   // Button Shadow Color
-  QColor shadowColor;
+  QColor _shadowColor;
 
   // Gradient Button Colors
   QColor gradientStart, gradientEnd, hoverGradientColor, color1, color2;
   
-  // Standard Button States Colors
-  // Primary Button
-  QColor _normalPrimaryColor, _normalPrimaryHoverColor, _normalPrimaryPressedColor;
+  // Button States Colors
+  QHash<ButtonStateColor, QColor> _colors;
 
-  // Secondary Button
-  QColor _normalSecondaryLightModeColor, _normalSecondaryLightModeHoverColor, _normalSecondaryLightModePressedColor;
-
-
-  // HyperLink Button Colors
-  QColor hyperlinkNormal, hyperlinkHover;
+  // Button Text Colors
+  QHash<ButtonTextColor, QColor> _textColors;
 
   // Font 
   QString fontFamily = "Segoe UI";
   int fontSize = 10;
   QFont::Weight fontWeight = QFont::Normal;
+  // Font Adjustment
+  int _x = 0, _y = 0;
 
   // Loader
   SpinnerProgress *spinner = nullptr;

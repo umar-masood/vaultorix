@@ -16,9 +16,8 @@ void Seperator::paintEvent(QPaintEvent *event) {
     QColor lineColor = !color.isEmpty() ? color : "#8D8D8D";
     painter.setPen(QPen(QBrush(lineColor), 1));
 
-    if (orientation == Qt::Horizontal) {
+    if (orientation == Qt::Horizontal) 
         painter.drawLine(0, height() / 2, width(), height() / 2);
-    } else if (orientation == Qt::Vertical) {
+    else if (orientation == Qt::Vertical) 
         painter.drawLine(width() / 2, 0, width() / 2, height());
-    }
 }
