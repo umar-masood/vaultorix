@@ -13,11 +13,11 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    illustration->setScaledContents(true);
 
    // Main Heading
-   heading = new Label(false, "Inter", 22, QFont::Bold, false, "Verify with OTP");
+   heading = new Label("Inter", 22, QFont::Bold, false, "Verify with OTP");
    heading->setStyleSheet("color: black;");
    
    // Text Under Main Heading
-   text = new Label(false, "Segoe UI", 10, QFont::Medium, false);
+   text = new Label("Segoe UI", 10, QFont::Medium, false);
    text->setWordWrap(true);
    text->setStyleSheet("color: #8D8D8D;");
    text->setFixedWidth(324);
@@ -27,7 +27,7 @@ AccountOTP::AccountOTP(QWidget *parent) : QWidget(parent) {
    _otpWidget = new OTPWidget;
 
    // Message Label (For displaying error messages)
-   _message = new AnimatedLabel(false, "Segoe UI", 10, QFont::Medium, false);
+   _message = new AnimatedLabel("Segoe UI", 10, QFont::Medium, false);
    _message->setWordWrap(true);
    _message->setStyleSheet("color: #FF0000;");
    _message->setFixedWidth(324);
@@ -274,7 +274,7 @@ TextWithBtn::TextWithBtn(const QString &promptText,
    setAttribute(Qt::WA_TranslucentBackground);
 
    // Text 
-   _text = new Label(false, "Segoe UI", 10, QFont::Normal, false, promptText, Qt::AlignHCenter);
+   _text = new Label("Segoe UI", 10, QFont::Normal, false, promptText, Qt::AlignHCenter);
    _text->setStyleSheet("color: black;");
    _text->setParent(this);
    _text->setFixedSize(promptTextSize);
@@ -297,7 +297,7 @@ TextWithBtn::TextWithBtn(const QString &promptText,
 
    // Timer Label
    if (hasTimer) {
-      _timer = new Label(false, "Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
+      _timer = new Label("Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
       _timer->setStyleSheet("color: black;");
       _timer->setParent(this);
       _timer->setFixedSize(36, 22);

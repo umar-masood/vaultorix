@@ -15,10 +15,10 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    illustration->setScaledContents(true);
 
    // Heading
-   heading = new Label(false, "Inter", 22, QFont::Bold, false, "Sign in");
+   heading = new Label("Inter", 22, QFont::Bold, false, "Sign in");
    
    // Text under Heading (Welcome Text)
-   text = new Label(false, "Segoe UI", 10, QFont::Medium, false, "Hi, Welcome back!");
+   text = new Label("Segoe UI", 10, QFont::Medium, false, "Hi, Welcome back!");
    text->setWordWrap(true);
    text->setStyleSheet("color: #8D8D8D;");
    text->setFixedWidth(324);

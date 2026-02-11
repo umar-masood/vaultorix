@@ -1,8 +1,9 @@
 #include "Menu.h"
 
-MenuItem::MenuItem(const QIcon &icon, const QString &text, const QString &shortcut, bool hasSubMenu) : QStandardItem(icon, text) {
+MenuItem::MenuItem(const QString &iconPath, const QString &text, const QString &shortcut, bool hasSubMenu) : QStandardItem(text) {
     setData(shortcut, Qt::UserRole + 1);
     setData(hasSubMenu, Qt::UserRole + 2);
+    setData(iconPath, Qt::UserRole + 3);
 }
 
 Menu::Menu(QWidget *parent) : QListView(parent), _maxVisibleItems(8) {
@@ -103,7 +104,7 @@ bool Menu::eventFilter(QObject *o, QEvent *event) {
 }
 
 void Menu::addAction(const MenuAction &menuAction) {
-    MenuItem *item = new MenuItem(QIcon(isDarkMode ? menuAction.darkIcon : menuAction.lightIcon), 
+    MenuItem *item = new MenuItem(isDarkMode ? menuAction.darkIcon : menuAction.lightIcon, 
                                  menuAction.text, menuAction.shortcut, menuAction.hasSubMenu);
 
     if (!menuAction.shortcut.isEmpty() && menuAction.hasSubMenu) {

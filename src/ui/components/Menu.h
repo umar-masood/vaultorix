@@ -27,7 +27,7 @@
 
 class MenuItem : public QStandardItem {
    public:
-   explicit MenuItem(const QIcon &icon, const QString &text, const QString &shortcut, bool hasSubMenu);
+   explicit MenuItem(const QString &iconPath, const QString &text, const QString &shortcut, bool hasSubMenu);
 };
 
 class Menu : public QListView {

@@ -8,7 +8,7 @@ TermsConditions::TermsConditions(QWidget *parent) : QWidget(parent) {
    scrollBar = new ScrollBar(Qt::Vertical);
 
    // Heading
-   heading = new Label(false, "Inter", 18, QFont::Bold, false, "Terms & Conditions", Qt::AlignLeft);
+   heading = new Label("Inter", 18, QFont::Bold, false, "Terms & Conditions", Qt::AlignLeft);
    heading->setStyleSheet("color: #0086CF;");
 
    // Terms & Conditions HTML Text View Widget

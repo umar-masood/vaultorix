@@ -1,6 +1,7 @@
 #pragma once
 #include "../../components/Button.h"
 #include "../../components/ToolTip.h"
+#include "../../../resources/IconManager.h"
 
 #include <dwmapi.h>
 #include <windowsx.h>
@@ -47,6 +48,12 @@ class SubWindow : public QWidget {
     QPoint m_dragStartPos;
 
     // Window Controls    
+    // Icons
+    QString closeIconLight = IconManager::icon(Icons::Win_CloseLight);
+    QString closeIconDark = IconManager::icon(Icons::Win_CloseDark);
+    QString minimizeIconLight = IconManager::icon(Icons::Win_MinimizeLight);
+    QString minimizeIconDark = IconManager::icon(Icons::Win_MinimizeDark);
+
     // Close Button
     bool hasCloseBtn = true;
     Button *closeBtn = nullptr;

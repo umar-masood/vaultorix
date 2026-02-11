@@ -48,7 +48,7 @@ Label* Statusbar::selectedItemsLabel() const { return selected_items; }
 Label* Statusbar::totalSizeLabel() const { return total_size; }
 
 Label* Statusbar::createLabel(const QString &text) {
-    return (new Label(false, "Segoe UI", 10, QFont::Normal, false, text));
+    return (new Label("Segoe UI", 10, QFont::Normal, false, text));
 }
 
 void Statusbar::paintEvent(QPaintEvent *event) {

@@ -13,7 +13,7 @@ EmptyStateWidget::EmptyStateWidget(QWidget *parent) : QWidget(parent) {
   illustration->setScaledContents(true);
 
   // Text
-  text = new Label(false, "Segoe UI", 10, QFont::Normal, false, "Import files into your vault\nClick here to add files into your vault and protect them securely.");
+  text = new Label("Segoe UI", 10, QFont::Normal, false, "Import files into your vault\nClick here to add files into your vault and protect them securely.");
   text->setWordWrap(true);
   text->setStyleSheet("color: black;");
    

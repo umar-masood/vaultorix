@@ -4,7 +4,7 @@ SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimiz
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setFixedSize(size);
 
-     // Content Area
+    // Content Area
     _contentArea = new QWidget(this);
     _contentArea->setGeometry(0,0, width(), height());
     _contentArea->setContentsMargins(0, 0, 0, 0);
@@ -167,8 +167,11 @@ void SubWindow::applyDWMEffects() {
 }
 
 void SubWindow::applyThemedIcons() {
-    if (closeBtn)  closeBtn->setUnicodeIcon("\uE8BB", 10);
-    if (minimizeBtn) minimizeBtn->setUnicodeIcon("\uE921", 10);
+    if (closeBtn)
+        closeBtn->setIconPaths(closeIconLight, closeIconDark);
+
+    if (minimizeBtn) 
+        minimizeBtn->setIconPaths(minimizeIconLight, minimizeIconDark);
 }
 
 void SubWindow::paintEvent(QPaintEvent *event) {
@@ -182,7 +185,7 @@ Button* SubWindow::windowButton() {
     Button *b = new Button;
     b->setSecondary(true);
     b->setCursor(Qt::PointingHandCursor);
-    b->setIconSize(QSize(16,16));
+    b->setIconSize(QSize(18, 18));
     b->setDisplayMode(Button::IconOnly);
     b->setFixedSize(QSize(26, 26));
     return b;
@@ -194,12 +197,11 @@ bool SubWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr 
     MSG *msg = (MSG *)message;
 
     switch (msg->message) {
-    case WM_NCCALCSIZE:
-        *result = 0;
-        return true;
+        case WM_NCCALCSIZE:
+            *result = 0;
+            return true;
 
-    default:
-        break;
+        default: break;
     }
 
     return false;

@@ -13,7 +13,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   app_icon->setPixmap(QPixmap(AppIcon).scaled(24, 22, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
   // App Name
-  app_name = new Label(false, "Segoe UI", 11, QFont::Normal, false, "Vaultorix");
+  app_name = new Label("Segoe UI", 11, QFont::Normal, false, "Vaultorix");
    
   // Seperator
   seperator = new Seperator(nullptr, 18, 1, Qt::Vertical);

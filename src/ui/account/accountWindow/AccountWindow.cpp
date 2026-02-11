@@ -22,7 +22,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    themeMode = new Button(titleBar);
    themeMode->setCursor(Qt::PointingHandCursor);
    themeMode->setSecondary(true);
-   themeMode->setIconSize(QSize(16,16));
+   themeMode->setIconSize(QSize(18, 18));
    themeMode->setDisplayMode(Button::IconOnly);
    themeMode->setFixedSize(QSize(26, 26));
    themeMode->setIconPaths(DarkModeIcon, DarkModeIcon);
