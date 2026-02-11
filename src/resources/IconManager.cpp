@@ -139,6 +139,8 @@ QString IconManager::icon(Icons icon) {
 
 QPixmap IconManager::renderSvg(const QString &iconPath, const QSize &size) {
     QSvgRenderer svg(iconPath);
+    svg.setAspectRatioMode(Qt::KeepAspectRatio);
+    
     if (!svg.isValid()) {
         qWarning() << "SVG not valid or not found:" << iconPath;
         return QPixmap();
