@@ -65,6 +65,7 @@ class AccountCreate : public QWidget {
    public:
    explicit AccountCreate(QWidget *parent = nullptr, AccountWindow *accountWindow = nullptr);
    Q_INVOKABLE void setDarkMode(bool value);
+   
    Button* createAccountButton() const;
    CustomTextField* nameField() const;
    CustomTextField* usernameField() const;
@@ -81,27 +82,27 @@ class AccountCreate : public QWidget {
    // Heading
    QLabel *heading = nullptr;
 
-   // Name Widget
+   // Name
    CustomTextField *name = nullptr;
-   QWidget *nameWidget = nullptr;
+   QVBoxLayout *nameLayout = nullptr;
 
-   // Password Widget
+   // Password
    CustomTextField *password = nullptr;
-   QWidget *passwordWidget = nullptr;
+   QVBoxLayout *passwordLayout = nullptr;
 
-   // Username Widget
+   // Username
    CustomTextField *username = nullptr;
-   QWidget *usernameWidget = nullptr;
+   QVBoxLayout *usernameLayout = nullptr;
 
-   // Email Widget
+   // Email
    CustomTextField *email = nullptr;
-   QWidget *emailWidget = nullptr;
+   QVBoxLayout *emailLayout = nullptr;
 
    // Holds all labels inside fields widgets
    QVector<QLabel *> labels;
 
    // Hold all field widgets 
-   QVector<QWidget *> fieldsWidgets;
+   QVector<QVBoxLayout *> fieldsLayouts;
 
    // Layout
    QVBoxLayout *layout = nullptr;
@@ -123,10 +124,9 @@ class AccountCreate : public QWidget {
    TextWithBtn *_redirectToSignInWidget = nullptr;
 
    // Helper Functions
-   CustomTextField *createTextField(const QString &placeholderText = "", bool hasValidity = false);
-   QWidget *createLabeledTextFieldWidget(const QString labelName = "", CustomTextField *currField = nullptr);
+   CustomTextField *createTextField(const QString &placeholderText = QString(), bool hasValidity = false);
+   QVBoxLayout *createLabeledTextFieldLayout(const QString labelName = QString(), CustomTextField *currField = nullptr);
    QFont font(const QString &family = "Segoe UI", int fontSize = 10, QFont::Weight weight = QFont::Medium);
-   void addLabelsInsideFieldsWidgets();
 
    signals:
    void onNameEntered();

@@ -1,4 +1,4 @@
-// #include "./core/account/accountAuthCoordinator/AccountAuthCoordinator.h"
+#include "./core/account/accountAuthCoordinator/AccountAuthCoordinator.h"
 #include "./ui/vault/vaultWindow/VaultWindow.h"
 #include <QApplication>
 

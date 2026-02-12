@@ -13,30 +13,31 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    heading->setFixedSize(QSize(276, 36));
    heading->setAlignment(Qt::AlignCenter);
    heading->setFont(font("Inter", 22, QFont::Bold));
+   labels.append(heading);
 
    // Name
    name = createTextField("Enter your full name", true);
    name->setContextMenu(true);
-   nameWidget = createLabeledTextFieldWidget("Full Name", name);
+   nameLayout = createLabeledTextFieldLayout("Full Name", name);
 
    // Username
    username = createTextField("Enter unique username", true);
    username->setContextMenu(false);
-   usernameWidget = createLabeledTextFieldWidget("Username", username);
+   usernameLayout = createLabeledTextFieldLayout("Username", username);
 
    // Email
    email = createTextField("Enter your email-address", true);
    email->setContextMenu(false);
-   emailWidget = createLabeledTextFieldWidget("Email-Address", email);
+   emailLayout = createLabeledTextFieldLayout("Email-Address", email);
 
    // Password
    password = createTextField("Enter strong password");
    password->setContextMenu(false);
    password->setPasswordTextField(true);
-   passwordWidget = createLabeledTextFieldWidget("Password", password);
+   passwordLayout = createLabeledTextFieldLayout("Password", password);
 
-   // Adding all field widgets to a vector
-   fieldsWidgets = {nameWidget, usernameWidget, emailWidget, passwordWidget};
+   // Adding all field layouts to a vector
+   fieldsLayouts = {nameLayout, usernameLayout, emailLayout, passwordLayout};
 
    // Validator
    _passwordValidatorWidget = new PwdRulesWidget;
@@ -58,8 +59,9 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    layout->addWidget(heading, 0, Qt::AlignHCenter);
    layout->addSpacing(16);
 
-   for (auto *widget : fieldsWidgets) {
-      layout->addWidget(widget, 0 , Qt::AlignHCenter);
+   for (auto *fieldLayout : fieldsLayouts) {
+      layout->addLayout(fieldLayout);
+      layout->setAlignment(fieldLayout, Qt::AlignHCenter);
       layout->addSpacing(12);
    }
 
@@ -92,9 +94,6 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    // Setting layout on widget
    setLayout(layout);
 
-   // Adding labels (present inside fields widgets) to a vector
-   addLabelsInsideFieldsWidgets();
-
    // Initial theme
    setDarkMode(isDarkMode);
 }
@@ -107,7 +106,7 @@ void AccountCreate::setDarkMode(bool value) {
    for (auto *label : labels)
       label->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
 
-   // TextFields inside fields widgets such as emailWidget, usernameWidget etc.
+   // TextFields inside fields layouts such as emailLayout, usernameLayout etc.
    for (auto *field : {name, username, password, email})
       field->setDarkMode(isDarkMode);
 
@@ -147,17 +146,14 @@ CustomTextField *AccountCreate::createTextField(const QString &placeholderText, 
    return field;
 }
 
-QWidget *AccountCreate::createLabeledTextFieldWidget(const QString labelName, CustomTextField *currField) {
-   auto *widget = new QWidget;
-   widget->setFixedSize(currField->width(), 60);
-   widget->setAttribute(Qt::WA_TranslucentBackground);
-
+QVBoxLayout *AccountCreate::createLabeledTextFieldLayout(const QString labelName, CustomTextField *currField) {
    auto *label = new QLabel;
    label->setAttribute(Qt::WA_TranslucentBackground);
    label->setText(labelName);
    label->setFont(font());
+   labels.append(label);
 
-   auto *layout = new QVBoxLayout(widget);
+   auto *layout = new QVBoxLayout;
    layout->setSpacing(0);
    layout->setContentsMargins(0, 0, 0, 0);
    layout->addWidget(label, 0, Qt::AlignLeft);
@@ -165,7 +161,7 @@ QWidget *AccountCreate::createLabeledTextFieldWidget(const QString labelName, Cu
    layout->addWidget(currField, 0, Qt::AlignLeft);
    layout->addStretch();
 
-   return widget;
+   return layout;
 }
 
 QFont AccountCreate::font(const QString &family , int fontSize, QFont::Weight weight) {
@@ -176,16 +172,6 @@ QFont AccountCreate::font(const QString &family , int fontSize, QFont::Weight we
    return font;
 }
 
-void AccountCreate::addLabelsInsideFieldsWidgets() {
-   for (auto *widget : fieldsWidgets) {
-      auto *label = widget->findChild<QLabel *>();
-      if (label) 
-         labels.append(label);
-   }   
-   
-   // Added heading (Create Account) inside labels vector for color changing
-   labels.append(heading);
-}
 
 /* ========================================================= 
              CUSTOMIZED WIDGETS FOR ABOVE CLASS               
