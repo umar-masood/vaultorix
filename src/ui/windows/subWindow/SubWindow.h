@@ -3,11 +3,13 @@
 #include "../../components/ToolTip.h"
 #include "../../../resources/IconManager.h"
 
+
 #include <dwmapi.h>
 #include <windowsx.h>
 #include <windows.h>
 #include <QWindow>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 
 class SubWindow : public QWidget {
     Q_OBJECT
@@ -18,7 +20,7 @@ class SubWindow : public QWidget {
 
     void setDarkMode(bool value);
     QWidget* contentArea() const;
-    QWidget* titleBar() const;
+    QHBoxLayout* titlebarLayout() const;
 
     protected: 
     void paintEvent(QPaintEvent *event) override;
@@ -39,6 +41,11 @@ class SubWindow : public QWidget {
 
     // Getter
     Button* windowButton();
+
+    // Layouts
+    QHBoxLayout *titlebar_layout = nullptr;
+    QHBoxLayout *titlebar_sublayout = nullptr;
+    QHBoxLayout *win_controls_layout = nullptr;
 
     // Window Handle (Unique Identifier)
     HWND hwnd;

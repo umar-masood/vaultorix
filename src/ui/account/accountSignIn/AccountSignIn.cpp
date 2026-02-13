@@ -28,18 +28,18 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    username->setPlaceholderText("Username");
    username->setContextMenu(false);
    username->setFixedSize(QSize(360, 36));
-   username->setTextFieldIcon(true);
+   username->setIconic(true);
    username->setClearButton(true);
-   username->setTextFieldIconSize(QSize(18,18));
+   username->setIconSize(QSize(18,18));
    
    // Password Field
    password = new TextField;
    password->setContextMenu(false);
    password->setPlaceholderText("Password");
    password->setFixedSize(QSize(360, 36));
-   password->setPasswordTextField(true);
-   password->setTextFieldIcon(true);
-   password->setTextFieldIconSize(QSize(18,18));
+   password->setPasswordMode(true);
+   password->setIconic(true);
+   password->setIconSize(QSize(18,18));
 
    // Forgot Password Field
    forgotPwd = new Button("Forgot Password?");
@@ -56,7 +56,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    signInBtn->setDisplayMode(Button::TextOnly);
    signInBtn->setFixedSize(QSize(360, 36));
    signInBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
-   signInBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
+   signInBtn->setFontProperties("Segoe UI", 11, QFont::Normal);
    signInBtn->setLoaderButton(true);
    connect(signInBtn, &Button::clicked, this, &AccountSignIn::signInClicked);
 
@@ -66,7 +66,7 @@ AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    cancelBtn->setDisplayMode(Button::TextOnly);
    cancelBtn->setSecondary(true);
    cancelBtn->setFixedSize(QSize(360, 36));
-   cancelBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
+   cancelBtn->setFontProperties("Segoe UI", 11, QFont::Normal);
    connect(cancelBtn, &Button::clicked, this,  &AccountSignIn::cancelClicked);
 
    // Sign up page redirect widget

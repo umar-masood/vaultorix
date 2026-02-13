@@ -25,6 +25,8 @@ class Label : public QLabel {
    explicit Label(bool isIconic = false,
                   Qt::Alignment alignment = Qt::AlignCenter,
                   QWidget *parent = nullptr);
+
+   void setTextColor(const QColor &color);
 };
 
 

@@ -220,7 +220,7 @@ void OTPWidget::updateStyles() {
    bg_color_normal = isDarkMode ? "#2D2D2D" : "#FBFBFB";
    bg_color_focused = isDarkMode ? "#242424" : "#FFFFFF";
    text_color = isDarkMode ? "white" : "black";
-   border_color = isDarkMode ? "#4D4D4D" : "#CCCCCC";
+   border_color = isDarkMode ? "#616161" : "#CCCCCC";
 
    normalStyle = QString(
                      "background-color: %1; border-radius: 7px; border: 1px solid %2; color: %3;")

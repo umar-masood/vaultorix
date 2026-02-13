@@ -15,11 +15,12 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    mainLayout->setContentsMargins(0, 0, 0, 0);
    mainLayout->setSpacing(0);
 
-   // TitleBar Area
-   QWidget *titleBar = this->titleBar();
+   // Titlebar Layout
+   QHBoxLayout *_titlebarLayout = this->titlebarLayout();
+   _titlebarLayout->addStretch();
 
    // Theme Mode Button
-   themeMode = new Button(titleBar);
+   themeMode = new Button;
    themeMode->setCursor(Qt::PointingHandCursor);
    themeMode->setSecondary(true);
    themeMode->setIconSize(QSize(18, 18));
@@ -28,6 +29,10 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    themeMode->setBorderTransparent(true);
    themeMode->setFixedSize(QSize(26, 26));
    themeMode->setIconPaths(DarkModeIcon, DarkModeIcon);
+
+   _titlebarLayout->addWidget(themeMode, 0, Qt::AlignRight);
+   _titlebarLayout->addSpacing(6);
+
    connect(themeMode, &Button::clicked, this, [this](){
       isDarkMode = !isDarkMode;
       emit themeModeChanged(isDarkMode);
@@ -38,16 +43,9 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    themeButtonTip->setText("Change theme mode");
 
    // Seperator 
-   seperator = new Seperator(titleBar, 18, 1, Qt::Vertical);
-   int x = titleBar->width() - 26*2 - 5*3 - 4;
-   int y = (titleBar->height() - 18) / 2;
-   seperator->move(x, y);
-   seperator->raise();
-
-   // Theme Button Positioning
-   y = (titleBar->height() - 26) / 2;
-   themeMode->move(x - 26 - 8, y );
-   themeMode->raise();
+   seperator = new Seperator(nullptr, 18, 1, Qt::Vertical);
+   _titlebarLayout->addWidget(seperator, 0, Qt::AlignRight);
+   _titlebarLayout->addSpacing(6);
 
    // Left Panel
    left = new QWidget;
@@ -174,6 +172,9 @@ void AccountWindow::onthemeModeChanged(bool enable) {
    themeButtonTip->setDarkMode(enable);
    enable ? themeMode->setIconPaths(LightModeIcon, LightModeIcon) : themeMode->setIconPaths(DarkModeIcon, DarkModeIcon);
    
+   // Titlebar Seperator 
+   seperator->setColor("#CCCCCC");
+
    // Right widget
    if (rightWidget)
       QMetaObject::invokeMethod(rightWidget, "setDarkMode", Q_ARG(bool, enable));

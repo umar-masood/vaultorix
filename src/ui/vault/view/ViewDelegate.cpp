@@ -70,7 +70,7 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
     /* ----------------------- Drawing Item Hover ------------------ */
     painter->setPen(Qt::NoPen);
-    painter->setBrush(isDarkMode ? "#2D2D2D" : "#F0F0F0");
+    painter->setBrush(isDarkMode ? "#2D2D2D" : "#F5F5F5");
     if (isSelected || isMouseOver)
         painter->drawRoundedRect(itemRect.adjusted(1, 2, -1, -2), 6, 6);
 
@@ -81,7 +81,7 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     // Border
     QPen pen;
     pen.setWidthF(isSelected ? 1.0 : 0.5);
-    pen.setColor(isSelected ? QColor("#0191DF") : (isDarkMode ? QColor("#4D4D4D") : QColor("#CCCCCC")));
+    pen.setColor(isSelected ? QColor("#0191DF") : (isDarkMode ? QColor("#616161") : QColor("#CCCCCC")));
     pen.setStyle(Qt::SolidLine);
     pen.setJoinStyle(Qt::RoundJoin);
     painter->setPen(pen);
@@ -91,7 +91,7 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     if (isSelected) 
        brushColor = isMouseOver ?   QColor("#1BB3E6") : QColor("#0191DF");
     else if (isMouseOver) 
-       brushColor = isDarkMode  ?   QColor("#323232") : QColor("#F0F0F0");
+       brushColor = isDarkMode  ?   QColor("#323232") : QColor("#F5F5F5");
     else 
        brushColor = isDarkMode  ?   QColor("#2D2D2D") : QColor("#FBFBFB");
 
@@ -379,7 +379,7 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         if (isListViewMode)
             brushColor = isDarkMode ? "#1C1C1C" : "#FFFFFF";
         else
-            brushColor = isDarkMode ? "#2D2D2D" : "#F0F0F0";
+            brushColor = isDarkMode ? "#2D2D2D" : "#F5F5F5";
 
         painter->setBrush(brushColor);
 

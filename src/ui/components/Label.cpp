@@ -29,6 +29,10 @@ Label::Label(const QString &family,
    setFont(fnt);
 }
 
+void Label::setTextColor(const QColor &color) {
+   setStyleSheet(QString("color : %1;").arg(color.name()));
+}
+
 AnimatedLabel::AnimatedLabel(bool isIconic, 
                            const QString &family, 
                            int pointSize, 

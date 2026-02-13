@@ -30,8 +30,8 @@ View::View(QWidget *parent) : QWidget(parent) {
     search_box->setPlaceholderText("Type to search your files…");
     search_box->setFixedSize(QSize(400, 32));
     search_box->setClearButton(true);
-    search_box->setTextFieldIcon(true);
-    search_box->setTextFieldIconSize(QSize(18, 18));
+    search_box->setIconic(true);
+    search_box->setIconSize(QSize(18, 18));
     search_box->setIconPaths(SearchIcon, SearchIcon);
 
     // View Mode Toggle 

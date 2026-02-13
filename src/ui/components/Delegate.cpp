@@ -39,7 +39,7 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
     QRect fullRec = option.rect;
     painter->setPen(Qt::NoPen);
     painter->setBrush(
-        (isHovered || isSelected || isMouseOver) ? (isDarkMode ? QColor("#383838") : QColor("#F0F0F0")) : Qt::transparent
+        (isHovered || isSelected || isMouseOver) ? (isDarkMode ? QColor("#383838") : QColor("#F5F5F5")) : Qt::transparent
     );
     painter->drawRoundedRect(fullRec.adjusted(1, 1, -1, -1), 6, 6); // Adjusted for small spacing between items
 

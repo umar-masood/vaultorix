@@ -33,7 +33,7 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    // Password
    password = createTextField("Enter strong password");
    password->setContextMenu(false);
-   password->setPasswordTextField(true);
+   password->setPasswordMode(true);
    passwordLayout = createLabeledTextFieldLayout("Password", password);
 
    // Adding all field layouts to a vector
@@ -77,7 +77,7 @@ AccountCreate::AccountCreate(QWidget *parent, AccountWindow *accountWindow) : QW
    createAccBtn->setLoaderButton(true);
    createAccBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
    createAccBtn->setText("Create Account");
-   createAccBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
+   createAccBtn->setFontProperties("Segoe UI", 11, QFont::Normal);
    createAccBtn->setEnabled(false);
 
    // Redirect to Sign In page widget

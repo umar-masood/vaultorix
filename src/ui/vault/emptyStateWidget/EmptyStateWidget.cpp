@@ -46,7 +46,7 @@ void EmptyStateWidget::paintEvent(QPaintEvent *event) {
   if (isPressed) 
     bg_color = isDarkMode ? "#242424" : "#FFFFFF";
   else if (isHover)
-    bg_color = isDarkMode ? "#323232" : "#F0F0F0";
+    bg_color = isDarkMode ? "#323232" : "#F5F5F5";
   else
     bg_color = Qt::transparent;
 

@@ -43,7 +43,7 @@ void CheckBox::paintEvent(QPaintEvent *) {
 
    QPen pen;
    pen.setWidthF(isChecked() ? 1.0 : 0.5);
-   pen.setColor(isChecked() ? QColor("#0191DF") : (isDarkMode ? QColor("#4D4D4D") : QColor("#CCCCCC")));
+   pen.setColor(isChecked() ? QColor("#0191DF") : (isDarkMode ? QColor("#616161") : QColor("#CCCCCC")));
    pen.setStyle(Qt::SolidLine);
    pen.setJoinStyle(Qt::RoundJoin);
    painter.setPen(pen);
@@ -52,7 +52,7 @@ void CheckBox::paintEvent(QPaintEvent *) {
    if (isChecked()) 
       bg_color = isHover ? QColor("#1BB3E6") : QColor("#0191DF");
    else if (isHover) 
-      bg_color = isDarkMode ? QColor("#323232") : QColor("#F0F0F0");
+      bg_color = isDarkMode ? QColor("#323232") : QColor("#F5F5F5");
    else 
       bg_color = isDarkMode ? QColor("#2D2D2D") : QColor("#FBFBFB");
     

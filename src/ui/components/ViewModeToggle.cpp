@@ -82,7 +82,7 @@ void ViewModeToggle::paintEvent(QPaintEvent *event) {
 
     QPen pen;
     pen.setWidthF(0.3);
-    pen.setColor(isDarkMode ? QColor("#4D4D4D") : QColor("#CCCCCC"));
+    pen.setColor(isDarkMode ? QColor("#616161") : QColor("#CCCCCC"));
     pen.setStyle(Qt::SolidLine);
     pen.setJoinStyle(Qt::RoundJoin);
     painter.setPen(pen);

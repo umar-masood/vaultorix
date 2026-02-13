@@ -176,7 +176,7 @@ void Button::loadDefaultColors() {
 
   // Secondary Light
   _colors[SecondaryNormalLight]   = QColor("#FBFBFB");
-  _colors[SecondaryHoverLight]    = QColor("#F0F0F0");
+  _colors[SecondaryHoverLight]    = QColor("#F5F5F5");
   _colors[SecondaryPressedLight]  = QColor("#FFFFFF");
   _colors[DisabledSecondaryLight] = QColor("#E0E0E0");
 
@@ -194,7 +194,7 @@ void Button::loadDefaultColors() {
   // Normal
   _textColors[PrimaryText]           = QColor("#FFFFFF");
   _textColors[SecondaryTextLight]    = QColor("#000000");
-  _textColors[SecondaryTextDark]     = QColor("#F0F0F0");
+  _textColors[SecondaryTextDark]     = QColor("#F5F5F5");
 
   // Disabled
   _textColors[DisabledPrimaryText]   = QColor("#FFFFFF");          
@@ -297,8 +297,8 @@ void Button::drawBorder(QPainter &painter) {
   if (isGradient || isHyperLink || isBorderTransparent)
     painter.setPen(Qt::NoPen);
   else {
-    QPen pen(isDarkMode ? "#4D4D4D" : "#CCCCCC");
-    pen.setWidthF(0.2);
+    QPen pen(isDarkMode ? "#616161" : "#CCCCCC");
+    pen.setWidthF(0.3);
     pen.setStyle(Qt::SolidLine);
     pen.setJoinStyle(Qt::RoundJoin);
     painter.setPen(pen);
@@ -383,11 +383,16 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
       if (_customSize.isValid()) {
         textW = width() - 2 * padding;
         setFixedSize(_customSize);
-      } else 
+      } else
         QPushButton::setFixedSize(buttonWidth, 36);
 
-      QRect textRect = isHyperLink ? QRect(0, 0, width(), height()) : QRect(padding, 0, textW, height());
-      painter.drawText(textRect, isHyperLink ? (Qt::AlignLeft | Qt::AlignVCenter) : (Qt::AlignCenter | Qt::TextWordWrap), text());
+      int textX = _x != 0 ? _x : (isHyperLink ? 0 : padding);
+      int textY = _y != 0 ? _y : 0;
+
+      QRect textRect = isHyperLink ? QRect(textX, textY, width(), height()) : QRect(textX, textY, textW, height());
+
+      painter.drawText( textRect, isHyperLink ? (Qt::AlignLeft | Qt::AlignVCenter) : (Qt::AlignCenter | Qt::TextWordWrap), text());
+
       break;
     }
 

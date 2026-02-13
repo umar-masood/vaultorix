@@ -13,48 +13,68 @@ SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimiz
 
     // Title Bar
     _titleBar = new QWidget(this);
-    _titleBar->setGeometry(0, 3, width(), 30);
+    _titleBar->setGeometry(0, 2, width(), 30);
     _titleBar->setContentsMargins(0, 0, 0, 0);
     _titleBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     _titleBar->setAttribute(Qt::WA_TranslucentBackground);
 
+    // Titlebar Layouts
+    // Main Layout
+    titlebar_layout = new QHBoxLayout(_titleBar);
+    titlebar_layout->setContentsMargins(4, 0, 4, 0);
+    titlebar_layout->setSpacing(0);
+
+    // Sublayout (for adding custom widgets inside titlebar)
+    titlebar_sublayout = new QHBoxLayout;
+    titlebar_sublayout->setContentsMargins(0, 0, 0, 0);
+    titlebar_sublayout->setSpacing(0);
+
     // Close Button
-    if (hasCloseBtn) {
-        closeBtn = windowButton();
-        closeBtn->setParent(_titleBar);
-        closeBtnTip = new ToolTip(closeBtn, "Close");
-        connect(closeBtn, &Button::clicked, this, &SubWindow::onCloseClicked);
+    closeBtn = windowButton();
+    if (!hasCloseBtn) {
+        closeBtn->setEnabled(false);
+        closeBtn->hide();
     }
+    connect(closeBtn, &Button::clicked, this, &SubWindow::onCloseClicked);
 
-    // Minimze Button
-    if (hasMinimizeBtn) {
-        minimizeBtn = windowButton();
-        minimizeBtn->setParent(_titleBar);
-        minimizeBtnTip = new ToolTip(minimizeBtn, "Minimize");
-        connect(minimizeBtn, &Button::clicked, this, &SubWindow::onMinimizedClicked);
+    // Tooltip
+    closeBtnTip = new ToolTip(closeBtn);
+    closeBtnTip->setText("Close");
+
+    // Minimize Button
+    minimizeBtn = windowButton();
+    if (!hasMinimizeBtn) {
+        minimizeBtn->setEnabled(false);
+        minimizeBtn->hide();
     }
+    connect(minimizeBtn, &Button::clicked, this, &SubWindow::onMinimizedClicked);
+    
+    // Tooltip
+    minimizeBtnTip = new ToolTip(minimizeBtn);
+    minimizeBtnTip->setText("Minimize");
 
+    // Controls layout
+    win_controls_layout = new QHBoxLayout;
+    win_controls_layout->setContentsMargins(0, 0, 0, 0);
+    win_controls_layout->setSpacing(0);
+
+    // Adding buttons to controls layout
+    win_controls_layout->addWidget(minimizeBtn, 0, Qt::AlignRight);
+    if (hasMinimizeBtn) win_controls_layout->addSpacing(4);
+    win_controls_layout->addWidget(closeBtn, 0, Qt::AlignRight);
+
+    // Adding sublayout, close and minimize button to titlebar layout
+    titlebar_layout->addLayout(titlebar_sublayout);
+    titlebar_layout->addLayout(win_controls_layout);
+    titlebar_layout->setAlignment(win_controls_layout, Qt::AlignRight);
+
+    // Window Handle
     hwnd = reinterpret_cast<HWND>(winId());
 
     // Apply Icons
     applyThemedIcons();
 
-    // Buttons Position
-    int x = _titleBar->width() - 26 - 5;
-    int y = (_titleBar->height() - 26) / 2;
-
-    _titleBar->raise();
-
-    if (closeBtn) {
-        closeBtn->move(x, y);
-        closeBtn->raise();
-    }
-
-    if (minimizeBtn) {
-        minimizeBtn->move(x - minimizeBtn->width() - 5, y);
-        minimizeBtn->raise();
-    }
-    
+    // Apply DWM Effects from Native Window API
     applyDWMEffects();
 }
 
@@ -213,9 +233,9 @@ void SubWindow::showEvent(QShowEvent *event) { applyDWMEffects(); }
 void SubWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         if (_titleBar && _titleBar->geometry().contains(event->pos())) {
-            for (auto *widget : {closeBtn, minimizeBtn}) 
-                if (widget && widget->geometry().contains(event->pos())) 
-                    return;
+            // for (auto *widget : {closeBtn, minimizeBtn}) 
+            //     if (widget && widget->geometry().contains(event->pos())) 
+            //         return;
             
             m_dragging = true;
             m_dragStartPos = event->globalPos() - frameGeometry().topLeft();
@@ -239,5 +259,5 @@ void SubWindow::mouseReleaseEvent(QMouseEvent *event) {
     QWidget::mouseReleaseEvent(event);
 }
 
-QWidget* SubWindow::titleBar() const { return _titleBar; }
+QHBoxLayout* SubWindow::titlebarLayout() const { return titlebar_sublayout; }
 QWidget* SubWindow::contentArea() const { return _contentArea; }

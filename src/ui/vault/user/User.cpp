@@ -133,7 +133,7 @@ void User::paintEvent(QPaintEvent *event) {
   if (isPressed)
     brushColor = isDarkMode ? "#242424" : "#FFFFFF";
   else if (isHover)
-    brushColor = isDarkMode ? "#323232" : "#F0F0F0";
+    brushColor = isDarkMode ? "#323232" : "#F5F5F5";
   else if (!isEnabled())
     brushColor = isDarkMode ? "#555555" : "#E0E0E0";
   else
