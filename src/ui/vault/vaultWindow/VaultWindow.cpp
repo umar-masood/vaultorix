@@ -100,7 +100,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   content_layout = new QVBoxLayout(contentArea());
   content_layout->setContentsMargins(12, 0, 12, 10);
   content_layout->setSpacing(0);
-  content_layout->addSpacing(4);
+  content_layout->addSpacing(2);
   content_layout->addWidget(toolbar, 0, Qt::AlignTop);
   content_layout->addSpacing(4);
   content_layout->addWidget(view);

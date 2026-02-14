@@ -44,7 +44,7 @@ void ScrollBar::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
 
-  QColor light_area = QColor("#F5F5F5");
+  QColor light_area = QColor("#F2F2F2");
   QColor dark_area = QColor("#383838");
 
   QColor currentColorArea = isHover ? (isDarkMode ? dark_area : light_area) : Qt::transparent;

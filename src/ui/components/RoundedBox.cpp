@@ -67,7 +67,7 @@ void RoundedBox::paintEvent(QPaintEvent *event) {
         font.setPointSize(9);
         font.setFamily("Segoe UI");
         painter.setFont(font);
-        painter.setPen(isDarkMode ? QColor("#F5F5F5") : QColor("#000000"));
+        painter.setPen(isDarkMode ? QColor("#F2F2F2") : QColor("#000000"));
         QRect text_area(12, 0, width() - 24, height());
         painter.drawText(text_area, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap, _text);
     }

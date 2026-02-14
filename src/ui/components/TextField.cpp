@@ -226,7 +226,7 @@ void TextField::paintEvent(QPaintEvent *event) {
 }
 
 void TextField::keyPressEvent(QKeyEvent *event) {
-    if (!hasContextMenu && event->modifiers() & Qt::ControlModifier) {
+    if ((!hasContextMenu || isReadOnly) && event->modifiers() & Qt::ControlModifier) {
         switch(event->key()) {
             case Qt::Key_C:
             case Qt::Key_V:
@@ -286,7 +286,7 @@ void TextField::focusOutEvent(QFocusEvent *event) {
 }
 
 void TextField::contextMenuEvent(QContextMenuEvent *event) {
-    if (!hasContextMenu) 
+    if (!hasContextMenu || isReadOnly) 
         return;
 
     menu = new Menu(this);
@@ -354,7 +354,7 @@ void TextField::loadDefaultColors() {
     // Background colors
     _colors[TextFieldColor::FocusedLight]  = QColor("#FFFFFF");      // focused background light
     _colors[TextFieldColor::FocusedDark]   = QColor("#242424");      // focused background dark
-    _colors[TextFieldColor::HoverLight]    = QColor("#F5F5F5");      // hover background light
+    _colors[TextFieldColor::HoverLight]    = QColor("#F2F2F2");      // hover background light
     _colors[TextFieldColor::HoverDark]     = QColor("#323232");      // hover background dark
     _colors[TextFieldColor::NormalLight]   = QColor("#FBFBFB");      // normal background light
     _colors[TextFieldColor::NormalDark]    = QColor("#2D2D2D");      // normal background dark

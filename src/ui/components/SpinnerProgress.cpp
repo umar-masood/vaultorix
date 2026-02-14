@@ -105,7 +105,7 @@ void SpinnerProgress::setValue(int value) {
 int SpinnerProgress::getValue() const { return currentValue; }
 
 void SpinnerProgress::loadDefaultColors() {
-   _colors[BackgroundLight]   = QColor("#F5F5F5");
+   _colors[BackgroundLight]   = QColor("#F2F2F2");
    _colors[BackgroundDark]    = QColor("#383838");
    _colors[ForegroundLight]   = QColor("#0191DF");
    _colors[ForegroundDark]    = QColor("#0191DF");

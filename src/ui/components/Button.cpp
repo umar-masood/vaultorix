@@ -176,7 +176,7 @@ void Button::loadDefaultColors() {
 
   // Secondary Light
   _colors[SecondaryNormalLight]   = QColor("#FBFBFB");
-  _colors[SecondaryHoverLight]    = QColor("#F5F5F5");
+  _colors[SecondaryHoverLight]    = QColor("#F2F2F2");
   _colors[SecondaryPressedLight]  = QColor("#FFFFFF");
   _colors[DisabledSecondaryLight] = QColor("#E0E0E0");
 
@@ -194,7 +194,7 @@ void Button::loadDefaultColors() {
   // Normal
   _textColors[PrimaryText]           = QColor("#FFFFFF");
   _textColors[SecondaryTextLight]    = QColor("#000000");
-  _textColors[SecondaryTextDark]     = QColor("#F5F5F5");
+  _textColors[SecondaryTextDark]     = QColor("#F2F2F2");
 
   // Disabled
   _textColors[DisabledPrimaryText]   = QColor("#FFFFFF");          
@@ -345,7 +345,7 @@ void Button::drawContent(QPainter &painter, const QPixmap &pixmap) {
       int textX = _x != 0 ? _x : iconX + iconW + spacing;
       int textY = _y != 0 ? _y : 0;
       
-      int buttonWidth = iconX + (hasRightSideIcon ? (2 * iconW + 2 * spacing) : (iconW + spacing)) + textW + 2 * spacing;
+      int buttonWidth = iconX + (hasRightSideIcon ? (2 * iconW + 2 * spacing) : (iconW + spacing)) + textW + spacing;
 
       if (!_customSize.isValid()) 
         QPushButton::setFixedSize(buttonWidth, 36);

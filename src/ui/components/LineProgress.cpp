@@ -16,7 +16,7 @@ LineProgress::LineProgress(QWidget *parent) : QWidget(parent) {
 }
 
 void LineProgress::loadDefaultColors() {
-   _colors[BackgroundLight] = QColor("#F5F5F5");
+   _colors[BackgroundLight] = QColor("#F2F2F2");
    _colors[BackgroundDark]  = QColor("#383838");
    _colors[ForegroundLight] = QColor("#0191DF");
    _colors[ForegroundDark]  = QColor("#0191DF");
@@ -144,7 +144,7 @@ void LineProgress::paintEvent(QPaintEvent *event) {
    font.setFamily("Segoe UI");
    font.setWeight(QFont::Normal);
    painter.setFont(font);
-   painter.setPen(isDarkMode ? QColor("#F5F5F5") : QColor("#000000"));
+   painter.setPen(isDarkMode ? QColor("#F2F2F2") : QColor("#000000"));
 
    QRect text_area(0, height() - 25, width(), 30);
    painter.drawText(text_area, Qt::AlignHCenter, loaderText);
