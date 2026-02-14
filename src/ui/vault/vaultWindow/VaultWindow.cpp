@@ -1,5 +1,14 @@
 #include "VaultWindow.h"
 
+
+VaultWindow *VaultWindow::instance(QWidget *parent) {
+  static VaultWindow *vw = nullptr;
+  if (!vw) 
+    vw = new VaultWindow(parent);
+  
+  return vw;
+}
+
 VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   // Window Properties
   setWindowTitle("Vaultorix");
@@ -127,4 +136,4 @@ void VaultWindow::onthemeModeChanged(bool enable) {
   sign_out_btn_tip->setDarkMode(enable);
 }
 
-Statusbar* VaultWindow::statusbar() const { return _statusbar; }
+Statusbar *VaultWindow::statusbar() const { return _statusbar; }

@@ -3,13 +3,20 @@
 #include "../../components/ToolTip.h"
 #include "../../../resources/IconManager.h"
 
-
 #include <dwmapi.h>
 #include <windowsx.h>
 #include <windows.h>
 #include <QWindow>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+
+class SubWindowOverlay : public QWidget {
+   public:
+   explicit SubWindowOverlay(QWidget *parent = nullptr);
+
+   protected:
+   void paintEvent(QPaintEvent *event) override;
+};
 
 class SubWindow : public QWidget {
     Q_OBJECT
@@ -18,13 +25,17 @@ class SubWindow : public QWidget {
     explicit SubWindow(QSize size = QSize(250, 250), QWidget *parent = nullptr, bool closeButton = true, bool minimizeButton = false);
     virtual ~SubWindow() = default;
 
+    void setModal(bool enable);
     void setDarkMode(bool value);
+
     QWidget* contentArea() const;
     QHBoxLayout* titlebarLayout() const;
 
     protected: 
     void paintEvent(QPaintEvent *event) override;
     bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
     void showEvent(QShowEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -35,6 +46,13 @@ class SubWindow : public QWidget {
     void onMinimizedClicked();
 
     private:
+    // ===== SubWindowOverlay for modal window =====
+    SubWindowOverlay *overlay = nullptr;
+    bool _useOverlay = false;
+    void createOverlay();
+    void centerInParent();
+    void destroyOverlay();
+
     // Setters
     void applyDWMEffects();
     void applyThemedIcons();

@@ -7,6 +7,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     // Window Properties
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowTitle("Account Settings");
+    setModal(true);
 
     // Window Content Area Layout
     auto *win_content_area_layout = new QVBoxLayout(contentArea());
@@ -73,7 +74,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     save_btn = new Button("Save");
     save_btn->setDisplayMode(Button::TextOnly);
     save_btn->setCursor(Qt::PointingHandCursor);
-    save_btn->setFixedSize(QSize(60, 26));
+    save_btn->setFixedSize(QSize(50, 26));
     save_btn->setFontXY(0, -1);
 
     // Seperator 
@@ -182,6 +183,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     // Text Field
     username_field = new TextField("umarmasood321");
     username_field->setFixedSize(QSize(360, 36));
+    username_field->setReadOnly(true);
 
     // Change Username Hyperlink Button
     change_username_btn = new Button("Change Username");

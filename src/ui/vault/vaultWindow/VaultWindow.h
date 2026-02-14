@@ -19,10 +19,12 @@ class VaultWindow : public Window {
     Q_OBJECT
 
     public:
-    explicit VaultWindow(QWidget *parent = nullptr);
+    static VaultWindow* instance(QWidget *parent = nullptr);
     Statusbar* statusbar() const;
 
-    private:
+    private:    
+    explicit VaultWindow(QWidget *parent = nullptr);
+
     // Title Bar
     // Layout
     QHBoxLayout *titlebar_layout = nullptr;

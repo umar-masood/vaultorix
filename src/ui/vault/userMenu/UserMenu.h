@@ -4,6 +4,7 @@
 #include "../../components/Button.h"
 #include "../../../resources/IconManager.h"
 #include "../../components/SmoothOpacity.h"
+#include "../accountSettingsWindow/AccountSettingsWindow.h"
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -44,6 +45,9 @@ class UserMenu : public RoundedBox {
 
     // Option Buttons
     Button *account_settings_btn      = nullptr;
+        // Account Settings Window
+        AccountSettingsWindow *acc_settings_win = nullptr;
+        
     Button *manage_subscription_btn   = nullptr;
     Button *preferences_btn           = nullptr;
     Button *report_bug_btn            = nullptr;

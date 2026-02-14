@@ -1,4 +1,5 @@
 #include "UserMenu.h"
+#include "../vaultWindow/VaultWindow.h"
 
 UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     setFixedSize(QSize(280, 362));
@@ -10,8 +11,8 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
 
     // Opacity Animation
     animation = new QPropertyAnimation(smooth_opacity, "opacity");
-    animation->setEasingCurve(QEasingCurve::InOutQuad);
-    animation->setDuration(400);
+    animation->setEasingCurve(QEasingCurve::InQuad);
+    animation->setDuration(300);
     
     // Option Buttons
     // Account Settings
@@ -44,12 +45,28 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     layout->addWidget(about, 0, Qt::AlignHCenter);
     layout->addStretch();
 
+ 
+    // Signal Slots
+    for (auto *btn : option_buttons)
+        connect(btn, &Button::clicked, this, &QWidget::hide);
+
+    connect(account_settings_btn, &Button::clicked, this, [this]() {
+        if (!acc_settings_win) {
+            acc_settings_win = new AccountSettingsWindow(VaultWindow::instance());
+            acc_settings_win->setAttribute(Qt::WA_DeleteOnClose);
+            acc_settings_win->setDarkMode(isDarkMode);
+            connect(acc_settings_win, &QObject::destroyed, this, [this]() {
+                acc_settings_win = nullptr;
+            });
+        }
+
+        acc_settings_win->show();
+        acc_settings_win->raise();
+        acc_settings_win->activateWindow();
+    });   
+    
     // Initial Theme
     setDarkMode(isDarkMode);
-
-    // Signal Slot
-    for (auto *btn : option_buttons)
-        connect(btn, &Button::clicked, this, &UserMenu::fadeOut);
 }
 
 Button* UserMenu::accountSettingsButton() const { return account_settings_btn; }
@@ -115,6 +132,9 @@ void UserMenu::setDarkMode(bool enable) {
 
     for (auto *btn : option_buttons) 
         btn->setDarkMode(isDarkMode);
+
+    if (acc_settings_win)
+        acc_settings_win->setDarkMode(isDarkMode);
 
     RoundedBox::setDarkMode(isDarkMode);
 }

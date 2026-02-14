@@ -1,5 +1,28 @@
 #include "SubWindow.h"
 
+SubWindowOverlay::SubWindowOverlay(QWidget *parent) : QWidget(parent) {
+   setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+   setAttribute(Qt::WA_TranslucentBackground);
+   setAttribute(Qt::WA_TransparentForMouseEvents, true);
+   setMouseTracking(false);
+}
+
+void SubWindowOverlay::paintEvent(QPaintEvent *event) {
+   Q_UNUSED(event);
+
+   // Colors
+   QColor BG = QColor(0,0,0,80);
+
+   QPainter painter(this);
+   painter.setRenderHints(QPainter::Antialiasing);
+   painter.setBrush(BG);
+   painter.setPen(Qt::NoPen);
+
+   QPainterPath path;
+   path.addRoundedRect(rect().adjusted(1.5, 1.5, -1.5, -1.5), 6, 6);
+   painter.drawPath(path);
+}
+
 SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimizeButton) : QWidget(parent), hasCloseBtn(closeButton), hasMinimizeBtn(minimizeButton) {
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setFixedSize(size);
@@ -76,6 +99,50 @@ SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimiz
 
     // Apply DWM Effects from Native Window API
     applyDWMEffects();
+}
+
+void SubWindow::setModal(bool enable) {
+    if (_useOverlay == enable)
+        return;
+
+    _useOverlay = enable;
+
+    _useOverlay ? createOverlay() : destroyOverlay();
+}
+
+void SubWindow::createOverlay() {
+    if (!parentWidget() || overlay)
+        return;
+
+    overlay = new SubWindowOverlay(parentWidget());
+    overlay->setGeometry(parentWidget()->rect());
+    overlay->hide();
+
+    parentWidget()->installEventFilter(this);
+}
+
+void SubWindow::destroyOverlay() {
+    if (!overlay)
+        return;
+
+    overlay->deleteLater();
+    overlay = nullptr;
+
+    if (parentWidget())
+        parentWidget()->removeEventFilter(this);
+}
+
+void SubWindow::centerInParent() {
+    if (parentWidget()) {
+        QScreen *screen = QApplication::screenAt(QCursor::pos());
+        if (!screen) 
+            screen = QApplication::primaryScreen();
+
+        QRect parentRect = parentWidget()->geometry();
+        int x = parentRect.x() + (parentRect.width() - width()) / 2;
+        int y = parentRect.y() + (parentRect.height() - height()) / 2;
+        move(x, y);
+    }
 }
 
 void SubWindow::setDarkMode(bool value) {
@@ -229,14 +296,41 @@ bool SubWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr 
     return false;
 }
 
-void SubWindow::showEvent(QShowEvent *event) { applyDWMEffects(); }
+bool SubWindow::eventFilter(QObject *obj, QEvent *event) {
+    if (_useOverlay && obj == parentWidget() && overlay) {
+        if (event->type() == QEvent::Resize ||
+            event->type() == QEvent::Move)
+        {
+            overlay->setGeometry(parentWidget()->rect());
+        }
+    }
+
+    return QWidget::eventFilter(obj, event);
+}
+void SubWindow::showEvent(QShowEvent *event) { 
+    applyDWMEffects();
+
+    if (_useOverlay && overlay && parentWidget()) {
+        overlay->setGeometry(parentWidget()->rect());
+        overlay->show();
+        overlay->raise();
+    }
+    
+    centerInParent();
+    this->raise();
+    QWidget::showEvent(event);
+}
+
+void SubWindow::closeEvent(QCloseEvent *event) {
+    if (overlay)
+        overlay->hide();
+
+    QWidget::closeEvent(event);
+}
+
 void SubWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         if (_titleBar && _titleBar->geometry().contains(event->pos())) {
-            // for (auto *widget : {closeBtn, minimizeBtn}) 
-            //     if (widget && widget->geometry().contains(event->pos())) 
-            //         return;
-            
             m_dragging = true;
             m_dragStartPos = event->globalPos() - frameGeometry().topLeft();
         }
