@@ -28,9 +28,12 @@ class Window : public QWidget {
 
     protected:
     void paintEvent(QPaintEvent *event) override;
-    bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
     private:
+    // Handle
+    HWND hwnd;
+    
     // Icons
     QString closeIconLight = IconManager::icon(Icons::Win_CloseLight);
     QString closeIconDark = IconManager::icon(Icons::Win_CloseDark);
@@ -41,17 +44,11 @@ class Window : public QWidget {
     QString restoreIconLight = IconManager::icon(Icons::Win_RestoreLight);
     QString restoreIconDark = IconManager::icon(Icons::Win_RestoreDark);
 
-    // Current Window Handle (ID)
-    HWND hwnd;
-
     // Set Window Controls Icons
     void applyThemedIcons();
 
     // Set Window Widgets theme
     void applyStyleSheet();
-
-    // Apply DWM Effects such as rounded corners, shadow etc.
-    void applyDWMEffects();
 
     // Setup whole window
     void setupWindow();

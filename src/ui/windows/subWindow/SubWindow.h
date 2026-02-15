@@ -33,13 +33,10 @@ class SubWindow : public QWidget {
 
     protected: 
     void paintEvent(QPaintEvent *event) override;
-    bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
     void showEvent(QShowEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
 
     private slots:
     void onCloseClicked();
@@ -54,7 +51,6 @@ class SubWindow : public QWidget {
     void destroyOverlay();
 
     // Setters
-    void applyDWMEffects();
     void applyThemedIcons();
 
     // Getter
@@ -67,10 +63,6 @@ class SubWindow : public QWidget {
 
     // Window Handle (Unique Identifier)
     HWND hwnd;
-
-    // Dragging
-    bool m_dragging = false;
-    QPoint m_dragStartPos;
 
     // Window Controls    
     // Icons

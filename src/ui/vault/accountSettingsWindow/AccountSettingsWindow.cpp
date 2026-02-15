@@ -5,8 +5,7 @@
 AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(600, 630), parent)
 {
     // Window Properties
-    setAttribute(Qt::WA_TranslucentBackground);
-    setWindowTitle("Account Settings");
+    setFocusPolicy(Qt::StrongFocus);
     setModal(true);
 
     // Window Content Area Layout

@@ -24,16 +24,8 @@ void Overlay::paintEvent(QPaintEvent *event) {
 }
 
 Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool hasCloseButton) : SubWindow(centralWidget->size(), parent, hasCloseButton, false), contentWidget(centralWidget) {
-   setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
-   setWindowModality(Qt::WindowModal);
    setFocusPolicy(Qt::StrongFocus);
-
-   if (parent) {
-      overlay = new Overlay(parent);
-      overlay->setGeometry(parent->rect());
-      overlay->hide();
-      parent->installEventFilter(this); 
-   } 
+   setModal(true);
 }
 
 void Dialog::setDarkMode(bool value) {
@@ -62,33 +54,9 @@ void Dialog::showEvent(QShowEvent *event) {
       setupDone = true;
    }
 
-   if (overlay && parentWidget()) {
-      overlay->setGeometry(parentWidget()->rect());
-      overlay->show();
-      overlay->raise();
-   }
-
    centerInParent();
-   this->raise();
+   raise();
    SubWindow::showEvent(event);
-}
-
-void Dialog::resizeEvent(QResizeEvent *event) {
-   if (overlay && parentWidget()) overlay->setGeometry(parentWidget()->rect());
-   SubWindow::resizeEvent(event);
-}
-
-void Dialog::closeEvent(QCloseEvent *event) {
-   if (overlay) overlay->hide();
-   SubWindow::closeEvent(event);
-}
-
-bool Dialog::eventFilter(QObject *obj, QEvent *event) {
-   if (obj == parentWidget() && overlay)
-      if (event->type() == QEvent::Resize || event->type() == QEvent::Move)
-         overlay->setGeometry(parentWidget()->rect());
-   
-   return SubWindow::eventFilter(obj, event);
 }
 
 void Dialog::setup() {

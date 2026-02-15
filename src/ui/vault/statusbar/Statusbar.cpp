@@ -1,7 +1,7 @@
 #include "Statusbar.h"
 
 Statusbar::Statusbar(QWidget *parent) : QWidget(parent) {
-    setFixedHeight(24);
+    setFixedHeight(30);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     // Total Items

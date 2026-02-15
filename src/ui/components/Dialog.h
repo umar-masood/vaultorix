@@ -19,8 +19,7 @@ class Overlay : public QWidget {
    void paintEvent(QPaintEvent *event) override;
 };
 
-class Dialog : public SubWindow 
-{
+class Dialog : public SubWindow {
    Q_OBJECT
 
    public:
@@ -29,9 +28,6 @@ class Dialog : public SubWindow
 
    protected:
    void showEvent(QShowEvent *event) override;
-   void resizeEvent(QResizeEvent *event) override;
-   void closeEvent(QCloseEvent *event) override;
-   bool eventFilter(QObject* obj, QEvent* event) override;
    
    private:
    void centerInParent();

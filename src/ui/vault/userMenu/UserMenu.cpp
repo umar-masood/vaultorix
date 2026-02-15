@@ -57,12 +57,12 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
             acc_settings_win->setDarkMode(isDarkMode);
             connect(acc_settings_win, &QObject::destroyed, this, [this]() {
                 acc_settings_win = nullptr;
+                VaultWindow::instance()->updateGeometry();
             });
         }
 
         acc_settings_win->show();
         acc_settings_win->raise();
-        acc_settings_win->activateWindow();
     });   
     
     // Initial Theme

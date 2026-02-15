@@ -1,8 +1,8 @@
 #include "Window.h"
 
 Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
-    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowMinMaxButtonsHint);
-
+    setAttribute(Qt::WA_TranslucentBackground);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
     setupWindow();
 }
 
@@ -44,33 +44,30 @@ void Window::applyStyleSheet() {
     _contentArea->setStyleSheet(stylesheet);
 }
 
-void Window::applyDWMEffects() {
-    /* Window Style Applying for Resizing*/
-    LONG style = GetWindowLong(hwnd, GWL_STYLE);
-    style |= WS_THICKFRAME | WS_CAPTION;
-    SetWindowLong(hwnd, GWL_STYLE, style);
-
-    const DWORD DWMWA_WINDOW_CORNER_PREFERENCE = 33;
-    enum DWM_WINDOW_CORNER_PREFERENCE {
-        DWMWCP_DEFAULT      = 0,
-        DWMWCP_DONOTROUND   = 1,
-        DWMWCP_ROUND        = 2,
-        DWMWCP_ROUNDSMALL   = 3
-    };
-
-    DWM_WINDOW_CORNER_PREFERENCE pref = DWMWCP_ROUND; 
-    DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &pref, sizeof(pref));
-    
-    // Force Windows to recalculate the frame based on new styles
-    SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-}
 
 void Window::paintEvent(QPaintEvent *event) {
-    Q_UNUSED(event);
-    QColor BG = isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF");
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
-    painter.fillRect(rect(), BG);
+
+    QColor brushColor = isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF");
+    QColor penColor = isDarkMode ? QColor("#505050") : QColor("#5f5f5f");
+
+    painter.setBrush(brushColor);
+    painter.setPen(QPen(penColor, 0.5));
+    painter.drawRoundedRect(rect().adjusted(2, 2, -2, -2), 6, 6);
+}
+
+void Window::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton) {
+        if (_mainTitleBar->geometry().contains(event->pos()) &&
+            !isPointInsideInteractiveTitleBarWidgets(event->position().x(), event->position().y())) 
+        {
+            if (windowHandle())
+                windowHandle()->startSystemMove(); 
+        }
+    }
+
+    QWidget::mousePressEvent(event);
 }
 
 Button * Window::createWindowButton() {
@@ -125,11 +122,10 @@ void Window::setupWindow() {
     _mainTitleBarLayout->addWidget(maximizeBtn, 0, Qt::AlignRight);
     _mainTitleBarLayout->addSpacing(4);
     _mainTitleBarLayout->addWidget(closeBtn, 0, Qt::AlignRight);
-    _mainTitleBarLayout->addSpacing(10);
+    _mainTitleBarLayout->addSpacing(6);
 
     /* Window Handle ID */
     hwnd = reinterpret_cast<HWND>(winId());
-    applyDWMEffects();
 
    /* Content Area */
    _contentArea = new QWidget(this);
@@ -139,9 +135,8 @@ void Window::setupWindow() {
    
    /* Entire Layout */
    entireLayout = new QVBoxLayout;
-   entireLayout->setContentsMargins(0, 0, 0, 0);
+   entireLayout->setContentsMargins(4, 4, 4, 4);
    entireLayout->setSpacing(0);
-   entireLayout->addSpacing(4);
    entireLayout->addWidget(_mainTitleBar, 0, Qt::AlignTop);
    entireLayout->addWidget(_contentArea, 0);
    setLayout(entireLayout);
@@ -173,60 +168,6 @@ bool Window::isPointInsideInteractiveTitleBarWidgets(int x, int y) {
         if (widget->rect().contains(localPos)) 
             return true;
     }
-    return false;
-}
-
-bool Window::nativeEvent(const QByteArray &, void *message, qintptr *result) {
-    MSG *msg = static_cast<MSG*>(message);
-
-    switch (msg->message) {
-    case WM_NCCALCSIZE:
-        return true;
-
-    case WM_NCHITTEST: {
-        RECT r;
-        GetWindowRect(msg->hwnd, &r);
-
-        int x = GET_X_LPARAM(msg->lParam);
-        int y = GET_Y_LPARAM(msg->lParam);
-        const int border = 8;
-
-        if (x < r.left + border && y < r.top + border) {
-            *result = HTTOPLEFT; return true;
-        }
-        if (x > r.right - border && y < r.top + border) {
-            *result = HTTOPRIGHT; return true;
-        }
-        if (x < r.left + border && y > r.bottom - border) {
-            *result = HTBOTTOMLEFT; return true;
-        }
-        if (x > r.right - border && y > r.bottom - border) {
-            *result = HTBOTTOMRIGHT; return true;
-        }
-        if (x < r.left + border) {
-            *result = HTLEFT; return true;
-        }
-        if (x > r.right - border) {
-            *result = HTRIGHT; return true;
-        }
-        if (y < r.top + border) {
-            *result = HTTOP; return true;
-        }
-        if (y > r.bottom - border) {
-            *result = HTBOTTOM; return true;
-        }
-        if (!isPointInsideInteractiveTitleBarWidgets(x, y)) {
-            *result = HTCAPTION; return true;
-        }
-
-        return false;
-    }
-
-    case WM_SIZE:
-        applyThemedIcons();
-        break;
-    }
-
     return false;
 }
 

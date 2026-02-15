@@ -12,7 +12,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
 
    // Main Layout
    mainLayout = new QHBoxLayout(contentArea());
-   mainLayout->setContentsMargins(0, 0, 0, 0);
+   mainLayout->setContentsMargins(2, 2, 2, 2);
    mainLayout->setSpacing(0);
 
    // Titlebar Layout
@@ -49,7 +49,10 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
 
    // Left Panel
    left = new QWidget;
-   left->setStyleSheet("background-color: #003F66;");
+   left->setStyleSheet(" \
+    border-top-left-radius: 6px;\
+    border-bottom-left-radius: 6px;\
+    background-color: #003F66;");
 
    // Branding of App
    brand = new Branding;

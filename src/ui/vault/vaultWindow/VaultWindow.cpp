@@ -72,7 +72,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   titlebar_layout->setSpacing(0);
   titlebar_layout->setContentsMargins(0, 0, 0, 0);
 
-  titlebar_layout->addSpacing(13);
+  titlebar_layout->addSpacing(7);
   titlebar_layout->addWidget(app_icon, 0, Qt::AlignLeft);
   titlebar_layout->addSpacing(10);
   titlebar_layout->addWidget(app_name, 0, Qt::AlignLeft);
@@ -98,7 +98,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
 
   // Layout
   content_layout = new QVBoxLayout(contentArea());
-  content_layout->setContentsMargins(12, 0, 12, 10);
+  content_layout->setContentsMargins(6, 0, 6, 4);
   content_layout->setSpacing(0);
   content_layout->addSpacing(2);
   content_layout->addWidget(toolbar, 0, Qt::AlignTop);

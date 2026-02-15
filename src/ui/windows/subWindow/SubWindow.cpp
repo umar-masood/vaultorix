@@ -19,12 +19,13 @@ void SubWindowOverlay::paintEvent(QPaintEvent *event) {
    painter.setPen(Qt::NoPen);
 
    QPainterPath path;
-   path.addRoundedRect(rect().adjusted(1.5, 1.5, -1.5, -1.5), 6, 6);
+   path.addRoundedRect(rect().adjusted(2, 2, -2, -2), 6, 6);
    painter.drawPath(path);
 }
 
 SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimizeButton) : QWidget(parent), hasCloseBtn(closeButton), hasMinimizeBtn(minimizeButton) {
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    setAttribute(Qt::WA_TranslucentBackground);
     setFixedSize(size);
 
     // Content Area
@@ -96,9 +97,6 @@ SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimiz
 
     // Apply Icons
     applyThemedIcons();
-
-    // Apply DWM Effects from Native Window API
-    applyDWMEffects();
 }
 
 void SubWindow::setModal(bool enable) {
@@ -162,96 +160,6 @@ void SubWindow::setDarkMode(bool value) {
     applyThemedIcons();
 }
 
-void SubWindow::applyDWMEffects() {
-    hwnd = reinterpret_cast<HWND>(winId());
-    /*
-     * LONG style = GetWindowLong(hwnd, GWL_STYLE);
-     *
-     * - LONG: A 32-bit signed integer type (typedef long). In the Win32 API,
-     *         window style flags are represented as a LONG bitmask.
-     *
-     * - GetWindowLong(hwnd, GWL_STYLE): Retrieves information about a window.
-     *   hwnd: The handle to the window.
-     *   GWL_STYLE: A constant (-16) that means "get the window's style flags".
-     *   These flags define how the window behaves (has a caption, border, etc.).
-     */
-    LONG style = GetWindowLong(hwnd, GWL_STYLE);
-
-    /*
-     * style |= WS_CAPTION;
-     *
-     * - WS_CAPTION: A predefined constant (0x00C00000) in WinUser.h.
-     *   It enables a title bar for the window. Even though we’re using
-     *   a frameless Qt window, setting WS_CAPTION is useful to let Windows
-     *   handle resizing and dragging logic when we simulate a custom title bar.
-     *
-     * - |= operator: Bitwise OR assignment.
-     *   Adds the WS_CAPTION bit to the style without removing other flags.
-     */
-    style |= WS_CAPTION;
-
-    /*
-     * SetWindowLong(hwnd, GWL_STYLE, style);
-     *
-     * - SetWindowLong: Changes information about a window.
-     *   hwnd: Handle to the window we want to modify.
-     *   GWL_STYLE: Index specifying we’re updating style flags.
-     *   style: The new LONG bitmask with WS_CAPTION included.
-     *
-     * - This applies the modified style back to the window.
-     */
-    SetWindowLong(hwnd, GWL_STYLE, style);
-
-    /*
-     * const DWORD DWMWA_WINDOW_CORNER_PREFERENCE = 33;
-     *
-     * - DWORD: A 32-bit unsigned integer type (typedef unsigned long).
-     *   Frequently used in Windows APIs for flags, enums, or indices.
-     *
-     * - DWMWA_WINDOW_CORNER_PREFERENCE: A constant attribute index
-     *   used with DwmSetWindowAttribute().
-     *   It tells Windows we want to control how corners are drawn.
-     */
-    const DWORD DWMWA_WINDOW_CORNER_PREFERENCE = 33;
-
-    enum DWM_WINDOW_CORNER_PREFERENCE {
-        DWMWCP_ROUND      = 2,
-        DWMWCP_ROUNDSMALL = 3
-    };
-
-    DWM_WINDOW_CORNER_PREFERENCE pref = DWMWCP_ROUND;
-
-    /*
-     * DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &pref, sizeof(pref));
-     *
-     *   DWMWA_WINDOW_CORNER_PREFERENCE: The attribute index we’re setting (33).
-     *   &pref: Pointer to the value we want to set (our enum instance).
-     *   sizeof(pref): Size in bytes of the value being passed.
-     */
-    DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &pref, sizeof(pref));
-
-    /*
-     * SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
-     *              SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-     *
-     * - SetWindowPos: Changes the size, position, or Z-order of a window.
-     *   hwnd: Handle to the window.
-     *   nullptr: No insert-after window (we’re not changing Z-order).
-     *   0,0,0,0: Since we’re not moving/resizing, these values are ignored.
-     *
-     * - Flags:
-     *   SWP_NOZORDER: Don’t change stacking order.
-     *   SWP_NOMOVE: Don’t move the window.
-     *   SWP_NOSIZE: Don’t resize the window.
-     *   SWP_FRAMECHANGED: Recalculate the window’s non-client area
-     *                     (caption, borders) based on new style flags.
-     *
-     * - Net effect: Forces Windows to refresh/redraw the frame without
-     *   actually resizing or moving the window.
-     */
-    SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
-                 SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-}
 
 void SubWindow::applyThemedIcons() {
     if (closeBtn)
@@ -262,10 +170,15 @@ void SubWindow::applyThemedIcons() {
 }
 
 void SubWindow::paintEvent(QPaintEvent *event) {
-    QColor BG = isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF");
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
-    painter.fillRect(rect(), BG);
+
+    QColor brushColor = isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF");
+    QColor penColor = isDarkMode ? QColor("#505050") : QColor("#5f5f5f");
+
+    painter.setBrush(brushColor);
+    painter.setPen(QPen(penColor, 0.5));
+    painter.drawRoundedRect(rect().adjusted(2, 2, -2, -2), 6, 6);
 }
 
 Button* SubWindow::windowButton() {
@@ -282,34 +195,17 @@ Button* SubWindow::windowButton() {
 
 void SubWindow::onCloseClicked() { ::SendMessage(hwnd, WM_CLOSE, 0, 0); }
 void SubWindow::onMinimizedClicked() { ::SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0); }
-bool SubWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr *result) {
-    MSG *msg = (MSG *)message;
-
-    switch (msg->message) {
-        case WM_NCCALCSIZE:
-            *result = 0;
-            return true;
-
-        default: break;
-    }
-
-    return false;
-}
-
 bool SubWindow::eventFilter(QObject *obj, QEvent *event) {
     if (_useOverlay && obj == parentWidget() && overlay) {
-        if (event->type() == QEvent::Resize ||
-            event->type() == QEvent::Move)
-        {
+        if (event->type() == QEvent::Resize || event->type() == QEvent::Move) {
             overlay->setGeometry(parentWidget()->rect());
         }
     }
 
     return QWidget::eventFilter(obj, event);
 }
-void SubWindow::showEvent(QShowEvent *event) { 
-    applyDWMEffects();
 
+void SubWindow::showEvent(QShowEvent *event) { 
     if (_useOverlay && overlay && parentWidget()) {
         overlay->setGeometry(parentWidget()->rect());
         overlay->show();
@@ -331,26 +227,12 @@ void SubWindow::closeEvent(QCloseEvent *event) {
 void SubWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         if (_titleBar && _titleBar->geometry().contains(event->pos())) {
-            m_dragging = true;
-            m_dragStartPos = event->globalPos() - frameGeometry().topLeft();
+            if (windowHandle()) 
+                windowHandle()->startSystemMove(); 
         }
     }
 
     QWidget::mousePressEvent(event);
-}
-
-void SubWindow::mouseMoveEvent(QMouseEvent *event) {
-    if (m_dragging && (event->buttons() & Qt::LeftButton)) 
-        move(event->globalPos() - m_dragStartPos);
-    
-    QWidget::mouseMoveEvent(event);
-}
-
-void SubWindow::mouseReleaseEvent(QMouseEvent *event) {
-    if (event->button() == Qt::LeftButton) 
-        m_dragging = false;
-    
-    QWidget::mouseReleaseEvent(event);
 }
 
 QHBoxLayout* SubWindow::titlebarLayout() const { return titlebar_sublayout; }
