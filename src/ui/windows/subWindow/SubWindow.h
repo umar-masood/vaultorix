@@ -3,9 +3,6 @@
 #include "../../components/ToolTip.h"
 #include "../../../resources/IconManager.h"
 
-#include <dwmapi.h>
-#include <windowsx.h>
-#include <windows.h>
 #include <QWindow>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -60,9 +57,6 @@ class SubWindow : public QWidget {
     QHBoxLayout *titlebar_layout = nullptr;
     QHBoxLayout *titlebar_sublayout = nullptr;
     QHBoxLayout *win_controls_layout = nullptr;
-
-    // Window Handle (Unique Identifier)
-    HWND hwnd;
 
     // Window Controls    
     // Icons

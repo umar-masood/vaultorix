@@ -2,7 +2,7 @@
 /* --------------------------------------------------------------------------
                         ACCOUNT SETTINGS WINDOW 
   -------------------------------------------------------------------------*/
-AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(600, 630), parent)
+AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(600, 600), parent)
 {
     // Window Properties
     setFocusPolicy(Qt::StrongFocus);
@@ -11,12 +11,12 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     // Window Content Area Layout
     auto *win_content_area_layout = new QVBoxLayout(contentArea());
     win_content_area_layout->setSpacing(0);
-    win_content_area_layout->setContentsMargins(10, 34, 8, 10); // 8 : for scrollbar placement
+    win_content_area_layout->setContentsMargins(14, 34, 8, 10); // 8 : for scrollbar placement
 
     // Main Widget
     auto *mainWidget = new QWidget;
     mainWidget->setAttribute(Qt::WA_TranslucentBackground);
-    mainWidget->setFixedWidth(570); // fixed to prevent horizontal scrolling
+    mainWidget->setFixedWidth(566); // fixed to prevent horizontal scrolling
 
     // ScrollArea
     auto *scrollArea = new QScrollArea;
@@ -57,7 +57,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     main_header_layout->setSpacing(0);
 
     // Header
-    mainHeader = new Label("Segoe UI", 11, QFont::Bold, false, "Profile Information", Qt::AlignLeft);
+    mainHeader = new Label("Segoe UI", 11, QFont::Normal, false, "Profile Information", Qt::AlignLeft);
 
     // Text under main header
     main_header_text = new Label("Segoe UI", 11, QFont::Normal, false, "Edit your personal information", Qt::AlignLeft);
@@ -104,7 +104,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     profile_pic_labels_layout->setSpacing(0);
 
     // Profile Picture Title
-    profile_pic_title = new Label("Segoe UI", 10, QFont::DemiBold, false, "Profile Picture", Qt::AlignLeft);
+    profile_pic_title = new Label("Segoe UI", 10, QFont::Normal, false, "Profile Picture", Qt::AlignLeft);
     
     // Profile Picture Hint
     profile_pic_hint = new Label("Segoe UI", 10, QFont::Normal, false, "PNG, JPEG, under 1 MB", Qt::AlignLeft);
@@ -120,6 +120,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     upload_pic_btn = new Button("Upload Profile Picture");
     upload_pic_btn->setDisplayMode(Button::TextOnly);
     upload_pic_btn->setSecondary(true);
+    upload_pic_btn->setFontXY(0, -1);
 
     // Delete Picture Button
     delete_pic_btn = new Button;
@@ -148,7 +149,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     name_layout->setSpacing(0);
 
     // Header
-    name_header = new Label("Segoe UI", 10, QFont::DemiBold, false, "Full Name", Qt::AlignLeft);
+    name_header = new Label("Segoe UI", 10, QFont::Normal, false, "Full Name", Qt::AlignLeft);
 
     // TextField
     name_field = new TextField("Umar Masood");
@@ -172,7 +173,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     username_layout->setSpacing(0);
 
     // Header
-    username_header = new Label("Segoe UI", 10, QFont::DemiBold, false, "Username", Qt::AlignLeft);
+    username_header = new Label("Segoe UI", 10, QFont::Normal, false, "Username", Qt::AlignLeft);
 
     // TextField & Username change button layout
     field_button_layout = new QHBoxLayout;
@@ -214,7 +215,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     email_layout->setSpacing(0);
 
     // Email Header
-    email_header = new Label("Segoe UI", 10, QFont::DemiBold, false, "Email-Address", Qt::AlignLeft);
+    email_header = new Label("Segoe UI", 10, QFont::Normal, false, "Email-Address", Qt::AlignLeft);
 
     // TextField and Status Layout
     field_status_layout = new QHBoxLayout;
@@ -257,7 +258,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     password_layout->setSpacing(0);
 
     // Header
-    password_header = new Label("Segoe UI", 10, QFont::DemiBold, false, "Password", Qt::AlignLeft);
+    password_header = new Label("Segoe UI", 10, QFont::Normal, false, "Password", Qt::AlignLeft);
 
     // Text
     password_text = new Label("Segoe UI", 10, QFont::Normal, false, "Modify your current password", Qt::AlignLeft);
@@ -300,7 +301,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     two_fa_sublayout->setSpacing(0);
 
     // Header
-    two_fa_header = new Label("Segoe UI", 10, QFont::DemiBold, false, "Two Factor Authentication", Qt::AlignLeft);
+    two_fa_header = new Label("Segoe UI", 10, QFont::Normal, false, "Two Factor Authentication", Qt::AlignLeft);
 
     // Text
     two_fa_text = new Label("Segoe UI", 10, QFont::Normal, false, "Always require two-factor authentication when signing in", Qt::AlignLeft);
@@ -336,7 +337,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     delete_acc_subLayout->setSpacing(0);
 
     // Header
-    delete_acc_header = new Label("Segoe UI", 10, QFont::DemiBold, false, "Delete Account", Qt::AlignLeft);
+    delete_acc_header = new Label("Segoe UI", 10, QFont::Normal, false, "Delete Account", Qt::AlignLeft);
 
     // Text
     delete_acc_text = new Label("Segoe UI", 10, QFont::Normal, false, "Deleting your account is permanent and cannot be undone. All your data, settings, and activity will be permanently removed.", Qt::AlignLeft);
@@ -353,11 +354,17 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     delete_acc_btn = new Button("Delete Account");
     delete_acc_btn->setDisplayMode(Button::TextOnly);
     delete_acc_btn->setFontProperties("Segoe UI", 10);
+    delete_acc_btn->setFontXY(0, -1);
     delete_acc_btn->setSecondary(true);
+    delete_acc_btn->setBorderTransparent(true);
     delete_acc_btn->setColor(Button::SecondaryNormalLight, QColor("#FFEAEA"));
     delete_acc_btn->setColor(Button::SecondaryHoverLight, QColor("#FFDBDB"));
     delete_acc_btn->setColor(Button::SecondaryPressedLight, QColor("#FFEAEA"));
     delete_acc_btn->setTextColor(Button::SecondaryTextLight, QColor("#DC2626"));
+    delete_acc_btn->setColor(Button::SecondaryNormalDark, QColor("#5C1E1E"));  
+    delete_acc_btn->setColor(Button::SecondaryHoverDark, QColor("#7A2626"));  
+    delete_acc_btn->setColor(Button::SecondaryPressedDark, QColor("#4A1414"));  
+    delete_acc_btn->setTextColor(Button::SecondaryTextDark, QColor("#FF6B6B")); 
 
     // Adding sublayout and button to its main layout
     delete_acc_layout->addLayout(delete_acc_subLayout);
@@ -437,7 +444,7 @@ void AccountSettingsWindow::setDarkMode(bool enable) {
     // -------------------- Seperators --------------------
     for (Seperator* sep : { sep_1, sep_2, sep_3, sep_4, sep_5, titlebar_sep })
         if (sep)
-            sep->setColor("#CCCCCC");
+            isDarkMode ? sep->setColor("#8A8A8A") : sep->setColor("#9F9F9F");
 
     // Base class method
     SubWindow::setDarkMode(isDarkMode);

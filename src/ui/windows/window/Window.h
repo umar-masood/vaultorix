@@ -20,6 +20,19 @@ class Window : public QWidget {
     explicit Window( QWidget *parent = nullptr);
     virtual ~Window() = default;
 
+    enum class ResizeRegion {
+        None,
+        Left,
+        Top,
+        Right,
+        Bottom,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    };
+
+
     void setDarkMode(bool value);
     void setInteractiveTitleBarWidget(QWidget *widget);
 
@@ -27,13 +40,21 @@ class Window : public QWidget {
     QWidget* contentArea() const;
 
     protected:
+    bool eventFilter(QObject *obj, QEvent *event);
     void paintEvent(QPaintEvent *event) override;
+    void changeEvent(QEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void leaveEvent(QEvent *event);
 
     private:
-    // Handle
-    HWND hwnd;
+    // Window Border
+    bool showBorder = false;
     
+    // Maximize / Restore
+    QRect normalGeometry; 
+
     // Icons
     QString closeIconLight = IconManager::icon(Icons::Win_CloseLight);
     QString closeIconDark = IconManager::icon(Icons::Win_CloseDark);
@@ -45,13 +66,15 @@ class Window : public QWidget {
     QString restoreIconDark = IconManager::icon(Icons::Win_RestoreDark);
 
     // Set Window Controls Icons
-    void applyThemedIcons();
+    void setWindowControlsIcons();
+    void updateMaximizeIcon();
 
-    // Set Window Widgets theme
-    void applyStyleSheet();
-
-    // Setup whole window
-    void setupWindow();
+    // Window Resizing 
+    void updateCursorForRegion(ResizeRegion region);
+    ResizeRegion detectResizeRegion(const QPoint &pos);
+    
+    ResizeRegion currentResizeRegion = ResizeRegion::None;
+    const int resizeMargin = 4;
 
     // Check weather the current coordinates lie inside titlebar interactive widgets
     bool isPointInsideInteractiveTitleBarWidgets(int x, int y);

@@ -3,7 +3,7 @@
 SubWindowOverlay::SubWindowOverlay(QWidget *parent) : QWidget(parent) {
    setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
    setAttribute(Qt::WA_TranslucentBackground);
-   setAttribute(Qt::WA_TransparentForMouseEvents, true);
+   setAttribute(Qt::WA_TransparentForMouseEvents, false);
    setMouseTracking(false);
 }
 
@@ -11,7 +11,7 @@ void SubWindowOverlay::paintEvent(QPaintEvent *event) {
    Q_UNUSED(event);
 
    // Colors
-   QColor BG = QColor(0,0,0,80);
+   QColor BG = QColor(0,0,0,120);
 
    QPainter painter(this);
    painter.setRenderHints(QPainter::Antialiasing);
@@ -37,8 +37,8 @@ SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimiz
 
     // Title Bar
     _titleBar = new QWidget(this);
-    _titleBar->setGeometry(0, 2, width(), 30);
-    _titleBar->setContentsMargins(0, 0, 0, 0);
+    _titleBar->setGeometry(0, 5, width(), 30);
+    _titleBar->setContentsMargins(4, 0, 4, 0);
     _titleBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     _titleBar->setAttribute(Qt::WA_TranslucentBackground);
 
@@ -91,9 +91,6 @@ SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimiz
     titlebar_layout->addLayout(titlebar_sublayout);
     titlebar_layout->addLayout(win_controls_layout);
     titlebar_layout->setAlignment(win_controls_layout, Qt::AlignRight);
-
-    // Window Handle
-    hwnd = reinterpret_cast<HWND>(winId());
 
     // Apply Icons
     applyThemedIcons();
@@ -174,7 +171,7 @@ void SubWindow::paintEvent(QPaintEvent *event) {
     painter.setRenderHints(QPainter::Antialiasing);
 
     QColor brushColor = isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF");
-    QColor penColor = isDarkMode ? QColor("#505050") : QColor("#5f5f5f");
+    QColor penColor = "#AFAFAF";
 
     painter.setBrush(brushColor);
     painter.setPen(QPen(penColor, 0.5));
@@ -193,8 +190,10 @@ Button* SubWindow::windowButton() {
     return b;
 }
 
-void SubWindow::onCloseClicked() { ::SendMessage(hwnd, WM_CLOSE, 0, 0); }
-void SubWindow::onMinimizedClicked() { ::SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0); }
+
+void SubWindow::onCloseClicked() { close(); }
+void SubWindow::onMinimizedClicked() { showMinimized();}
+
 bool SubWindow::eventFilter(QObject *obj, QEvent *event) {
     if (_useOverlay && obj == parentWidget() && overlay) {
         if (event->type() == QEvent::Resize || event->type() == QEvent::Move) {
