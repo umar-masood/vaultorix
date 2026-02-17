@@ -4,8 +4,7 @@
 #include "../../components/TextField.h"
 #include "../../components/Label.h"
 #include "../accountOTP/AccountOTP.h"
-#include "../../../resources/IconManager.h"
-#include "../../../resources/IllustrationManager.h"
+
 
 /* ---------------- Account Sign in ------------------  */
 class AccountSignIn : public QWidget {
@@ -24,8 +23,7 @@ class AccountSignIn : public QWidget {
    bool isDarkMode = false;
 
    // Icons
-   QString UserIcon = IconManager::icon(Icons::UserAvator);
-   QString KeyIcon = IconManager::icon(Icons::Key);
+   QString UserIcon, KeyIcon;
 
    // Illustration
    Label *illustration = nullptr;

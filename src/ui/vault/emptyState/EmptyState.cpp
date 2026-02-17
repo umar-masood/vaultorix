@@ -1,6 +1,7 @@
-#include "EmptyStateWidget.h"
+#include "EmptyState.h"
+#include "../../../resources/IllustrationManager.h" 
 
-EmptyStateWidget::EmptyStateWidget(QWidget *parent) : QWidget(parent) {
+EmptyState::EmptyState(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_Hover, true);  
   setMouseTracking(true);             
   setAttribute(Qt::WA_TransparentForMouseEvents, false);
@@ -29,7 +30,7 @@ EmptyStateWidget::EmptyStateWidget(QWidget *parent) : QWidget(parent) {
   setDarkMode(isDarkMode);
 }
 
-void EmptyStateWidget::paintEvent(QPaintEvent *event) {
+void EmptyState::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
   painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
@@ -56,7 +57,7 @@ void EmptyStateWidget::paintEvent(QPaintEvent *event) {
   painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 12, 12);
 }
 
-void EmptyStateWidget::setDarkMode(bool enable) {
+void EmptyState::setDarkMode(bool enable) {
   isDarkMode = enable;
   
   // Illustration Change
@@ -69,7 +70,7 @@ void EmptyStateWidget::setDarkMode(bool enable) {
   update();
 }
 
-void EmptyStateWidget::mousePressEvent(QMouseEvent *event) {
+void EmptyState::mousePressEvent(QMouseEvent *event) {
   isPressed = true;
 
   if (event->button() == Qt::LeftButton)
@@ -79,13 +80,13 @@ void EmptyStateWidget::mousePressEvent(QMouseEvent *event) {
   update();
 }
 
-void EmptyStateWidget::mouseReleaseEvent(QMouseEvent *event) {
+void EmptyState::mouseReleaseEvent(QMouseEvent *event) {
   isPressed = false;
   QWidget::mouseReleaseEvent(event);
   update();
 }
 
-void EmptyStateWidget::enterEvent(QEnterEvent *event) {
+void EmptyState::enterEvent(QEnterEvent *event) {
   isHover = true;
   setCursor(Qt::PointingHandCursor);
 
@@ -93,7 +94,7 @@ void EmptyStateWidget::enterEvent(QEnterEvent *event) {
   update();
 }
 
-void EmptyStateWidget::leaveEvent(QEvent *event) {
+void EmptyState::leaveEvent(QEvent *event) {
   isHover = false;
   setCursor(Qt::ArrowCursor);
   

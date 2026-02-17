@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../emptyStateWidget/EmptyStateWidget.h"
+#include "../emptyState/EmptyState.h"
+#include "../../components/ViewModeToggle.h"
+
 #include "../../components/TextField.h"
 #include "../../components/ButtonMenu.h"
-#include "../../components/ViewModeToggle.h"
-#include "../../../resources/IconManager.h"
-#include "./ViewDelegate.h"
 #include "../../components/ScrollBar.h"
+
+#include "ViewDelegate.h"
 
 #include <QListView>
 #include <QStandardItemModel>
@@ -27,7 +28,7 @@ class View : public QWidget {
     TextField* searchBox() const;
     ButtonMenu* filterMenu() const;
     ViewModeToggle* viewMode() const;
-    EmptyStateWidget* emptyStateWidget() const; 
+    EmptyState* emptyStateWidget() const; 
 
     protected:
     void paintEvent(QPaintEvent *event) override;
@@ -38,7 +39,7 @@ class View : public QWidget {
     bool isDarkMode = false;
 
     // Empty State Widget
-    EmptyStateWidget *empty_state = nullptr;
+    EmptyState *empty_state = nullptr;
 
     // Seperator Color, Height
     QColor separatorColor;
@@ -56,9 +57,7 @@ class View : public QWidget {
     ButtonMenu *filterButtonMenu = nullptr;
 
     // Icons
-    const QString FilterIcon    = IconManager::icon(Icons::Filter);
-    const QString ArrowDownIcon = IconManager::icon(Icons::ArrowDown);
-    const QString SearchIcon    = IconManager::icon(Icons::Search);
+    QString FilterIcon, ArrowDownIcon, SearchIcon;   
 
     // Search Box
     TextField *search_box = nullptr;

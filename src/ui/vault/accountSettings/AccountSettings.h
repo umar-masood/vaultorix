@@ -10,7 +10,6 @@
 #include "../../components/Toggle.h"
 #include "../../components/TextField.h"
 #include "../../components/Seperator.h"
-#include "../../../resources/IconManager.h"
 
 class AccountSettingsWindow : public SubWindow {
     Q_OBJECT

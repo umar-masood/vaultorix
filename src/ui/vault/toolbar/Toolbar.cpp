@@ -1,8 +1,17 @@
 #include "ToolBar.h"
+#include "../../../resources/IconManager.h"
 
 Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     setFixedHeight(64);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    // Icons
+    DecryptIcon   = IconManager::icon(Icons::Decrypt);
+    EncryptIcon   = IconManager::icon(Icons::Encrypt);
+    DeleteIcon    = IconManager::icon(Icons::FileDelete);
+    ImportIcon    = IconManager::icon(Icons::Import);
+    OpenIcon      = IconManager::icon(Icons::Open);
+    RestoreIcon   = IconManager::icon(Icons::Restore);
 
     // Import Action
     import_btn = createButton("Import", ImportIcon);

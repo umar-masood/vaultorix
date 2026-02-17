@@ -1,4 +1,5 @@
 #include "ComboBox.h"
+#include "../../resources/IconManager.h"
 
 ComboBox::ComboBox(QWidget *parent) : TextField(parent) {
     setFixedSize(QSize(250, 36));

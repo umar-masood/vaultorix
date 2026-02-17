@@ -1,4 +1,7 @@
 #include "AccountWindow.h"
+#include "../../../resources/IconManager.h"
+#include "../../../resources/IllustrationManager.h"
+
 /* ========================================================================================= 
                               ACCOUNT WINDOW IMPLEMENTATION              
    ========================================================================================= */
@@ -9,6 +12,10 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    // Window Information
    setWindowTitle("Vaultorix");
    setWindowIcon(QIcon(IconManager::icon(Icons::AppIcon)));
+
+   // Icons
+   DarkModeIcon = IconManager::icon(Icons::DarkMode);
+   LightModeIcon = IconManager::icon(Icons::LightMode);
 
    // Main Layout
    mainLayout = new QHBoxLayout(contentArea());

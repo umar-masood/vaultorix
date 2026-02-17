@@ -2,7 +2,6 @@
 
 #include "../../components/Button.h"
 #include "../../components/ToolTip.h"
-#include "../../../resources/IconManager.h"
 #include "../user/User.h"
 
 #include <QHBoxLayout>
@@ -69,12 +68,7 @@ class Toolbar : public QWidget {
     Button* createButton(const QString &text, const QString &iconPath);
 
     // Icons
-    const QString DecryptIcon   = IconManager::icon(Icons::Decrypt);
-    const QString EncryptIcon   = IconManager::icon(Icons::Encrypt);
-    const QString DeleteIcon    = IconManager::icon(Icons::FileDelete);
-    const QString ImportIcon    = IconManager::icon(Icons::Import);
-    const QString OpenIcon      = IconManager::icon(Icons::Open);
-    const QString RestoreIcon   = IconManager::icon(Icons::Restore);
+    QString DecryptIcon, EncryptIcon , DeleteIcon , ImportIcon , OpenIcon, RestoreIcon; 
 
     // List of Actions
     QList<Button *> actions;

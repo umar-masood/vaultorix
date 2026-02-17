@@ -8,7 +8,6 @@
 #include "../../components/Dialog.h"
 #include "../accountWindow/AccountWindow.h"
 #include "../accountOTP/AccountOTP.h"
-#include "../../../resources/IconManager.h"
 
 #include <QLabel>
 

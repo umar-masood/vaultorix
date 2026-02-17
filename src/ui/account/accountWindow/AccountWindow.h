@@ -6,8 +6,6 @@
 #include "../../components/Dialog.h"
 #include "../../components/Seperator.h"
 #include "../../components/ToolTip.h"
-#include "../../../resources/IconManager.h"
-#include "../../../resources/IllustrationManager.h"
 
 #include <QVBoxLayout>
 #include <QVector>
@@ -70,8 +68,7 @@ class AccountWindow : public SubWindow {
 
    // Theme Mode Flag
    bool isDarkMode = false;
-   QString DarkModeIcon = IconManager::icon(Icons::DarkMode);
-   QString LightModeIcon = IconManager::icon(Icons::LightMode);
+   QString DarkModeIcon, LightModeIcon;
 
    // Seperator for titlbar controls
    Seperator *seperator = nullptr;

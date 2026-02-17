@@ -10,7 +10,6 @@
 #include <QFont>
 
 #include "../userMenu/UserMenu.h"
-#include "../../../resources/IconManager.h"
 
 class User : public QWidget {
     Q_OBJECT

@@ -1,4 +1,5 @@
 #include "AccountCreate.h"
+#include "../../../resources/IconManager.h"
 
 /* ========================================================================================= 
                               ACCOUNT CREATE IMPLEMENTATION              

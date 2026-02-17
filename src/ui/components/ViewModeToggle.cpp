@@ -1,7 +1,14 @@
 #include "ViewModeToggle.h"
+#include "../../resources/IconManager.h"
 
 ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
     setFixedSize(QSize(60, 32));
+
+    // Icons
+    ListViewIcon          = IconManager::icon(Icons::ListView);
+    ListViewCheckedIcon   = IconManager::icon(Icons::ListViewChecked);
+    GridViewIcon          = IconManager::icon(Icons::GridView);
+    GridViewCheckedIcon   = IconManager::icon(Icons::GridViewChecked);
 
     // List View Button
     list_view_btn = createButton();

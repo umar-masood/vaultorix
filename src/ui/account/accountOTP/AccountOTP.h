@@ -7,7 +7,6 @@
 #include <QKeyEvent>
 #include <QShowEvent>
 
-#include "../../../resources/IllustrationManager.h"
 #include "../../components/Button.h"
 #include "../../components/Label.h"
 

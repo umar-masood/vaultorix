@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../components/Label.h"
-#include "../../../resources/IllustrationManager.h" 
 
 #include <QVBoxLayout>
 #include <QWidget>
@@ -10,11 +9,11 @@
 #include <QMouseEvent>
 #include <QPixmap>
 
-class EmptyStateWidget : public QWidget {
+class EmptyState : public QWidget {
     Q_OBJECT
 
     public:
-    explicit EmptyStateWidget(QWidget *parent = nullptr);
+    explicit EmptyState(QWidget *parent = nullptr);
     void setDarkMode(bool enable);
 
     protected:

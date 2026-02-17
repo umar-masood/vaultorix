@@ -1,4 +1,5 @@
 #include "Delegate.h"
+#include "../../resources/IconManager.h"
 
 Delegate::Delegate(const QSize& itemSize, QObject *parent) : QStyledItemDelegate(parent), m_itemSize(itemSize) {}
 

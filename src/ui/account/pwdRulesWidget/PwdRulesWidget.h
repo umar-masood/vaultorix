@@ -7,8 +7,6 @@
 #include <QVBoxLayout>
 #include <QFont>
 
-#include "../../../resources/IconManager.h"
-
 class RuleItem : public QWidget {
     Q_OBJECT
 

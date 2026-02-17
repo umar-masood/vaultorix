@@ -1,0 +1,34 @@
+#pragma once
+
+#include <QWidget>
+#include <QVector>
+#include <QVBoxLayout>
+#include <QCoreApplication>
+#include <QFontMetrics>
+#include <QDebug>
+
+class Label;
+class Dialog;
+
+class About : public QWidget {
+    public:
+    static About& instance();
+    void show(); 
+    void setDarkMode(bool enable);
+
+    private:
+    explicit About(QWidget *parent = nullptr);
+
+    bool isDarkMode = false;
+
+    // Labels
+    Label *app_name = nullptr;
+    Label *app_version = nullptr;
+    Label *tagline = nullptr;
+    Label *developer = nullptr;
+    Label *copyright = nullptr;
+
+    QVector<Label *> labels;
+
+    Dialog *dialog = nullptr;
+};

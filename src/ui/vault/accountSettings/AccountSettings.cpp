@@ -1,4 +1,6 @@
-#include "AccountSettingsWindow.h"
+#include "AccountSettings.h"
+#include "../../../resources/IconManager.h"
+
 /* --------------------------------------------------------------------------
                         ACCOUNT SETTINGS WINDOW 
   -------------------------------------------------------------------------*/

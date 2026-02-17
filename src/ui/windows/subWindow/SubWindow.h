@@ -10,9 +10,13 @@
 class SubWindowOverlay : public QWidget {
    public:
    explicit SubWindowOverlay(QWidget *parent = nullptr);
+   void setRadius(int radius);
 
    protected:
    void paintEvent(QPaintEvent *event) override;
+
+   private:
+   int _radius = 6;
 };
 
 class SubWindow : public QWidget {

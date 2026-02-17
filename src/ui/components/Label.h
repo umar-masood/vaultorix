@@ -8,7 +8,7 @@
 #include <QTimer>
 #include <QGraphicsOpacityEffect>
 
-#include "./SmoothOpacity.h"
+#include "SmoothOpacity.h"
 
 class Label : public QLabel {
    Q_OBJECT 

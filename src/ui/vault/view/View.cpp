@@ -1,10 +1,16 @@
 #include "View.h"
+#include "../../../resources/IconManager.h"
 
 View::View(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   
+    // Icons
+    FilterIcon    = IconManager::icon(Icons::Filter);
+    ArrowDownIcon = IconManager::icon(Icons::ArrowDown);
+    SearchIcon    = IconManager::icon(Icons::Search);
+
     // Empty State Widget
-    empty_state = new EmptyStateWidget(this);
+    empty_state = new EmptyState(this);
     empty_state->hide();
 
     // Menu Button (for testing)
@@ -248,4 +254,4 @@ void View::setDarkMode(bool enable) {
 TextField* View::searchBox() const { return search_box; }
 ButtonMenu* View::filterMenu()  const { return filterButtonMenu; }
 ViewModeToggle* View::viewMode() const { return view_mode; }
-EmptyStateWidget* View::emptyStateWidget() const { return empty_state; }
+EmptyState* View::emptyStateWidget() const { return empty_state; }

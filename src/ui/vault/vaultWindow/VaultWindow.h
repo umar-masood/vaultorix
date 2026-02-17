@@ -1,18 +1,17 @@
 #pragma once
 
 #include "../../windows/window/Window.h"
-#include "../../components/Label.h"
 #include "../../components/Seperator.h"
 #include "../../components/ToolTip.h"
-#include "../../../resources/IconManager.h"
+#include "../../components/Label.h"
 
 #include "../statusbar/Statusbar.h"
 #include "../view/View.h"
 #include "../user/User.h"
 #include "../toolbar/Toolbar.h"
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-
 
 /* --------------------- Vault Main Window --------------------------- */
 class VaultWindow : public Window {
@@ -24,6 +23,7 @@ class VaultWindow : public Window {
 
     private:    
     explicit VaultWindow(QWidget *parent = nullptr);
+    Button *createButton(const QString &iconPathLight, const QString &iconPathDark);
 
     // Title Bar
     // Layout
@@ -42,9 +42,7 @@ class VaultWindow : public Window {
     ToolTip *theme_mode_btn_tip = nullptr;
 
     // Icons   
-    const QString AppIcon       = IconManager::icon(Icons::AppIcon);
-    const QString DarkModeIcon  = IconManager::icon(Icons::DarkMode);
-    const QString LightModeIcon = IconManager::icon(Icons::LightMode);
+    QString AppIcon, DarkModeIcon, LightModeIcon;
     
     // Flag
     bool isDarkMode = false;
@@ -53,6 +51,11 @@ class VaultWindow : public Window {
     Button *sign_out_btn = nullptr;
     // ToolTip
     ToolTip *sign_out_btn_tip = nullptr;
+
+    // Settings button
+    Button *preferences_btn  = nullptr;
+    // ToolTip
+    ToolTip *preferences_btn_tip = nullptr;
 
     // Content Area
     // Main Layout

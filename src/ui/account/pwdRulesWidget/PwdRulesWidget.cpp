@@ -1,4 +1,5 @@
 #include "PwdRulesWidget.h"
+#include "../../../resources/IconManager.h"
 
 /* ------------  Custom Rule Item Widget ------------  */
 RuleItem::RuleItem(const QString &ruleTxt, QWidget *parent) : QWidget(parent) {

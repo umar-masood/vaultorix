@@ -1,5 +1,5 @@
 #include "VaultWindow.h"
-
+#include "../../../resources/IconManager.h"
 
 VaultWindow *VaultWindow::instance(QWidget *parent) {
   static VaultWindow *vw = nullptr;
@@ -15,11 +15,16 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   setWindowIcon(QIcon(AppIcon));
   setMinimumSize(QSize(1000,600));
 
+  // Icons
+  AppIcon       = IconManager::icon(Icons::AppIcon);
+  DarkModeIcon  = IconManager::icon(Icons::DarkMode);
+  LightModeIcon = IconManager::icon(Icons::LightMode);
+
   // Title Bar
   // App Icon
   app_icon = new Label(true);
   app_icon->setFixedSize(QSize(26, 24));
-  app_icon->setPixmap(QPixmap(AppIcon).scaled(24, 22, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+  app_icon->setPixmap(QPixmap(AppIcon).scaled(26, 24, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
   // App Name
   app_name = new Label("Segoe UI", 11, QFont::Normal, false, "Vaultorix");
@@ -29,14 +34,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   seperator->raise();
 
   // Theme Mode Button
-  theme_mode_btn = new Button;
-  theme_mode_btn->setCursor(Qt::PointingHandCursor);
-  theme_mode_btn->setSecondary(true);
-  theme_mode_btn->setIconSize(QSize(18, 18));
-  theme_mode_btn->setNormalBackgroundTransparent(true);
-  theme_mode_btn->setBorderTransparent(true);
-  theme_mode_btn->setDisplayMode(Button::IconOnly);
-  theme_mode_btn->setFixedSize(QSize(26, 26));
+  theme_mode_btn = createButton(IconManager::icon(Icons::LightMode), IconManager::icon(Icons::LightMode));
   setInteractiveTitleBarWidget(theme_mode_btn);
 
   // Tooltip of theme mode button
@@ -67,6 +65,13 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   sign_out_btn_tip = new ToolTip(sign_out_btn);
   sign_out_btn_tip->setText("Sign out of your account");
 
+  // Preferences Button
+  preferences_btn = createButton(IconManager::icon(Icons::PreferencesLight), IconManager::icon(Icons::PreferencesDark));
+
+  // ToolTip of preferences button
+  preferences_btn_tip = new ToolTip(preferences_btn);
+  preferences_btn_tip->setText("Preferences");
+
   // Title Bar Layout
   titlebar_layout = new QHBoxLayout(titleBar());
   titlebar_layout->setSpacing(0);
@@ -80,6 +85,8 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   titlebar_layout->addStretch();
 
   titlebar_layout->addWidget(sign_out_btn, 0, Qt::AlignRight);
+  titlebar_layout->addSpacing(10);
+  titlebar_layout->addWidget(preferences_btn, 0, Qt::AlignRight);
   titlebar_layout->addSpacing(10);
   titlebar_layout->addWidget(theme_mode_btn, 0, Qt::AlignRight);
   titlebar_layout->addSpacing(10);
@@ -111,6 +118,19 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   emit themeModeChanged(false);
 }
 
+Button* VaultWindow::createButton(const QString &iconPathLight, const QString &iconPathDark) {
+  auto *btn = new Button;
+  btn->setDisplayMode(Button::IconOnly);
+  btn->setFixedSize(QSize(26, 26));
+  btn->setSecondary(true);
+  btn->setNormalBackgroundTransparent(true);
+  btn->setBorderTransparent(true);
+  btn->setIconSize(QSize(18, 18));
+  btn->setIconPaths(iconPathLight, iconPathDark);
+  btn->setCursor(Qt::PointingHandCursor);
+  return btn;
+}
+
 void VaultWindow::onthemeModeChanged(bool enable) {
   // Calling Base class member function of theme
   setDarkMode(enable);
@@ -120,8 +140,11 @@ void VaultWindow::onthemeModeChanged(bool enable) {
 
   // Theme Mode Button
   theme_mode_btn->setDarkMode(enable);
+  
   enable ? theme_mode_btn->setIconPaths(LightModeIcon, LightModeIcon) : theme_mode_btn->setIconPaths(DarkModeIcon, DarkModeIcon);
-  theme_mode_btn_tip->setDarkMode(enable);
+
+  // Preferences Button
+  preferences_btn->setDarkMode(enable);
 
   // Toolbar theme
   toolbar->setDarkMode(enable);
@@ -132,8 +155,9 @@ void VaultWindow::onthemeModeChanged(bool enable) {
   // Statusbar theme
   _statusbar->setDarkMode(enable);
 
-  // Sign out Button
-  sign_out_btn_tip->setDarkMode(enable);
+  // ToolTips
+  for (auto *t : {preferences_btn_tip, sign_out_btn_tip, theme_mode_btn_tip})
+    t->setDarkMode(isDarkMode);
 }
 
 Statusbar *VaultWindow::statusbar() const { return _statusbar; }

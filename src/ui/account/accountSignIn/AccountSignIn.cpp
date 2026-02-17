@@ -1,4 +1,6 @@
 #include "AccountSignIn.h"
+#include "../../../resources/IconManager.h"
+#include "../../../resources/IllustrationManager.h"
 
 /* ========================================================================================= 
                               ACCOUNT SIGN IN IMPLEMENTATION              
@@ -6,6 +8,10 @@
 AccountSignIn::AccountSignIn(QWidget *parent) : QWidget(parent) {
    setAttribute(Qt::WA_TranslucentBackground);
    setFocusPolicy(Qt::StrongFocus);
+
+   // Icons
+   UserIcon = IconManager::icon(Icons::UserAvator);
+   KeyIcon = IconManager::icon(Icons::Key);
 
    // Main Icon
    illustration = new Label(true);

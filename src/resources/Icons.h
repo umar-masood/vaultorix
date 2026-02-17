@@ -1,6 +1,6 @@
 #pragma once
 
-enum Icons {
+enum class Icons {
     AppIcon             = 0x1,
 
     Valid               = 0x2,
@@ -111,7 +111,7 @@ enum Icons {
     Avator              = 0x76,
     AccountSettings     = 0x77,
     Subscription        = 0x78,
-    Preferences         = 0x79,
+    PreferencesLight    = 0x79,
     Bug                 = 0x7A,
     About               = 0x7B,
 
@@ -122,5 +122,7 @@ enum Icons {
     Win_MaximizeLight   = 0x80,
     Win_MaximizeDark    = 0x81,
     Win_RestoreDark     = 0x82,
-    Win_RestoreLight    = 0x83
+    Win_RestoreLight    = 0x83,
+
+    PreferencesDark     = 0x84,
 };

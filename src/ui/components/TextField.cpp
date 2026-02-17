@@ -1,4 +1,5 @@
 #include "TextField.h"
+#include "../../resources/IconManager.h"
 
 TextField::TextField(const QString &text, QWidget *parent) : QLineEdit(text, parent) { init(); }
 TextField::TextField(QWidget *parent) : QLineEdit(parent) { init(); }
@@ -331,6 +332,18 @@ void TextField::init() {
     setFocusPolicy(Qt::ClickFocus);
     loadDefaultColors();
     updateStyle();
+
+    // Icons
+    CopyIcon      =  IconManager::icon(Icons::Copy);
+    CutIcon       =  IconManager::icon(Icons::Cut);
+    PasteIcon     =  IconManager::icon(Icons::Paste);
+    DeleteIcon    =  IconManager::icon(Icons::MenuDelete);
+    SelectAllIcon =  IconManager::icon(Icons::SelectAll);
+    UndoIcon      =  IconManager::icon(Icons::Undo);
+    RedoIcon      =  IconManager::icon(Icons::Redo);
+    ShowIcon      =  IconManager::icon(Icons::Show);     
+    HideIcon      =  IconManager::icon(Icons::Hide);   
+    ClearIcon     =  IconManager::icon(Icons::Clear);   
 
     effect = new SmoothShadow(this);
     effect->setOffset(0, 0);

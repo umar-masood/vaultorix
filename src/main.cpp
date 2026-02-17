@@ -9,8 +9,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion("1.0.0");
     QCoreApplication::setOrganizationName("Umar Creations");
     
-    AccountAuthCoordinator *c = new AccountAuthCoordinator(&app);
-    c->show();
+    // AccountAuthCoordinator *c = new AccountAuthCoordinator(&app);
+    // c->show();
 
     VaultWindow::instance()->show();
 

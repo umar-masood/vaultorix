@@ -33,14 +33,23 @@ Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
     closeBtn = createWindowButton();
     setInteractiveTitleBarWidget(closeBtn);
     connect(closeBtn, &Button::clicked, this, &Window::onCloseClicked);
+
+    close_btn_tip = new ToolTip(closeBtn);
+    close_btn_tip->setText("Close");
     
     minimizeBtn = createWindowButton();
     setInteractiveTitleBarWidget(minimizeBtn);
     connect(minimizeBtn, &Button::clicked, this, &Window::onMinimizeClicked);
+
+    minimize_btn_tip = new ToolTip(minimizeBtn);
+    minimize_btn_tip->setText("Minimize");
     
     maximizeBtn = createWindowButton();    
     setInteractiveTitleBarWidget(maximizeBtn);
     connect(maximizeBtn, &Button::clicked, this, &Window::onMaximizeClicked);
+    
+    maximize_btn_tip = new ToolTip(maximizeBtn);
+    maximize_btn_tip->setText("Maximize");
 
     _mainTitleBarLayout->addWidget(minimizeBtn, 0, Qt::AlignRight);
     _mainTitleBarLayout->addSpacing(4);
@@ -97,6 +106,10 @@ void Window::setDarkMode(bool value) {
     _mainTitleBar->setStyleSheet(style);
     _contentArea->setStyleSheet(style);
 
+    // ToolTips
+    for (auto *t : {maximize_btn_tip, close_btn_tip, minimize_btn_tip}) 
+        t->setDarkMode(isDarkMode);
+
     setWindowControlsIcons();
     update(); 
 }
@@ -151,12 +164,19 @@ void Window::onMaximizeClicked() {
     if (geometry() == screenRect) {
         if (normalGeometry.isValid()) {
             setGeometry(normalGeometry);
+
             showBorder = true;
+
+            maximize_btn_tip->setText("Maximize");
         } 
+
     } else {
         normalGeometry = geometry(); 
-        setGeometry(screenRect);   
+        setGeometry(screenRect);
+           
         showBorder = false;
+
+        maximize_btn_tip->setText("Restore");
     }
 
     update();

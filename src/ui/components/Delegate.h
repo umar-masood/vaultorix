@@ -15,8 +15,6 @@
 #include <QRect>
 #include <QString>
 
-#include "../../resources/IconManager.h"
-
 class Delegate : public QStyledItemDelegate {
     Q_OBJECT
 
@@ -31,6 +29,7 @@ class Delegate : public QStyledItemDelegate {
     void setSelectionCheckIndicator(bool enable);
     void setActiveIndex(const QModelIndex &index);
 
+    protected:
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 

@@ -3,7 +3,6 @@
 #include "Button.h"
 #include "Menu.h"
 #include "SmoothShadow.h"
-#include "../../resources/IconManager.h"
 
 #include <QResizeEvent>
 #include <QFocusEvent>
@@ -114,16 +113,7 @@ class TextField : public QLineEdit {
   QHash<TextFieldTextColor, QColor> _textColors;
 
   // Icons
-  const QString CopyIcon      =  IconManager::icon(Icons::Copy);
-  const QString CutIcon       =  IconManager::icon(Icons::Cut);
-  const QString PasteIcon     =  IconManager::icon(Icons::Paste);
-  const QString DeleteIcon    =  IconManager::icon(Icons::MenuDelete);
-  const QString SelectAllIcon =  IconManager::icon(Icons::SelectAll);
-  const QString UndoIcon      =  IconManager::icon(Icons::Undo);
-  const QString RedoIcon      =  IconManager::icon(Icons::Redo);
-  const QString ShowIcon      =  IconManager::icon(Icons::Show);     
-  const QString HideIcon      =  IconManager::icon(Icons::Hide);   
-  const QString ClearIcon     =  IconManager::icon(Icons::Clear);   
+  QString CopyIcon , CutIcon, PasteIcon , DeleteIcon , SelectAllIcon , UndoIcon , RedoIcon , ShowIcon , HideIcon, ClearIcon;
 
   // Graphics
   SmoothShadow *effect = nullptr;

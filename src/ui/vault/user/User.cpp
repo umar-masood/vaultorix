@@ -1,4 +1,5 @@
 #include "User.h"
+#include "../../../resources/IconManager.h"
 
 User::User(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_Hover);

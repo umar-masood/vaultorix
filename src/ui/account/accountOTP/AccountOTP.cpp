@@ -1,4 +1,5 @@
 #include "AccountOTP.h"
+#include "../../../resources/IllustrationManager.h"
 
 /* ========================================================================================= 
                               ACCOUNT OTP IMPLEMENTATION              

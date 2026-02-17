@@ -1,8 +1,10 @@
 #include "UserMenu.h"
 #include "../vaultWindow/VaultWindow.h"
+#include "../../../resources/IconManager.h"
 
 UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
-    setFixedSize(QSize(280, 362));
+    setFixedHeight(290);
+    setFixedWidth(280);
     hide();
 
     // Smooth Opacity
@@ -21,16 +23,10 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     // Manage Subscription
     manage_subscription_btn = createButton("Manage Subscription", IconManager::icon(Icons::Subscription));
 
-    // Preferences
-    preferences_btn = createButton("Preferences", IconManager::icon(Icons::Preferences));
-
     // Bug Report
     report_bug_btn = createButton("Report a Bug", IconManager::icon(Icons::Bug));
 
-    // About us
-    about = createButton("About Vaultorix", IconManager::icon(Icons::About));
-
-    option_buttons = {account_settings_btn, manage_subscription_btn, preferences_btn, report_bug_btn, about};
+    option_buttons = {account_settings_btn, manage_subscription_btn, report_bug_btn};
 
     // Layout
     layout = new QVBoxLayout(this);
@@ -40,12 +36,9 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     layout->addStretch();
     layout->addWidget(account_settings_btn, 0, Qt::AlignHCenter);
     layout->addWidget(manage_subscription_btn, 0, Qt::AlignHCenter);
-    layout->addWidget(preferences_btn, 0, Qt::AlignHCenter);
     layout->addWidget(report_bug_btn, 0, Qt::AlignHCenter);
-    layout->addWidget(about, 0, Qt::AlignHCenter);
     layout->addStretch();
 
- 
     // Signal Slots
     for (auto *btn : option_buttons)
         connect(btn, &Button::clicked, this, &QWidget::hide);
@@ -55,6 +48,7 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
             acc_settings_win = new AccountSettingsWindow(VaultWindow::instance());
             acc_settings_win->setAttribute(Qt::WA_DeleteOnClose);
             acc_settings_win->setDarkMode(isDarkMode);
+
             connect(acc_settings_win, &QObject::destroyed, this, [this]() {
                 acc_settings_win = nullptr;
                 VaultWindow::instance()->updateGeometry();
@@ -64,16 +58,14 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
         acc_settings_win->show();
         acc_settings_win->raise();
     });   
-    
+
     // Initial Theme
     setDarkMode(isDarkMode);
 }
 
 Button* UserMenu::accountSettingsButton() const { return account_settings_btn; }
 Button* UserMenu::manageSubscriptionButton() const { return manage_subscription_btn; }
-Button* UserMenu::preferencesButton() const { return preferences_btn; }
 Button* UserMenu::reportBugButton() const { return report_bug_btn; }
-Button* UserMenu::aboutButton() const { return about; }
 
 void UserMenu::fadeIn() {
     animation->stop();
@@ -135,6 +127,7 @@ void UserMenu::setDarkMode(bool enable) {
 
     if (acc_settings_win)
         acc_settings_win->setDarkMode(isDarkMode);
+
 
     RoundedBox::setDarkMode(isDarkMode);
 }

@@ -7,6 +7,10 @@ SubWindowOverlay::SubWindowOverlay(QWidget *parent) : QWidget(parent) {
    setMouseTracking(false);
 }
 
+void SubWindowOverlay::setRadius(int radius) {
+    _radius = radius;
+}
+
 void SubWindowOverlay::paintEvent(QPaintEvent *event) {
    Q_UNUSED(event);
 
@@ -19,7 +23,7 @@ void SubWindowOverlay::paintEvent(QPaintEvent *event) {
    painter.setPen(Qt::NoPen);
 
    QPainterPath path;
-   path.addRoundedRect(rect().adjusted(2, 2, -2, -2), 6, 6);
+   path.addRoundedRect(rect().adjusted(2, 2, -2, -2), _radius, _radius);
    painter.drawPath(path);
 }
 

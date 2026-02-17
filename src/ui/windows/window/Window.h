@@ -1,10 +1,8 @@
 #pragma once
 #include "../../components/Button.h"
 #include "../../../resources/IconManager.h"
+#include "../../components/ToolTip.h"
 
-#include <dwmapi.h>
-#include <windowsx.h>
-#include <windows.h>
 #include <QWindow>
 #include <QHBoxLayout>
 #include <QObject>
@@ -31,7 +29,6 @@ class Window : public QWidget {
         BottomLeft,
         BottomRight
     };
-
 
     void setDarkMode(bool value);
     void setInteractiveTitleBarWidget(QWidget *widget);
@@ -92,7 +89,11 @@ class Window : public QWidget {
     Button *closeBtn = nullptr;
     Button *minimizeBtn = nullptr;
     Button *maximizeBtn = nullptr;
-    
+    // ToolTips
+    ToolTip *close_btn_tip = nullptr;
+    ToolTip *minimize_btn_tip = nullptr;
+    ToolTip *maximize_btn_tip = nullptr;
+
     // Main Title Bar
     QWidget *_mainTitleBar = nullptr;
     QHBoxLayout *_mainTitleBarLayout = nullptr;

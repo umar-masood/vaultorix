@@ -2,9 +2,9 @@
 
 #include "../../components/RoundedBox.h"
 #include "../../components/Button.h"
-#include "../../../resources/IconManager.h"
 #include "../../components/SmoothOpacity.h"
-#include "../accountSettingsWindow/AccountSettingsWindow.h"
+
+#include "../accountSettings/AccountSettings.h"
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -24,9 +24,7 @@ class UserMenu : public RoundedBox {
 
     Button* accountSettingsButton() const;
     Button* manageSubscriptionButton() const;
-    Button* preferencesButton() const;
     Button* reportBugButton() const;
-    Button* aboutButton() const; 
 
     void fadeIn();
     void fadeOut();
@@ -49,9 +47,7 @@ class UserMenu : public RoundedBox {
         AccountSettingsWindow *acc_settings_win = nullptr;
         
     Button *manage_subscription_btn   = nullptr;
-    Button *preferences_btn           = nullptr;
     Button *report_bug_btn            = nullptr;
-    Button *about                     = nullptr;
     
     QVector<Button *> option_buttons;
     

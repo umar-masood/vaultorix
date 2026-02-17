@@ -9,7 +9,6 @@
 #include <QStandardItem>
 #include <algorithm>
 #include <QtMath>
-#include "../../../resources/IconManager.h"
 #include <QTimer>
 
 enum ItemDelegateRoles {
