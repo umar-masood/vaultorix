@@ -31,25 +31,19 @@ Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
 
     /* Window Controls*/
     closeBtn = createWindowButton();
+    closeBtn->setToolTip("Close");
     setInteractiveTitleBarWidget(closeBtn);
     connect(closeBtn, &Button::clicked, this, &Window::onCloseClicked);
-
-    close_btn_tip = new ToolTip(closeBtn);
-    close_btn_tip->setText("Close");
     
     minimizeBtn = createWindowButton();
+    minimizeBtn->setToolTip("Minimize");
     setInteractiveTitleBarWidget(minimizeBtn);
     connect(minimizeBtn, &Button::clicked, this, &Window::onMinimizeClicked);
-
-    minimize_btn_tip = new ToolTip(minimizeBtn);
-    minimize_btn_tip->setText("Minimize");
     
-    maximizeBtn = createWindowButton();    
+    maximizeBtn = createWindowButton();
+    maximizeBtn->setToolTip("Maximize");
     setInteractiveTitleBarWidget(maximizeBtn);
     connect(maximizeBtn, &Button::clicked, this, &Window::onMaximizeClicked);
-    
-    maximize_btn_tip = new ToolTip(maximizeBtn);
-    maximize_btn_tip->setText("Maximize");
 
     _mainTitleBarLayout->addWidget(minimizeBtn, 0, Qt::AlignRight);
     _mainTitleBarLayout->addSpacing(4);
@@ -73,7 +67,6 @@ Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
     entireLayout->addWidget(_mainTitleBar, 0, Qt::AlignTop);
     entireLayout->addWidget(_contentArea, 0);
     setLayout(entireLayout);
-
 
     /* Apply Styles */
     setDarkMode(isDarkMode);
@@ -105,10 +98,6 @@ void Window::setDarkMode(bool value) {
     QString style = QString("background-color: %1;").arg(isDarkMode ? "#1F1F1F" : "#FFFFFF");
     _mainTitleBar->setStyleSheet(style);
     _contentArea->setStyleSheet(style);
-
-    // ToolTips
-    for (auto *t : {maximize_btn_tip, close_btn_tip, minimize_btn_tip}) 
-        t->setDarkMode(isDarkMode);
 
     setWindowControlsIcons();
     update(); 
@@ -167,7 +156,7 @@ void Window::onMaximizeClicked() {
 
             showBorder = true;
 
-            maximize_btn_tip->setText("Maximize");
+            maximizeBtn->setToolTip("Maximize");
         } 
 
     } else {
@@ -176,7 +165,7 @@ void Window::onMaximizeClicked() {
            
         showBorder = false;
 
-        maximize_btn_tip->setText("Restore");
+        maximizeBtn->setToolTip("Restore");
     }
 
     update();

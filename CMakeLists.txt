@@ -30,6 +30,9 @@ add_executable(Vaultorix
     # About
     ./src/ui/vault/about/About.cpp
     
+    # App Preferences
+    ./src/ui/vault/preferences/Preferences.cpp
+    
     ## Empty State Widget
     src/ui/vault/emptyState/EmptyState.cpp
 
@@ -80,9 +83,9 @@ add_executable(Vaultorix
     src/ui/components/ToolTip.cpp
     src/ui/components/Seperator.cpp
     src/ui/components/Label.cpp
-    src/ui/components/Popup.cpp
     src/ui/components/ButtonMenu.cpp
     src/ui/components/ViewModeToggle.cpp
+    src/ui/components/Popup.cpp
 
     # Core
     # Validators

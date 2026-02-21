@@ -5,7 +5,6 @@
 #include "../../components/Button.h"
 #include "../../components/Dialog.h"
 #include "../../components/Seperator.h"
-#include "../../components/ToolTip.h"
 
 #include <QVBoxLayout>
 #include <QVector>
@@ -75,8 +74,6 @@ class AccountWindow : public SubWindow {
 
    // Theme Mode Button
    Button *themeMode = nullptr;
-   // ToolTip
-   ToolTip *themeButtonTip = nullptr;
 
    // Vector to store all subwidgets (like dialogs, popups etc., especially for theme)
    QVector<QWidget *> subWidgets = {};

@@ -59,27 +59,23 @@ SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimiz
 
     // Close Button
     closeBtn = windowButton();
+    closeBtn->setToolTip("Close");
+
     if (!hasCloseBtn) {
         closeBtn->setEnabled(false);
         closeBtn->hide();
     }
     connect(closeBtn, &Button::clicked, this, &SubWindow::onCloseClicked);
 
-    // Tooltip
-    closeBtnTip = new ToolTip(closeBtn);
-    closeBtnTip->setText("Close");
-
     // Minimize Button
     minimizeBtn = windowButton();
+    minimizeBtn->setToolTip("Minimize");
+
     if (!hasMinimizeBtn) {
         minimizeBtn->setEnabled(false);
         minimizeBtn->hide();
     }
     connect(minimizeBtn, &Button::clicked, this, &SubWindow::onMinimizedClicked);
-    
-    // Tooltip
-    minimizeBtnTip = new ToolTip(minimizeBtn);
-    minimizeBtnTip->setText("Minimize");
 
     // Controls layout
     win_controls_layout = new QHBoxLayout;
@@ -147,15 +143,11 @@ void SubWindow::centerInParent() {
 void SubWindow::setDarkMode(bool value) {
     isDarkMode = value; 
 
-    if (closeBtn) {
-        closeBtn->setDarkMode(isDarkMode);
-        closeBtnTip->setDarkMode(isDarkMode);
-    }
+    if (closeBtn) 
+        closeBtn->setDarkMode(isDarkMode);    
 
-    if (minimizeBtn) {
+    if (minimizeBtn) 
        minimizeBtn->setDarkMode(isDarkMode); 
-       minimizeBtnTip->setDarkMode(isDarkMode);
-    } 
 
     update();
     applyThemedIcons();

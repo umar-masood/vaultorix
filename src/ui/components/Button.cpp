@@ -31,6 +31,13 @@ void Button::setShadow(bool enable) {
   (isShadowEnabled) ? setGraphicsEffect(effect) : setGraphicsEffect(nullptr);
 }
 
+void Button::setToolTip(const QString &text) {
+  if (!tip) 
+    tip = new ToolTip(this);
+
+  tip->setText(text);
+}
+
 void Button::setFontProperties(const QString &family, int pointSize, QFont::Weight weight, bool italic) {
   fontFamily = family; 
   fontSize = pointSize; 
@@ -95,7 +102,10 @@ void Button::setDarkMode(bool enable) {
   isDarkMode = enable; 
 
   if (isLoaderBtn && spinner) 
-    spinner->setDarkMode(enable); 
+    spinner->setDarkMode(isDarkMode); 
+
+  if (tip)
+    tip->setDarkMode(isDarkMode);
 }
 
 void Button::setCheckedButtonIcon(const QString &iconPath) { 

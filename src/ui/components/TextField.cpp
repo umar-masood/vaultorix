@@ -45,6 +45,11 @@ void TextField::setIconPaths(const QString &lightIcon, const QString &darkIcon) 
 void TextField::setReadOnly(bool enable) {
     isReadOnly = enable;
     QLineEdit::setReadOnly(isReadOnly);
+
+    if (isReadOnly)
+        setCursor(Qt::ArrowCursor);      
+    else
+        setCursor(Qt::IBeamCursor);     
 }
 
 void TextField::setEnabled(bool enable) {
@@ -147,6 +152,7 @@ void TextField::resizeEvent(QResizeEvent *event) {
     positionButton(clear);
     positionButton(password);
 }
+
 
 void TextField::positionButton(Button *button) {
     if (button) {
@@ -258,7 +264,8 @@ void TextField::focusInEvent(QFocusEvent *event) {
     if (!isReadOnly)
         isFocused = true;
     
-    if (clear) clear->setVisible(!text().isEmpty());
+    if (clear) 
+        clear->setVisible(!text().isEmpty());
 
     if (hasShadow) {
         effect->setColor(QColor("#32CCFE"));
@@ -274,7 +281,8 @@ void TextField::focusInEvent(QFocusEvent *event) {
 void TextField::focusOutEvent(QFocusEvent *event) {
     isFocused = false;
  
-    if (clear) clear->setVisible(false);
+    if (clear) 
+        clear->setVisible(false);
 
     if (hasShadow) {
         animate->setStartValue(effect->blurRadius());

@@ -1,7 +1,6 @@
 #pragma once
 #include "../../components/Button.h"
 #include "../../../resources/IconManager.h"
-#include "../../components/ToolTip.h"
 
 #include <QWindow>
 #include <QHBoxLayout>
@@ -89,10 +88,6 @@ class Window : public QWidget {
     Button *closeBtn = nullptr;
     Button *minimizeBtn = nullptr;
     Button *maximizeBtn = nullptr;
-    // ToolTips
-    ToolTip *close_btn_tip = nullptr;
-    ToolTip *minimize_btn_tip = nullptr;
-    ToolTip *maximize_btn_tip = nullptr;
 
     // Main Title Bar
     QWidget *_mainTitleBar = nullptr;

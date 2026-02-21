@@ -22,7 +22,6 @@ ToolTip::ToolTip(QWidget *target, const QString &text, QObject *parent) : QObjec
 
   connect(this, &ToolTip::textEntered, this, &ToolTip::onTextEntered);
   connect(&timer, &QTimer::timeout, this, &ToolTip::onTimeout);
-  connect(this, &ToolTip::themeModeChanged, this, &ToolTip::onThemeModeChanged);
 }
 
 void ToolTip::fadeInAnimation() {
@@ -62,13 +61,19 @@ bool ToolTip::eventFilter(QObject *obj, QEvent *event) {
       case QEvent::MouseButtonDblClick:
       case QEvent::Wheel:
       case QEvent::FocusIn:
-      case QEvent::Destroy:
       case QEvent::Hide:
         timer.stop();
-        QTimer::singleShot(150, this, [this](){
-          if (tooltipWidget && !isHovering) 
+        QTimer::singleShot(150, this, [this]() {
+          if (tooltipWidget && !isHovering)
             fadeOutAnimation();
         });
+        break;
+
+      case QEvent::Destroy:
+        timer.stop();
+        fadeOutAnimation();
+        _target = nullptr;  
+        break;
 
       default: break;
     }
@@ -94,7 +99,7 @@ bool ToolTip::eventFilter(QObject *obj, QEvent *event) {
       case QEvent::Leave:
         isHovering = false;
         QTimer::singleShot(150, this, [this](){
-          if (tooltipWidget && !_target->underMouse())
+          if (tooltipWidget && _target && !_target->underMouse())
             fadeOutAnimation();
         });
         break;
@@ -165,7 +170,9 @@ void ToolTip::setDarkMode(bool enable) {
     return;
   
   isDarkMode = enable;
-  emit themeModeChanged(isDarkMode); 
+  
+  if (tooltipWidget) 
+    tooltipWidget->setDarkMode(isDarkMode);
 }
 
 void ToolTip::setTargetWidget(QWidget *target) {
@@ -185,11 +192,6 @@ void ToolTip::setTargetWidget(QWidget *target) {
   }
 
   _target->installEventFilter(this);
-}
-
-void ToolTip::onThemeModeChanged(bool enable) {
-  if (tooltipWidget) 
-    tooltipWidget->setDarkMode(enable);
 }
 
 void ToolTip::hide() {

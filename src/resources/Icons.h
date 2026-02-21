@@ -125,4 +125,19 @@ enum class Icons {
     Win_RestoreLight    = 0x83,
 
     PreferencesDark     = 0x84,
+
+    FolderLockLight     = 0x85,
+    FolderLockDark      = 0x86,
+
+    LanguagesLight      = 0x87,
+    LanguagesDark       = 0x88,
+
+    LockLight           = 0x89,
+    LockDark            = 0x8A,
+
+    PaletteLight        = 0x8B,
+    PaletteDark         = 0x8C,
+
+    UpdateLight         = 0x8D,
+    UpdateDark          = 0x8E
 };

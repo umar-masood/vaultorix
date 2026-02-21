@@ -39,11 +39,9 @@ class ToolTip : public QObject {
 
   signals:
   void textEntered(const QString &text);
-  void themeModeChanged(bool enable);
 
   private slots:
   void onTextEntered(const QString &text);
-  void onThemeModeChanged(bool enable);
   void onTimeout();
 };
 

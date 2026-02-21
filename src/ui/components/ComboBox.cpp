@@ -1,5 +1,4 @@
 #include "ComboBox.h"
-#include "../../resources/IconManager.h"
 
 ComboBox::ComboBox(QWidget *parent) : TextField(parent) {
     setFixedSize(QSize(250, 36));
@@ -13,7 +12,7 @@ void ComboBox::init() {
     delegate = new Delegate(this->size());
     
     // Popup
-    popup = new Popup(this);
+    popup = new Popup;
     popup->setModel(&model);
     popup->setItemDelegate(delegate);
     popup->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -34,6 +33,12 @@ void ComboBox::init() {
 
     // List item Signal Slot
     connect(popup->list(), &QListView::clicked, this, &ComboBox::onComboItemClicked);
+
+    // Set Readonly by default
+    setEditable(false);
+
+    // Initial Theme
+    setDarkMode(isDarkMode);
 }
 
 bool ComboBox::eventFilter(QObject *obj, QEvent *event) {
@@ -53,7 +58,8 @@ bool ComboBox::eventFilter(QObject *obj, QEvent *event) {
     }
 
     if (event->type() == QEvent::ApplicationDeactivate) 
-        if (popup->isVisible()) popup->fadeOut();
+        if (popup->isVisible()) 
+            popup->fadeOut();
 
     return QObject::eventFilter(obj, event);
 }
@@ -74,17 +80,17 @@ void ComboBox::setIconic(bool value) {
 
 void ComboBox::setEditable(bool value) {
     isEditable = value;
-    setReadOnly(!isEditable);
-    setCursor(isEditable ? Qt::IBeamCursor : Qt::ArrowCursor);
+    TextField::setReadOnly(!isEditable);
 }
 
 void ComboBox::setDarkMode(bool value) {
     isDarkMode = value;
-    TextField::setDarkMode(value);
 
-    dropdown->setDarkMode(value);
-    popup->setDarkMode(value);
-    delegate->setDarkMode(value);
+    TextField::setDarkMode(isDarkMode);
+
+    dropdown->setDarkMode(isDarkMode);
+    popup->setDarkMode(isDarkMode);
+    delegate->setDarkMode(isDarkMode);
 
     updateItemIcons();
 }
@@ -176,7 +182,12 @@ void ComboBox::positionPopup() {
     popup->fadeIn();
 }
 
-void ComboBox::setMaxVisibleItems(int items) { _maxVisibleItems = items; }
+void ComboBox::setMaxVisibleItems(int items) { 
+    _maxVisibleItems = items; 
+    if (popup)
+        popup->setMaxVisibleItems(items);
+}
+
 int ComboBox::maxVisibleItems() const { return _maxVisibleItems; }
 
 void ComboBox::updateItemIcons() {
@@ -251,21 +262,25 @@ void ComboBox::keyPressEvent(QKeyEvent *event) {
         event->accept();
     } else {
         switch (event->key()) {
+            case Qt::Key_Return:
+            case Qt::Key_Enter: {
+                QString typed = text().trimmed();
+
+                for (int i = 0; i < items.size(); ++i) {
+                    if (QString::compare(items[i].text, typed, Qt::CaseInsensitive) == 0) {
+                        setCurrentItem(i);
+                        popup->fadeOut();
+                        break;
+                    }
+                }
+
+                return;
+                break;
+            }
+            
             case Qt::Key_Up:
             case Qt::Key_Down: {
                 QApplication::sendEvent(popup->list(), event);
-                break;
-            }
-        
-            case Qt::Key_Return:
-            case Qt::Key_Enter: {
-                int index = currentIndex();
-                if (index != -1) {
-                    setCurrentItem(currentIndex());
-                    popup->fadeOut();
-                }
-               
-                event->accept();
                 break;
             }
         
@@ -276,7 +291,9 @@ void ComboBox::keyPressEvent(QKeyEvent *event) {
                 break;
             }
             
-            default:  break;
+            default:
+            TextField::keyPressEvent(event);
+            return;
         }
     }
 }

@@ -132,6 +132,22 @@ QString IconManager::icon(Icons icon) {
         case Icons::File_XML:          return ":/icons/fileTypes/XML.svg";
         case Icons::File_XSL:          return ":/icons/fileTypes/XSL.svg";
         case Icons::File_ZIP:          return ":/icons/fileTypes/ZIP.svg";
+
+        case Icons::FolderLockLight:   return ":/icons/folder-lock-light.svg";
+        case Icons::FolderLockDark:    return ":/icons/folder-lock-dark.svg";
+
+        case Icons::UpdateLight:       return ":/icons/update-light.svg";
+        case Icons::UpdateDark:        return ":/icons/update-dark.svg";
+
+        case Icons::LockLight:         return ":/icons/lock-light.svg";
+        case Icons::LockDark:          return ":/icons/lock-dark.svg";
+
+        case Icons::PaletteLight:      return ":/icons/palette-light.svg";
+        case Icons::PaletteDark:       return ":/icons/palette-dark.svg";
+
+        case Icons::LanguagesLight:    return ":/icons/languages-light.svg";
+        case Icons::LanguagesDark:     return ":/icons/languages-dark.svg";
+
     }
 
     qWarning("The requested icon is not found");
@@ -139,6 +155,9 @@ QString IconManager::icon(Icons icon) {
 }
 
 QPixmap IconManager::renderSvg(const QString &iconPath, const QSize &size) {
+    if (iconPath.isEmpty())
+        return QPixmap();
+        
     QSvgRenderer svg(iconPath);
     svg.setAspectRatioMode(Qt::KeepAspectRatio);
     

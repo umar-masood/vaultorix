@@ -1,7 +1,9 @@
 #pragma once 
 #include "SmoothShadow.h"
 #include "SpinnerProgress.h"
+
 #include "../../resources/IconManager.h"
+#include "ToolTip.h"
 
 #include <QPushButton>
 #include <QPainterPath>
@@ -23,7 +25,6 @@ class Button : public QPushButton {
   Q_PROPERTY(QColor endColor READ getEndColor WRITE setEndColor)
   
   public:
-
   enum DisplayMode { 
     IconOnly, 
     TextOnly, 
@@ -74,6 +75,7 @@ class Button : public QPushButton {
   void setDarkMode(bool enable);
   void setSecondary(bool enable);
   void setShadow(bool enable);
+  void setToolTip(const QString &text);
   void setHyperLink(bool enable);
   /**
    * @brief Sets the background color of button
@@ -190,4 +192,7 @@ class Button : public QPushButton {
 
   // Loader
   SpinnerProgress *spinner = nullptr;
+
+  // ToolTip
+  ToolTip *tip = nullptr;
 };

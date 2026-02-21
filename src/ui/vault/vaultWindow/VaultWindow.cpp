@@ -3,6 +3,7 @@
 
 VaultWindow *VaultWindow::instance(QWidget *parent) {
   static VaultWindow *vw = nullptr;
+
   if (!vw) 
     vw = new VaultWindow(parent);
   
@@ -35,11 +36,8 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
 
   // Theme Mode Button
   theme_mode_btn = createButton(IconManager::icon(Icons::LightMode), IconManager::icon(Icons::LightMode));
+  theme_mode_btn->setToolTip("Change theme mode");
   setInteractiveTitleBarWidget(theme_mode_btn);
-
-  // Tooltip of theme mode button
-  theme_mode_btn_tip = new ToolTip(theme_mode_btn);
-  theme_mode_btn_tip->setText("Change theme mode");
 
   // Theme Mode Button Signal Slot
   connect(theme_mode_btn, &Button::clicked, this, [this](){
@@ -59,18 +57,28 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   sign_out_btn->setDisplayMode(Button::IconText);
   sign_out_btn->setFixedSize(QSize(100, 26));
   sign_out_btn->setPrimaryButtonIcon(IconManager::icon(Icons::SignOut));
+  sign_out_btn->setToolTip("Sign out of your account");
   setInteractiveTitleBarWidget(sign_out_btn);
-
-  // ToolTip of sign out button
-  sign_out_btn_tip = new ToolTip(sign_out_btn);
-  sign_out_btn_tip->setText("Sign out of your account");
 
   // Preferences Button
   preferences_btn = createButton(IconManager::icon(Icons::PreferencesLight), IconManager::icon(Icons::PreferencesDark));
+  preferences_btn->setToolTip("Preferences");
 
-  // ToolTip of preferences button
-  preferences_btn_tip = new ToolTip(preferences_btn);
-  preferences_btn_tip->setText("Preferences");
+  connect(preferences_btn, &Button::clicked, this, [this](){
+    if (!pref) {
+      pref = new Preferences(this);
+      pref->setAttribute(Qt::WA_DeleteOnClose);
+      pref->setDarkMode(isDarkMode);
+
+      connect(pref, &QObject::destroyed, this, [this](){
+        pref = nullptr;
+        VaultWindow::instance()->updateGeometry(); 
+      });
+    }
+
+    pref->show();
+    pref->raise();
+  });
 
   // Title Bar Layout
   titlebar_layout = new QHBoxLayout(titleBar());
@@ -154,10 +162,6 @@ void VaultWindow::onthemeModeChanged(bool enable) {
   
   // Statusbar theme
   _statusbar->setDarkMode(enable);
-
-  // ToolTips
-  for (auto *t : {preferences_btn_tip, sign_out_btn_tip, theme_mode_btn_tip})
-    t->setDarkMode(isDarkMode);
 }
 
 Statusbar *VaultWindow::statusbar() const { return _statusbar; }

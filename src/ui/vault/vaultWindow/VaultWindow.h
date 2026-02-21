@@ -2,10 +2,10 @@
 
 #include "../../windows/window/Window.h"
 #include "../../components/Seperator.h"
-#include "../../components/ToolTip.h"
 #include "../../components/Label.h"
 
 #include "../statusbar/Statusbar.h"
+#include "../preferences/Preferences.h"
 #include "../view/View.h"
 #include "../user/User.h"
 #include "../toolbar/Toolbar.h"
@@ -38,8 +38,6 @@ class VaultWindow : public Window {
 
     // Theme Mode Button   
     Button *theme_mode_btn = nullptr;
-    // ToolTip
-    ToolTip *theme_mode_btn_tip = nullptr;
 
     // Icons   
     QString AppIcon, DarkModeIcon, LightModeIcon;
@@ -49,13 +47,12 @@ class VaultWindow : public Window {
  
     // Sign out Button
     Button *sign_out_btn = nullptr;
-    // ToolTip
-    ToolTip *sign_out_btn_tip = nullptr;
 
     // Settings button
     Button *preferences_btn  = nullptr;
-    // ToolTip
-    ToolTip *preferences_btn_tip = nullptr;
+
+    // Preferences Settings
+    Preferences *pref = nullptr;
 
     // Content Area
     // Main Layout

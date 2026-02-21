@@ -50,27 +50,6 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     _titlebarLayout->addWidget(winTitle, 0, Qt::AlignLeft | Qt::AlignVCenter);
     _titlebarLayout->addStretch();
 
-   /* ---------------------------------------------------------------------------------
-                                Main Header Section
-    ---------------------------------------------------------------------------------*/
-    // Layout 
-    main_header_layout = new QVBoxLayout;
-    main_header_layout->setContentsMargins(0, 0, 0, 0);
-    main_header_layout->setSpacing(0);
-
-    // Header
-    mainHeader = new Label("Segoe UI", 11, QFont::Normal, false, "Profile Information", Qt::AlignLeft);
-
-    // Text under main header
-    main_header_text = new Label("Segoe UI", 11, QFont::Normal, false, "Edit your personal information", Qt::AlignLeft);
-
-    // Adding header, text to its layout
-    main_header_layout->addStretch();
-    main_header_layout->addWidget(mainHeader, 0, Qt::AlignLeft);
-    main_header_layout->addSpacing(2);
-    main_header_layout->addWidget(main_header_text, 0, Qt::AlignLeft);
-    main_header_layout->addStretch();
-
     // --------------------------- Save Button ---------------------------
     save_btn = new Button("Save");
     save_btn->setDisplayMode(Button::TextOnly);
@@ -86,6 +65,27 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     _titlebarLayout->addSpacing(6);
     _titlebarLayout->addWidget(titlebar_sep, 0, Qt::AlignRight | Qt::AlignVCenter);
     _titlebarLayout->addSpacing(6);
+
+   /* ---------------------------------------------------------------------------------
+                                Main Header Section
+    ---------------------------------------------------------------------------------*/
+    // Layout 
+    main_header_layout = new QVBoxLayout;
+    main_header_layout->setContentsMargins(0, 0, 0, 0);
+    main_header_layout->setSpacing(0);
+
+    // Header
+    mainHeader = new Label("Segoe UI", 10, QFont::Normal, false, "Profile Information", Qt::AlignLeft);
+
+    // Text under main header
+    main_header_text = new Label("Segoe UI", 10, QFont::Normal, false, "Edit your personal information", Qt::AlignLeft);
+
+    // Adding header, text to its layout
+    main_header_layout->addStretch();
+    main_header_layout->addWidget(mainHeader, 0, Qt::AlignLeft);
+    main_header_layout->addSpacing(2);
+    main_header_layout->addWidget(main_header_text, 0, Qt::AlignLeft);
+    main_header_layout->addStretch();
 
     /* ---------------------------------------------------------------------------------
                                 Profile Picture Section
@@ -423,12 +423,12 @@ void AccountSettingsWindow::setDarkMode(bool enable) {
     // -------------------- Subtexts --------------------
     for (Label* label : { main_header_text, profile_pic_hint, password_text, two_fa_text, delete_acc_text, email_note })
         if (label)
-            label->setTextColor("#6B7280");  
+            label->setTextColor(isDarkMode ? "#94A3B8" : "#6B7280");
 
     // -------------------- Headers --------------------
     for (Label* label : {winTitle, mainHeader, name_header, username_header, email_header, password_header, two_fa_header, delete_acc_header, profile_pic_title })
         if (label)
-            label->setTextColor(isDarkMode ? "#FFFFFF" : "#000000"); 
+            label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
 
     // -------------------- TextFields --------------------
     for (TextField* field : { name_field, username_field, email_field, curr_password_field, new_password_field })
@@ -446,7 +446,7 @@ void AccountSettingsWindow::setDarkMode(bool enable) {
     // -------------------- Seperators --------------------
     for (Seperator* sep : { sep_1, sep_2, sep_3, sep_4, sep_5, titlebar_sep })
         if (sep)
-            isDarkMode ? sep->setColor("#8A8A8A") : sep->setColor("#9F9F9F");
+            sep->setColor(isDarkMode ? "#334155" : "#E5E7EB");
 
     // Base class method
     SubWindow::setDarkMode(isDarkMode);

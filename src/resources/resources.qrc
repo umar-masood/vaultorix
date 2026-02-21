@@ -120,5 +120,15 @@
     <file>icons/win-restore-light.svg</file>
     <file>icons/preferences-dark.svg</file>
     <file>icons/preferences-light.svg</file>
+    <file>icons/folder-lock-dark.svg</file>
+    <file>icons/languages-dark.svg</file>
+    <file>icons/palette-dark.svg</file>
+    <file>icons/update-dark.svg</file>
+    <file>icons/languages-light.svg</file>
+    <file>icons/palette-light.svg</file>
+    <file>icons/folder-lock-light.svg</file>
+    <file>icons/update-light.svg</file>
+    <file>icons/lock-light.svg</file>
+    <file>icons/lock-dark.svg</file>
   </qresource>
 </RCC>

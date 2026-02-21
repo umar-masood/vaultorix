@@ -1,6 +1,5 @@
 #pragma once
 #include "../../components/Button.h"
-#include "../../components/ToolTip.h"
 #include "../../../resources/IconManager.h"
 
 #include <QWindow>
@@ -72,12 +71,10 @@ class SubWindow : public QWidget {
     // Close Button
     bool hasCloseBtn = true;
     Button *closeBtn = nullptr;
-    ToolTip *closeBtnTip = nullptr;
 
     // Minimize Button
     bool hasMinimizeBtn = false;
     Button *minimizeBtn = nullptr;
-    ToolTip *minimizeBtnTip = nullptr;
 
     // Theme Mode
     bool isDarkMode = false;

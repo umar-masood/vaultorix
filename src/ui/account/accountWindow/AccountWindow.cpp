@@ -36,7 +36,7 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
    themeMode->setBorderTransparent(true);
    themeMode->setFixedSize(QSize(26, 26));
    themeMode->setIconPaths(DarkModeIcon, DarkModeIcon);
-
+   themeMode->setToolTip("Change theme mode");
    _titlebarLayout->addWidget(themeMode, 0, Qt::AlignRight);
    _titlebarLayout->addSpacing(6);
 
@@ -44,10 +44,6 @@ AccountWindow::AccountWindow(QWidget *rightWidget, QWidget *parent,
       isDarkMode = !isDarkMode;
       emit themeModeChanged(isDarkMode);
    });
-
-   // Theme Button Tooltip
-   themeButtonTip = new ToolTip(themeMode);
-   themeButtonTip->setText("Change theme mode");
 
    // Seperator 
    seperator = new Seperator(nullptr, 18, 1, Qt::Vertical);
@@ -179,7 +175,6 @@ void AccountWindow::onthemeModeChanged(bool enable) {
 
    // Theme Mode Button
    themeMode->setDarkMode(enable);
-   themeButtonTip->setDarkMode(enable);
    enable ? themeMode->setIconPaths(LightModeIcon, LightModeIcon) : themeMode->setIconPaths(DarkModeIcon, DarkModeIcon);
    
    // Titlebar Seperator 
