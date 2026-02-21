@@ -27,9 +27,9 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
 
     // Adding Save button and seperator to titlebar layout
     _titlebarLayout->addWidget(save_btn, 0, Qt::AlignRight | Qt::AlignVCenter);
-    _titlebarLayout->addSpacing(6);
+    _titlebarLayout->addSpacing(10);
     _titlebarLayout->addWidget(titlebar_sep, 0, Qt::AlignRight | Qt::AlignVCenter);
-    _titlebarLayout->addSpacing(6);
+    _titlebarLayout->addSpacing(10);
 
 
     // ---------------- Window Content Area Layout -------------------------------
@@ -374,7 +374,7 @@ void Preferences::setDarkMode(bool enable) {
             toggle->setDarkMode(isDarkMode);
 
     // -------------------- Seperators --------------------
-    for (Seperator* sep : { sep_1, sep_2, sep_3, sep_4, titlebar_sep })
+    for (Seperator* sep : { sep_1, sep_2, sep_3, sep_4 })
         if (sep)
             sep->setColor(isDarkMode ? "#334155" : "#E5E7EB");
 

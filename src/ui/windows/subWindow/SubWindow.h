@@ -31,6 +31,8 @@ class SubWindow : public QWidget {
     QWidget* contentArea() const;
     QHBoxLayout* titlebarLayout() const;
 
+    SubWindowOverlay *modalOverlay() const;
+
     protected: 
     void paintEvent(QPaintEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;

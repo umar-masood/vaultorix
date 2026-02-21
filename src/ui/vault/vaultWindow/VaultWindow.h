@@ -48,11 +48,14 @@ class VaultWindow : public Window {
     // Sign out Button
     Button *sign_out_btn = nullptr;
 
-    // Settings button
+    // Settings Button
     Button *preferences_btn  = nullptr;
 
     // Preferences Settings
     Preferences *pref = nullptr;
+    
+    // Updates Download Button
+    Button *updates_download_btn = nullptr;
 
     // Content Area
     // Main Layout

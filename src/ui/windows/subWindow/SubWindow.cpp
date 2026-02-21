@@ -1,4 +1,5 @@
 #include "SubWindow.h"
+#include "../window/Window.h"
 
 SubWindowOverlay::SubWindowOverlay(QWidget *parent) : QWidget(parent) {
    setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
@@ -9,6 +10,7 @@ SubWindowOverlay::SubWindowOverlay(QWidget *parent) : QWidget(parent) {
 
 void SubWindowOverlay::setRadius(int radius) {
     _radius = radius;
+    update();
 }
 
 void SubWindowOverlay::paintEvent(QPaintEvent *event) {
@@ -23,7 +25,7 @@ void SubWindowOverlay::paintEvent(QPaintEvent *event) {
    painter.setPen(Qt::NoPen);
 
    QPainterPath path;
-   path.addRoundedRect(rect().adjusted(2, 2, -2, -2), _radius, _radius);
+   path.addRoundedRect(_radius == 0 ? rect() : rect().adjusted(2, 2, -2, -2), _radius, _radius);
    painter.drawPath(path);
 }
 
@@ -208,13 +210,26 @@ void SubWindow::showEvent(QShowEvent *event) {
     }
     
     centerInParent();
-    this->raise();
+    raise();
+
+    if (parentWidget()) 
+        if (auto *w = qobject_cast<Window *>(parentWidget())) {
+            if (!w->isWindowNormal()) 
+                modalOverlay()->setRadius(0);
+            
+            w->setInteractionBlocked(true);
+        }
+
     QWidget::showEvent(event);
 }
 
 void SubWindow::closeEvent(QCloseEvent *event) {
     if (overlay)
         overlay->hide();
+
+    if (parentWidget()) 
+        if (auto w = qobject_cast<Window*>(parentWidget()))
+            w->setInteractionBlocked(false);
 
     QWidget::closeEvent(event);
 }
@@ -231,4 +246,5 @@ void SubWindow::mousePressEvent(QMouseEvent *event) {
 }
 
 QHBoxLayout* SubWindow::titlebarLayout() const { return titlebar_sublayout; }
-QWidget* SubWindow::contentArea() const { return _contentArea; }
+SubWindowOverlay *SubWindow::modalOverlay() const { return overlay; }
+QWidget *SubWindow::contentArea() const { return _contentArea; }

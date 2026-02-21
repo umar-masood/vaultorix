@@ -130,5 +130,7 @@
     <file>icons/update-light.svg</file>
     <file>icons/lock-light.svg</file>
     <file>icons/lock-dark.svg</file>
+    <file>icons/update-download-light.svg</file>
+    <file>icons/update-download-dark.svg</file>
   </qresource>
 </RCC>

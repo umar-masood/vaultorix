@@ -60,6 +60,10 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   sign_out_btn->setToolTip("Sign out of your account");
   setInteractiveTitleBarWidget(sign_out_btn);
 
+  // Update Download Button
+  updates_download_btn = createButton(IconManager::icon(Icons::DownloadUpdateLight), IconManager::icon(Icons::DownloadUpdateDark));
+  updates_download_btn->setToolTip("Vaultorix Updates");
+
   // Preferences Button
   preferences_btn = createButton(IconManager::icon(Icons::PreferencesLight), IconManager::icon(Icons::PreferencesDark));
   preferences_btn->setToolTip("Preferences");
@@ -93,6 +97,8 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   titlebar_layout->addStretch();
 
   titlebar_layout->addWidget(sign_out_btn, 0, Qt::AlignRight);
+  titlebar_layout->addSpacing(10);
+  titlebar_layout->addWidget(updates_download_btn, 0, Qt::AlignRight);
   titlebar_layout->addSpacing(10);
   titlebar_layout->addWidget(preferences_btn, 0, Qt::AlignRight);
   titlebar_layout->addSpacing(10);
@@ -153,6 +159,9 @@ void VaultWindow::onthemeModeChanged(bool enable) {
 
   // Preferences Button
   preferences_btn->setDarkMode(enable);
+
+  // Update Download Button
+  updates_download_btn->setDarkMode(enable);
 
   // Toolbar theme
   toolbar->setDarkMode(enable);

@@ -139,5 +139,8 @@ enum class Icons {
     PaletteDark         = 0x8C,
 
     UpdateLight         = 0x8D,
-    UpdateDark          = 0x8E
+    UpdateDark          = 0x8E,
+
+    DownloadUpdateLight = 0x8F,
+    DownloadUpdateDark  = 0x90,
 };

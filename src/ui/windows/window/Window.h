@@ -31,9 +31,12 @@ class Window : public QWidget {
 
     void setDarkMode(bool value);
     void setInteractiveTitleBarWidget(QWidget *widget);
+    void setInteractionBlocked(bool enable);
 
     QWidget* titleBar() const;
     QWidget* contentArea() const;
+
+    bool isWindowNormal() const;
 
     protected:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -43,23 +46,27 @@ class Window : public QWidget {
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void leaveEvent(QEvent *event);
+    bool event(QEvent *event) override;
 
     private:
     // Window Border
-    bool showBorder = false;
+    bool _isNormalWindow = false;
     
+    // Interaction Blocked
+    bool _interactionBlocked = false;
+
     // Maximize / Restore
     QRect normalGeometry; 
 
     // Icons
-    QString closeIconLight = IconManager::icon(Icons::Win_CloseLight);
-    QString closeIconDark = IconManager::icon(Icons::Win_CloseDark);
-    QString minimizeIconLight = IconManager::icon(Icons::Win_MinimizeLight);
-    QString minimizeIconDark = IconManager::icon(Icons::Win_MinimizeDark);
-    QString maximizeIconLight = IconManager::icon(Icons::Win_MaximizeLight);
-    QString maximizeIconDark = IconManager::icon(Icons::Win_MaximizeDark);
-    QString restoreIconLight = IconManager::icon(Icons::Win_RestoreLight);
-    QString restoreIconDark = IconManager::icon(Icons::Win_RestoreDark);
+    QString closeIconLight      = IconManager::icon(Icons::Win_CloseLight);
+    QString closeIconDark       = IconManager::icon(Icons::Win_CloseDark);
+    QString minimizeIconLight   = IconManager::icon(Icons::Win_MinimizeLight);
+    QString minimizeIconDark    = IconManager::icon(Icons::Win_MinimizeDark);
+    QString maximizeIconLight   = IconManager::icon(Icons::Win_MaximizeLight);
+    QString maximizeIconDark    = IconManager::icon(Icons::Win_MaximizeDark);
+    QString restoreIconLight    = IconManager::icon(Icons::Win_RestoreLight);
+    QString restoreIconDark     = IconManager::icon(Icons::Win_RestoreDark);
 
     // Set Window Controls Icons
     void setWindowControlsIcons();
@@ -70,7 +77,7 @@ class Window : public QWidget {
     ResizeRegion detectResizeRegion(const QPoint &pos);
     
     ResizeRegion currentResizeRegion = ResizeRegion::None;
-    const int resizeMargin = 4;
+    const int resizeMargin = 6;
 
     // Check weather the current coordinates lie inside titlebar interactive widgets
     bool isPointInsideInteractiveTitleBarWidgets(int x, int y);

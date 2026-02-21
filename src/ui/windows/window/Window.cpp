@@ -136,6 +136,13 @@ void Window::setWindowControlsIcons() {
     updateMaximizeIcon();
 }
 
+void Window::setInteractionBlocked(bool enable) {
+    _interactionBlocked = enable;
+
+    if (_interactionBlocked)
+        setCursor(Qt::ArrowCursor);
+}
+
 void Window::updateMaximizeIcon() {
     QRect screenRect = screen()->availableGeometry();
 
@@ -154,7 +161,7 @@ void Window::onMaximizeClicked() {
         if (normalGeometry.isValid()) {
             setGeometry(normalGeometry);
 
-            showBorder = true;
+            _isNormalWindow = true;
 
             maximizeBtn->setToolTip("Maximize");
         } 
@@ -163,7 +170,7 @@ void Window::onMaximizeClicked() {
         normalGeometry = geometry(); 
         setGeometry(screenRect);
            
-        showBorder = false;
+        _isNormalWindow = false;
 
         maximizeBtn->setToolTip("Restore");
     }
@@ -184,6 +191,27 @@ void Window::updateCursorForRegion(ResizeRegion region) {
         case ResizeRegion::BottomLeft: setCursor(Qt::SizeBDiagCursor); break;
         default: setCursor(Qt::ArrowCursor); break;
     }
+}
+
+bool Window::event(QEvent *event) {
+
+    if (_interactionBlocked) {
+
+        switch (event->type()) {
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+        case QEvent::MouseMove:
+        case QEvent::MouseButtonDblClick:
+        case QEvent::Wheel:
+        case QEvent::KeyPress:
+        case QEvent::KeyRelease:
+            return true; // Fully block
+        default:
+            break;
+        }
+    }
+
+    return QWidget::event(event);
 }
 
 bool Window::eventFilter(QObject *obj, QEvent *event) {
@@ -212,7 +240,7 @@ void Window::paintEvent(QPaintEvent *event) {
 
     const int borderSize = 2;
 
-    if (showBorder) {
+    if (_isNormalWindow) {
         painter.setPen(QPen(penColor, 0.5));
         painter.drawRoundedRect(rect().adjusted(borderSize, borderSize, -borderSize, -borderSize), 6, 6);
     } else {
@@ -242,14 +270,16 @@ Window::ResizeRegion Window::detectResizeRegion(const QPoint &pos) {
 }
 
 void Window::mouseMoveEvent(QMouseEvent *event) {
-    QPoint pos = event->position().toPoint();
-    ResizeRegion region = detectResizeRegion(pos);
+    if (_isNormalWindow) {
+        QPoint pos = event->position().toPoint();
+        ResizeRegion region = detectResizeRegion(pos);
 
-    // Always update the cursor
-    updateCursorForRegion(region);
+        // Always update the cursor
+        updateCursorForRegion(region);
 
-    // Store current region
-    currentResizeRegion = region;
+        // Store current region
+        currentResizeRegion = region;
+    }
 
     // Call base class for normal processing
     QWidget::mouseMoveEvent(event);
@@ -261,7 +291,7 @@ void Window::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
-    if (currentResizeRegion != ResizeRegion::None) {
+    if (_isNormalWindow && (currentResizeRegion != ResizeRegion::None)) {
         if (windowHandle()) {
             Qt::Edges edges = Qt::Edges();
             switch (currentResizeRegion) {
@@ -299,7 +329,7 @@ void Window::leaveEvent(QEvent *event) {
 void Window::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
 
-    showBorder = true;
+    _isNormalWindow = true;
 
     update();
     updateMaximizeIcon();
@@ -314,3 +344,4 @@ void Window::changeEvent(QEvent *event) {
 
 QWidget* Window::titleBar() const { return _subTitleBar; }
 QWidget* Window::contentArea() const { return _contentArea; }
+bool Window::isWindowNormal() const { return _isNormalWindow; }
