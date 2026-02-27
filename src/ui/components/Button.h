@@ -2,7 +2,7 @@
 #include "SmoothShadow.h"
 #include "SpinnerProgress.h"
 
-#include "../../resources/IconManager.h"
+#include "../../../resources/IconManager.h"
 #include "ToolTip.h"
 
 #include <QPushButton>

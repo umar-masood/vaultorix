@@ -12,7 +12,7 @@ The goal of this project is to provide a secure and modular system for future de
 
 ## 🛠 Requirements
 
-- CMake (version 3.10 or higher)
+- CMake (version 3.16 or higher)
 - C++ Compiler (GCC / Clang / MSVC)
 - Git
 

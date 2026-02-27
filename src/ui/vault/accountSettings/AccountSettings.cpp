@@ -1,5 +1,5 @@
 #include "AccountSettings.h"
-#include "../../../resources/IconManager.h"
+#include "../../../../resources/IconManager.h"
 
 /* --------------------------------------------------------------------------
                         ACCOUNT SETTINGS WINDOW 
@@ -45,7 +45,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     QHBoxLayout *_titlebarLayout = this->titlebarLayout();
 
     // --------------------------- Window Title ---------------------------
-    winTitle = new Label("Segoe UI", 11, QFont::Normal, false, "Account Settings", Qt::AlignLeft);
+    winTitle = new Label("Segoe UI", 10, QFont::Normal, false, "Account Settings", Qt::AlignLeft);
     _titlebarLayout->addSpacing(6);
     _titlebarLayout->addWidget(winTitle, 0, Qt::AlignLeft | Qt::AlignVCenter);
     _titlebarLayout->addStretch();

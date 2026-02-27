@@ -1,6 +1,6 @@
 #pragma once
 #include "../../components/Button.h"
-#include "../../../resources/IconManager.h"
+#include "../../../../resources/IconManager.h"
 
 #include <QWindow>
 #include <QVBoxLayout>

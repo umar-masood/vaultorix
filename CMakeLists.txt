@@ -8,12 +8,15 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 REQUIRED Core Gui Widgets Svg Network)
 
 add_executable(Vaultorix
-    # User Interface
+    # ------------------------------------------------------------
+    #                     USER INTERFACE
+    # ------------------------------------------------------------
 
     # Windows
     src/ui/windows/window/Window.cpp
     src/ui/windows/subWindow/SubWindow.cpp
 
+    # ----------------- MAIN APP VAULT ---------------------------
     # Vault Window
     src/ui/vault/vaultWindow/VaultWindow.cpp
 
@@ -26,13 +29,7 @@ add_executable(Vaultorix
     src/ui/vault/userMenu/UserMenu.cpp
     #### Account Settings
     src/ui/vault/accountSettings/AccountSettings.cpp
-    
-    # About
-    ./src/ui/vault/about/About.cpp
-    
-    # App Preferences
-    ./src/ui/vault/preferences/Preferences.cpp
-    
+
     ## Empty State Widget
     src/ui/vault/emptyState/EmptyState.cpp
 
@@ -44,28 +41,36 @@ add_executable(Vaultorix
     ## Statusbar
     src/ui/vault/statusbar/Statusbar.cpp
 
+    ## About
+    src/ui/vault/about/About.cpp
+    
+    ## Update
+    src/ui/vault/update/Update.cpp
+    
+    ## App Preferences
+    src/ui/vault/preferences/Preferences.cpp
+    
+    # ------------ AUTH (SIGN IN, SIGN UP, OTP) -----------
     # Account Window
-    src/ui/account/accountWindow/AccountWindow.cpp
+    src/ui/auth/authWindow/AuthWindow.cpp
     
-    # Account Create
-    src/ui/account/accountCreate/AccountCreate.cpp
+    ## Account Signup
+    src/ui/auth/signup/Signup.cpp
     
-    # Account OTP
-    src/ui/account/accountOTP/AccountOTP.cpp
+    ## Account OTP
+    src/ui/auth/otp/Otp.cpp
 
-    # Account Sign In
-    src/ui/account/accountSignIn/AccountSignIn.cpp
+    ## Account Signin
+    src/ui/auth/signin/Signin.cpp
 
-    # Terms & Conditions
-    src/ui/dialogs/termsConditions/TermsConditions.cpp
-
+    # ----------------- Dialogs ---------------------------
     # Error Dialogs
     src/ui/dialogs/errorDialog/ErrorDialog.cpp
 
-    # Pwd Validator
-    src/ui/account/pwdRulesWidget/pwdRulesWidget.cpp
-    
-    # UI Components
+    ## Terms & Conditions
+    src/ui/dialogs/termsConditions/TermsConditions.cpp
+
+    # ----------------- Compoenents ---------------------------
     src/ui/components/Button.cpp
     src/ui/components/CheckBox.cpp
     src/ui/components/ComboBox.cpp
@@ -87,34 +92,45 @@ add_executable(Vaultorix
     src/ui/components/ViewModeToggle.cpp
     src/ui/components/Popup.cpp
 
-    # Core
+    # ------------------------------------------------------------
+    #                        CORE
+    # ------------------------------------------------------------
+
     # Validators
-    src/core/account/validators/emailValidator/EmailValidator.cpp
-    src/core/account/validators/pwdValidator/PwdValidator.cpp
-    src/core/account/validators/OTPValidator/OTPValidator.cpp
-    src/core/account/validators/usernameValidator/UsernameValidator.cpp
-    src/core/account/validators/validatorUtils/ValidatorUtils.cpp
-    src/core/account/validators/nameValidator/NameValidator.cpp
+    ## Auth
+    src/core/validators/auth/EmailValidator.cpp
+    src/core/validators/auth/PasswordValidator.cpp
+    src/core/validators/auth/OTPValidator.cpp
+    src/core/validators/auth/UsernameValidator.cpp
+    src/core/validators/auth/NameValidator.cpp
+
+    # Utils
+    src/core/utils/ValidatorUtils.cpp
 
     ## Coordinator
-    src/core/account/accountAuthCoordinator/AccountAuthCoordinator.cpp
+    src/core/account/auth/AuthCoordinator.cpp
 
-    ## Managers
-    src/core/account/accountCreateManager/AccountCreateManager.cpp
-    src/core/account/accountSignInManager/AccountSignInManager.cpp
+    ## Services
+    ### Auth
+    src/core/services/auth/SignupService.cpp
+    src/core/services/auth/SigninService.cpp
     
     ## Device Info
-    src/core/account/deviceInfo/DeviceInfo.cpp
+    src/core/system/DeviceInfo.cpp
+
+    # ------------------------------------------------------------
+    #                   ENTRY POINT & RESOURCES
+    # ------------------------------------------------------------
 
     # Entry Point of App
     src/main.cpp
 
     # Resources
-    src/resources/Icons.h
-    src/resources/IconManager.cpp
-    src/resources/Illustrations.h
-    src/resources/IllustrationManager.cpp
-    src/resources/resources.qrc
+    resources/Icons.h
+    resources/IconManager.cpp
+    resources/Illustrations.h
+    resources/IllustrationManager.cpp
+    resources/resources.qrc
 )
 
 target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt6::Network Qt6::Gui Qt6::Svg Qt6::Widgets dwmapi user32)

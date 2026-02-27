@@ -1,5 +1,5 @@
 #include "Preferences.h"
-#include "../../../resources/IconManager.h"
+#include "../../../../resources/IconManager.h"
 
 Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
 {
@@ -10,7 +10,7 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     QHBoxLayout *_titlebarLayout = this->titlebarLayout();
 
     // --------------------------- Window Title ---------------------------
-    winTitle = new Label("Segoe UI", 11, QFont::Normal, false, "Preferences", Qt::AlignLeft);
+    winTitle = new Label("Segoe UI", 10, QFont::Normal, false, "Preferences", Qt::AlignLeft);
     _titlebarLayout->addSpacing(6);
     _titlebarLayout->addWidget(winTitle, 0, Qt::AlignLeft | Qt::AlignVCenter);
     _titlebarLayout->addStretch();
@@ -35,7 +35,7 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     // ---------------- Window Content Area Layout -------------------------------
     auto *win_content_area_layout = new QVBoxLayout(contentArea());
     win_content_area_layout->setSpacing(0);
-    win_content_area_layout->setContentsMargins(14, 34, 14, 10); // 8 : for scrollbar placement if we later add more options
+    win_content_area_layout->setContentsMargins(14, 34, 14, 10);
 
     /* -----------------------------------------------------------------------------------------
                             OPTION 1 : Lock Timeout

@@ -1,5 +1,5 @@
 #include "ViewDelegate.h"
-#include "../../../resources/IconManager.h"
+#include "../../../../resources/IconManager.h"
 
 ViewItem::ViewItem(const QString &title,
                    const QString &thumbnailPath,

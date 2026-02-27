@@ -1,5 +1,5 @@
 #include "ToolBar.h"
-#include "../../../resources/IconManager.h"
+#include "../../../../resources/IconManager.h"
 
 Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     setFixedHeight(64);

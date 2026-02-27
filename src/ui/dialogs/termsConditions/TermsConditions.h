@@ -3,8 +3,8 @@
 #include <QTextBrowser>
 
 #include "../../windows/subWindow/SubWindow.h"
-#include "../../account/accountOTP/AccountOTP.h"
-#include "../../account/accountWindow/AccountWindow.h"
+#include "../../auth/otp/Otp.h"
+#include "../../auth/authWindow/AuthWindow.h"
 #include "../../components/ScrollBar.h"
 
 class TermsConditions : public QWidget {
@@ -13,9 +13,6 @@ class TermsConditions : public QWidget {
    public:
    explicit TermsConditions(QWidget *parent = nullptr);
    Q_INVOKABLE void setDarkMode(bool value);
-
-   signals:
-   void themeModeChanged(bool enable);
 
    private:
    // Theme Mode Flag

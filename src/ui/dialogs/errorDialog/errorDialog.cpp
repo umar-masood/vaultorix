@@ -74,10 +74,7 @@ void Error::setDarkMode(bool value) {
 Button* Error::actionButton() { return actionBtn; }
 
 /* ---------------  Error Dialog Manager  --------------- */
-ErrorDialogManager::ErrorDialogManager(AccountWindow *window, QObject *parent) : QObject(parent), accountWindow(window) {
-
-    if (!accountWindow) return;
-
+ErrorDialogManager::ErrorDialogManager(AuthWindow *instance, QObject *parent) : QObject(parent), authWindow(instance) {
     create("InvalidCredentials",       "The email or password you entered is incorrect. Please try again.",                         "Retry",    WrongCredentialsIllustration);
     create("MaxAttempts",              "Maximum invalid attempts limit reached. Please try again after 24 hours.",                  "OK",       MaxLimitReachedIllustration);
     create("SomethingWentWrong",       "Something went wrong. Please try again.",                                                   "Retry",    SomethingWentWrongIllustration);
@@ -86,7 +83,7 @@ ErrorDialogManager::ErrorDialogManager(AccountWindow *window, QObject *parent) :
     create("FurtherAttemptBlocked",    "You cannot create multiple accounts on same device.",                                       "OK",       AccessDeniedIllustration);
     create("NoInternet",               "You're offline. We couldn't connect to the internet. Check your connection and try again.", "Retry",    NoInternetIllustration);
 
-    accountWindow->setSubWidgets(allWidgets());
+    authWindow->setSubWidgets(allWidgets());
 }
 
 void ErrorDialogManager::create(const QString &key, const QString &text, const QString &actionButtonText, const QString &iconPath) {
@@ -98,7 +95,7 @@ void ErrorDialogManager::create(const QString &key, const QString &text, const Q
         close(key);
     });
 
-    ed->dialog = new Dialog(ed->widget, accountWindow, false);
+    ed->dialog = new Dialog(ed->widget, authWindow, false);
 
     dialogs.insert(key, ed);
 }

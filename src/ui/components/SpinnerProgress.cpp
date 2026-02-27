@@ -14,23 +14,6 @@ SpinnerProgress::SpinnerProgress(QWidget *parent) : QWidget(parent) {
    loadDefaultColors();
 }
 
-void SpinnerProgress::setFixedSize(QSize s, bool isButton) {
-   const QSize minimumSize(250, 140);
-   int width, height;
-
-   isButtonMode = isButton;
-
-   if (!isButtonMode) {
-      width = qMax(s.width(), minimumSize.width());
-      height = minimumSize.height();
-   } else {
-      width = s.width(); height = s.height();
-   }
-
-   QWidget::setFixedSize(width, height);
-   update();
-}
-
 void SpinnerProgress::fadeIn() {
    animation->stop();
    disconnect(animation, &QPropertyAnimation::finished, nullptr, nullptr);
@@ -51,7 +34,7 @@ void SpinnerProgress::fadeOut() {
 
 void SpinnerProgress::start() {
    if (timer && !timer->isActive() && isIndeterminate) 
-      timer->start(16); // ~60 FPS
+      timer->start(10); // ~60 FPS
    
    fadeIn();
 }
@@ -63,13 +46,9 @@ void SpinnerProgress::stop() {
    fadeOut();
 }
 
-void SpinnerProgress::setText(const QString &text) {
-   loaderText = text;
-   update();
-}
-
 void SpinnerProgress::setDarkMode(bool enable) {
    isDarkMode = enable;
+   loaderTextColor = isDarkMode ? QColor("#F1F5F9") : QColor("#111827");
    update();
 }
 
@@ -107,9 +86,9 @@ int SpinnerProgress::getValue() const { return currentValue; }
 void SpinnerProgress::loadDefaultColors() {
    _colors[BackgroundLight]   = QColor("#F2F2F2");
    _colors[BackgroundDark]    = QColor("#383838");
-   _colors[ForegroundLight]   = QColor("#0191DF");
-   _colors[ForegroundDark]    = QColor("#0191DF");
-   _colors[ButtonForeground]  = QColor("#FFFFFF");
+   _colors[ForegroundLight]   = QColor("#109AC7");
+   _colors[ForegroundDark]    = QColor("#109AC7");
+   loaderTextColor = isDarkMode ? "#F1F5F9" : "#111827";
 }
 
 void SpinnerProgress::setColor(const SpinnerColor &state, const QColor &color) {
@@ -117,38 +96,41 @@ void SpinnerProgress::setColor(const SpinnerColor &state, const QColor &color) {
    update();
 }
 
+void SpinnerProgress::setTextColor(const QColor &color) {
+   loaderTextColor = color;
+   update();
+}
+
+
 QColor SpinnerProgress::color(const SpinnerColor &state) const { return _colors.value(state, Qt::transparent); }
 
-void SpinnerProgress::paintEvent(QPaintEvent *event) {
+void SpinnerProgress::setArcWidth(int w) {
+   arcWidth = w;
+   update();
+}
+
+void SpinnerProgress::paintEvent(QPaintEvent *) {
    QPainter painter(this);
    painter.setRenderHint(QPainter::Antialiasing);
    painter.setBrush(Qt::NoBrush);
 
-   // Circular background arc
+   // Background arc
    QPen pen;
-   pen.setWidth(isButtonMode ? 3 : 6);
+   pen.setWidth(arcWidth);
    pen.setCapStyle(Qt::RoundCap);
    pen.setJoinStyle(Qt::RoundJoin);
    pen.setColor(isDarkMode ? color(BackgroundDark) : color(BackgroundLight));
 
-   int size;
-   if (isButtonMode)
-      size = qMin(width(), height()) - 4;
-   else
-      size = qMin(width() - 160, height()) - 2 * margin;
-
+   int size = qMin(width(), height()) - 2 * margin;
    QRectF rec((width() - size) / 2, (height() - size) / 2, size, size);
-   double percent = 0.0;
-   int spanAngle = 0;
 
-   if (!isButtonMode) {
-      painter.setPen(pen);
-      painter.drawArc(rec, 0, 360 * 16);
-   }
-
-   // Rotating foreground arc
-   pen.setColor(isButtonMode ? color(ButtonForeground) : color(ForegroundLight));
    painter.setPen(pen);
+   painter.drawArc(rec, 0, 360 * 16);
+
+   // Foreground arc
+   pen.setColor(isDarkMode ? color(ForegroundDark) : color(ForegroundLight));
+   painter.setPen(pen);
+
    QPoint center(width() / 2, height() / 2);
 
    if (isIndeterminate) {
@@ -156,38 +138,25 @@ void SpinnerProgress::paintEvent(QPaintEvent *event) {
       painter.translate(center);
       painter.rotate(angle);
       painter.translate(-center);
-      painter.drawArc(rec, 0, 60 * 16);
+      
+      // ---- Pulsating effect ----
+      int baseSpan = 60;       // base arc length
+      int variation = 40;      // max pulse
+      int span = baseSpan + variation * std::sin(angle * 3.14159 / 180.0);
+
+      painter.drawArc(rec, 0, span * 16);
       painter.restore();
    } else {
-      percent = static_cast<double>(currentValue - minimum) / (maximum - minimum);
-      spanAngle = static_cast<int>(percent * 360 * 16);
+      double percent = static_cast<double>(currentValue - minimum) / (maximum - minimum);
+      int spanAngle = static_cast<int>(percent * 360 * 16);
+
       painter.drawArc(rec, 90 * 16, -spanAngle);
-   }
 
-   // Text below loader
-   QFont font;
-   font.setPointSize(11);
-   font.setFamily("Segoe UI");
-   font.setWeight(QFont::Normal);
-   painter.setFont(font);
-   painter.setPen(isDarkMode ? color(BackgroundLight) : QColor("#000000"));
-
-   if (isIndeterminate) {
-      QRect text_area(0, height() - 25, width(), 25);
-      painter.drawText(text_area, Qt::AlignHCenter | Qt::AlignVCenter, loaderText); 
-   } else {
-      percent = static_cast<double>(currentValue - minimum) / (maximum - minimum);
-      QString percentText = QString::number(static_cast<int>(percent * 100)) + "%";
-      painter.drawText(rec, Qt::AlignHCenter | Qt::AlignVCenter, percentText); 
+      // Percentage Text
+      QFont font("Segoe UI", 10, QFont::Normal);
+      painter.setFont(font);
+      painter.setPen(loaderTextColor);
+      painter.drawText(rec, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(static_cast<int>(static_cast<double>(currentValue - minimum) / (maximum - minimum) * 100)) + "%");
    }
 }
 
-void SpinnerProgress::showEvent(QShowEvent * event) {
-   QWidget::showEvent(event);
-
-   if (parentWidget()) {
-      int x = (parentWidget()->width() - width()) / 2;
-      int y = (parentWidget()->height() - height()) / 2;
-      move(x, y);
-   }
-}

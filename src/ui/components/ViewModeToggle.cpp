@@ -1,5 +1,5 @@
 #include "ViewModeToggle.h"
-#include "../../resources/IconManager.h"
+#include "../../../resources/IconManager.h"
 
 ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
     setFixedSize(QSize(60, 32));

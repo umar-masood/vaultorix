@@ -1,11 +1,13 @@
 #pragma once
 
 #include "../../components/Dialog.h"
-#include "../../account/accountWindow/AccountWindow.h"
-#include "../../windows/subWindow/SubWindow.h"
 #include "../../components/Button.h"
 #include "../../components/Label.h"
-#include "../../../resources/IllustrationManager.h"
+
+#include "../../auth/authWindow/AuthWindow.h"
+#include "../../windows/subWindow/SubWindow.h"
+
+#include "../../../../resources/IllustrationManager.h"
 
 #include <QObject>
 #include <QMap>
@@ -50,7 +52,7 @@ class ErrorDialogManager : public QObject {
     Q_OBJECT
 
     public:
-    explicit ErrorDialogManager(AccountWindow *window, QObject *parent = nullptr);
+    explicit ErrorDialogManager(AuthWindow *instance = nullptr, QObject *parent = nullptr);
     void show(const QString &key);
     void close(const QString &key);
     QList<QWidget *> allWidgets() const;
@@ -74,8 +76,8 @@ class ErrorDialogManager : public QObject {
     const QString AccessDeniedIllustration              = IllustrationManager::illustration(Illustrations::AccessDenied); 
     const QString TimeoutIllustration                   = IllustrationManager::illustration(Illustrations::Timeout); 
 
-    // Stores the current accountWindow
-    AccountWindow *accountWindow = nullptr;
+    // Stores the current authWindow
+    AuthWindow *authWindow = nullptr;
 
     // Map to stored different Error Dialogs for efficiency
     QMap<QString, ErrorDialog*> dialogs;

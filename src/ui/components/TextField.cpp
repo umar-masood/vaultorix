@@ -1,5 +1,5 @@
 #include "TextField.h"
-#include "../../resources/IconManager.h"
+#include "../../../resources/IconManager.h"
 
 TextField::TextField(const QString &text, QWidget *parent) : QLineEdit(text, parent) { init(); }
 TextField::TextField(QWidget *parent) : QLineEdit(parent) { init(); }
@@ -337,7 +337,7 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
 
 void TextField::init() {
     setFixedSize(QSize(0, 0));
-    setFocusPolicy(Qt::ClickFocus);
+    setFocusPolicy(Qt::StrongFocus);
     loadDefaultColors();
     updateStyle();
 

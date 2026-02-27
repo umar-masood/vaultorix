@@ -65,6 +65,8 @@ AnimatedLabel::AnimatedLabel(const QString &family,
    fnt.setItalic(italic);
    setFont(fnt); 
    setText(text);
+
+   init();
 }
 
 void AnimatedLabel::init() {
@@ -100,11 +102,11 @@ void AnimatedLabel::show() {
       QLabel::show();
    }
 
-   fadeIn->start();
+   if (fadeIn) fadeIn->start();
 }
 
 void AnimatedLabel::hide() {  
-   fadeOut->start();
+   if (fadeOut) fadeOut->start();
 }
 
 void AnimatedLabel::setAnimatedText(const QString &text) {

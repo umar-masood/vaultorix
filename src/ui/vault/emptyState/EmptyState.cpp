@@ -1,5 +1,5 @@
 #include "EmptyState.h"
-#include "../../../resources/IllustrationManager.h" 
+#include "../../../../resources/IllustrationManager.h" 
 
 EmptyState::EmptyState(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_Hover, true);  

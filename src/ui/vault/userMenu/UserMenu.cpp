@@ -1,6 +1,6 @@
 #include "UserMenu.h"
 #include "../vaultWindow/VaultWindow.h"
-#include "../../../resources/IconManager.h"
+#include "../../../../resources/IconManager.h"
 
 UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     setFixedHeight(290);

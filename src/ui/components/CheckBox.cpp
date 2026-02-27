@@ -1,5 +1,5 @@
 #include "CheckBox.h"
-#include "../../resources/IconManager.h"
+#include "../../../resources/IconManager.h"
 
 CheckBox::CheckBox(const QString &text, QWidget *parent) : QWidget(parent), text(text) {
    setAttribute(Qt::WA_TranslucentBackground);

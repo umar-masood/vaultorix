@@ -20,7 +20,12 @@ void Button::init() {
   // Loader Spinner
   spinner = new SpinnerProgress(this);
   spinner->setIndeterminate(true);
-  spinner->setFixedSize(QSize(20, 20), true);
+  spinner->setColor(SpinnerProgress::ForegroundDark, Qt::white);
+  spinner->setColor(SpinnerProgress::ForegroundLight, Qt::white);
+  spinner->setColor(SpinnerProgress::BackgroundDark, Qt::transparent);
+  spinner->setColor(SpinnerProgress::BackgroundLight, Qt::transparent);
+  spinner->setArcWidth(3);
+  spinner->setFixedSize(QSize(30, 30));
 
   // Loading Default Colors
   loadDefaultColors();

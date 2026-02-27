@@ -1,5 +1,5 @@
 #include "View.h"
-#include "../../../resources/IconManager.h"
+#include "../../../../resources/IconManager.h"
 
 View::View(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

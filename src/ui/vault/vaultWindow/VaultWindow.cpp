@@ -1,5 +1,5 @@
 #include "VaultWindow.h"
-#include "../../../resources/IconManager.h"
+#include "../../../../resources/IconManager.h"
 
 VaultWindow *VaultWindow::instance(QWidget *parent) {
   static VaultWindow *vw = nullptr;
@@ -63,6 +63,29 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   // Update Download Button
   updates_download_btn = createButton(IconManager::icon(Icons::DownloadUpdateLight), IconManager::icon(Icons::DownloadUpdateDark));
   updates_download_btn->setToolTip("Vaultorix Updates");
+  
+  connect(updates_download_btn, &Button::clicked, this, [this]{
+    if (!au) {
+      au = new AppUpdates(this);
+      au->setAttribute(Qt::WA_DeleteOnClose);
+      au->setDarkMode(isDarkMode);
+
+      connect(au, &QObject::destroyed, this, [this](){
+        au = nullptr;
+        VaultWindow::instance()->updateGeometry(); 
+      });
+
+      // Au must exist while timer is running
+      QTimer::singleShot(15000, au, [=]() {
+          if (au->updateInfoWidget()) {
+              au->updateInfoWidget()->setUpdateAvailable(true);
+          }
+      });
+
+      au->show();
+      au->raise();
+    }
+  });
 
   // Preferences Button
   preferences_btn = createButton(IconManager::icon(Icons::PreferencesLight), IconManager::icon(Icons::PreferencesDark));

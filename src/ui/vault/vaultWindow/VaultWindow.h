@@ -9,6 +9,7 @@
 #include "../view/View.h"
 #include "../user/User.h"
 #include "../toolbar/Toolbar.h"
+#include "../update/Update.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -56,6 +57,9 @@ class VaultWindow : public Window {
     
     // Updates Download Button
     Button *updates_download_btn = nullptr;
+
+    // App Updates 
+    AppUpdates *au = nullptr;
 
     // Content Area
     // Main Layout
