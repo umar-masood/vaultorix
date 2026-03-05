@@ -15,40 +15,27 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
 
     // Import Action
     import_btn = createButton("Import", ImportIcon);
-
-    // ToolTip
-    import_btn_tip = new ToolTip(import_btn);
-    import_btn_tip->setText("Import files into the vault");
+    import_btn->setToolTip("Import files into the vault");
 
     // Encrypt Action
     encrypt_btn = createButton("Encrypt", EncryptIcon);
-    // ToolTip
-    encrypt_btn_tip = new ToolTip(encrypt_btn);
-    encrypt_btn_tip->setText("Encrypt the selected file");
+    encrypt_btn->setToolTip("Encrypt the selected file");
 
     // Decrypt Action
     decrypt_btn = createButton("Decrypt", DecryptIcon);
-    // ToolTip
-    decrypt_btn_tip = new ToolTip(decrypt_btn);
-    decrypt_btn_tip->setText("Decrypt the selected file");
+    decrypt_btn->setToolTip("Decrypt the selected file");
 
     // Open Action
     open_btn = createButton("Open", OpenIcon);
-    // ToolTip
-    open_btn_tip = new ToolTip(open_btn);
-    open_btn_tip->setText("Open the selected file");
+    open_btn->setToolTip("Open the selected file");
 
     // Delete Action
     delete_btn = createButton("Delete", DeleteIcon);
-    // ToolTip
-    delete_btn_tip = new ToolTip(delete_btn);
-    delete_btn_tip->setText("Permanently delete the selected file");
+    delete_btn->setToolTip("Permanently delete the selected file");
 
     // Restore Action
     restore_btn = createButton("Restore", RestoreIcon);
-    // ToolTip
-    restore_btn_tip = new ToolTip(restore_btn);
-    restore_btn_tip->setText("Remove the selected file from vault and return to its original location");
+    restore_btn->setToolTip("Remove the selected file from vault and return to its original location");
 
     // User Profile Widget
     user_widget = new User;
@@ -83,10 +70,6 @@ void Toolbar::setDarkMode(bool enable) {
     // Actions Buttons Theme
     for (auto action : actions) 
         action->setDarkMode(isDarkMode);
-
-    // Actions Tooltips Theme
-    for (auto tip : {import_btn_tip ,encrypt_btn_tip ,decrypt_btn_tip ,open_btn_tip ,delete_btn_tip ,restore_btn_tip})
-        tip->setDarkMode(isDarkMode);
 }
 
 Button* Toolbar::decryptButton() const { return decrypt_btn; }
@@ -99,6 +82,7 @@ Button *Toolbar::restoreButton() const { return restore_btn; }
 Button* Toolbar::createButton(const QString &text, const QString &iconPath) {
     auto *btn = new Button(text);
     btn->setFixedSize(QSize(70, 58));
+    btn->setCursor(Qt::PointingHandCursor);
     btn->setDisplayMode(Button::TextUnderIcon);
     btn->setIconSize(QSize(24,24));
     btn->setSecondary(true);

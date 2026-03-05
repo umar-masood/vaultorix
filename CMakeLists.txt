@@ -50,6 +50,9 @@ add_executable(Vaultorix
     ## App Preferences
     src/ui/vault/preferences/Preferences.cpp
     
+    ## Report a Bug
+    ./src/ui/vault/reportBug/ReportBug.cpp
+
     # ------------ AUTH (SIGN IN, SIGN UP, OTP) -----------
     # Account Window
     src/ui/auth/authWindow/AuthWindow.cpp
@@ -62,6 +65,9 @@ add_executable(Vaultorix
 
     ## Account Signin
     src/ui/auth/signin/Signin.cpp
+
+    ## Auth Coordinator
+    src/ui/auth/authCoordinator/AuthCoordinator.cpp
 
     # ----------------- Dialogs ---------------------------
     # Error Dialogs
@@ -91,6 +97,7 @@ add_executable(Vaultorix
     src/ui/components/ButtonMenu.cpp
     src/ui/components/ViewModeToggle.cpp
     src/ui/components/Popup.cpp
+    src/ui/components/TextEdit.cpp
 
     # ------------------------------------------------------------
     #                        CORE
@@ -106,9 +113,6 @@ add_executable(Vaultorix
 
     # Utils
     src/core/utils/ValidatorUtils.cpp
-
-    ## Coordinator
-    src/core/account/auth/AuthCoordinator.cpp
 
     ## Services
     ### Auth

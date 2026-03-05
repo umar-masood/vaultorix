@@ -30,9 +30,13 @@ void SubWindowOverlay::paintEvent(QPaintEvent *event) {
 }
 
 SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimizeButton) : QWidget(parent), hasCloseBtn(closeButton), hasMinimizeBtn(minimizeButton) {
+    setFixedSize(size);
+    init();
+}
+
+void SubWindow::init() {
     setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
-    setFixedSize(size);
 
     // Content Area
     _contentArea = new QWidget(this);

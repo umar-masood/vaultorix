@@ -1,4 +1,14 @@
 #include "VaultWindow.h"
+
+#include "../statusbar/Statusbar.h"
+#include "../preferences/Preferences.h"
+#include "../view/View.h"
+#include "../user/User.h"
+#include "../toolbar/Toolbar.h"
+#include "../update/Update.h"
+#include "../about/About.h"
+#include "../reportBug/ReportBug.h"
+
 #include "../../../../resources/IconManager.h"
 
 VaultWindow *VaultWindow::instance(QWidget *parent) {
@@ -31,7 +41,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
   app_name = new Label("Segoe UI", 11, QFont::Normal, false, "Vaultorix");
    
   // Seperator
-  seperator = new Seperator(nullptr, 18, 1, Qt::Vertical);
+  seperator = new Seperator( 18, 1, Qt::Vertical);
   seperator->raise();
 
   // Theme Mode Button
@@ -76,7 +86,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
       });
 
       // Au must exist while timer is running
-      QTimer::singleShot(15000, au, [=]() {
+      QTimer::singleShot(5000, au, [=]() {
           if (au->updateInfoWidget()) {
               au->updateInfoWidget()->setUpdateAvailable(true);
           }
@@ -107,6 +117,46 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     pref->raise();
   });
 
+  // About Button
+  about_btn = createButton(IconManager::icon(Icons::AboutLight), IconManager::icon(Icons::AboutDark));
+  about_btn->setToolTip("About Vaultorix");
+
+  connect(about_btn, &Button::clicked, this, [this] {
+    if (!about) {
+      about = About::instance();
+      about->setAttribute(Qt::WA_DeleteOnClose);
+      about->setDarkMode(isDarkMode);
+
+      connect(about, &QObject::destroyed, this, [this](){
+        about = nullptr;
+        VaultWindow::instance()->updateGeometry(); 
+      });
+    }
+
+    about->show();
+    about->raise();
+  });
+
+  // Report Bug Button
+  report_bug_btn = createButton(IconManager::icon(Icons::BugLight), IconManager::icon(Icons::BugDark));
+  report_bug_btn->setToolTip("Report a bug");
+
+  connect(report_bug_btn, &Button::clicked, this, [this](){
+    if (!report_bug) {
+      report_bug = new ReportBug(this);
+      report_bug->setAttribute(Qt::WA_DeleteOnClose);
+      report_bug->setDarkMode(isDarkMode);
+
+      connect(report_bug, &QObject::destroyed, this, [this](){
+        report_bug = nullptr;
+        VaultWindow::instance()->updateGeometry(); 
+      });
+    }
+
+    report_bug->show();
+    report_bug->raise();
+  });
+
   // Title Bar Layout
   titlebar_layout = new QHBoxLayout(titleBar());
   titlebar_layout->setSpacing(0);
@@ -119,14 +169,11 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
 
   titlebar_layout->addStretch();
 
-  titlebar_layout->addWidget(sign_out_btn, 0, Qt::AlignRight);
-  titlebar_layout->addSpacing(10);
-  titlebar_layout->addWidget(updates_download_btn, 0, Qt::AlignRight);
-  titlebar_layout->addSpacing(10);
-  titlebar_layout->addWidget(preferences_btn, 0, Qt::AlignRight);
-  titlebar_layout->addSpacing(10);
-  titlebar_layout->addWidget(theme_mode_btn, 0, Qt::AlignRight);
-  titlebar_layout->addSpacing(10);
+  for (auto *btn : {sign_out_btn, report_bug_btn, about_btn, updates_download_btn, preferences_btn, theme_mode_btn}) {                       
+    titlebar_layout->addWidget(btn, 0, Qt::AlignRight);
+    titlebar_layout->addSpacing(10);
+  }
+
   titlebar_layout->addWidget(seperator, 0, Qt::AlignRight);
   titlebar_layout->addSpacing(10);
 
@@ -175,16 +222,11 @@ void VaultWindow::onthemeModeChanged(bool enable) {
   // App name
   enable ? app_name->setStyleSheet("color: white;") : app_name->setStyleSheet("color: black;");
 
-  // Theme Mode Button
-  theme_mode_btn->setDarkMode(enable);
+  // Buttons
+  for (auto *btn : {theme_mode_btn, preferences_btn, updates_download_btn, about_btn, report_bug_btn})
+    btn->setDarkMode(enable);
   
   enable ? theme_mode_btn->setIconPaths(LightModeIcon, LightModeIcon) : theme_mode_btn->setIconPaths(DarkModeIcon, DarkModeIcon);
-
-  // Preferences Button
-  preferences_btn->setDarkMode(enable);
-
-  // Update Download Button
-  updates_download_btn->setDarkMode(enable);
 
   // Toolbar theme
   toolbar->setDarkMode(enable);

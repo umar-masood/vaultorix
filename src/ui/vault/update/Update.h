@@ -11,6 +11,7 @@
 #include <QVBoxLayout>
 #include <QDateTime>
 #include <QHBoxLayout>
+#include <QStackedWidget>
 
 struct Update {
   QString _currentVersion = "0.0.0";
@@ -74,20 +75,56 @@ class AppUpdates : public SubWindow {
   // Window Title
   Label *winTitle = nullptr;
 
-  // Layout
+  // Main Layout
   QVBoxLayout *win_content_area_layout = nullptr;
 
-  // Checking for update
-  // Spinner Wrapper
+  // Stacked Widget (State Manager)
+  QStackedWidget *stacked_widget = nullptr;
+
+  /* ===============================================================
+                              Pages
+     =============================================================== */
+
+  QWidget *checking_page = nullptr;
+  QWidget *no_update_page = nullptr;
+  QWidget *update_page = nullptr;
+
+  QStackedWidget *action_stack = nullptr;
+  QWidget *action_button_page = nullptr;
+  QWidget *action_progress_page = nullptr;
+  /* ===============================================================
+                              Checking Page
+     =============================================================== */
+
   QWidget *spinner_wrapper = nullptr;
-  // Spinner
   SpinnerProgress *spinner = nullptr;
-  // Spinner Label
   Label *spinner_label = nullptr;
 
-  // Update details
-  UpdateInfo *update_details_widget = nullptr;
+  /* ===============================================================
+                              No Update Page
+     =============================================================== */
 
-  // Seperator
+  Label *no_update_label = nullptr;
+
+  /* ===============================================================
+                              Update Available Page
+     =============================================================== */
+
+  UpdateInfo *update_details_widget = nullptr;
   Seperator *sep = nullptr;
+  Button *update_btn = nullptr;
+
+  /* ===============================================================
+                              Downloading Page
+     =============================================================== */
+
+  Label *downloading_label = nullptr;
+  LineProgress *update_progressbar = nullptr;
+  Label *closing_app_label = nullptr;
+  /* ===============================================================
+                              Timer
+     =============================================================== */
+
+  QTimer *timer = nullptr;
+  int v = 0;
 };

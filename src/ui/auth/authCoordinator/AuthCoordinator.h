@@ -1,14 +1,15 @@
 #pragma once
 
-#include "../../../ui/auth/signup/Signup.h"
-#include "../../services/auth/SignupService.h"
+#include "../signup/Signup.h"
+#include "../../../core/services/auth/SignupService.h"
 
-#include "../../../ui/auth/otp/Otp.h"
-#include "../../validators/auth/OTPValidator.h"
-#include "../../../ui/auth/authWindow/AuthWindow.h"
+#include "../otp/Otp.h"
+#include "../../../core/validators/auth/OTPValidator.h"
 
-#include "../../../ui/auth/signin/Signin.h"
-#include "../../services/auth/SigninService.h"
+#include "../authWindow/AuthWindow.h"
+
+#include "../signin/Signin.h"
+#include "../../../core/services/auth/SigninService.h"
 
 #include <QSettings>
 #include <QObject>

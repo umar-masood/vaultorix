@@ -4,15 +4,18 @@
 #include "../../components/Seperator.h"
 #include "../../components/Label.h"
 
-#include "../statusbar/Statusbar.h"
-#include "../preferences/Preferences.h"
-#include "../view/View.h"
-#include "../user/User.h"
-#include "../toolbar/Toolbar.h"
-#include "../update/Update.h"
-
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+
+/* ------------------- Forward Declarations ---------------------------*/
+class Statusbar;
+class Preferences;
+class View;
+class User;
+class Toolbar;
+class AppUpdates;
+class About;
+class ReportBug;
 
 /* --------------------- Vault Main Window --------------------------- */
 class VaultWindow : public Window {
@@ -58,8 +61,20 @@ class VaultWindow : public Window {
     // Updates Download Button
     Button *updates_download_btn = nullptr;
 
+    // Updates Download Button
+    Button *about_btn = nullptr;
+
     // App Updates 
     AppUpdates *au = nullptr;
+
+    // App About
+    About *about = nullptr;
+
+    // Report a bug Button
+    Button *report_bug_btn = nullptr;
+
+    // Report Bug
+    ReportBug *report_bug = nullptr;
 
     // Content Area
     // Main Layout

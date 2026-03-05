@@ -189,7 +189,7 @@ void Window::updateCursorForRegion(ResizeRegion region) {
         case ResizeRegion::BottomRight: setCursor(Qt::SizeFDiagCursor); break;
         case ResizeRegion::TopRight:
         case ResizeRegion::BottomLeft: setCursor(Qt::SizeBDiagCursor); break;
-        default: setCursor(Qt::ArrowCursor); break;
+        default: unsetCursor(); break;
     }
 }
 
@@ -321,7 +321,7 @@ void Window::mousePressEvent(QMouseEvent *event) {
 
 void Window::leaveEvent(QEvent *event) {
     currentResizeRegion = ResizeRegion::None;
-    setCursor(Qt::ArrowCursor);
+    unsetCursor();
 
     QWidget::leaveEvent(event);
 }

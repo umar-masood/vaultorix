@@ -27,10 +27,10 @@ class LineProgress : public QWidget {
    explicit LineProgress(QWidget *parent = nullptr);
 
    void setColor(const LineColor &state, const QColor &color);    
-   void setFixedSize(QSize s);
    void setDarkMode(bool value);
    void setText(const QString &text);
-   void setIndeterminate(bool value);   
+   void setIndeterminate(bool value);  
+   void setTrackHeight(int h); 
 
    void start();
    void stop();
@@ -45,6 +45,9 @@ class LineProgress : public QWidget {
    protected:
    void paintEvent(QPaintEvent *event) override;
 
+   signals:
+   void completed();
+   
    private: 
    void fadeIn();
    void fadeOut();
@@ -56,6 +59,7 @@ class LineProgress : public QWidget {
 
    bool isDarkMode = false;
    bool isIndeterminate = false;
+   bool isCompleted = false;
 
    double offset = 0.0;
    double currentValue = 0.0;
@@ -64,8 +68,8 @@ class LineProgress : public QWidget {
    double maximum = 1.0;
 
    const int margin = 12;
-   const int lineHeight = 8;
-   const int radius = lineHeight / 2;
+   int trackHeight = 6;
+   const int radius = trackHeight / 2;
 
    QTimer *timer = nullptr;   
    QPropertyAnimation *animation = nullptr;

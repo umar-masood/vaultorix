@@ -31,15 +31,6 @@ QColor LineProgress::color(const LineColor &state) const {
    return _colors.value(state, Qt::transparent);
 }
 
-void LineProgress::setFixedSize(QSize s) {
-   const QSize minimumSize(250, 50);
-   int width = qMax(s.width(), minimumSize.width());
-   int height = minimumSize.height();
-
-   QWidget::setFixedSize(width, height);
-   update();
-}
-
 void LineProgress::fadeIn() {
    animation->stop();
    disconnect(animation, &QPropertyAnimation::finished, nullptr, nullptr);
@@ -76,6 +67,9 @@ void LineProgress::stop() {
 }
 
 void LineProgress::setText(const QString &text) {
+   if (isCompleted)
+      return;
+      
    loaderText = text;
    update();
 }
@@ -91,11 +85,26 @@ void LineProgress::setIndeterminate(bool value) {
    }
 }
 
+void LineProgress::setTrackHeight(int h) {
+   trackHeight = h;
+   update();
+}
+
 void LineProgress::setValue(int value) {
+   if (isCompleted)
+      return;
+
    if (value > 100 || value < 0) {
       qWarning() << "Your Progress current value is invalid";
       return;
    }
+
+   if (value == 100) {
+      emit completed();
+      isCompleted = true;
+      return;
+   }
+   
    currentValue = std::clamp(static_cast<double>(value) / 100.0, 0.0, 1.0);
    update();
 }
@@ -112,8 +121,9 @@ void LineProgress::paintEvent(QPaintEvent *event) {
    painter.setPen(Qt::NoPen);
    painter.setBrush(isDarkMode ? color(BackgroundDark) : color(BackgroundLight));
 
-   int trackW = width() - 2 * margin;
-   QRect trackRec(margin, 0, trackW, lineHeight);
+   int trackW = width() - 2 * margin - 30; // 30 for loader text
+   int y = (height() - trackHeight) / 2;
+   QRect trackRec(margin, y, trackW, trackHeight);
 
    painter.drawRoundedRect(trackRec, radius, radius);
 
@@ -122,30 +132,33 @@ void LineProgress::paintEvent(QPaintEvent *event) {
 
    int wBar = trackW / 3;
    int xBar = margin + int(offset * trackW);
+   int yBar = (height() - trackHeight) / 2;
 
    if (isIndeterminate) {
       if (xBar + wBar > trackW + margin) {
          int overflow = (xBar + wBar) - (trackW + margin);
 
-         painter.drawRoundedRect(QRect(xBar, 0, wBar - overflow, lineHeight), radius, radius);
-         painter.drawRoundedRect(QRect(margin, 0, overflow, lineHeight), radius, radius);
+         painter.drawRoundedRect(QRect(xBar, yBar, wBar - overflow, trackHeight), radius, radius);
+         painter.drawRoundedRect(QRect(margin, yBar, overflow, trackHeight), radius, radius);
       } else 
-         painter.drawRoundedRect(QRect(xBar, 0, wBar, lineHeight), radius, radius);
+         painter.drawRoundedRect(QRect(xBar, yBar, wBar, trackHeight), radius, radius);
       
    } else {
       int barWidth = int(currentValue * trackW);
-      QRect barRec(margin,0, barWidth, lineHeight);
+      QRect barRec(margin, yBar, barWidth, trackHeight);
+
       painter.drawRoundedRect(barRec, radius, radius);
+
+      // --------------- Loader Text -------------------
+      QFont font;
+      font.setPointSize(10);
+      font.setFamily("Segoe UI");
+      font.setWeight(QFont::Normal);
+      painter.setFont(font);
+      painter.setPen(isDarkMode ? QColor("#F2F2F2") : QColor("#000000"));
+
+      int textH = QFontMetrics(font).height();
+      QRect text_area(trackRec.right() + 12, (trackRec.y() + (trackRec.height() - textH) / 2) - 2, 30, textH); // -2 slight tweak for font
+      painter.drawText(text_area, Qt::AlignLeft, loaderText + "%");
    }
-
-   // --------------- Loader Text -------------------
-   QFont font;
-   font.setPointSize(10);
-   font.setFamily("Segoe UI");
-   font.setWeight(QFont::Normal);
-   painter.setFont(font);
-   painter.setPen(isDarkMode ? QColor("#F2F2F2") : QColor("#000000"));
-
-   QRect text_area(0, height() - 25, width(), 30);
-   painter.drawText(text_area, Qt::AlignHCenter, loaderText);
 }

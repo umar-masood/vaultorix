@@ -54,6 +54,7 @@ class SubWindow : public QWidget {
 
     // Setters
     void applyThemedIcons();
+    void init();
 
     // Getter
     Button* windowButton();

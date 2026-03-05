@@ -23,7 +23,7 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     save_btn->setFontXY(0, -1);
 
     // Seperator 
-    titlebar_sep = new Seperator(nullptr, 18, 1, Qt::Vertical);
+    titlebar_sep = new Seperator( 18, 1, Qt::Vertical);
 
     // Adding Save button and seperator to titlebar layout
     _titlebarLayout->addWidget(save_btn, 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -35,7 +35,7 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     // ---------------- Window Content Area Layout -------------------------------
     auto *win_content_area_layout = new QVBoxLayout(contentArea());
     win_content_area_layout->setSpacing(0);
-    win_content_area_layout->setContentsMargins(14, 34, 14, 10);
+    win_content_area_layout->setContentsMargins(14, 34, 14, 14);
 
     /* -----------------------------------------------------------------------------------------
                             OPTION 1 : Lock Timeout
@@ -91,7 +91,7 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     win_content_area_layout->addLayout(lock_timeout_layout);
 
     // ============================ Seperator ========================================
-    sep_1 = new Seperator(nullptr, 1, width() - 2*14, Qt::Horizontal);
+    sep_1 = new Seperator( 1, width() - 2*14, Qt::Horizontal);
 
     /* -----------------------------------------------------------------------------------------
                             OPTION 2 : Encrypt Files on Import
@@ -142,7 +142,7 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     win_content_area_layout->addLayout(encrypt_import_layout);
 
     // ================================= Seperator ==============================================
-    sep_2 = new Seperator(nullptr, 1, width() - 2*14, Qt::Horizontal);
+    sep_2 = new Seperator( 1, width() - 2*14, Qt::Horizontal);
 
     /* -----------------------------------------------------------------------------------------
                             OPTION 3: Appearance
@@ -198,7 +198,7 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     win_content_area_layout->addLayout(appearance_layout);
 
     // ============================ Seperator ========================================
-    sep_3 = new Seperator(nullptr, 1, width() - 2*14, Qt::Horizontal);
+    sep_3 = new Seperator( 1, width() - 2*14, Qt::Horizontal);
 
     /* -----------------------------------------------------------------------------------------
                             OPTION 4 : Automatic Updates
@@ -249,7 +249,7 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     win_content_area_layout->addLayout(auto_updates_layout);
 
     // ============================ Seperator ========================================
-    sep_4 = new Seperator(nullptr, 1, width() - 2*14, Qt::Horizontal);
+    sep_4 = new Seperator( 1, width() - 2*14, Qt::Horizontal);
 
     /* -----------------------------------------------------------------------------------------
                             OPTION 5: App Language

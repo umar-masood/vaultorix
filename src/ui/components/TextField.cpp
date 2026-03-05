@@ -299,6 +299,7 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
         return;
 
     menu = new Menu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
     menu->setMaxVisibleItems(12);
     menu->setItemSize(QSize(180, 36));
     menu->setDarkMode(isDarkMode);
@@ -306,6 +307,7 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
 
     const bool hasText = !this->text().isEmpty();
     const bool hasSelection = this->hasSelectedText();
+    const bool hasClipboardText = QApplication::clipboard()->mimeData()->hasText();
 
     if (hasSelection) {
         menu->addAction({ "Copy",    false,  "Ctrl + C",  CopyIcon,    CopyIcon });
@@ -313,7 +315,8 @@ void TextField::contextMenuEvent(QContextMenuEvent *event) {
         menu->addAction({ "Delete",  false,  "Delete",    DeleteIcon,  DeleteIcon });
     }
 
-    menu->addAction({ "Paste", false, "Ctrl + V", PasteIcon, PasteIcon});
+    if (hasClipboardText)
+        menu->addAction({ "Paste", false, "Ctrl + V", PasteIcon, PasteIcon});
     
     if (hasText && !hasSelection) menu->addAction({ "Select All",  false,  "Ctrl + A",  SelectAllIcon,  SelectAllIcon});
     if (this->isUndoAvailable())  menu->addAction({ "Undo",        false,  "Ctrl + Z",  UndoIcon,       UndoIcon});

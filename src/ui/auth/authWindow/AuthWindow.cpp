@@ -46,7 +46,7 @@ AuthWindow::AuthWindow(QWidget *rightWidget, QWidget *parent,
    });
 
    // Seperator 
-   seperator = new Seperator(nullptr, 18, 1, Qt::Vertical);
+   seperator = new Seperator( 18, 1, Qt::Vertical);
    _titlebarLayout->addWidget(seperator, 0, Qt::AlignRight);
    _titlebarLayout->addSpacing(6);
 

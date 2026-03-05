@@ -8,7 +8,7 @@ Statusbar::Statusbar(QWidget *parent) : QWidget(parent) {
     total_items = createLabel("256 items");
 
     // Seperator 
-    seperator = new Seperator(nullptr, 18);
+    seperator = new Seperator( 18);
 
     // Selected Items
     selected_items = createLabel("69 items selected");

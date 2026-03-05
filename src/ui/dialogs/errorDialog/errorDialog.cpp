@@ -20,7 +20,7 @@ Error::Error(const QString &text, const QString &illustrationLight,
     actionBtn->setDisplayMode(Button::TextOnly);
     actionBtn->setFixedSize(QSize(316, 36));
     actionBtn->setText("Retry");
-    actionBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
+    actionBtn->setFontProperties("Segoe UI", 10, QFont::DemiBold);
     errorWidgetHeight += 36;
 
     // Illustration
@@ -35,7 +35,6 @@ Error::Error(const QString &text, const QString &illustrationLight,
     if (!text.isEmpty()) {
         label = new Label("Segoe UI", 10);
         label->setFixedSize(QSize(290, 36));
-        label->setStyleSheet("color: #8D8D8D;");
         label->setWordWrap(true);
         label->setText(text);
 
@@ -69,6 +68,9 @@ void Error::setDarkMode(bool value) {
     
     if (illustration)
         illustration->setPixmap(QPixmap(isDarkMode ? darkIcon : lightIcon));
+    
+    if (label)
+        label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
 }
 
 Button* Error::actionButton() { return actionBtn; }

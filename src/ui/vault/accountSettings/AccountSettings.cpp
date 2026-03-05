@@ -13,7 +13,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     // Window Content Area Layout
     auto *win_content_area_layout = new QVBoxLayout(contentArea());
     win_content_area_layout->setSpacing(0);
-    win_content_area_layout->setContentsMargins(14, 34, 8, 10); // 8 : for scrollbar placement
+    win_content_area_layout->setContentsMargins(14, 34, 8, 14); // 8 : for scrollbar placement
 
     // Main Widget
     auto *mainWidget = new QWidget;
@@ -58,13 +58,13 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     save_btn->setFontXY(0, -1);
 
     // Seperator 
-    titlebar_sep = new Seperator(nullptr, 18, 1, Qt::Vertical);
+    titlebar_sep = new Seperator( 18, 1, Qt::Vertical);
 
     // Adding Save button and seperator to titlebar layout
     _titlebarLayout->addWidget(save_btn, 0, Qt::AlignRight | Qt::AlignVCenter);
-    _titlebarLayout->addSpacing(6);
+    _titlebarLayout->addSpacing(10);
     _titlebarLayout->addWidget(titlebar_sep, 0, Qt::AlignRight | Qt::AlignVCenter);
-    _titlebarLayout->addSpacing(6);
+    _titlebarLayout->addSpacing(10);
 
    /* ---------------------------------------------------------------------------------
                                 Main Header Section
@@ -164,7 +164,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     name_layout->addWidget(name_field, 0, Qt::AlignLeft);
 
     // ============================ Seperator ========================================
-    sep_1 = new Seperator(nullptr, 1, width(), Qt::Horizontal);
+    sep_1 = new Seperator( 1, width(), Qt::Horizontal);
 
     /* ---------------------------------------------------------------------------------
                                     Username Section
@@ -206,7 +206,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     username_layout->setAlignment(field_button_layout, Qt::AlignLeft);
 
     // ============================ Seperator ========================================
-    sep_2 = new Seperator(nullptr, 1, width(), Qt::Horizontal);
+    sep_2 = new Seperator( 1, width(), Qt::Horizontal);
 
     /* ---------------------------------------------------------------------------------
                                     Email  Section
@@ -249,7 +249,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     email_layout->addWidget(email_note, 0, Qt::AlignLeft);
 
     // ============================ Seperator ========================================
-    sep_3 = new Seperator(nullptr, 1, width(), Qt::Horizontal);
+    sep_3 = new Seperator( 1, width(), Qt::Horizontal);
 
     /* ---------------------------------------------------------------------------------
                                 Password  Section
@@ -287,7 +287,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     password_layout->addWidget(new_password_field);
 
     // ============================ Seperator ========================================
-    sep_4 = new Seperator(nullptr, 1, width(), Qt::Horizontal);
+    sep_4 = new Seperator( 1, width(), Qt::Horizontal);
 
     /* ---------------------------------------------------------------------------------
                                 2FA  Section
@@ -323,7 +323,7 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
     two_fa_layout->addWidget(two_fa_toggle, Qt::AlignRight);
 
     // ============================ Seperator ========================================
-    sep_5 = new Seperator(nullptr, 1, width(), Qt::Horizontal);
+    sep_5 = new Seperator( 1, width(), Qt::Horizontal);
 
     /* ---------------------------------------------------------------------------------
                                 Delete Account Section
@@ -444,7 +444,7 @@ void AccountSettingsWindow::setDarkMode(bool enable) {
     if (two_fa_toggle) two_fa_toggle->setDarkMode(isDarkMode);
 
     // -------------------- Seperators --------------------
-    for (Seperator* sep : { sep_1, sep_2, sep_3, sep_4, sep_5, titlebar_sep })
+    for (Seperator* sep : { sep_1, sep_2, sep_3, sep_4, sep_5 })
         if (sep)
             sep->setColor(isDarkMode ? "#334155" : "#E5E7EB");
 

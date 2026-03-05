@@ -34,7 +34,7 @@ void SpinnerProgress::fadeOut() {
 
 void SpinnerProgress::start() {
    if (timer && !timer->isActive() && isIndeterminate) 
-      timer->start(10); // ~60 FPS
+      timer->start(16); // ~60 FPS
    
    fadeIn();
 }
@@ -138,13 +138,7 @@ void SpinnerProgress::paintEvent(QPaintEvent *) {
       painter.translate(center);
       painter.rotate(angle);
       painter.translate(-center);
-      
-      // ---- Pulsating effect ----
-      int baseSpan = 60;       // base arc length
-      int variation = 40;      // max pulse
-      int span = baseSpan + variation * std::sin(angle * 3.14159 / 180.0);
-
-      painter.drawArc(rec, 0, span * 16);
+      painter.drawArc(rec, 0, 270 * 16);
       painter.restore();
    } else {
       double percent = static_cast<double>(currentValue - minimum) / (maximum - minimum);

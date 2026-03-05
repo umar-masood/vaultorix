@@ -4,8 +4,12 @@
 #include "../../components/Dialog.h"
 #include "../../components/Label.h"
 
-About& About::instance() {
-    static About about;
+About* About::instance(QWidget *parent) {
+    static About *about = nullptr;
+
+    if (!about)
+        about = new About(parent);
+
     return about;
 }
 
@@ -15,14 +19,11 @@ void About::show() {
 }
 
 void About::setDarkMode(bool enable) {
-    if (isDarkMode == enable) 
-        return;
-
     isDarkMode = enable;
 
-    for (auto *l : labels) 
-        if (l)
-            l->setTextColor(isDarkMode ? "#FFFFFF" : "#000000");
+    for (auto *label : labels) 
+        if (label)
+            label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
 
     if (dialog)
         dialog->setDarkMode(isDarkMode);
@@ -80,4 +81,7 @@ About::About(QWidget *parent) : QWidget(parent) {
 
     // Dialog
     dialog = new Dialog(this, VaultWindow::instance(), true);
+
+    // Initial Theme
+    setDarkMode(isDarkMode);
 }

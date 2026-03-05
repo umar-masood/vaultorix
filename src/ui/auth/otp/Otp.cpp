@@ -43,7 +43,7 @@ Otp::Otp(QWidget *parent) : QWidget(parent) {
    _verifyBtn->setDisplayMode(Button::TextOnly);
    _verifyBtn->setFixedSize(QSize(360, 36));
    _verifyBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
-   _verifyBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
+   _verifyBtn->setFontProperties("Segoe UI", 10, QFont::DemiBold);
    _verifyBtn->setLoaderButton(true);
    _verifyBtn->setEnabled(false);
    
@@ -58,7 +58,7 @@ Otp::Otp(QWidget *parent) : QWidget(parent) {
    _cancelBtn->setDisplayMode(Button::TextOnly);
    _cancelBtn->setSecondary(true);
    _cancelBtn->setFixedSize(QSize(360, 36));
-   _cancelBtn->setFontProperties("Segoe UI", 11, QFont::DemiBold);
+   _cancelBtn->setFontProperties("Segoe UI", 10, QFont::DemiBold);
    connect(_cancelBtn, &Button::clicked, this,  &Otp::cancelClicked);
 
    // Main Layout

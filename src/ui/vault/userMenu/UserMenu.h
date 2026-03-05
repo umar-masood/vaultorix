@@ -24,7 +24,6 @@ class UserMenu : public RoundedBox {
 
     Button* accountSettingsButton() const;
     Button* manageSubscriptionButton() const;
-    Button* reportBugButton() const;
 
     void fadeIn();
     void fadeOut();
@@ -43,11 +42,10 @@ class UserMenu : public RoundedBox {
 
     // Option Buttons
     Button *account_settings_btn      = nullptr;
-        // Account Settings Window
-        AccountSettingsWindow *acc_settings_win = nullptr;
+    // Account Settings Window
+    AccountSettingsWindow *acc_settings_win = nullptr;
         
     Button *manage_subscription_btn   = nullptr;
-    Button *report_bug_btn            = nullptr;
     
     QVector<Button *> option_buttons;
     

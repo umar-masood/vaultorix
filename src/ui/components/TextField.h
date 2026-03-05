@@ -12,6 +12,9 @@
 #include <algorithm>
 #include <QLineEdit>
 #include <QHash>
+#include <QApplication>
+#include <QClipboard>
+#include <QMimeData>
 
 class TextField : public QLineEdit {
   Q_OBJECT

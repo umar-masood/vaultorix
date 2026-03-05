@@ -1,4 +1,4 @@
-#include "./core/account/auth/AuthCoordinator.h"
+#include "./ui/auth/authCoordinator/AuthCoordinator.h"
 #include "./ui/vault/vaultWindow/VaultWindow.h"
 #include <QApplication>
 
@@ -11,9 +11,8 @@ int main(int argc, char *argv[])
     
     AuthCoordinator *c = new AuthCoordinator(&app);
     c->show();
-
-  
-    // VaultWindow::instance()->show();
-
+    
+    VaultWindow::instance()->show();
+    
     return app.exec();
 }

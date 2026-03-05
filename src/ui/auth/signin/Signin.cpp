@@ -62,7 +62,7 @@ Signin::Signin(QWidget *parent) : QWidget(parent) {
    signInBtn->setDisplayMode(Button::TextOnly);
    signInBtn->setFixedSize(QSize(360, 36));
    signInBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
-   signInBtn->setFontProperties("Segoe UI", 11, QFont::Normal);
+   signInBtn->setFontProperties("Segoe UI", 10, QFont::Normal);
    signInBtn->setLoaderButton(true);
    connect(signInBtn, &Button::clicked, this, &Signin::signInClicked);
 
@@ -72,7 +72,7 @@ Signin::Signin(QWidget *parent) : QWidget(parent) {
    cancelBtn->setDisplayMode(Button::TextOnly);
    cancelBtn->setSecondary(true);
    cancelBtn->setFixedSize(QSize(360, 36));
-   cancelBtn->setFontProperties("Segoe UI", 11, QFont::Normal);
+   cancelBtn->setFontProperties("Segoe UI", 10, QFont::Normal);
    connect(cancelBtn, &Button::clicked, this,  &Signin::cancelClicked);
 
    // Sign up page redirect widget

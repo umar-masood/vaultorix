@@ -70,10 +70,16 @@ QString IconManager::icon(Icons icon) {
 
         case Icons::Avator:            return ":/icons/avator.svg";
         case Icons::AccountSettings:   return ":/icons/account-settings.svg";
-        case Icons::Bug:               return ":/icons/bug.svg";
+
+        case Icons::BugLight:          return ":/icons/bug-light.svg";
+        case Icons::BugDark:           return ":/icons/bug-dark.svg";
+
         case Icons::PreferencesLight:  return ":/icons/preferences-light.svg";
         case Icons::PreferencesDark:   return ":/icons/preferences-dark.svg";
-        case Icons::About:             return ":/icons/info.svg";
+
+        case Icons::AboutLight:        return ":/icons/about-light.svg";
+        case Icons::AboutDark:         return ":/icons/about-dark.svg";
+
         case Icons::Subscription:      return ":/icons/subscription.svg";
 
         case Icons::Files:             return ":/icons/files.svg";
@@ -174,6 +180,7 @@ QPixmap IconManager::renderSvg(const QString &iconPath, const QSize &size) {
 
     QPainter p(&pm);
     p.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    
     svg.render(&p, QRectF(0, 0, pm.width(), pm.height()));
     p.end();
 

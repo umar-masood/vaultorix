@@ -3,7 +3,7 @@
 #include "../../../../resources/IconManager.h"
 
 UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
-    setFixedHeight(290);
+    setFixedHeight(254);
     setFixedWidth(280);
     hide();
 
@@ -24,9 +24,7 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     manage_subscription_btn = createButton("Manage Subscription", IconManager::icon(Icons::Subscription));
 
     // Bug Report
-    report_bug_btn = createButton("Report a Bug", IconManager::icon(Icons::Bug));
-
-    option_buttons = {account_settings_btn, manage_subscription_btn, report_bug_btn};
+    option_buttons = {account_settings_btn, manage_subscription_btn};
 
     // Layout
     layout = new QVBoxLayout(this);
@@ -36,7 +34,6 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     layout->addStretch();
     layout->addWidget(account_settings_btn, 0, Qt::AlignHCenter);
     layout->addWidget(manage_subscription_btn, 0, Qt::AlignHCenter);
-    layout->addWidget(report_bug_btn, 0, Qt::AlignHCenter);
     layout->addStretch();
 
     // Signal Slots
@@ -65,7 +62,6 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
 
 Button* UserMenu::accountSettingsButton() const { return account_settings_btn; }
 Button* UserMenu::manageSubscriptionButton() const { return manage_subscription_btn; }
-Button* UserMenu::reportBugButton() const { return report_bug_btn; }
 
 void UserMenu::fadeIn() {
     animation->stop();

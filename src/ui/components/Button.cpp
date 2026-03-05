@@ -4,7 +4,7 @@ Button::Button(const QString &text, QWidget *parent) : QPushButton(text, parent)
 Button::Button(QWidget *parent) : QPushButton(parent) { init(); }
 
 void Button::init() {
-  setFocusPolicy(Qt::NoFocus);
+  setFocusPolicy(Qt::StrongFocus);
 
   // Shadow Effect
   effect = new SmoothShadow(this);
@@ -24,7 +24,7 @@ void Button::init() {
   spinner->setColor(SpinnerProgress::ForegroundLight, Qt::white);
   spinner->setColor(SpinnerProgress::BackgroundDark, Qt::transparent);
   spinner->setColor(SpinnerProgress::BackgroundLight, Qt::transparent);
-  spinner->setArcWidth(3);
+  spinner->setArcWidth(2);
   spinner->setFixedSize(QSize(30, 30));
 
   // Loading Default Colors

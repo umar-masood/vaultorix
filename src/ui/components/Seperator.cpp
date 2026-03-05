@@ -1,6 +1,6 @@
 #include "Seperator.h"
 
-Seperator::Seperator(QWidget *parent, int height, int width, Qt::Orientation o) : QWidget(parent), orientation(o) {
+Seperator::Seperator(int height, int width, Qt::Orientation o, QWidget *parent) : QWidget(parent), orientation(o) {
     setFixedSize(width, height);
 }
 

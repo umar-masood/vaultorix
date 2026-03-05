@@ -12,7 +12,7 @@ class Dialog;
 
 class About : public QWidget {
     public:
-    static About& instance();
+    static About* instance(QWidget *parent = nullptr);
     void show(); 
     void setDarkMode(bool enable);
 

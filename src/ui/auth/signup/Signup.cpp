@@ -78,7 +78,7 @@ Signup::Signup(QWidget *parent, AuthWindow *authWindow) : QWidget(parent) {
    createAccBtn->setLoaderButton(true);
    createAccBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
    createAccBtn->setText("Create Account");
-   createAccBtn->setFontProperties("Segoe UI", 11, QFont::Normal);
+   createAccBtn->setFontProperties("Segoe UI", 10, QFont::Normal);
    createAccBtn->setEnabled(false);
 
    // Redirect to Sign In page widget

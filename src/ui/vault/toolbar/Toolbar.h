@@ -1,13 +1,11 @@
 #pragma once
 
 #include "../../components/Button.h"
-#include "../../components/ToolTip.h"
 #include "../user/User.h"
 
 #include <QHBoxLayout>
 #include <QList>
 #include <QMap>
-#include <QWidget>
 
 /* ---------------------  Toolbar ---------------------- */
 class Toolbar : public QWidget {
@@ -33,33 +31,21 @@ class Toolbar : public QWidget {
 
     // Import Action
     Button *import_btn = nullptr;
-    // ToolTip
-    ToolTip *import_btn_tip = nullptr;
 
     // Encrypt Action
     Button *encrypt_btn = nullptr;
-    // ToolTip
-    ToolTip *encrypt_btn_tip = nullptr;
 
     // Decrypt Action
     Button *decrypt_btn = nullptr;
-    // ToolTip
-    ToolTip *decrypt_btn_tip = nullptr;
 
     // Open Action
     Button *open_btn = nullptr;
-    // ToolTip
-    ToolTip *open_btn_tip = nullptr;
 
     // Delete Action
     Button *delete_btn = nullptr;
-    // ToolTip
-    ToolTip *delete_btn_tip = nullptr;
 
     // Restore Action
     Button *restore_btn = nullptr;
-    // ToolTip
-    ToolTip *restore_btn_tip = nullptr;
 
     // User Profile Widget
     User *user_widget = nullptr;

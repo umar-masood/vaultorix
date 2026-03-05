@@ -112,8 +112,8 @@ enum class Icons {
     AccountSettings     = 0x77,
     Subscription        = 0x78,
     PreferencesLight    = 0x79,
-    Bug                 = 0x7A,
-    About               = 0x7B,
+    BugLight            = 0x7A,
+    AboutLight          = 0x7B,
 
     Win_CloseLight      = 0x7C,
     Win_CloseDark       = 0x7D,
@@ -143,4 +143,8 @@ enum class Icons {
 
     DownloadUpdateLight = 0x8F,
     DownloadUpdateDark  = 0x90,
+
+    AboutDark           = 0x9A,
+    BugDark             = 0x9B
+
 };
