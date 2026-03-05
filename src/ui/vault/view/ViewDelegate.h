@@ -19,8 +19,11 @@ enum ItemDelegateRoles {
     DateModified            =   Qt::UserRole + 4,
     EncryptionStatus        =   Qt::UserRole + 5,
     DecryptionStatus        =   Qt::UserRole + 6,
-    ShowProgress            =   Qt::UserRole + 7,
-    ProgressCurrentValue    =   Qt::UserRole + 8
+    ImportStatus            =   Qt::UserRole + 7,
+    RestoreStatus           =   Qt::UserRole + 8,
+    DeleteStatus            =   Qt::UserRole + 9,
+    ShowProgress            =   Qt::UserRole + 10,
+    ProgressCurrentValue    =   Qt::UserRole + 11,
 };
 
 enum ItemsViewMode {
@@ -37,7 +40,10 @@ class ViewItem : public QStandardItem {
             const QString &sizem,
             const QString &lastModifiedDate,
             bool isEncrypted = false,
-            bool isDecrypted = false);
+            bool isDecrypted = false,
+            bool isImporting = false,
+            bool isRestoring = false,
+            bool isDeleting  = false);
 };
 
 class ViewDelegate : public QStyledItemDelegate {

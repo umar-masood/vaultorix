@@ -7,7 +7,10 @@ ViewItem::ViewItem(const QString &title,
                    const QString &sizem,
                    const QString &lastModifiedDate,
                    bool isEncrypted,
-                   bool isDecrypted)
+                   bool isDecrypted,
+                   bool isImporting,
+                   bool isRestoring,
+                   bool isDeleting)
 {
     setData(title, FileTitle);
 
@@ -18,6 +21,10 @@ ViewItem::ViewItem(const QString &title,
 
     setData(isEncrypted, EncryptionStatus);
     setData(isDecrypted, DecryptionStatus);
+
+    setData(isImporting, ImportStatus);
+    setData(isRestoring, RestoreStatus);
+    setData(isDeleting,  DeleteStatus);
 }
 
 ViewDelegate::ViewDelegate(QObject *parent) :
@@ -262,9 +269,12 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         painter->drawText(dateModifiedTxtRect, Qt::AlignVCenter | Qt::AlignLeft, elidedDateModifiedTxt);
     }
 
-    /* ----------------- Encryption/Decryption ------------ */
+    /* ----------------- Encryption/Decryption/Import/Delete/Restore ------------ */
     bool isEncrypted = (index.data(ItemDelegateRoles::EncryptionStatus)).toBool();
     bool isDecrypted = (index.data(ItemDelegateRoles::DecryptionStatus)).toBool();
+    bool isImporting = (index.data(ItemDelegateRoles::ImportStatus)).toBool();
+    bool isRestoring = (index.data(ItemDelegateRoles::RestoreStatus)).toBool();
+    bool isDeleting  = (index.data(ItemDelegateRoles::DeleteStatus)).toBool();
 
     QString statusText;
 
@@ -287,7 +297,9 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         brushColor = isDarkMode ? "#4B3F00" : "#FFF8E1";
 
     painter->setBrush(brushColor);
-    painter->drawRoundedRect(statusRect, 6, 6);
+
+    if (!isImporting)
+        painter->drawRoundedRect(statusRect, 6, 6);
     
     // Icon
     QString currentIconPath;
@@ -302,7 +314,9 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 
     int statusIconX = statusRect.x() + 8;
     int statusIconY = statusRect.y() + (statusRect.height() - statusIconSize.height()) / 2;
-    painter->drawPixmap(statusIconX, statusIconY, statusPixmap);
+    
+    if (!isImporting)
+        painter->drawPixmap(statusIconX, statusIconY, statusPixmap);
     
     // Font
     font.setWeight(QFont::DemiBold);
@@ -321,7 +335,7 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         statusText = "Not Safe";
     }
 
-    painter->setPen(textColor);
+    painter->setPen(!isImporting ? textColor : Qt::transparent);
 
     // Text Rect
     int statusTxtX = statusIconX + statusIconSize.width() + 8;
@@ -332,7 +346,8 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     QRect statusTxtRect(statusTxtX, statusTxtY, statusTxtW, statusTxtH);
 
     // Drawing Text
-    painter->drawText(statusTxtRect, Qt::AlignVCenter | Qt::AlignLeft, statusText);
+    if (!isImporting)
+        painter->drawText(statusTxtRect, Qt::AlignVCenter | Qt::AlignLeft, statusText);
 
     /* --------------------- Progress Bar ---------------------------------- */
 
@@ -355,20 +370,29 @@ void ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         QRect progressTxtRect(progressRect.x() + 2, contentY, progressRect.width(), progressTextH);
 
         // Text Color
-        QColor progressColor =  isDecrypted ? (
-                isDarkMode ? "#44FF73" : "#0ACD3B"
-            ) : (
-                isDarkMode ? "#FF8989" : "#C71010"
-            );
+        QColor progressColor;
+        if      (isDecrypted)
+            progressColor =  isDarkMode ? "#44FF73" : "#0ACD3B";
+        else if (isEncrypted || isDeleting)
+            progressColor =  isDarkMode ? "#FF8989" : "#C71010";
+        else if (isImporting || isRestoring)
+            progressColor =  "#109AC7";
+        else 
+            progressColor = isDarkMode ? "#FFFFFF" : "#000000";
 
         painter->setPen(progressColor);
 
         // Drawing Text
         QString progressText;
-        if (isEncrypted) 
+        if (isImporting)
+            progressText = "Importing...";
+        else if (isRestoring)
+            progressText = "Restoring...";
+        else if (isDeleting)
+            progressText = "Deleting...";
+        else if (isEncrypted)
             progressText = "Decrypting...";
-        
-        if (isDecrypted)
+        else if (isDecrypted)
             progressText = "Encrypting...";
 
         painter->drawText(progressTxtRect, isListViewMode ? (Qt::AlignLeft | Qt::AlignVCenter) : (Qt::AlignCenter), progressText);
