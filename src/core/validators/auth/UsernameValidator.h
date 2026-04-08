@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../ui/auth/signup/Signup.h"
-#include "../../utils/ValidatorUtils.h"
+#include "../../utils/Utils.h"
 
 #include <unordered_set>
 #include <fstream>
@@ -23,7 +23,7 @@ class UsernameValidator : public QObject {
 
     private:
     // Validator Utils
-    ValidatorUtils *vu = nullptr;
+    Utils::BlacklistManager *bm = nullptr;
 
     // Network Manager
     QNetworkAccessManager *manager = nullptr;

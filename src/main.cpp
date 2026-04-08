@@ -1,18 +1,15 @@
-#include "./ui/auth/authCoordinator/AuthCoordinator.h"
-#include "./ui/vault/vaultWindow/VaultWindow.h"
+#include "./ui/auth/auth_coordinator/AuthCoordinator.h"
+#include "./core/config/Constants.h"
 #include <QApplication>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    QCoreApplication::setApplicationName("Vaultorix");
-    QCoreApplication::setApplicationVersion("1.0.0");
-    QCoreApplication::setOrganizationName("Umar Creations");
+    QCoreApplication::setApplicationName(APP_NAME);
+    QCoreApplication::setApplicationVersion(APP_VERSION);
+    QCoreApplication::setOrganizationName(APP_ORG);
     
     AuthCoordinator *c = new AuthCoordinator(&app);
     c->show();
-    
-    VaultWindow::instance()->show();
-    
+  
     return app.exec();
 }

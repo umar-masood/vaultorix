@@ -1,16 +1,18 @@
 #include "UsernameValidator.h"
+#include "../../config/APIConfig.h"
+#include "../../config/Constants.h"
 
 UsernameValidator::UsernameValidator(QObject *parent) : QObject(parent) {
     manager = new QNetworkAccessManager(this);
 
-    vu = new ValidatorUtils(this, "Username");
-    vu->setFileName("badUsernames.config");
-    if (vu->downloadList(QUrl("https://raw.githubusercontent.com/umar-masood/Weak-Credentials/refs/heads/main/badUsernames.config")))
+    bm = new Utils::BlacklistManager(this, "Username");
+    bm->setFileName(USERNAME_BLACKLIST_FILE);
+    if (bm->downloadList(QUrl(QString::fromUtf8(APIRoutes::USERNAME_BLACKLIST))))
         qDebug() << "Username blacklist download started.\n";
     else
         loadUsernamesFromFile();
     
-    connect(vu, &ValidatorUtils::listDownloaded, this, [this]() {
+    connect(bm, &Utils::BlacklistManager::listDownloaded, this, [this]() {
         qDebug() << "Username blacklist download completed.\n";
         loadUsernamesFromFile();
     });
@@ -48,7 +50,7 @@ bool UsernameValidator::isValidUsername(QByteArray &username) {
 
     // Convert to lowercase safely
     std::string usernameStd = username.toStdString();                
-    ValidatorUtils::lower(usernameStd);
+    Utils::lower(usernameStd);
 
     // Check for repeated characters (>=3)
     int count = 1;
@@ -56,7 +58,7 @@ bool UsernameValidator::isValidUsername(QByteArray &username) {
         if (usernameStd[i] == usernameStd[i + 1]) {
             count++;
             if (count >= 3) {
-                ValidatorUtils::cleanupMemory(usernameStd);
+                Utils::cleanupMemory(usernameStd);
                 return false;
             }
         } else {
@@ -66,7 +68,7 @@ bool UsernameValidator::isValidUsername(QByteArray &username) {
 
     // In case if there was an issue loading the blacklist (not found or not downloaded)
     if (tempUsernames.empty()) {
-        ValidatorUtils::cleanupMemory(usernameStd);
+        Utils::cleanupMemory(usernameStd);
         qDebug() << "Username blacklist is not loaded.\n";
         return false;
     }
@@ -74,7 +76,7 @@ bool UsernameValidator::isValidUsername(QByteArray &username) {
     // Blacklist check
     bool blacklisted = isUsernameBlacklisted(usernameStd);
 
-    ValidatorUtils::cleanupMemory(usernameStd);
+    Utils::cleanupMemory(usernameStd);
 
     return !blacklisted;
 }
@@ -84,13 +86,12 @@ bool UsernameValidator::isUsernameBlacklisted(const std::string &username) const
 }
 
 void UsernameValidator::isUsernameAvailable(QByteArray &username) {
-    // QUrl url("http://www.umarcreations.site");
-    QUrl url("http://127.0.0.1:8000");
-    url.setPath("/check-username/" + QString::fromUtf8(username));    
+    QUrl url(route(APIRoutes::CHK_USERNAME));
+    url.setPath(QString::fromUtf8(username));    
 
     qDebug() << "Checking username availability for: " << QString::fromUtf8(username) << "\n";
     QNetworkRequest request(url);
-    request.setTransferTimeout(15000);
+    request.setTransferTimeout(REQUEST_TIMEOUT);
 
     QNetworkReply *reply = manager->get(request);
 
@@ -133,13 +134,13 @@ void UsernameValidator::isUsernameAvailable(QByteArray &username) {
         
         qDebug() << "Username check response: " << message << " (Status Code: " << statusCode << ")\n";
 
-        ValidatorUtils::cleanupMemory(username);
+        Utils::cleanupMemory(username);
         emit usernameAvailable(statusCode == 200);
     });
 }
 
 void UsernameValidator::loadUsernamesFromFile() {
-    std::ifstream file(vu->filePath);
+    std::ifstream file(bm->filePath);
     if (!file.is_open()) {
         qDebug() << "Could not open usernames list file.\n";
         return;
@@ -152,7 +153,7 @@ void UsernameValidator::loadUsernamesFromFile() {
         while (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
             line.pop_back();
 
-        ValidatorUtils::lower(line);
+        Utils::lower(line);
 
         if (!line.empty())
             tempUsernames.insert(line);
@@ -209,7 +210,7 @@ void GetUsername::onUnableToCheckUsernameAvailability() {
         ac->usernameField()->setTooltip("Failed to check username availability.");
         retryAttempts = 0;
 
-        ValidatorUtils::cleanupMemory(text);
+        Utils::cleanupMemory(text);
         return;
     }
 }
@@ -248,7 +249,7 @@ void GetUsername::onTimeout() {
         qDebug() << "Username is not Valid: " << text << "\n";
 
         emit usernameValidated(false); 
-        ValidatorUtils::cleanupMemory(text);
+        Utils::cleanupMemory(text);
     }
     
 }

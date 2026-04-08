@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(Vaultorix VERSION 1.0 LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -18,7 +19,7 @@ add_executable(Vaultorix
 
     # ----------------- MAIN APP VAULT ---------------------------
     # Vault Window
-    src/ui/vault/vaultWindow/VaultWindow.cpp
+    src/ui/vault/vault_window/VaultWindow.cpp
 
     ## Toolbar
     src/ui/vault/toolbar/Toolbar.cpp
@@ -28,10 +29,10 @@ add_executable(Vaultorix
     ### User Menu
     src/ui/vault/userMenu/UserMenu.cpp
     #### Account Settings
-    src/ui/vault/accountSettings/AccountSettings.cpp
+    src/ui/vault/account_settings/AccountSettings.cpp
 
     ## Empty State Widget
-    src/ui/vault/emptyState/EmptyState.cpp
+    src/ui/vault/empty_state/EmptyState.cpp
 
     ## View 
     src/ui/vault/view/View.cpp
@@ -51,11 +52,11 @@ add_executable(Vaultorix
     src/ui/vault/preferences/Preferences.cpp
     
     ## Report a Bug
-    ./src/ui/vault/reportBug/ReportBug.cpp
+    ./src/ui/vault/report_bug/ReportBug.cpp
 
     # ------------ AUTH (SIGN IN, SIGN UP, OTP) -----------
     # Account Window
-    src/ui/auth/authWindow/AuthWindow.cpp
+    src/ui/auth/auth_window/AuthWindow.cpp
     
     ## Account Signup
     src/ui/auth/signup/Signup.cpp
@@ -67,14 +68,14 @@ add_executable(Vaultorix
     src/ui/auth/signin/Signin.cpp
 
     ## Auth Coordinator
-    src/ui/auth/authCoordinator/AuthCoordinator.cpp
+    src/ui/auth/auth_coordinator/AuthCoordinator.cpp
 
     # ----------------- Dialogs ---------------------------
     # Error Dialogs
-    src/ui/dialogs/errorDialog/ErrorDialog.cpp
+    src/ui/dialogs/error_dialog/ErrorDialog.cpp
 
     ## Terms & Conditions
-    src/ui/dialogs/termsConditions/TermsConditions.cpp
+    src/ui/dialogs/terms_conditions/TermsConditions.cpp
 
     # ----------------- Compoenents ---------------------------
     src/ui/components/Button.cpp
@@ -107,21 +108,27 @@ add_executable(Vaultorix
     ## Auth
     src/core/validators/auth/EmailValidator.cpp
     src/core/validators/auth/PasswordValidator.cpp
-    src/core/validators/auth/OTPValidator.cpp
     src/core/validators/auth/UsernameValidator.cpp
     src/core/validators/auth/NameValidator.cpp
 
     # Utils
-    src/core/utils/ValidatorUtils.cpp
+    src/core/utils/Utils.cpp
 
     ## Services
     ### Auth
     src/core/services/auth/SignupService.cpp
     src/core/services/auth/SigninService.cpp
-    
+    src/core/services/auth/OTPService.cpp
+    src/core/services/auth/TokenManager.cpp
+
     ## Device Info
     src/core/system/DeviceInfo.cpp
 
+    ## Config
+    src/core/config/APIConfig.h
+
+    ## Theme Manager
+    src/core/theme/ThemeManager.cpp
     # ------------------------------------------------------------
     #                   ENTRY POINT & RESOURCES
     # ------------------------------------------------------------
@@ -139,3 +146,9 @@ add_executable(Vaultorix
 
 target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt6::Network Qt6::Gui Qt6::Svg Qt6::Widgets dwmapi user32)
 set_target_properties(Vaultorix PROPERTIES WIN32_EXECUTABLE TRUE)
+
+# ------------------------------------------------------------
+#                   EXTERNAL DEPENDENCIES
+# ------------------------------------------------------------
+add_subdirectory(${PROJECT_SOURCE_DIR}/dependencies/qtkeychain)
+target_link_libraries(Vaultorix PRIVATE Qt6::Core QtKeychain)

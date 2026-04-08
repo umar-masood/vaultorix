@@ -71,7 +71,7 @@ AnimatedLabel::AnimatedLabel(const QString &family,
 
 void AnimatedLabel::init() {
    // Opacity effect
-   effect = new SmoothOpacity(this);
+   effect = new QGraphicsOpacityEffect;
    effect->setOpacity(0.0);
    setGraphicsEffect(effect);
 
@@ -90,23 +90,30 @@ void AnimatedLabel::init() {
    fadeOut->setEasingCurve(QEasingCurve::InOutQuad);
 
    connect(fadeOut, &QPropertyAnimation::finished, this, [this]() {
-      QLabel::hide();
-      setGraphicsEffect(nullptr);
-      effect->setOpacity(1.0);
+      fadeOut->stop();        
+      effect->setOpacity(1.0); 
+      QLabel::hide();    
+     // setGraphicsEffect(nullptr);
    });
 }
 
 void AnimatedLabel::show() {
-   if (!isVisible()) {
-      effect->setOpacity(0.0);
-      QLabel::show();
-   }
+   if (fadeOut->state() == QAbstractAnimation::Running)
+      fadeOut->stop();
 
-   if (fadeIn) fadeIn->start();
+   effect->setOpacity(0.0);
+
+   QLabel::show();
+
+   fadeIn->start();
 }
 
-void AnimatedLabel::hide() {  
-   if (fadeOut) fadeOut->start();
+void AnimatedLabel::hide() {
+   if (fadeIn->state() == QAbstractAnimation::Running)
+      fadeIn->stop();
+
+   if (fadeOut)
+      fadeOut->start();
 }
 
 void AnimatedLabel::setAnimatedText(const QString &text) {

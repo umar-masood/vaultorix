@@ -4,7 +4,7 @@
 #include "../../components/Button.h"
 #include "../../components/SmoothOpacity.h"
 
-#include "../accountSettings/AccountSettings.h"
+#include "../account_settings/AccountSettings.h"
 
 #include <QApplication>
 #include <QVBoxLayout>

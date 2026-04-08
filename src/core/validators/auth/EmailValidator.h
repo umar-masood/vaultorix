@@ -12,7 +12,7 @@
 #include <QJsonObject>
 
 #include "../../../ui/auth/signup/Signup.h"
-#include "../../utils/ValidatorUtils.h"
+#include "../../utils/Utils.h"
 
 /* ---------------------------   Email Validator -------------------------  */
 class EmailValidator : public QObject {
@@ -24,8 +24,8 @@ class EmailValidator : public QObject {
     void isEmailAvailable(QByteArray &email);
 
     private:
-    // Validator Utils
-    ValidatorUtils *vu = nullptr;
+    // Blacklist Manager
+    Utils::BlacklistManager *bm = nullptr;
 
     // Network Manager
     QNetworkAccessManager *manager = nullptr;

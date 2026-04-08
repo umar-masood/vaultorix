@@ -63,7 +63,7 @@ void GetName::onTimeout() {
     // Emit signal
     emit nameValidated(ok);
 
-    ValidatorUtils::cleanupMemory(text);
+    Utils::cleanupMemory(text);
 
     if (ok) {
         ac->nameField()->setValid();

@@ -1,6 +1,6 @@
 #include "About.h"
 
-#include "../vaultWindow/VaultWindow.h"
+#include "../vault_window/VaultWindow.h"
 #include "../../components/Dialog.h"
 #include "../../components/Label.h"
 

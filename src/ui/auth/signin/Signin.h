@@ -12,16 +12,14 @@ class Signin : public QWidget {
 
    public:
    explicit Signin(QWidget *parent = nullptr);
-   Q_INVOKABLE void setDarkMode(bool value);
+   void setDarkMode(bool isDarkMode);
+   
    TextField* usernameField() const;
    TextField* passwordField() const;
    TextWithBtn* redirectToSignup() const;
    Button* signInButton() const;
 
    private:
-   // Theme Mode Flag
-   bool isDarkMode = false;
-
    // Icons
    QString UserIcon, KeyIcon;
 

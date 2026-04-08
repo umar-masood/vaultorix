@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../emptyState/EmptyState.h"
+#include "../empty_state/EmptyState.h"
 #include "../../components/ViewModeToggle.h"
 
 #include "../../components/TextField.h"

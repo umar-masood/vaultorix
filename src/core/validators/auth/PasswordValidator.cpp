@@ -1,15 +1,17 @@
 #include "PasswordValidator.h"
+#include "../../config/APIConfig.h"
+#include "../../config/Constants.h"
 
 /* -------------------- Password Validator --------------------- */
 PasswordValidator::PasswordValidator(QObject *parent) : QObject(parent) {
-    vu = new ValidatorUtils(this, "Password");
-    vu->setFileName("badPwds.config");
-    if (vu->downloadList(QUrl("https://raw.githubusercontent.com/umar-masood/Weak-Credentials/refs/heads/main/badPwds.config"))) 
+    bm = new Utils::BlacklistManager(this, "Password");
+    bm->setFileName(PWD_BLACKLIST_FILE);
+    if (bm->downloadList(QUrl(QString::fromUtf8(APIRoutes::PWD_BLACKLIST)))) 
         qDebug() << "Password blacklist downloaded started.\n";
     else
         loadPwdsFromFile();
 
-    connect(vu, &ValidatorUtils::listDownloaded, this, [this]() {
+    connect(bm, &Utils::BlacklistManager::listDownloaded, this, [this]() {
         qDebug() << "Password blacklist download completed.\n";
         loadPwdsFromFile();
     });
@@ -44,17 +46,17 @@ bool PasswordValidator::isValidPwd(QByteArray &pwdBytes, PasswordRules *pwdRules
         pwdBytes[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(pwdBytes[i])));
 
     std::string pwdStd = pwdBytes.toStdString();    
-    ValidatorUtils::cleanupMemory(pwdBytes);
+    Utils::cleanupMemory(pwdBytes);
 
     if (weakPwds.empty()) {
-        ValidatorUtils::cleanupMemory(pwdStd);
+        Utils::cleanupMemory(pwdStd);
         pwdRules->strongPassword()->setInvalid();
         qDebug() << "Weak password list is not loaded.\n";
         return false; // If weak password list is not loaded, we cannot check for weak passwords
     }
 
     bool notWeak = !isPwdBlacklisted(pwdStd);
-    ValidatorUtils::cleanupMemory(pwdStd);
+    Utils::cleanupMemory(pwdStd);
 
     bool isStrongPwd = hasLength && hasUpper && hasLower && hasDigit && hasSpecial && notWeak;
     isStrongPwd ? pwdRules->strongPassword()->setValid() : pwdRules->strongPassword()->setInvalid();
@@ -66,7 +68,7 @@ bool PasswordValidator::isPwdBlacklisted(const std::string &password) {
     auto it = cacheMap.find(password); // We make a search in the cache map to see if the password has been checked before using an iterator.
     if (it != cacheMap.end()) { // If the password is found in the cache map (means the iterator does not reached at the end of the map)
         qDebug() << "Password is already checked...";
-        order.splice(order.end(), order, it->second); /* Splice method is used to move an element from one position to aother. It takes three arguments where the first 
+        order.splice(order.end(), order, it->second); /* Splice method is used to move an element from one position to another. It takes three arguments where the first 
         argument is the destination (where) you want to move value, second argument is the current data structure and the last one is the value which you want to move.
         Basically here we are moving the iterator(it->second) which points to the password in the list to the end of the list (most recently used position).
         In the start of list, all previously used passwords are stored in the order of their usage (least recently used at front and most recently used at end).
@@ -92,7 +94,7 @@ bool PasswordValidator::isPwdBlacklisted(const std::string &password) {
 }
 
 void PasswordValidator::loadPwdsFromFile() {
-    std::ifstream file(vu->filePath);
+    std::ifstream file(bm->filePath);
     if (!file.is_open()) {
         qDebug() << "Could not open weak pwd list file.\n";
         return;
@@ -103,7 +105,7 @@ void PasswordValidator::loadPwdsFromFile() {
     while (std::getline(file, line)) {
         if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
             line.pop_back();
-        ValidatorUtils::lower(line);
+        Utils::lower(line);
         if (!line.empty())
             weakPwds.insert(line);
     }
@@ -128,7 +130,7 @@ GetPassword::GetPassword(QObject *parent) : QObject(parent) {
         // Emit signal
         emit pwdValidated(ok);
 
-        ValidatorUtils::cleanupMemory(bytes);
+        Utils::cleanupMemory(bytes);
     });
 }
 

@@ -8,8 +8,6 @@
 #include <QTimer>
 #include <QGraphicsOpacityEffect>
 
-#include "SmoothOpacity.h"
-
 class Label : public QLabel {
    Q_OBJECT 
 
@@ -59,7 +57,7 @@ class AnimatedLabel : public QLabel {
    private:
    void init();
 
-   SmoothOpacity *effect = nullptr;
+   QGraphicsOpacityEffect *effect = nullptr;
    QPropertyAnimation *fadeIn = nullptr;
    QPropertyAnimation *fadeOut = nullptr;
 };

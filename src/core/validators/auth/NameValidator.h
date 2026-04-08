@@ -3,7 +3,7 @@
 #include <QRegularExpression>
 
 #include "../../../ui/auth/signup/Signup.h"
-#include "../../utils/ValidatorUtils.h"
+#include "../../utils/Utils.h"
 
 /* -------------- Name Validator --------------- */
 class NameValidator {

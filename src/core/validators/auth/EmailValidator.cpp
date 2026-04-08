@@ -1,16 +1,18 @@
 #include "EmailValidator.h"
+#include "../../config/APIConfig.h"
+#include "../../config/Constants.h"
 
 EmailValidator::EmailValidator(QObject *parent) : QObject(parent) {
-    vu = new ValidatorUtils(this, "Email");
+    bm = new Utils::BlacklistManager(this, "Email");
     manager = new QNetworkAccessManager(this);
     
-    vu->setFileName("badDomains.config");
-    if (vu->downloadList(QUrl("https://raw.githubusercontent.com/umar-masood/Weak-Credentials/refs/heads/main/badDomains.config"))) 
+    bm->setFileName(EMAIL_BLACKLIST_FILE);
+    if (bm->downloadList(QUrl(QString::fromUtf8(APIRoutes::EMAIL_BLACKLIST)))) 
        qDebug() << "Email blacklist download started.\n";
     else
         loadMailsFromFile();
 
-    connect(vu, &ValidatorUtils::listDownloaded, this, [this]() {
+    connect(bm, &Utils::BlacklistManager::listDownloaded, this, [this]() {
         qDebug() << "Email blacklist download completed.\n";
         loadMailsFromFile();
     });
@@ -77,15 +79,15 @@ bool EmailValidator::isValidEmail(QByteArray &email) {
 
     // Extract domain part
     std::string domainStr(domain.constData(), domain.size());
-    ValidatorUtils::lower(domainStr);
+    Utils::lower(domainStr);
 
     // Check if the domain is disposable
     bool isDisposable = isEmailBlacklisted(domainStr);
 
     // Securely wipe temporary std::string and QByteArray
-    ValidatorUtils::cleanupMemory(domainStr);
-    ValidatorUtils::cleanupMemory(domain);
-    ValidatorUtils::cleanupMemory(local);
+    Utils::cleanupMemory(domainStr);
+    Utils::cleanupMemory(domain);
+    Utils::cleanupMemory(local);
 
     // Return true if email is valid and not disposable
     return !isDisposable;
@@ -114,13 +116,11 @@ bool EmailValidator::isEmailBlacklisted(const std::string &domain) {
 }
 
 void EmailValidator::isEmailAvailable(QByteArray &email) {
-    // QUrl url("http://www.umarcreations.site");
-    QUrl url("http://127.0.0.1:8000");
-    url.setPath("/check-email/" + QString::fromUtf8(email));    
+    QUrl url(route(APIRoutes::CHK_EMAIL));
+    url.setPath(QString::fromUtf8(email));    
 
-    qDebug() << "Checking email availability for: " << QString::fromUtf8(email) << "\n";
     QNetworkRequest request(url);
-    request.setTransferTimeout(15000);
+    request.setTransferTimeout(REQUEST_TIMEOUT);
     
     QNetworkReply *reply = manager->get(request);
 
@@ -164,13 +164,13 @@ void EmailValidator::isEmailAvailable(QByteArray &email) {
         
         qDebug() << "Email check response: " << message << " (Status Code: " << statusCode << ")\n";
 
-        ValidatorUtils::cleanupMemory(email); // Cleaning the memory after successfult request handled
+        Utils::cleanupMemory(email); // Cleaning the memory after successfult request handled
         emit emailAvailable(statusCode == 200);
     });
 }
 
 void EmailValidator::loadMailsFromFile() {
-    std::ifstream file(vu->filePath);
+    std::ifstream file(bm->filePath);
     if (!file.is_open()) {
         qDebug() << "Could not open domains list file.\n";
         return;
@@ -181,7 +181,7 @@ void EmailValidator::loadMailsFromFile() {
     while (std::getline(file, line)) {
         if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
             line.pop_back();
-        ValidatorUtils::lower(line);
+        Utils::lower(line);
         if (!line.empty())
             tempMails.insert(line);
     }
@@ -241,7 +241,7 @@ void GetEmail::onUnableToCheckEmailAvailability() {
 
         retryAttempts = 0; // Resetting conter
 
-        ValidatorUtils::cleanupMemory(text); // We're clearning the memory when max retry attempts limit reached
+        Utils::cleanupMemory(text); // We're clearning the memory when max retry attempts limit reached
         return;
     }
 }
@@ -285,6 +285,6 @@ void GetEmail::onTimeout() {
         qDebug() << "Email is not Valid: " << text << "\n";
 
         emit emailValidated(false);    
-        ValidatorUtils::cleanupMemory(text); // Cleaning data
+        Utils::cleanupMemory(text); // Cleaning data
     }
 }

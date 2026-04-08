@@ -6,7 +6,7 @@
 #include <list>
 
 #include "../../../ui/auth/signup/Signup.h"
-#include "../../utils/ValidatorUtils.h"
+#include "../../utils/Utils.h"
 
 class PasswordValidator : public QObject{
     public:
@@ -15,7 +15,7 @@ class PasswordValidator : public QObject{
 
     private:
     // Validator Utils
-    ValidatorUtils *vu = nullptr;
+    Utils::BlacklistManager *bm = nullptr;
     
     // Caching Data Structures
     std::unordered_set<std::string> weakPwds;

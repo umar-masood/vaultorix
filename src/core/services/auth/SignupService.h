@@ -5,7 +5,7 @@
 #include "../../validators/auth/PasswordValidator.h"
 #include "../../validators/auth/NameValidator.h"
 
-#include "../../../ui/dialogs/errorDialog/ErrorDialog.h"
+#include "../../../ui/dialogs/error_dialog/ErrorDialog.h"
 #include "../../system/DeviceInfo.h"
 
 #include <QSettings>
@@ -32,7 +32,6 @@ class SignupService : public QObject {
 
     // API Credentials
     const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
-    const QString API_URL = "https://www.umarcreations.site/store-credentials";
 
     // API Response
     QString message;

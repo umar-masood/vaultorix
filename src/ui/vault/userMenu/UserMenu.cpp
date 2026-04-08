@@ -1,5 +1,5 @@
 #include "UserMenu.h"
-#include "../vaultWindow/VaultWindow.h"
+#include "../vault_window/VaultWindow.h"
 #include "../../../../resources/IconManager.h"
 
 UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {

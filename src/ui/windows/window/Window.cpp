@@ -77,7 +77,7 @@ Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
 }
 
 Button * Window::createWindowButton() {
-    Button *b = new Button;
+    auto *b = new Button;
     b->setSecondary(true);
     b->setIconSize(QSize(18, 18));
     b->setDisplayMode(Button::IconOnly);
@@ -224,7 +224,6 @@ bool Window::eventFilter(QObject *obj, QEvent *event) {
             }
         }
     }
-
 
     return QWidget::eventFilter(obj, event);
 }

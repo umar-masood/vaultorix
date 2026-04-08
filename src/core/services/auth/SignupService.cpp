@@ -1,4 +1,7 @@
 #include "SignupService.h"
+#include "../../config/APIConfig.h"
+#include "../../config/Constants.h"
+#include "../../utils/Utils.h"
 #include <QDebug>
 
 /* ========================================================================================= 
@@ -94,13 +97,11 @@ QJsonObject SignupService::getCredentials() {
 
 // Calling api for storing user credentials
 void SignupService::storeCredentials() {
-    // QUrl url(API_URL);
-    QUrl url("http://127.0.0.1:8000/store-credentials");
-    QNetworkRequest request(url);
+    QNetworkRequest request(QUrl(route(APIRoutes::SIGNUP)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
     request.setRawHeader("api_key", API_KEY.toUtf8());
-    request.setTransferTimeout(10000);
+    request.setTransferTimeout(REQUEST_TIMEOUT);
 
     QNetworkReply *reply = manager->post(request, QJsonDocument(getCredentials()).toJson());
 
@@ -137,7 +138,7 @@ void SignupService::storeCredentials() {
             handleCreateAccError("MaxAttempts");
         else /*if (statusCode == 513) 
             handleCreateAccError("FurtherAttemptBlocked");
-        else*/  // We will handle this later if we thinks it's necessary 
+        else*/  // We will handle this later if we think it's necessary 
             handleCreateAccError("SomethingWentWrong", true);
     });
 }
@@ -150,13 +151,13 @@ void SignupService::handleCreateAccError(const QString &errorName, bool createAc
 
 // Store device unique identifier in registry
 void SignupService::storeDeviceId() {
-    if (!settings->contains("deviceId"))
-        settings->setValue("deviceId", deviceInfo.getDeviceId());
+    if (!settings->contains(DEVICE_ID_SETTINGS_KEY))
+        settings->setValue(DEVICE_ID_SETTINGS_KEY, deviceInfo.getDeviceId());
 }
 
 // Get device unique identifier in registry
 QString SignupService::getDeviceIdLocally() const {
-    return settings->value("deviceId").toString();
+    return settings->value(DEVICE_ID_SETTINGS_KEY).toString();
 }
 
 // Slots
@@ -190,8 +191,10 @@ void SignupService::onTCBoxCheck(bool checked) {
 }
 
 void SignupService::onCreateAccBtnClicked() {
-    storeCredentials();
-    updateCreateAccBtnState(false, "");
+    Utils::InternetConnectivity::instance().runIfOnline([this](){    
+        updateCreateAccBtnState(false, "");
+        storeCredentials();
+    }, this, errorDialogManager);
 }
 
 void SignupService::onErrorDialogActionBtnClicked(const QString &key) {
@@ -203,4 +206,3 @@ void SignupService::updateCreateAccBtnState(bool isEnabled, const QString &text)
     accountSignup->createAccountButton()->setEnabled(isEnabled);
     accountSignup->createAccountButton()->setText(text);
 }
-

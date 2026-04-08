@@ -16,7 +16,7 @@ class OTPWidget : public QWidget {
 
    public:
    explicit OTPWidget(QWidget *parent = nullptr);
-   void setDarkMode(bool value);
+   void setDarkMode(bool isDarkMode);
    void setEnabled(bool enabled);
 
    signals:
@@ -28,15 +28,10 @@ class OTPWidget : public QWidget {
    void showEvent(QShowEvent *event) override;
 
    private:
-
-   // Theme Mode Flag
-   bool isDarkMode = false;
-
+   bool _isDarkMode = false;
+   
    // Current Index Tracker
    int currentIndex = 0;
-
-   // No. of Boxes
-   const int boxes = 5;
 
    // Vectors to store OTP Boxes
    QVector<QLabel *> OTPBoxes;
@@ -99,9 +94,6 @@ class Otp : public QWidget {
    AnimatedLabel *message() const;
 
    private:
-   // Theme Mode Flag
-   bool isDarkMode = false;
-
    // Illustration
    Label *illustration = nullptr;
 

@@ -134,68 +134,68 @@ View::View(QWidget *parent) : QWidget(parent) {
     updateEmptyStatePosition();
 
 
-     QTimer *timer = new QTimer(this);
+    //  QTimer *timer = new QTimer(this);
 
-    connect(timer, &QTimer::timeout, this, [this]() {
+    // connect(timer, &QTimer::timeout, this, [this]() {
 
-        if (_model.rowCount() == 0)
-            return;
+    //     if (_model.rowCount() == 0)
+    //         return;
 
-        // Pick random row
-        int randomRow = QRandomGenerator::global()->bounded(_model.rowCount());
-        QModelIndex index = _model.index(randomRow, 0);
+    //     // Pick random row
+    //     int randomRow = QRandomGenerator::global()->bounded(_model.rowCount());
+    //     QModelIndex index = _model.index(randomRow, 0);
 
-        // Get current progress
-        int currentProgress = index.data(ItemDelegateRoles::ProgressCurrentValue).toInt();
+    //     // Get current progress
+    //     int currentProgress = index.data(ItemDelegateRoles::ProgressCurrentValue).toInt();
 
-        // If not started, initialize it
-        if (!index.data(ItemDelegateRoles::ShowProgress).toBool()) {
+    //     // If not started, initialize it
+    //     if (!index.data(ItemDelegateRoles::ShowProgress).toBool()) {
 
-            _model.setData(index, true, ItemDelegateRoles::ShowProgress);
+    //         _model.setData(index, true, ItemDelegateRoles::ShowProgress);
 
-           // Randomly pick one operation: 0=Encrypt, 1=Decrypt, 2=Restore, 3=Delete, 4=Import
-            int op = QRandomGenerator::global()->bounded(5);
+    //        // Randomly pick one operation: 0=Encrypt, 1=Decrypt, 2=Restore, 3=Delete, 4=Import
+    //         int op = QRandomGenerator::global()->bounded(5);
                     
-            // Reset all flags first
-            _model.setData(index, false, ItemDelegateRoles::EncryptionStatus);
-            _model.setData(index, false, ItemDelegateRoles::DecryptionStatus);
-            _model.setData(index, false, ItemDelegateRoles::RestoreStatus);
-            _model.setData(index, false, ItemDelegateRoles::DeleteStatus);
-            _model.setData(index, false, ItemDelegateRoles::ImportStatus);
+    //         // Reset all flags first
+    //         _model.setData(index, false, ItemDelegateRoles::EncryptionStatus);
+    //         _model.setData(index, false, ItemDelegateRoles::DecryptionStatus);
+    //         _model.setData(index, false, ItemDelegateRoles::RestoreStatus);
+    //         _model.setData(index, false, ItemDelegateRoles::DeleteStatus);
+    //         _model.setData(index, false, ItemDelegateRoles::ImportStatus);
                     
-            switch(op) {
-                case 0: _model.setData(index, true, ItemDelegateRoles::EncryptionStatus); break;
-                case 1: _model.setData(index, true, ItemDelegateRoles::DecryptionStatus); break;
-                case 2: _model.setData(index, true, ItemDelegateRoles::RestoreStatus); break;
-                case 3: _model.setData(index, true, ItemDelegateRoles::DeleteStatus); break;
-                case 4: _model.setData(index, true, ItemDelegateRoles::ImportStatus); break;
-            }
-            return;
-        }
+    //         switch(op) {
+    //             case 0: _model.setData(index, true, ItemDelegateRoles::EncryptionStatus); break;
+    //             case 1: _model.setData(index, true, ItemDelegateRoles::DecryptionStatus); break;
+    //             case 2: _model.setData(index, true, ItemDelegateRoles::RestoreStatus); break;
+    //             case 3: _model.setData(index, true, ItemDelegateRoles::DeleteStatus); break;
+    //             case 4: _model.setData(index, true, ItemDelegateRoles::ImportStatus); break;
+    //         }
+    //         return;
+    //     }
 
-        // Increase progress randomly
-        int step = QRandomGenerator::global()->bounded(5, 15);
-        currentProgress += step;
+    //     // Increase progress randomly
+    //     int step = QRandomGenerator::global()->bounded(5, 15);
+    //     currentProgress += step;
 
-        if (currentProgress >= 100) {
-            currentProgress = 100;
+    //     if (currentProgress >= 100) {
+    //         currentProgress = 100;
 
-            // Stop progress when complete
-            _model.setData(index, false, ItemDelegateRoles::ShowProgress);
-            _model.setData(index, false, ItemDelegateRoles::EncryptionStatus);
-            _model.setData(index, false, ItemDelegateRoles::DecryptionStatus);
-            _model.setData(index, false, ItemDelegateRoles::RestoreStatus);
-            _model.setData(index, false, ItemDelegateRoles::DeleteStatus);
-            _model.setData(index, false, ItemDelegateRoles::ImportStatus);
-        }
+    //         // Stop progress when complete
+    //         _model.setData(index, false, ItemDelegateRoles::ShowProgress);
+    //         _model.setData(index, false, ItemDelegateRoles::EncryptionStatus);
+    //         _model.setData(index, false, ItemDelegateRoles::DecryptionStatus);
+    //         _model.setData(index, false, ItemDelegateRoles::RestoreStatus);
+    //         _model.setData(index, false, ItemDelegateRoles::DeleteStatus);
+    //         _model.setData(index, false, ItemDelegateRoles::ImportStatus);
+    //     }
 
-        _model.setData(index, currentProgress, ItemDelegateRoles::ProgressCurrentValue);
+    //     _model.setData(index, currentProgress, ItemDelegateRoles::ProgressCurrentValue);
 
         // Force repaint
-        _list->update(index);
-    });
+        // _list->update(index);
+    // });
 
-    timer->start(100); // update every 300ms
+    // timer->start(100); // update every 300ms
 }
 
 void View::updateGridLayout() {
