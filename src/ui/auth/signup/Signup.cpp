@@ -50,7 +50,6 @@ Signup::Signup(QWidget *parent, AuthWindow *authWindow) : QWidget(parent)
     // Terms & Conditions Popup
     termsConditionsDialogWidget = new TermsConditions;
     termsConditionsDialog = new Dialog(termsConditionsDialogWidget, authWindow, true);
-    authWindow->setSubWidgets({termsConditionsDialogWidget, termsConditionsDialog});
     // Signal Slot of T&Cs Dialog
     connect(_termsConditionsWidget, &CheckWithBtn::onButtonClicked, this, [=]() { termsConditionsDialog->show(); });
 

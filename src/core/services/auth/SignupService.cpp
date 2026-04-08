@@ -24,7 +24,7 @@ SignupService::SignupService(AuthWindow *instance, QObject *parent) : QObject(pa
     storeDeviceId();
 
     // Error Dialogs Manager
-    errorDialogManager = new ErrorDialogManager(instance, this);
+    errorDialogManager = ErrorDialogManager::instance();
 }
 
 void SignupService::setAccountSignup(Signup *instance) {
@@ -145,7 +145,7 @@ void SignupService::storeCredentials() {
 
 // Handling error dialogs and create account button status update
 void SignupService::handleCreateAccError(const QString &errorName, bool createAccButtonEnabled, const QString &createAccButtonText) {
-    errorDialogManager->show(errorName); 
+    errorDialogManager->show(errorName, "Auth"); 
     updateCreateAccBtnState(createAccButtonEnabled, createAccButtonText);
 }
 

@@ -2,12 +2,12 @@
 #include "../../../../resources/IconManager.h"
 #include "../../../../resources/IllustrationManager.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../dialogs/error_dialog/ErrorDialog.h"
 
 /* ========================================================================================= 
                               ACCOUNT WINDOW IMPLEMENTATION              
    ========================================================================================= */
-AuthWindow::AuthWindow(QWidget *rightWidget, QWidget *parent,
-                        const QVector<QWidget *> &subWidgets) : 
+AuthWindow::AuthWindow(QWidget *rightWidget, QWidget *parent) : 
                         SubWindow(QSize(1000, 720), nullptr, true, true), rightWidget(rightWidget) 
 {
    // Window Information
@@ -127,6 +127,9 @@ AuthWindow::AuthWindow(QWidget *rightWidget, QWidget *parent,
    auto &tm = ThemeManager::instance();
    connect(&tm, &ThemeManager::themeChanged, this, &AuthWindow::setDarkMode);
    setDarkMode((tm.isDarkMode()));  
+
+   // Error Dailog Manager Registry Window
+   ErrorDialogManager::instance()->registerWindow("Auth", this); 
 }
 
 /* --------------------  Setters  -----------------  */
@@ -176,12 +179,6 @@ void AuthWindow::setDarkMode(bool isDarkMode) {
 
     // Titlebar Seperator
     seperator->setColor("#CCCCCC");
-}
-
-void AuthWindow::setSubWidgets(const QVector<QWidget *> subWidgets) { 
-    for (QWidget *w : subWidgets) 
-        if (!this->subWidgets.contains(w)) 
-            this->subWidgets.append(w);
 }
 
 /* ========================================================================================= 

@@ -4,7 +4,6 @@
 #include "../../components/Button.h"
 #include "../../components/Label.h"
 
-#include "../../auth/auth_window/AuthWindow.h"
 #include "../../windows/subWindow/SubWindow.h"
 
 #include "../../../../resources/IllustrationManager.h"
@@ -52,15 +51,17 @@ class ErrorDialogManager : public QObject {
     Q_OBJECT
 
     public:
-    explicit ErrorDialogManager(AuthWindow *instance = nullptr, QObject *parent = nullptr);
-    void show(const QString &key);
+    static ErrorDialogManager* instance();
+    void show(const QString &dialogKey, const QString &windowKey);
     void close(const QString &key);
-    QList<QWidget *> allWidgets() const;
+    void registerWindow(const QString &key, QWidget *window = nullptr);
 
     signals:
     void actionTriggered(const QString &key);
 
-    private:
+    private:    
+    explicit ErrorDialogManager(QObject *parent = nullptr);
+
     // Structure for error dialogs
     struct ErrorDialog {
         Error *widget = nullptr;
@@ -76,11 +77,11 @@ class ErrorDialogManager : public QObject {
     const QString AccessDeniedIllustration              = IllustrationManager::illustration(Illustrations::AccessDenied); 
     const QString TimeoutIllustration                   = IllustrationManager::illustration(Illustrations::Timeout); 
 
-    // Stores the current authWindow
-    AuthWindow *authWindow = nullptr;
-
     // Map to stored different Error Dialogs for efficiency
     QMap<QString, ErrorDialog*> dialogs;
+
+    // Map to store parent windows
+    QMap<QString, QWidget *> parentWindows;
 
     // Helper Function to create error dialog box
     void create(const QString &key, const QString &text, const QString &actionButtonText, const QString &iconPath);

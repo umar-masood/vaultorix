@@ -112,7 +112,7 @@ GetOTP::GetOTP(AuthWindow *ac, QObject *parent) : QObject(parent) {
     connect(timer, &QTimer::timeout, this, &GetOTP::onTimeout);
 
     // Error Dialog Manager
-    errorManager = new ErrorDialogManager(ac);
+    errorManager = ErrorDialogManager::instance();
 }
 
 bool GetOTP::setAccountOtp(Otp *instance, const QString &email) {
@@ -256,7 +256,7 @@ void GetOTP::onTimeout() {
 }
 
 void GetOTP::onSomethingWrong() { 
-    errorManager->show("SomethingWentWrong"); // Show error dialog if there is an error received from server
+    errorManager->show("SomethingWentWrong", "Auth"); // Show error dialog if there is an error received from server
     ao->setEmail("");
     disableControls("Verify");                // Disable verify button
 }

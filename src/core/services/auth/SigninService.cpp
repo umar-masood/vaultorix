@@ -26,7 +26,7 @@ SigninService::SigninService(AuthWindow *instance, QObject *parent) : QObject(pa
     aw = instance;
 
     // Error Dialogs Manager
-    errorDialogManager = new ErrorDialogManager(instance, this);
+    errorDialogManager = ErrorDialogManager::instance();
     connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &SigninService::onErrorDialogActionBtnClicked);
 }
 
@@ -152,7 +152,7 @@ void SigninService::updateSignInBtnState(bool isEnabled, const QString &text) {
 }
 
 void SigninService::handleSignInError(const QString &errorName, bool isSignInButtonEnabled, const QString &signInButtonText) {
-    errorDialogManager->show(errorName); 
+    errorDialogManager->show(errorName, "Auth"); 
     updateSignInBtnState(isSignInButtonEnabled, signInButtonText);
 }
 

@@ -53,10 +53,8 @@ class AuthWindow : public SubWindow {
    Q_OBJECT
 
    public:
-   explicit AuthWindow(QWidget *rightWidget = nullptr, QWidget *parent = nullptr, const QVector<QWidget *> &dialogs = {});
-
+   explicit AuthWindow(QWidget *rightWidget = nullptr, QWidget *parent = nullptr);
    void setRightWidget(QWidget *rightWidget);
-   void setSubWidgets(const QVector<QWidget *> subWidgets = {});
    void setDarkMode(bool isDarkMode);
 
    private:
@@ -68,9 +66,6 @@ class AuthWindow : public SubWindow {
 
    // Theme Mode Button
    Button *themeMode = nullptr;
-
-   // Vector to store all subwidgets (like dialogs, popups etc., especially for theme)
-   QVector<QWidget *> subWidgets = {};
 
    // Main Layout
    QHBoxLayout *mainLayout = nullptr;

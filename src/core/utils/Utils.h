@@ -46,7 +46,7 @@ namespace Utils {
                     func();
                 else {
                     if (errorManager)
-                        errorManager->show("NoInternet");
+                        errorManager->show("NoInternet", "Auth");
                 }
             }, Qt::SingleShotConnection);
         }

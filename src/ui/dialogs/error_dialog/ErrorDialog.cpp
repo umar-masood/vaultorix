@@ -68,7 +68,7 @@ void Error::setDarkMode(bool value) {
 Button* Error::actionButton() { return actionBtn; }
 
 /* ---------------  Error Dialog Manager  --------------- */
-ErrorDialogManager::ErrorDialogManager(AuthWindow *instance, QObject *parent) : QObject(parent), authWindow(instance) {
+ErrorDialogManager::ErrorDialogManager(QObject *parent) : QObject(parent) {
     create("InvalidCredentials",       "The email or password you entered is incorrect. Please try again.",                         "Retry",    WrongCredentialsIllustration);
     create("MaxAttempts",              "Maximum invalid attempts limit reached. Please try again after 24 hours.",                  "OK",       MaxLimitReachedIllustration);
     create("SomethingWentWrong",       "Something went wrong. Please try again.",                                                   "Retry",    SomethingWentWrongIllustration);
@@ -77,7 +77,12 @@ ErrorDialogManager::ErrorDialogManager(AuthWindow *instance, QObject *parent) : 
     create("FurtherAttemptBlocked",    "You cannot create multiple accounts on same device.",                                       "OK",       AccessDeniedIllustration);
     create("NoInternet",               "You're offline. We couldn't connect to the internet. Check your connection and try again.", "Retry",    NoInternetIllustration);
 
-    authWindow->setSubWidgets(allWidgets());
+    // authWindow->setSubWidgets(allWidgets());
+}
+
+ErrorDialogManager* ErrorDialogManager::instance() {
+    static auto *errManager = new ErrorDialogManager(qApp);
+    return errManager;
 }
 
 void ErrorDialogManager::create(const QString &key, const QString &text, const QString &actionButtonText, const QString &iconPath) {
@@ -91,7 +96,7 @@ void ErrorDialogManager::create(const QString &key, const QString &text, const Q
         close(key);
     });
 
-    ed->dialog = new Dialog(ed->widget, authWindow, false);
+    ed->dialog = new Dialog(ed->widget, nullptr, false);
 
     auto &tm = ThemeManager::instance();
     connect(&tm, &ThemeManager::themeChanged, ed->dialog, &Dialog::setDarkMode);
@@ -100,9 +105,22 @@ void ErrorDialogManager::create(const QString &key, const QString &text, const Q
     dialogs.insert(key, ed);
 }
 
-void ErrorDialogManager::show(const QString &key) {
-    if (dialogs.contains(key) && dialogs[key]->dialog) 
-        dialogs[key]->dialog->show();    
+void ErrorDialogManager::show(const QString &dialogKey, const QString &windowKey) {
+    if (!dialogs.contains(dialogKey))
+        return;
+
+    QWidget *parent = nullptr;
+
+    if (!windowKey.isEmpty() && parentWindows.contains(windowKey)) 
+        parent = parentWindows[windowKey];
+
+    if (!parent)
+        return;
+
+    auto *dialog = dialogs[dialogKey]->dialog;
+    dialog->setParent(parent);  // reparent dynamically
+    dialog->raise();            // bring to front
+    dialog->show();
 }
 
 void ErrorDialogManager::close(const QString &key) {
@@ -110,11 +128,7 @@ void ErrorDialogManager::close(const QString &key) {
         dialogs[key]->dialog->close();
 }
 
-QList<QWidget *> ErrorDialogManager::allWidgets() const {
-    QList<QWidget *> widgets;
-
-    for (const auto &d : dialogs) 
-        widgets << d->widget << d->dialog;
-    
-    return widgets;
+void ErrorDialogManager::registerWindow(const QString & key, QWidget *window) {
+    if (window)
+        parentWindows[key] = window;
 }
