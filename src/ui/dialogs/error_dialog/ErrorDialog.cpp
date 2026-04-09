@@ -118,8 +118,8 @@ void ErrorDialogManager::show(const QString &dialogKey, const QString &windowKey
         return;
 
     auto *dialog = dialogs[dialogKey]->dialog;
-    dialog->setParent(parent);  // reparent dynamically
-    dialog->raise();            // bring to front
+    dialog->setParent(parent, dialog->windowFlags());
+    dialog->raise();           
     dialog->show();
 }
 

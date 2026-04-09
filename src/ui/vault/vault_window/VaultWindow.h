@@ -23,13 +23,17 @@ class VaultWindow : public Window {
 
     public:
     static VaultWindow* instance(QWidget *parent = nullptr);
-    void setDarkMode(bool isDarkMode);
     Statusbar* statusbar() const;
 
     private:    
     explicit VaultWindow(QWidget *parent = nullptr);
     Button* createButton(const QString &iconPathLight, const QString &iconPathDark);
-
+    void setDarkMode(bool isDarkMode);
+    void onAboutBtnClicked();
+    void onPreferencesBtnClicked();
+    void onUpdatesBtnClicked();
+    void onReportBugBtnClicked();
+    
     // Title Bar
     // Layout
     QHBoxLayout *titlebar_layout = nullptr;

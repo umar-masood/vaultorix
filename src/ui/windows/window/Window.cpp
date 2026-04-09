@@ -194,9 +194,7 @@ void Window::updateCursorForRegion(ResizeRegion region) {
 }
 
 bool Window::event(QEvent *event) {
-
     if (_interactionBlocked) {
-
         switch (event->type()) {
         case QEvent::MouseButtonPress:
         case QEvent::MouseButtonRelease:

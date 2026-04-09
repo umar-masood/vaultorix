@@ -29,7 +29,9 @@ void SubWindowOverlay::paintEvent(QPaintEvent *event) {
    painter.drawPath(path);
 }
 
-SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimizeButton) : QWidget(parent), hasCloseBtn(closeButton), hasMinimizeBtn(minimizeButton) {
+SubWindow::SubWindow(QSize size, QWidget *parent, bool closeButton, bool minimizeButton) : 
+           QWidget(parent), hasCloseBtn(closeButton), hasMinimizeBtn(minimizeButton) 
+{
     setFixedSize(size);
     init();
 }
@@ -107,8 +109,32 @@ void SubWindow::setModal(bool enable) {
         return;
 
     _useOverlay = enable;
-
     _useOverlay ? createOverlay() : destroyOverlay();
+}
+
+void SubWindow::setInteractionBlocked(bool enable) {
+    _interactionBlocked = enable;
+}
+
+bool SubWindow::event(QEvent *event) {
+
+    if (_interactionBlocked) {
+
+        switch (event->type()) {
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+        case QEvent::MouseMove:
+        case QEvent::MouseButtonDblClick:
+        case QEvent::Wheel:
+        case QEvent::KeyPress:
+        case QEvent::KeyRelease:
+            return true; // Fully block
+        default:
+            break;
+        }
+    }
+
+    return QWidget::event(event);
 }
 
 void SubWindow::createOverlay() {
@@ -159,7 +185,6 @@ void SubWindow::setDarkMode(bool value) {
     applyThemedIcons();
 }
 
-
 void SubWindow::applyThemedIcons() {
     if (closeBtn)
         closeBtn->setIconPaths(closeIconLight, closeIconDark);
@@ -192,7 +217,6 @@ Button* SubWindow::windowButton() {
     return b;
 }
 
-
 void SubWindow::onCloseClicked() { close(); }
 void SubWindow::onMinimizedClicked() { showMinimized();}
 
@@ -206,23 +230,31 @@ bool SubWindow::eventFilter(QObject *obj, QEvent *event) {
     return QWidget::eventFilter(obj, event);
 }
 
-void SubWindow::showEvent(QShowEvent *event) { 
-    if (_useOverlay && overlay && parentWidget()) {
-        overlay->setGeometry(parentWidget()->rect());
-        overlay->show();
-        overlay->raise();
+void SubWindow::showEvent(QShowEvent *event) {
+    if (_useOverlay) {
+        if (!overlay && parentWidget())
+            createOverlay();
+
+        if (overlay) {
+            overlay->setGeometry(parentWidget()->rect());
+            overlay->show();
+            overlay->raise();
+        }
     }
-    
+
     centerInParent();
     raise();
 
-    if (parentWidget()) 
+    if (parentWidget()) {
         if (auto *w = qobject_cast<Window *>(parentWidget())) {
-            if (!w->isWindowNormal()) 
+            if (!w->isWindowNormal())
                 modalOverlay()->setRadius(0);
-            
             w->setInteractionBlocked(true);
         }
+
+        if (auto *w = qobject_cast<SubWindow *>(parentWidget()))
+            w->setInteractionBlocked(true);
+    }
 
     QWidget::showEvent(event);
 }
@@ -231,9 +263,13 @@ void SubWindow::closeEvent(QCloseEvent *event) {
     if (overlay)
         overlay->hide();
 
-    if (parentWidget()) 
+    if (parentWidget()) {
         if (auto w = qobject_cast<Window*>(parentWidget()))
             w->setInteractionBlocked(false);
+
+        if (auto *w = qobject_cast<SubWindow *>(parentWidget())) 
+            w->setInteractionBlocked(false);
+    }
 
     QWidget::closeEvent(event);
 }

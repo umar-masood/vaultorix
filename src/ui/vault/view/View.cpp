@@ -1,7 +1,9 @@
 #include "View.h"
 #include "../../../../resources/IconManager.h"
+#include "../../../core/theme/ThemeManager.h"
 #include <QTimer>
 #include <QRandomGenerator>
+
 View::View(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   
@@ -127,8 +129,10 @@ View::View(QWidget *parent) : QWidget(parent) {
     connect(&_model, &QAbstractItemModel::rowsRemoved, this, &View::updateEmptyState);
     connect(&_model, &QAbstractItemModel::modelReset, this, &View::updateEmptyState);
 
-    // Initial Theme
-    setDarkMode(isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &View::setDarkMode);
+    setDarkMode(tm.isDarkMode());
 
     // Positioning Empty State
     updateEmptyStatePosition();
@@ -217,7 +221,6 @@ void View::updateGridLayout() {
     _list->setGridSize(QSize(finalItemW, itemHeight));
 }
 
-
 void View::onListViewModeSelected() {
     if (_delegate) {
         _delegate->setViewMode(ItemsViewMode::ListMode);
@@ -281,7 +284,7 @@ void View::paintEvent(QPaintEvent *event) {
 
     // Background
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QBrush(isDarkMode ? "#262626" : "#F9F9F9"));
+    painter.setBrush(QBrush(ThemeManager::instance().isDarkMode() ? "#262626" : "#F9F9F9"));
     painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
 
     // Seperator
@@ -289,9 +292,7 @@ void View::paintEvent(QPaintEvent *event) {
     painter.drawLine(0, 44, width(), 44);
 }
 
-void View::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
+void View::setDarkMode(bool isDarkMode) {
     // Filter Menu Button
     filterButtonMenu->setDarkMode(isDarkMode);
 

@@ -13,7 +13,6 @@ class Toolbar : public QWidget {
 
     public:
     Toolbar(QWidget *parent = nullptr);
-    void setDarkMode(bool enable);
 
     Button* importButton() const;
     Button* restoreButton() const;
@@ -23,8 +22,7 @@ class Toolbar : public QWidget {
     Button* decryptButton() const;
 
     private:
-    // Theme Mode
-    bool isDarkMode = false;
+    void setDarkMode(bool isDarkMode);
 
     // Main Layout
     QHBoxLayout *layout = nullptr;

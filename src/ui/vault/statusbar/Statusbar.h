@@ -13,15 +13,13 @@ class Statusbar : public QWidget {
 
     public:
     Statusbar(QWidget *parent = nullptr);
-    void setDarkMode(bool enable);
 
     Label* totalItemsLabel() const;
     Label* selectedItemsLabel() const;
     Label* totalSizeLabel() const;
 
     private:
-    // Theme Mode
-    bool isDarkMode = false;
+    void setDarkMode(bool isDarkMode);
 
     // Total Items 
     Label *total_items = nullptr;

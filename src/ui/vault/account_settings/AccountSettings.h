@@ -17,18 +17,14 @@ class AccountSettingsWindow : public SubWindow {
 
     public:
     explicit AccountSettingsWindow(QWidget *parent = nullptr);
-    void setDarkMode(bool enable);
 
     TextField* nameField() const;
     CustomTextField* usernameField() const;
     TextField* emailField() const;
     TextField* currentPasswordField() const;
     TextField* newPasswordField() const;
-    
     Toggle* twoFAToggle() const;
-    
     Label* emailStatus() const;
-    
     Button* saveButton() const;
     Button* deleteAccountButton() const;
     Button* uploadPictureButton() const;
@@ -36,8 +32,7 @@ class AccountSettingsWindow : public SubWindow {
     Button* changeUsernameButton() const;
 
     private:
-    // Theme Mode
-    bool isDarkMode = false;
+    void setDarkMode(bool isDarkMode);
 
     // Save Button
     Button *save_btn = nullptr;

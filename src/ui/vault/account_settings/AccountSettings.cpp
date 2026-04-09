@@ -1,6 +1,8 @@
 #include "AccountSettings.h"
 #include "../../../../resources/IconManager.h"
 #include "../../auth/signup/Signup.h"
+#include "../../../core/theme/ThemeManager.h"
+
 /* --------------------------------------------------------------------------
                         ACCOUNT SETTINGS WINDOW 
   -------------------------------------------------------------------------*/
@@ -434,13 +436,13 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
 
     contentLayout->addLayout(delete_acc_layout);
 
-    // Initial Theme
-    setDarkMode(isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &AccountSettingsWindow::setDarkMode);
+    setDarkMode(tm.isDarkMode());
 }
 
-void AccountSettingsWindow::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
+void AccountSettingsWindow::setDarkMode(bool isDarkMode) {
     // Scrollbar
     scrollbar->setDarkMode(isDarkMode);
 

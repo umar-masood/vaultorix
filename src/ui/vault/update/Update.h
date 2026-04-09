@@ -5,7 +5,6 @@
 #include "../../components/Button.h"
 #include "../../components/Seperator.h"
 #include "../../components/Label.h"
-
 #include "../../windows/subWindow/SubWindow.h"
 
 #include <QVBoxLayout>
@@ -32,15 +31,14 @@ class UpdateInfo : public QWidget {
 
   public:
   UpdateInfo(QWidget *parent = nullptr);
-  void setDarkMode(bool enable);
   void setUpdate(const Update &update);
   void setUpdateAvailable(bool isAvailable);
+  void setDarkMode(bool enable);
 
   signals:
   void isUpdateAvailable(bool isAvailable);
 
   private:
-  // Theme Mode
   bool isDarkMode = false;
 
   // Update Version, Size , and Released Date
@@ -61,16 +59,13 @@ class AppUpdates : public SubWindow {
 
   public:
   AppUpdates(QWidget *parent = nullptr);
-  void setDarkMode(bool enable);
-
   UpdateInfo* updateInfoWidget() const;
   
   protected:
   void showEvent(QShowEvent *event);
 
   private:
-  // Theme Mode Flag
-  bool isDarkMode = false;
+  void setDarkMode(bool isDarkMode);
 
   // Window Title
   Label *winTitle = nullptr;

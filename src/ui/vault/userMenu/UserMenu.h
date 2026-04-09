@@ -3,7 +3,6 @@
 #include "../../components/RoundedBox.h"
 #include "../../components/Button.h"
 #include "../../components/SmoothOpacity.h"
-
 #include "../account_settings/AccountSettings.h"
 
 #include <QApplication>
@@ -15,8 +14,6 @@ class UserMenu : public RoundedBox {
 
     public:
     explicit UserMenu(QWidget *parent = nullptr);
-
-    void setDarkMode(bool enable);
     void setAvator(const QPixmap &avator);
     void setName(const QString &name);
     void setEmail(const QString &email);
@@ -32,8 +29,8 @@ class UserMenu : public RoundedBox {
     void paintEvent(QPaintEvent *event) override;
 
     private:
-    // Theme Mode Flag
-    bool isDarkMode = false;
+    void setDarkMode(bool isDarkMode);
+    void onAccountSettingsBtnClicked();
 
     // Data
     QPixmap _avator;

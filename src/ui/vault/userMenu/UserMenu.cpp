@@ -1,6 +1,7 @@
 #include "UserMenu.h"
 #include "../vault_window/VaultWindow.h"
 #include "../../../../resources/IconManager.h"
+#include "../../../core/theme/ThemeManager.h"
 
 UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     setFixedHeight(254);
@@ -40,28 +41,31 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     for (auto *btn : option_buttons)
         connect(btn, &Button::clicked, this, &QWidget::hide);
 
-    connect(account_settings_btn, &Button::clicked, this, [this]() {
-        if (!acc_settings_win) {
-            acc_settings_win = new AccountSettingsWindow(VaultWindow::instance());
-            acc_settings_win->setAttribute(Qt::WA_DeleteOnClose);
-            acc_settings_win->setDarkMode(isDarkMode);
+    connect(account_settings_btn, &Button::clicked, this, &UserMenu::onAccountSettingsBtnClicked);   
 
-            connect(acc_settings_win, &QObject::destroyed, this, [this]() {
-                acc_settings_win = nullptr;
-                VaultWindow::instance()->updateGeometry();
-            });
-        }
-
-        acc_settings_win->show();
-        acc_settings_win->raise();
-    });   
-
-    // Initial Theme
-    setDarkMode(isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &UserMenu::setDarkMode);
+    setDarkMode(tm.isDarkMode());
 }
 
 Button* UserMenu::accountSettingsButton() const { return account_settings_btn; }
 Button* UserMenu::manageSubscriptionButton() const { return manage_subscription_btn; }
+
+void UserMenu::onAccountSettingsBtnClicked() {
+    if (!acc_settings_win) {
+        acc_settings_win = new AccountSettingsWindow(VaultWindow::instance());
+        acc_settings_win->setAttribute(Qt::WA_DeleteOnClose);
+
+        connect(acc_settings_win, &QObject::destroyed, this, [this]() {
+            acc_settings_win = nullptr;
+            VaultWindow::instance()->updateGeometry(); 
+        });
+    }
+
+    acc_settings_win->show();
+    acc_settings_win->raise();
+}
 
 void UserMenu::fadeIn() {
     animation->stop();
@@ -115,15 +119,9 @@ void UserMenu::showAt(QWidget *anchorWidget) {
     raise();
 }
 
-void UserMenu::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
+void UserMenu::setDarkMode(bool isDarkMode) {
     for (auto *btn : option_buttons) 
         btn->setDarkMode(isDarkMode);
-
-    if (acc_settings_win)
-        acc_settings_win->setDarkMode(isDarkMode);
-
 
     RoundedBox::setDarkMode(isDarkMode);
 }
@@ -148,6 +146,8 @@ void UserMenu::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
+
+    bool isDarkMode = ThemeManager::instance().isDarkMode();
 
     // User Profile Rect
     const int padding = 12;

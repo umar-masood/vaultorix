@@ -13,13 +13,12 @@ class ReportBug : public SubWindow {
 
     public:
     explicit ReportBug(QWidget *parent = nullptr);
-    void setDarkMode(bool enable);
 
     TextEdit *descp_field() const;
     TextField *subject_field() const;
 
     private:
-    bool isDarkMode = false;
+    void setDarkMode(bool isDarkMode);
 
     // Window Title
     Label *winTitle = nullptr;

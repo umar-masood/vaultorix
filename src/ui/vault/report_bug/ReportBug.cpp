@@ -1,4 +1,5 @@
 #include "ReportBug.h"
+#include "../../../core/theme/ThemeManager.h"
 
 ReportBug::ReportBug(QWidget *parent) : SubWindow(QSize(390, 412), parent){
     setModal(true);
@@ -57,8 +58,10 @@ ReportBug::ReportBug(QWidget *parent) : SubWindow(QSize(390, 412), parent){
     connect(_descp_field, &TextEdit::textChanged, this, &ReportBug::onTextChanged);
     connect(submit_btn, &Button::clicked, this, &ReportBug::reportFinished);
 
-    // Initial Theme
-    setDarkMode(!isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &ReportBug::setDarkMode);
+    setDarkMode(tm.isDarkMode());
 }
 
 void ReportBug::onTextChanged() {
@@ -80,9 +83,7 @@ void ReportBug::onTextChanged() {
     submit_btn->setEnabled(enableButton);
 }
 
-void ReportBug::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
+void ReportBug::setDarkMode(bool isDarkMode) {
     // Window
     SubWindow::setDarkMode(isDarkMode);
 

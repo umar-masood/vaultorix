@@ -1,4 +1,5 @@
 #include "Statusbar.h"
+#include "../../../core/theme/ThemeManager.h"
 
 Statusbar::Statusbar(QWidget *parent) : QWidget(parent) {
     setFixedHeight(30);
@@ -29,13 +30,13 @@ Statusbar::Statusbar(QWidget *parent) : QWidget(parent) {
     layout->addWidget(total_size, 0, Qt::AlignVCenter);
     layout->addStretch();
 
-    // Initial Theme
-    setDarkMode(isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &Statusbar::setDarkMode);
+    setDarkMode(tm.isDarkMode());
 }
 
-void Statusbar::setDarkMode(bool enable) {
-    isDarkMode = enable;
-    
+void Statusbar::setDarkMode(bool isDarkMode) {
     // Labels
     for (auto label : {total_items, selected_items, total_size})
         label->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
@@ -56,7 +57,7 @@ void Statusbar::paintEvent(QPaintEvent *event) {
     painter.setRenderHints(QPainter::Antialiasing);
 
     // Background
-    painter.setBrush(QBrush(isDarkMode ? "#262626" : "#F9F9F9"));
+    painter.setBrush(QBrush(ThemeManager::instance().isDarkMode() ? "#262626" : "#F9F9F9"));
     painter.setPen(Qt::NoPen);
     painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
 }

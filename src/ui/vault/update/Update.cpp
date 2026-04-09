@@ -1,4 +1,5 @@
 #include "Update.h"
+#include "../../../core/theme/ThemeManager.h"
 
 /* ---------------------------------------------------------------
                          Update Info Widget
@@ -279,17 +280,17 @@ AppUpdates::AppUpdates(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     // Initial page
     stacked_widget->setCurrentWidget(checking_page);
 
-    // Initial Theme
-    setDarkMode(isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &AppUpdates::setDarkMode);
+    setDarkMode(tm.isDarkMode());
 }
 
 UpdateInfo* AppUpdates::updateInfoWidget() const {
     return update_details_widget;
 }
 
-void AppUpdates::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
+void AppUpdates::setDarkMode(bool isDarkMode) {
     // Seperator
     if (sep)
         sep->setColor(isDarkMode ? "#334155" : "#E5E7EB");

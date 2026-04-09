@@ -1,5 +1,6 @@
 #include "Preferences.h"
 #include "../../../../resources/IconManager.h"
+#include "../../../core/theme/ThemeManager.h"
 
 Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
 {
@@ -30,7 +31,6 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     _titlebarLayout->addSpacing(10);
     _titlebarLayout->addWidget(titlebar_sep, 0, Qt::AlignRight | Qt::AlignVCenter);
     _titlebarLayout->addSpacing(10);
-
 
     // ---------------- Window Content Area Layout -------------------------------
     auto *win_content_area_layout = new QVBoxLayout(contentArea());
@@ -322,14 +322,13 @@ Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
     win_content_area_layout->addLayout(app_lang_layout);
     win_content_area_layout->addStretch();
 
-
-    // Initial Theme
-    setDarkMode(isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &Preferences::setDarkMode);
+    setDarkMode(tm.isDarkMode());
 }
 
-void Preferences::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
+void Preferences::setDarkMode(bool isDarkMode) {
     // -------------------- Icons --------------------
     QHash<Label *, QPair<Icons, Icons>> iconMap = {
         {lock_timeout_icon, {Icons::LockLight, Icons::LockDark}},

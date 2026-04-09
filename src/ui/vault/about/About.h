@@ -12,14 +12,11 @@ class Dialog;
 
 class About : public QWidget {
     public:
-    static About* instance(QWidget *parent = nullptr);
+    explicit About(QWidget *parent = nullptr);
     void show(); 
-    void setDarkMode(bool enable);
 
     private:
-    explicit About(QWidget *parent = nullptr);
-
-    bool isDarkMode = false;
+    void setDarkMode(bool isDarkMode);
 
     // Labels
     Label *app_name = nullptr;
@@ -27,7 +24,6 @@ class About : public QWidget {
     Label *tagline = nullptr;
     Label *developer = nullptr;
     Label *copyright = nullptr;
-
     QVector<Label *> labels;
 
     Dialog *dialog = nullptr;

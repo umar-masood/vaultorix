@@ -16,7 +16,6 @@ class User : public QWidget {
     
     public:
     explicit User(QWidget *parent = nullptr);
-    void setDarkMode(bool enable);
     void setName(const QString &name);
     void setAvator(const QPixmap &pixmap, int size);
 
@@ -34,9 +33,9 @@ class User : public QWidget {
     private: 
     void adjustWidgetSize();
     QFont font();
-    
+    void setDarkMode(bool isDarkMode);
+
     // Flags
-    bool isDarkMode = false;
     bool isHover = false;
     bool isPressed = false;
 

@@ -48,6 +48,11 @@ class SubWindow : public QWidget {
     // ===== SubWindowOverlay for modal window =====
     SubWindowOverlay *overlay = nullptr;
     bool _useOverlay = false;
+
+    bool _interactionBlocked = false;
+
+    bool event(QEvent *event);
+    void setInteractionBlocked(bool enable);
     void createOverlay();
     void centerInParent();
     void destroyOverlay();

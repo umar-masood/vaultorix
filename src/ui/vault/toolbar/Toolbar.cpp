@@ -1,5 +1,6 @@
 #include "ToolBar.h"
 #include "../../../../resources/IconManager.h"
+#include "../../../core/theme/ThemeManager.h"
 
 Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     setFixedHeight(64);
@@ -57,19 +58,18 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     layout->addStretch();
     layout->addWidget(user_widget, 0, Qt::AlignVCenter | Qt::AlignRight);
 
-    // Initial Theme
-    setDarkMode(isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &Toolbar::setDarkMode);
+    setDarkMode(tm.isDarkMode());
 }
 
-void Toolbar::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
-    // User Profile Widget Theme
-    user_widget->setDarkMode(isDarkMode);
-    
+void Toolbar::setDarkMode(bool isDarkMode) {
     // Actions Buttons Theme
     for (auto action : actions) 
         action->setDarkMode(isDarkMode);
+    
+    update();
 }
 
 Button* Toolbar::decryptButton() const { return decrypt_btn; }
@@ -98,8 +98,7 @@ void Toolbar::paintEvent(QPaintEvent *event) {
     painter.setRenderHints(QPainter::Antialiasing);
 
     // Background
-    painter.setBrush(QBrush(isDarkMode ? "#262626" : "#F9F9F9"));
+    painter.setBrush(QBrush(ThemeManager::instance().isDarkMode() ? "#262626" : "#F9F9F9"));
     painter.setPen(Qt::NoPen);
     painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
 }
-

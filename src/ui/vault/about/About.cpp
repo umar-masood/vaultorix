@@ -3,31 +3,7 @@
 #include "../vault_window/VaultWindow.h"
 #include "../../components/Dialog.h"
 #include "../../components/Label.h"
-
-About* About::instance(QWidget *parent) {
-    static About *about = nullptr;
-
-    if (!about)
-        about = new About(parent);
-
-    return about;
-}
-
-void About::show() {
-    if (dialog)
-        dialog->show();
-}
-
-void About::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
-    for (auto *label : labels) 
-        if (label)
-            label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
-
-    if (dialog)
-        dialog->setDarkMode(isDarkMode);
-}
+#include "../../../core/theme/ThemeManager.h"
 
 About::About(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_TranslucentBackground);
@@ -82,6 +58,22 @@ About::About(QWidget *parent) : QWidget(parent) {
     // Dialog
     dialog = new Dialog(this, VaultWindow::instance(), true);
 
-    // Initial Theme
-    setDarkMode(isDarkMode);
+    // Theme
+    auto &tm = ThemeManager::instance();
+    connect(&tm, &ThemeManager::themeChanged, this, &About::setDarkMode);
+    setDarkMode(tm.isDarkMode());
+}
+
+void About::show() {
+    if (dialog)
+        dialog->show();
+}
+
+void About::setDarkMode(bool isDarkMode) {
+    for (auto *label : labels) 
+        if (label)
+            label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
+
+    if (dialog)
+        dialog->setDarkMode(isDarkMode);
 }

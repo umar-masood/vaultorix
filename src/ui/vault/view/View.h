@@ -2,7 +2,6 @@
 
 #include "../empty_state/EmptyState.h"
 #include "../../components/ViewModeToggle.h"
-
 #include "../../components/TextField.h"
 #include "../../components/ButtonMenu.h"
 #include "../../components/ScrollBar.h"
@@ -23,7 +22,6 @@ class View : public QWidget {
 
     public:
     explicit View(QWidget *parent = nullptr);
-    void setDarkMode(bool enable);
 
     TextField* searchBox() const;
     ButtonMenu* filterMenu() const;
@@ -35,8 +33,7 @@ class View : public QWidget {
     void resizeEvent(QResizeEvent *event) override;
 
     private:
-    // Flags
-    bool isDarkMode = false;
+    void setDarkMode(bool isDarkMode);
 
     // Empty State Widget
     EmptyState *empty_state = nullptr;
@@ -78,7 +75,6 @@ class View : public QWidget {
     QVBoxLayout *_layout = nullptr;
 
     QTimer *progressTimer = nullptr;
-
 
     // Helpers
     void updateEmptyState();

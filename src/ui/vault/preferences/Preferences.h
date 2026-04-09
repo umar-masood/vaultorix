@@ -11,20 +11,16 @@ class Preferences : public SubWindow {
 
     public:
     Preferences(QWidget *parent = nullptr);
-    void setDarkMode(bool enable);
 
     ComboBox* lockTimeoutComboBox() const;
     ComboBox* appearanceComboBox() const;
     ComboBox* languageComboBox() const;
-    
     Toggle* encryptImportToggle() const;
     Toggle* autoUpdatesToggle() const;
-    
     Button* saveButton() const;
 
     private:
-    // Theme Mode
-    bool isDarkMode = false;
+    void setDarkMode(bool isDarkMode);
 
     // Save Button
     Button *save_btn = nullptr;
