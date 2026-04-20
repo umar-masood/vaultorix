@@ -1,51 +1,48 @@
-#include "SigninService.h"
+#include "Signin.h"
+#include "TokenManager.h"
 
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
-
 #include "../../../ui/auth/signin/Signin.h"
 #include "../../../ui/auth/auth_window/AuthWindow.h"
-
 #include "../../utils/Utils.h"
-
 #include "../../../ui/dialogs/error_dialog/ErrorDialog.h"
 #include "../../../ui/components/Dialog.h"
-
 #include "../../../ui/vault/vault_window/VaultWindow.h"
-
-#include "TokenManager.h"
 
 #include <QApplication>
 #include <QDebug>
 
-SigninService::SigninService(AuthWindow *instance, QObject *parent) : QObject(parent) {
+using Core::Services::Auth::Signin;
+
+Signin::Signin(Ui::Auth::AuthWindow *authWindow, QObject *parent) : QObject(parent) {
     // Network Manager
     manager = new QNetworkAccessManager(this);
 
-    // Auth Window
-    aw = instance;
+    // Auth Window Widget
+    this->authWindow = authWindow;
 
     // Error Dialogs Manager
     errorDialogManager = ErrorDialogManager::instance();
-    connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &SigninService::onErrorDialogActionBtnClicked);
+    connect(errorDialogManager, &ErrorDialogManager::actionTriggered, this, &Signin::onErrorDialogActionBtnClicked);
 }
 
-void SigninService::setAccountSignin(Signin *instance) {
+void Signin::setAccountSigninWidget(Ui::Auth::Signin *instance) {
     if (!instance) 
         return;
 
-    as = instance;
+    signinWidget = instance;
     
-    connect(as, &Signin::signInClicked, this, &SigninService::onSignInClicked);
-    connect(as, &Signin::cancelClicked, this, &SigninService::onCancelClicked);
+    connect(signinWidget, &Ui::Auth::Signin::signInClicked, this, &Signin::onSignInClicked);
+    connect(signinWidget, &Ui::Auth::Signin::cancelClicked, this, &Signin::onCancelClicked);
 }
 
-void SigninService::onErrorDialogActionBtnClicked(const QString &key) {
+void Signin::onErrorDialogActionBtnClicked(const QString &key) {
     if (key == "MaxAttempts") 
         QApplication::quit();
 }
 
-void SigninService::verifyCredentials() {
+void Signin::verifyCredentials() {
     QNetworkRequest request(QUrl(route(APIRoutes::SIGNIN)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
@@ -98,7 +95,7 @@ void SigninService::verifyCredentials() {
         QString email;
         if (obj.contains("email")) {
             email = obj["email"].toString();
-            qDebug() << "Email Address Received as Verification Required Model from Server : " << email;
+            qDebug() << "Email Address Received signinWidget Verification Required Model from Server : " << email;
         }
 
         switch (statusCode) {
@@ -107,18 +104,18 @@ void SigninService::verifyCredentials() {
 
                 TokenManager::instance()->extractTokens(obj);
 
-                if (aw) {
-                    aw->close();
-                    aw->deleteLater();
+                if (authWindow) {
+                    authWindow->close();
+                    authWindow->deleteLater();
                 }
 
-                as->usernameField()->setText("");
-                as->usernameField()->setEnabled(false);
+                signinWidget->usernameField()->setText("");
+                signinWidget->usernameField()->setEnabled(false);
 
-                as->passwordField()->setText("");
-                as->passwordField()->setEnabled(false);
+                signinWidget->passwordField()->setText("");
+                signinWidget->passwordField()->setEnabled(false);
 
-                VaultWindow::instance()->show();
+                Ui::Vault::VaultWindow::instance()->show();
             }
             break;
 
@@ -131,11 +128,11 @@ void SigninService::verifyCredentials() {
     });
 }
 
-void SigninService::onSignInClicked() {
-    if (!as) return;
+void Signin::onSignInClicked() {
+    if (!signinWidget) return;
 
-    username = as->usernameField()->text().toUtf8();
-    password = as->passwordField()->text().toUtf8();
+    username = signinWidget->usernameField()->text().toUtf8();
+    password = signinWidget->passwordField()->text().toUtf8();
 
     if (username.isEmpty() || password.isEmpty()) return;
     if (username.length() < 3 || password.length() < 8) return;
@@ -146,14 +143,14 @@ void SigninService::onSignInClicked() {
     }, this, errorDialogManager);
 }
 
-void SigninService::updateSignInBtnState(bool isEnabled, const QString &text) {
-    as->signInButton()->setEnabled(isEnabled);
-    as->signInButton()->setText(text);
+void Signin::updateSignInBtnState(bool isEnabled, const QString &text) {
+    signinWidget->signInButton()->setEnabled(isEnabled);
+    signinWidget->signInButton()->setText(text);
 }
 
-void SigninService::handleSignInError(const QString &errorName, bool isSignInButtonEnabled, const QString &signInButtonText) {
+void Signin::handleSignInError(const QString &errorName, bool isSignInButtonEnabled, const QString &signInButtonText) {
     errorDialogManager->show(errorName, "Auth"); 
     updateSignInBtnState(isSignInButtonEnabled, signInButtonText);
 }
 
-void SigninService::onCancelClicked() const { QApplication::quit(); }
+void Signin::onCancelClicked() const { QApplication::quit(); }

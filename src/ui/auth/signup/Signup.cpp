@@ -1,6 +1,8 @@
 #include "Signup.h"
 #include "../../../../resources/IconManager.h"
 #include "../../../core/theme/ThemeManager.h"
+
+using namespace Ui::Auth;
 /* =========================================================================================
                               ACCOUNT SIGN UP IMPLEMENTATION
    ========================================================================================= */

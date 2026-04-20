@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../../components/Label.h"
-
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QPaintEvent>
@@ -9,35 +7,39 @@
 #include <QMouseEvent>
 #include <QPixmap>
 
-class EmptyState : public QWidget {
-    Q_OBJECT
+class Label;
 
-    public:
-    explicit EmptyState(QWidget *parent = nullptr);
-    void setDarkMode(bool enable);
+namespace Ui::Vault {
+    class EmptyState : public QWidget {
+        Q_OBJECT
 
-    protected:
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void enterEvent(QEnterEvent *event) override;
-    void leaveEvent(QEvent *event) override;
+        public:
+        explicit EmptyState(QWidget *parent = nullptr);
+        void setDarkMode(bool enable);
 
-    signals:
-    void clicked();
-    
-    private:
-    // Flags
-    bool isDarkMode = false;
-    bool isPressed = false;
-    bool isHover = false;
+        protected:
+        void paintEvent(QPaintEvent *event) override;
+        void mousePressEvent(QMouseEvent *event) override;
+        void mouseReleaseEvent(QMouseEvent *event) override;
+        void enterEvent(QEnterEvent *event) override;
+        void leaveEvent(QEvent *event) override;
 
-    // Illustration
-    Label *illustration = nullptr;
+        signals:
+        void clicked();
 
-    // Text
-    Label *text = nullptr;
+        private:
+        // Flags
+        bool isDarkMode = false;
+        bool isPressed = false;
+        bool isHover = false;
 
-    // Layout
-    QVBoxLayout *layout = nullptr;
+        // Illustration
+        Label *illustration = nullptr;
+
+        // Text
+        Label *text = nullptr;
+
+        // Layout
+        QVBoxLayout *layout = nullptr;
+    };
 };

@@ -11,72 +11,73 @@
 #include <QtMath>
 #include <QTimer>
 
-enum ItemDelegateRoles {
-    FileTitle               =   Qt::DisplayRole,
-    FileThumbnail           =   Qt::UserRole + 1,
-    FileType                =   Qt::UserRole + 2,
-    FileSize                =   Qt::UserRole + 3,
-    DateModified            =   Qt::UserRole + 4,
-    EncryptionStatus        =   Qt::UserRole + 5,
-    DecryptionStatus        =   Qt::UserRole + 6,
-    ImportStatus            =   Qt::UserRole + 7,
-    RestoreStatus           =   Qt::UserRole + 8,
-    DeleteStatus            =   Qt::UserRole + 9,
-    ShowProgress            =   Qt::UserRole + 10,
-    ProgressCurrentValue    =   Qt::UserRole + 11,
-};
+namespace Ui::Vault {
+    enum ItemDelegateRoles {
+        FileTitle               =   Qt::DisplayRole,
+        FileThumbnail           =   Qt::UserRole + 1,
+        FileType                =   Qt::UserRole + 2,
+        FileSize                =   Qt::UserRole + 3,
+        DateModified            =   Qt::UserRole + 4,
+        EncryptionStatus        =   Qt::UserRole + 5,
+        DecryptionStatus        =   Qt::UserRole + 6,
+        ImportStatus            =   Qt::UserRole + 7,
+        RestoreStatus           =   Qt::UserRole + 8,
+        DeleteStatus            =   Qt::UserRole + 9,
+        ShowProgress            =   Qt::UserRole + 10,
+        ProgressCurrentValue    =   Qt::UserRole + 11,
+    };
 
-enum ItemsViewMode {
-    ListMode = 0x1,
-    GridMode = 0x2,
-};
+    enum ItemsViewMode {
+        ListMode = 0x1,
+        GridMode = 0x2,
+    };
 
-class ViewItem : public QStandardItem {
-    
-    public:
-    ViewItem(const QString &title, 
-            const QString &thumbnailPath,
-            const QString &type,
-            const QString &sizem,
-            const QString &lastModifiedDate,
-            bool isEncrypted = false,
-            bool isDecrypted = false,
-            bool isImporting = false,
-            bool isRestoring = false,
-            bool isDeleting  = false);
-};
+    class ViewItem : public QStandardItem {
+        public:
+        ViewItem(const QString &title, 
+                const QString &thumbnailPath,
+                const QString &type,
+                const QString &sizem,
+                const QString &lastModifiedDate,
+                bool isEncrypted = false,
+                bool isDecrypted = false,
+                bool isImporting = false,
+                bool isRestoring = false,
+                bool isDeleting  = false);
+    };
 
-class ViewDelegate : public QStyledItemDelegate {
-    Q_OBJECT
+    class ViewDelegate : public QStyledItemDelegate {
+        Q_OBJECT
 
-    public:
-    explicit ViewDelegate(QObject *parent = nullptr);
-    void setDarkMode(bool enable);
-    void setItemHeight(int itemHeight);
-    void setViewMode(ItemsViewMode mode);
+        public:
+        explicit ViewDelegate(QObject *parent = nullptr);
+        void setDarkMode(bool enable);
+        void setItemHeight(int itemHeight);
+        void setViewMode(ItemsViewMode mode);
 
-    protected:
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+        protected:
+        QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+        void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
-    private:
-    // Theme Mode
-    bool isDarkMode = false;
-    
-    // Items Size
-    int _itemHeight;
+        private:
+        // Theme Mode
+        bool isDarkMode = false;
 
-    // Items View Mode
-    ItemsViewMode _viewMode;
+        // Items Size
+        int _itemHeight;
 
-    // Spacing
-    const int spacing = 30;
+        // Items View Mode
+        ItemsViewMode _viewMode;
 
-    // Select Item Checkbox
-    QSize cbSize;
-    QPixmap cbPixmap;
-    QRect selectItemCheckboxRect(const QRect &itemRect) const;
+        // Spacing
+        const int spacing = 30;
 
-    // Encryption Status Icon
-    QSize statusIconSize;
+        // Select Item Checkbox
+        QSize cbSize;
+        QPixmap cbPixmap;
+        QRect selectItemCheckboxRect(const QRect &itemRect) const;
+
+        // Encryption Status Icon
+        QSize statusIconSize;
+    };
 };

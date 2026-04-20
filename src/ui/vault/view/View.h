@@ -1,13 +1,5 @@
 #pragma once
 
-#include "../empty_state/EmptyState.h"
-#include "../../components/ViewModeToggle.h"
-#include "../../components/TextField.h"
-#include "../../components/ButtonMenu.h"
-#include "../../components/ScrollBar.h"
-
-#include "ViewDelegate.h"
-
 #include <QListView>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
@@ -17,71 +9,83 @@
 #include <QPainter>
 #include <QResizeEvent>
 
-class View : public QWidget {
-    Q_OBJECT
+class ViewModeToggle;
+class TextField;
+class ButtonMenu;
+class ScrollBar;
 
-    public:
-    explicit View(QWidget *parent = nullptr);
+namespace Ui::Vault {
+    class EmptyState;
+    class ViewDelegate;
+};
 
-    TextField* searchBox() const;
-    ButtonMenu* filterMenu() const;
-    ViewModeToggle* viewMode() const;
-    EmptyState* emptyStateWidget() const; 
+namespace Ui::Vault {
+    class View : public QWidget {
+        Q_OBJECT
 
-    protected:
-    void paintEvent(QPaintEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
+        public:
+        explicit View(QWidget *parent = nullptr);
 
-    private:
-    void setDarkMode(bool isDarkMode);
+        TextField* searchBox() const;
+        ButtonMenu* filterMenu() const;
+        ViewModeToggle* viewMode() const;
+        Ui::Vault::EmptyState* emptyStateWidget() const; 
 
-    // Empty State Widget
-    EmptyState *empty_state = nullptr;
+        protected:
+        void paintEvent(QPaintEvent *event) override;
+        void resizeEvent(QResizeEvent *event) override;
 
-    // Seperator Color, Height
-    QColor separatorColor;
-    int separatorHeight = 2;
+        private:
+        void setDarkMode(bool isDarkMode);
 
-    // Wrapper (View Action Toolbar)
-    QWidget *view_toolbar_wrapper = nullptr;
-    // Wrapper Action Toolbar Layout
-    QHBoxLayout *wrapper_layout = nullptr;
+        // Empty State Widget
+        Ui::Vault::EmptyState *empty_state = nullptr;
 
-    // View Mode Toggle
-    ViewModeToggle *view_mode = nullptr;
+        // Seperator Color, Height
+        QColor separatorColor;
+        int separatorHeight = 2;
 
-    // Filter Button Menu
-    ButtonMenu *filterButtonMenu = nullptr;
+        // Wrapper (View Action Toolbar)
+        QWidget *view_toolbar_wrapper = nullptr;
+        // Wrapper Action Toolbar Layout
+        QHBoxLayout *wrapper_layout = nullptr;
 
-    // Icons
-    QString FilterIcon, ArrowDownIcon, SearchIcon;   
+        // View Mode Toggle
+        ViewModeToggle *view_mode = nullptr;
 
-    // Search Box
-    TextField *search_box = nullptr;
-    
-    // Items View List
-    QListView *_list = nullptr;
+        // Filter Button Menu
+        ButtonMenu *filterButtonMenu = nullptr;
 
-    // Model
-    QStandardItemModel _model;
-    
-    // Scroll Bars
-    ScrollBar *vScroll = nullptr;
+        // Icons
+        QString FilterIcon, ArrowDownIcon, SearchIcon;   
 
-    // Items View Delegate
-    ViewDelegate *_delegate = nullptr;
+        // Search Box
+        TextField *search_box = nullptr;
 
-    // Main Layout
-    QVBoxLayout *_layout = nullptr;
+        // Items View List
+        QListView *_list = nullptr;
 
-    QTimer *progressTimer = nullptr;
+        // Model
+        QStandardItemModel _model;
 
-    // Helpers
-    void updateEmptyState();
-    void updateEmptyStatePosition();
-    void updateGridLayout();
+        // Scroll Bars
+        ScrollBar *vScroll = nullptr;
 
-    // Slots
-    void onListViewModeSelected();
-    void onGridViewModeSelected();
+        // Items View Delegate
+        Ui::Vault::ViewDelegate *_delegate = nullptr;
+
+        // Main Layout
+        QVBoxLayout *_layout = nullptr;
+
+        QTimer *progressTimer = nullptr;
+
+        // Helpers
+        void updateEmptyState();
+        void updateEmptyStatePosition();
+        void updateGridLayout();
+
+        // Slots
+        void onListViewModeSelected();
+        void onGridViewModeSelected();
+    };
 };

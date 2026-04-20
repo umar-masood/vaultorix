@@ -48,58 +48,62 @@ class BulletPoint : public QLabel {
 };
 
 class ThemeManager;
-/* ---------------- Account Window ---------------- */
-class AuthWindow : public SubWindow {
-   Q_OBJECT
 
-   public:
-   explicit AuthWindow(QWidget *rightWidget = nullptr, QWidget *parent = nullptr);
-   void setRightWidget(QWidget *rightWidget);
-   void setDarkMode(bool isDarkMode);
+namespace Ui::Auth {
+    /* ---------------- Account Window ---------------- */
+    class AuthWindow : public SubWindow {
+       Q_OBJECT
 
-   private:
-   // Icons
-   QString DarkModeIcon, LightModeIcon;
+       public:
+       explicit AuthWindow(QWidget *rightWidget = nullptr, QWidget *parent = nullptr);
+       void setRightWidget(QWidget *rightWidget);
+       void setDarkMode(bool isDarkMode);
 
-   // Seperator for titlbar controls
-   Seperator *seperator = nullptr;
+       private:
+       // Icons
+       QString DarkModeIcon, LightModeIcon;
 
-   // Theme Mode Button
-   Button *themeMode = nullptr;
+       // Seperator for titlbar controls
+       Seperator *seperator = nullptr;
 
-   // Main Layout
-   QHBoxLayout *mainLayout = nullptr;
+       // Theme Mode Button
+       Button *themeMode = nullptr;
 
-   // Right Widget
-   QWidget *right = nullptr;
-   // Layout
-   QVBoxLayout *entireLayoutRight = nullptr;
+       // Main Layout
+       QHBoxLayout *mainLayout = nullptr;
 
-   // Left Widget
-   QWidget *left = nullptr;
-   // Layout
-   QVBoxLayout *entireLayoutLeft = nullptr;
-   
-   // Right Side Widget (It will change depending upon situation)
-   QWidget *rightWidget = nullptr;
+       // Right Widget
+       QWidget *right = nullptr;
+       // Layout
+       QVBoxLayout *entireLayoutRight = nullptr;
 
-   // Left Panel
-   // Illustration
-   QLabel *illustration = nullptr;
+       // Left Widget
+       QWidget *left = nullptr;
+       // Layout
+       QVBoxLayout *entireLayoutLeft = nullptr;
+    
+       // Right Side Widget (It will change depending upon situation)
+       QWidget *rightWidget = nullptr;
 
-   // Tagline
-   QLabel *tagline = nullptr;
+       // Left Panel
+       // Illustration
+       QLabel *illustration = nullptr;
 
-   // App Branding
-   Branding *brand = nullptr;
+       // Tagline
+       QLabel *tagline = nullptr;
 
-   // Features bullet points
-   BulletPoint *point1 = nullptr;
-   BulletPoint *point2 = nullptr;
-   BulletPoint *point3 = nullptr;
-   BulletPoint *point4 = nullptr;
-   BulletPoint *point5 = nullptr;
+       // App Branding
+       Branding *brand = nullptr;
 
-   // Vector to store all bullet points
-   QVector<BulletPoint *> points;
+       // Features bullet points
+       BulletPoint *point1 = nullptr;
+       BulletPoint *point2 = nullptr;
+       BulletPoint *point3 = nullptr;
+       BulletPoint *point4 = nullptr;
+       BulletPoint *point5 = nullptr;
+
+       // Vector to store all bullet points
+       QVector<BulletPoint *> points;
+
+    };   
 };

@@ -1,17 +1,19 @@
 #include "PasswordValidator.h"
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
+#include "../../../ui/auth/signup/Signup.h"
 
 /* -------------------- Password Validator --------------------- */
 PasswordValidator::PasswordValidator(QObject *parent) : QObject(parent) {
-    bm = new Utils::BlacklistManager(this, "Password");
-    bm->setFileName(PWD_BLACKLIST_FILE);
-    if (bm->downloadList(QUrl(QString::fromUtf8(APIRoutes::PWD_BLACKLIST)))) 
+    blacklistManager = new Utils::BlacklistManager(this, "Password");
+    blacklistManager->setFileName(PWD_BLACKLIST_FILE);
+    
+    if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::PWD_BLACKLIST)))) 
         qDebug() << "Password blacklist downloaded started.\n";
     else
         loadPwdsFromFile();
 
-    connect(bm, &Utils::BlacklistManager::listDownloaded, this, [this]() {
+    connect(blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
         qDebug() << "Password blacklist download completed.\n";
         loadPwdsFromFile();
     });
@@ -94,7 +96,7 @@ bool PasswordValidator::isPwdBlacklisted(const std::string &password) {
 }
 
 void PasswordValidator::loadPwdsFromFile() {
-    std::ifstream file(bm->filePath);
+    std::ifstream file(blacklistManager->filePath);
     if (!file.is_open()) {
         qDebug() << "Could not open weak pwd list file.\n";
         return;
@@ -105,7 +107,9 @@ void PasswordValidator::loadPwdsFromFile() {
     while (std::getline(file, line)) {
         if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
             line.pop_back();
+        
         Utils::lower(line);
+
         if (!line.empty())
             weakPwds.insert(line);
     }
@@ -122,10 +126,10 @@ GetPassword::GetPassword(QObject *parent) : QObject(parent) {
     pwdValidate = new PasswordValidator(this);
 
     connect(timer, &QTimer::timeout, this, [this](){
-        if (!ac) return;
+        if (!signupWidget) return;
         
-        QByteArray bytes = ac->passwordField()->text().toUtf8();
-        bool ok = pwdValidate->isValidPwd(bytes, ac->passwordValidatorWidget());
+        QByteArray bytes = signupWidget->passwordField()->text().toUtf8();
+        bool ok = pwdValidate->isValidPwd(bytes, signupWidget->passwordValidatorWidget());
         
         // Emit signal
         emit pwdValidated(ok);
@@ -134,13 +138,13 @@ GetPassword::GetPassword(QObject *parent) : QObject(parent) {
     });
 }
 
-void GetPassword::setAccountSignup(Signup *instance) {
+void GetPassword::setAccountSignupWidget(Ui::Auth::Signup *instance) {
     if (!instance) 
         return;
 
-    ac = instance;
+    signupWidget = instance;
 
-    connect(ac->passwordField(), &CustomTextField::textChanged, this, &GetPassword::onPwdChanged);
+    connect(signupWidget->passwordField(), &CustomTextField::textChanged, this, &GetPassword::onPwdChanged);
 }
 
 void GetPassword::onPwdChanged(const QString &text) {

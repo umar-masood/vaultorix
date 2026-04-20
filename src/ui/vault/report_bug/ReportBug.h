@@ -1,46 +1,48 @@
 #pragma once
 
 #include "../../windows/subWindow/SubWindow.h"
-#include "../../components/Label.h"
-#include "../../components/TextEdit.h"
-#include "../../components/TextField.h"
-#include "../../components/Button.h"
-
 #include <QVBoxLayout>
 
-class ReportBug : public SubWindow {
-    Q_OBJECT
+class Label;
+class Button;
+class TextField;
+class TextEdit;
 
-    public:
-    explicit ReportBug(QWidget *parent = nullptr);
+namespace Ui::Vault {
+    class ReportBug : public SubWindow {
+        Q_OBJECT
 
-    TextEdit *descp_field() const;
-    TextField *subject_field() const;
+        public:
+        explicit ReportBug(QWidget *parent = nullptr);
 
-    private:
-    void setDarkMode(bool isDarkMode);
+        TextEdit *descp_field() const;
+        TextField *subject_field() const;
 
-    // Window Title
-    Label *winTitle = nullptr;
+        private:
+        void setDarkMode(bool isDarkMode);
 
-    // Main Layout
-    QVBoxLayout *win_content_area_layout = nullptr;
+        // Window Title
+        Label *winTitle = nullptr;
 
-    // Label
-    Label *label = nullptr;
-    
-    // Subject TextField
-    TextField *_subject_field = nullptr;
+        // Main Layout
+        QVBoxLayout *win_content_area_layout = nullptr;
 
-    // Bug Descp 
-    TextEdit *_descp_field = nullptr;
+        // Label
+        Label *label = nullptr;
 
-    // Submit
-    Button *submit_btn = nullptr;
+        // Subject TextField
+        TextField *_subject_field = nullptr;
 
-    signals:
-    void reportFinished();
+        // Bug Descp 
+        TextEdit *_descp_field = nullptr;
 
-    private slots:
-    void onTextChanged();
+        // Submit
+        Button *submit_btn = nullptr;
+
+        signals:
+        void reportFinished();
+
+        private slots:
+        void onTextChanged();
+    };
 };

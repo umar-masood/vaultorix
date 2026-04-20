@@ -3,11 +3,11 @@
 #include "../../../../resources/IllustrationManager.h"
 #include "../../../core/theme/ThemeManager.h"
 
+using namespace Ui::Auth;
 /* =========================================================================================
                               ACCOUNT SIGN IN IMPLEMENTATION
    ========================================================================================= */
-Signin::Signin(QWidget *parent) : QWidget(parent)
-{
+Signin::Signin(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_TranslucentBackground);
     setFocusPolicy(Qt::StrongFocus);
 

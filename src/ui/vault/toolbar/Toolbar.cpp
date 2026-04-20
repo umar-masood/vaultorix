@@ -1,6 +1,10 @@
 #include "ToolBar.h"
 #include "../../../../resources/IconManager.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../components/Button.h"
+#include "../user/User.h"
+
+using Ui::Vault::Toolbar;
 
 Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     setFixedHeight(64);
@@ -39,7 +43,7 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     restore_btn->setToolTip("Remove the selected file from vault and return to its original location");
 
     // User Profile Widget
-    user_widget = new User;
+    user_widget = new Ui::Vault::User();
     user_widget->setName("Umar Masood");
 
     // Layout

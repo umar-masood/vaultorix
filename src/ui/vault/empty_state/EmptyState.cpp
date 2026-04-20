@@ -1,5 +1,8 @@
 #include "EmptyState.h"
 #include "../../../../resources/IllustrationManager.h" 
+#include "../../components/Label.h"
+
+using Ui::Vault::EmptyState;
 
 EmptyState::EmptyState(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_Hover, true);  

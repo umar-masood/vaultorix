@@ -2,6 +2,11 @@
 #include "../vault_window/VaultWindow.h"
 #include "../../../../resources/IconManager.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../components/Button.h"
+#include "../../components/SmoothOpacity.h"
+#include "../account_settings/AccountSettings.h"
+
+using Ui::Vault::UserMenu;
 
 UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     setFixedHeight(254);
@@ -54,12 +59,12 @@ Button* UserMenu::manageSubscriptionButton() const { return manage_subscription_
 
 void UserMenu::onAccountSettingsBtnClicked() {
     if (!acc_settings_win) {
-        acc_settings_win = new AccountSettingsWindow(VaultWindow::instance());
+        acc_settings_win = new Ui::Vault::AccountSettings(Ui::Vault::VaultWindow::instance());
         acc_settings_win->setAttribute(Qt::WA_DeleteOnClose);
 
         connect(acc_settings_win, &QObject::destroyed, this, [this]() {
             acc_settings_win = nullptr;
-            VaultWindow::instance()->updateGeometry(); 
+            Ui::Vault::VaultWindow::instance()->updateGeometry(); 
         });
     }
 

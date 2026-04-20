@@ -9,42 +9,44 @@
 #include <QPainterPath>
 #include <QFont>
 
-#include "../userMenu/UserMenu.h"
+namespace Ui::Vault { class UserMenu; };
 
-class User : public QWidget {
-    Q_OBJECT
-    
-    public:
-    explicit User(QWidget *parent = nullptr);
-    void setName(const QString &name);
-    void setAvator(const QPixmap &pixmap, int size);
+namespace Ui::Vault {
+    class User : public QWidget {
+        Q_OBJECT
 
-    protected:
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void enterEvent(QEnterEvent *event) override;
-    void leaveEvent(QEvent *event) override;
-    bool eventFilter(QObject *o, QEvent *event) override;
+        public:
+        explicit User(QWidget *parent = nullptr);
+        void setName(const QString &name);
+        void setAvator(const QPixmap &pixmap, int size);
 
-    signals:
-    void clicked();
+        protected:
+        void paintEvent(QPaintEvent *event) override;
+        void mousePressEvent(QMouseEvent *event) override;
+        void mouseReleaseEvent(QMouseEvent *event) override;
+        void enterEvent(QEnterEvent *event) override;
+        void leaveEvent(QEvent *event) override;
+        bool eventFilter(QObject *o, QEvent *event) override;
 
-    private: 
-    void adjustWidgetSize();
-    QFont font();
-    void setDarkMode(bool isDarkMode);
+        signals:
+        void clicked();
 
-    // Flags
-    bool isHover = false;
-    bool isPressed = false;
+        private: 
+        void adjustWidgetSize();
+        QFont font();
+        void setDarkMode(bool isDarkMode);
 
-    // Profile Icon
-    QPixmap avator;
-    
-    // Name
-    QString _name = "Umar Masood Khan";
+        // Flags
+        bool isHover = false;
+        bool isPressed = false;
 
-    // Menu
-    UserMenu *um = nullptr;
+        // Profile Icon
+        QPixmap avator;
+
+        // Name
+        QString _name = "Umar Masood Khan";
+
+        // Menu
+        Ui::Vault::UserMenu *um = nullptr;
+    };
 };

@@ -1,6 +1,12 @@
 #include "Preferences.h"
 #include "../../../../resources/IconManager.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../components/Label.h"
+#include "../../components/Toggle.h"
+#include "../../components/Seperator.h"
+#include "../../components/ComboBox.h"
+
+using Ui::Vault::Preferences;
 
 Preferences::Preferences(QWidget *parent) : SubWindow(QSize(600, 600), parent)
 {

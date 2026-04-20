@@ -3,6 +3,7 @@
 #include "../../../core/config/Constants.h"
 #include "../../../core/theme/ThemeManager.h"
 
+using namespace Ui::Auth;
 /* =========================================================================================
                               ACCOUNT OTP IMPLEMENTATION
    ========================================================================================= */

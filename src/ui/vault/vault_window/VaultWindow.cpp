@@ -10,6 +10,11 @@
 #include "../report_bug/ReportBug.h"
 #include "../../../../resources/IconManager.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../../core/services/update/Update.h"
+#include "../../components/Seperator.h"
+#include "../../components/Label.h"
+
+using Ui::Vault::VaultWindow;
 
 VaultWindow *VaultWindow::instance(QWidget *parent) {
     static VaultWindow *vw = nullptr;
@@ -58,7 +63,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     // Update Download Button
     updates_download_btn = createButton(IconManager::icon(Icons::DownloadUpdateLight), IconManager::icon(Icons::DownloadUpdateDark));
     updates_download_btn->setToolTip("Vaultorix Updates");
-    connect(updates_download_btn, &Button::clicked, this, &VaultWindow::onUpdatesBtnClicked);
+    connect(updates_download_btn, &Button::clicked, this, &VaultWindow::onAppUpdateBtnClicked);
 
     // Preferences Button
     preferences_btn = createButton(IconManager::icon(Icons::PreferencesLight), IconManager::icon(Icons::PreferencesDark));
@@ -98,13 +103,13 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
 
     // Content Area
     // Toolbar
-    toolbar = new Toolbar;
+    toolbar = new Ui::Vault::Toolbar;
 
     // View
-    view = new View;
+    view = new Ui::Vault::View;
 
     // Statusbar
-    _statusbar = new Statusbar;
+    _statusbar = new Ui::Vault::Statusbar;
 
     // Layout
     content_layout = new QVBoxLayout(contentArea());
@@ -153,7 +158,7 @@ void VaultWindow::setDarkMode(bool isDarkMode) {
 
 void VaultWindow::onAboutBtnClicked() {
     if (!about) {
-        about = new About(this);
+        about = new Ui::Vault::About(this);
         about->setAttribute(Qt::WA_DeleteOnClose);
 
         connect(about, &QObject::destroyed, this, [this](){
@@ -168,7 +173,7 @@ void VaultWindow::onAboutBtnClicked() {
 
 void VaultWindow::onPreferencesBtnClicked() {
     if (!pref) {
-        pref = new Preferences(this);
+        pref = new Ui::Vault::Preferences(this);
         pref->setAttribute(Qt::WA_DeleteOnClose);   
 
         connect(pref, &QObject::destroyed, this, [this](){
@@ -181,31 +186,30 @@ void VaultWindow::onPreferencesBtnClicked() {
     pref->raise();
 }
 
-void VaultWindow::onUpdatesBtnClicked() {
-    if (!au) {
-        au = new AppUpdates(this);
-        au->setAttribute(Qt::WA_DeleteOnClose);
+void VaultWindow::onAppUpdateBtnClicked() {
+    if (!appUpdateWidget) {
+        // Frontend
+        appUpdateWidget = new Ui::Vault::AppUpdate(this);
+        appUpdateWidget->setAttribute(Qt::WA_DeleteOnClose);
 
-        connect(au, &QObject::destroyed, this, [this](){
-            au = nullptr;
+        // Backend
+        appUpdateCore = new Core::Services::AppUpdate(this);
+        appUpdateCore->setAppUpdateWidget(appUpdateWidget);
+
+        connect(appUpdateWidget, &QObject::destroyed, this, [this](){
+            appUpdateWidget = nullptr;
+            appUpdateCore = nullptr;
             VaultWindow::instance()->updateGeometry(); 
         });
 
-        // Au must exist while timer is running
-        QTimer::singleShot(5000, au, [=]() {
-            if (au->updateInfoWidget()) {
-                au->updateInfoWidget()->setUpdateAvailable(true);
-            }
-        });
-
-        au->show();
-        au->raise();
+        appUpdateWidget->show();
+        appUpdateWidget->raise();
     } 
 }
 
 void VaultWindow::onReportBugBtnClicked() {
     if (!report_bug) {
-        report_bug = new ReportBug(this);
+        report_bug = new Ui::Vault::ReportBug(this);
         report_bug->setAttribute(Qt::WA_DeleteOnClose);
 
         connect(report_bug, &QObject::destroyed, this, [this]() {
@@ -218,4 +222,4 @@ void VaultWindow::onReportBugBtnClicked() {
     report_bug->raise();
 }
 
-Statusbar *VaultWindow::statusbar() const { return _statusbar; }
+Ui::Vault::Statusbar *VaultWindow::statusbar() const { return _statusbar; }

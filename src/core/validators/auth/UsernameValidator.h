@@ -1,18 +1,22 @@
 #pragma once
 
-#include "../../../ui/auth/signup/Signup.h"
 #include "../../utils/Utils.h"
 
 #include <unordered_set>
 #include <fstream>
-
 #include <QRegularExpression>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
 
+namespace Ui::Auth { class Signup; };
+
 /* ----------------- Username Validator -------------------- */
+
+/**
+ * This class will the check the username passed by the class GetUsername, whether it is valid and available?
+ */
 class UsernameValidator : public QObject {
     Q_OBJECT
     
@@ -23,7 +27,7 @@ class UsernameValidator : public QObject {
 
     private:
     // Validator Utils
-    Utils::BlacklistManager *bm = nullptr;
+    Utils::BlacklistManager *blacklistManager = nullptr;
 
     // Network Manager
     QNetworkAccessManager *manager = nullptr;
@@ -45,12 +49,16 @@ class UsernameValidator : public QObject {
 };
 
 /* ---------------  Get Username ------------------ */
+
+/**
+ * This class will take the username from username text field from Account Sign up widget in Ui and then passed it to the actual username validator class for validation.
+ */
 class GetUsername : public QObject {
     Q_OBJECT
 
     public:
     explicit GetUsername(QObject *parent = nullptr);
-    void setAccountSignup(Signup *instance = nullptr);
+    void setAccountSignupWidget(Ui::Auth::Signup *instance = nullptr);
 
     private:
     // Timer to delay username checking on every key stroke being pressed
@@ -59,8 +67,8 @@ class GetUsername : public QObject {
     // Username Validator
     UsernameValidator *usernameValidator = nullptr;
 
-    // Current Account Create
-    Signup *ac = nullptr;
+    // Current Account Signup
+    Ui::Auth::Signup *signupWidget = nullptr;
 
     // Retry Attempts Tracker
     int retryAttempts = 0;

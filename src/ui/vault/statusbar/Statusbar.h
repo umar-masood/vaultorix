@@ -1,44 +1,47 @@
 #pragma once
-#include "../../components/Label.h"
-#include "../../components/Seperator.h"
 
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QPaintEvent>
 #include <QPainter>
 
-/* ---------------------  Statusbar ---------------------- */
-class Statusbar : public QWidget {
-    Q_OBJECT
+class Label;
+class Seperator;
 
-    public:
-    Statusbar(QWidget *parent = nullptr);
+namespace Ui::Vault {
+    /* ---------------------  Statusbar ---------------------- */
+    class Statusbar : public QWidget {
+        Q_OBJECT
 
-    Label* totalItemsLabel() const;
-    Label* selectedItemsLabel() const;
-    Label* totalSizeLabel() const;
+        public:
+        Statusbar(QWidget *parent = nullptr);
 
-    private:
-    void setDarkMode(bool isDarkMode);
+        Label* totalItemsLabel() const;
+        Label* selectedItemsLabel() const;
+        Label* totalSizeLabel() const;
 
-    // Total Items 
-    Label *total_items = nullptr;
+        private:
+        void setDarkMode(bool isDarkMode);
 
-    // Seperator
-    Seperator *seperator = nullptr;
-    
-    // Selected Items
-    Label *selected_items = nullptr;
+        // Total Items 
+        Label *total_items = nullptr;
 
-    // Total Size 
-    Label *total_size = nullptr;
+        // Seperator
+        Seperator *seperator = nullptr;
 
-    // Main Layout
-    QHBoxLayout *layout = nullptr;
+        // Selected Items
+        Label *selected_items = nullptr;
 
-    // Helper
-    Label* createLabel(const QString &text = "");
+        // Total Size 
+        Label *total_size = nullptr;
 
-    protected:
-    void paintEvent(QPaintEvent *event) override;
+        // Main Layout
+        QHBoxLayout *layout = nullptr;
+
+        // Helper
+        Label* createLabel(const QString &text = "");
+
+        protected:
+        void paintEvent(QPaintEvent *event) override;
+    };
 };

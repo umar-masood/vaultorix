@@ -35,6 +35,7 @@ namespace Utils {
 
         public:
         static InternetConnectivity& instance();
+        void checkConnectivity();
 
         template<typename Function>
         void runIfOnline(Function func, QObject *parent = nullptr, ErrorDialogManager *errorManager = nullptr) {
@@ -58,7 +59,6 @@ namespace Utils {
         InternetConnectivity();
 
         QNetworkAccessManager *manager = nullptr;        
-        void checkConnectivity();
 
     };
 

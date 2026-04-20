@@ -29,7 +29,10 @@ class LineProgress : public QWidget {
    void setColor(const LineColor &state, const QColor &color);    
    void setDarkMode(bool value);
    void setText(const QString &text);
+   
    void setIndeterminate(bool value);  
+   bool indeterminate() const;
+
    void setTrackHeight(int h); 
 
    void start();
@@ -38,9 +41,9 @@ class LineProgress : public QWidget {
    void setValue(int value);
    int getValue() const;
 
-   inline uint qHash(const LineColor &state, uint seed = 0) {
-      return ::qHash(static_cast<int>(state), seed);
-   }
+    inline uint qHash(const LineColor &state, uint seed = 0) {
+        return ::qHash(static_cast<int>(state), seed);
+    }
 
    protected:
    void paintEvent(QPaintEvent *event) override;

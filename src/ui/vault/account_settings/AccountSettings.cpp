@@ -3,10 +3,17 @@
 #include "../../auth/signup/Signup.h"
 #include "../../../core/theme/ThemeManager.h"
 
+#include "../../components/Label.h"
+#include "../../components/Button.h"
+#include "../../components/Toggle.h"
+#include "../../components/TextField.h"
+#include "../../components/Seperator.h"
+
+using Ui::Vault::AccountSettings;
 /* --------------------------------------------------------------------------
                         ACCOUNT SETTINGS WINDOW 
   -------------------------------------------------------------------------*/
-AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(600, 600), parent)
+AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), parent)
 {
     // Window Properties
     setFocusPolicy(Qt::StrongFocus);
@@ -438,11 +445,11 @@ AccountSettingsWindow::AccountSettingsWindow(QWidget *parent) : SubWindow(QSize(
 
     // Theme
     auto &tm = ThemeManager::instance();
-    connect(&tm, &ThemeManager::themeChanged, this, &AccountSettingsWindow::setDarkMode);
+    connect(&tm, &ThemeManager::themeChanged, this, &AccountSettings::setDarkMode);
     setDarkMode(tm.isDarkMode());
 }
 
-void AccountSettingsWindow::setDarkMode(bool isDarkMode) {
+void AccountSettings::setDarkMode(bool isDarkMode) {
     // Scrollbar
     scrollbar->setDarkMode(isDarkMode);
 
@@ -484,15 +491,15 @@ void AccountSettingsWindow::setDarkMode(bool isDarkMode) {
 /* --------------------------------------------------------------------------
                                    GETTERS 
   -------------------------------------------------------------------------*/
-TextField* AccountSettingsWindow::nameField() const { return name_field; }
-CustomTextField* AccountSettingsWindow::usernameField() const { return username_field; }
-TextField* AccountSettingsWindow::emailField() const { return email_field; }
-TextField* AccountSettingsWindow::currentPasswordField() const { return curr_password_field; }
-TextField* AccountSettingsWindow::newPasswordField() const { return new_password_field; }
-Toggle* AccountSettingsWindow::twoFAToggle() const { return two_fa_toggle; }
-Label* AccountSettingsWindow::emailStatus() const { return email_status; }
-Button* AccountSettingsWindow::saveButton() const { return save_btn; }
-Button* AccountSettingsWindow::deleteAccountButton() const { return delete_acc_btn; }
-Button* AccountSettingsWindow::uploadPictureButton() const { return upload_pic_btn; }
-Button* AccountSettingsWindow::deletePictureButton() const { return delete_pic_btn; }
-Button* AccountSettingsWindow::changeUsernameButton() const { return change_username_btn; }
+TextField* AccountSettings::nameField() const { return name_field; }
+CustomTextField* AccountSettings::usernameField() const { return username_field; }
+TextField* AccountSettings::emailField() const { return email_field; }
+TextField* AccountSettings::currentPasswordField() const { return curr_password_field; }
+TextField* AccountSettings::newPasswordField() const { return new_password_field; }
+Toggle* AccountSettings::twoFAToggle() const { return two_fa_toggle; }
+Label* AccountSettings::emailStatus() const { return email_status; }
+Button* AccountSettings::saveButton() const { return save_btn; }
+Button* AccountSettings::deleteAccountButton() const { return delete_acc_btn; }
+Button* AccountSettings::uploadPictureButton() const { return upload_pic_btn; }
+Button* AccountSettings::deletePictureButton() const { return delete_pic_btn; }
+Button* AccountSettings::changeUsernameButton() const { return change_username_btn; }

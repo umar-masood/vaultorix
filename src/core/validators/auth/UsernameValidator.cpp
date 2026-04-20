@@ -1,18 +1,20 @@
 #include "UsernameValidator.h"
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
+#include "../../../ui/auth/signup/Signup.h"
 
 UsernameValidator::UsernameValidator(QObject *parent) : QObject(parent) {
     manager = new QNetworkAccessManager(this);
 
-    bm = new Utils::BlacklistManager(this, "Username");
-    bm->setFileName(USERNAME_BLACKLIST_FILE);
-    if (bm->downloadList(QUrl(QString::fromUtf8(APIRoutes::USERNAME_BLACKLIST))))
+    blacklistManager = new Utils::BlacklistManager(this, "Username");
+    blacklistManager->setFileName(USERNAME_BLACKLIST_FILE);
+    
+    if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::USERNAME_BLACKLIST))))
         qDebug() << "Username blacklist download started.\n";
     else
         loadUsernamesFromFile();
     
-    connect(bm, &Utils::BlacklistManager::listDownloaded, this, [this]() {
+    connect(blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
         qDebug() << "Username blacklist download completed.\n";
         loadUsernamesFromFile();
     });
@@ -86,9 +88,8 @@ bool UsernameValidator::isUsernameBlacklisted(const std::string &username) const
 }
 
 void UsernameValidator::isUsernameAvailable(QByteArray &username) {
-    QUrl url(route(APIRoutes::CHK_USERNAME));
-    url.setPath(QString::fromUtf8(username));    
-
+    QUrl url(route(APIRoutes::CHK_USERNAME) +  QString::fromUtf8(username));
+  
     qDebug() << "Checking username availability for: " << QString::fromUtf8(username) << "\n";
     QNetworkRequest request(url);
     request.setTransferTimeout(REQUEST_TIMEOUT);
@@ -140,7 +141,7 @@ void UsernameValidator::isUsernameAvailable(QByteArray &username) {
 }
 
 void UsernameValidator::loadUsernamesFromFile() {
-    std::ifstream file(bm->filePath);
+    std::ifstream file(blacklistManager->filePath);
     if (!file.is_open()) {
         qDebug() << "Could not open usernames list file.\n";
         return;
@@ -175,13 +176,13 @@ GetUsername::GetUsername(QObject *parent) : QObject(parent) {
     connect(usernameValidator, &UsernameValidator::unableToCheckUsernameAvailability, this, &GetUsername::onUnableToCheckUsernameAvailability);
 }
 
-void GetUsername::setAccountSignup(Signup *instance) {
+void GetUsername::setAccountSignupWidget(Ui::Auth::Signup *instance) {
     if (!instance) 
         return;
 
-    ac = instance;
+    signupWidget = instance;
     
-    connect(ac->usernameField(), &CustomTextField::textChanged, this, &GetUsername::onUsernameChanged);
+    connect(signupWidget->usernameField(), &CustomTextField::textChanged, this, &GetUsername::onUsernameChanged);
 }
 
 void GetUsername::onUsernameChanged(const QString &text) {
@@ -192,11 +193,11 @@ void GetUsername::onUsernameChanged(const QString &text) {
 
 void GetUsername::onUsernameAvailable(bool isAvailable) {
     if (isAvailable) {
-        ac->usernameField()->setValid();
-        ac->usernameField()->setTooltip("Username is available.");
+        signupWidget->usernameField()->setValid();
+        signupWidget->usernameField()->setTooltip("Username is available.");
     } else {
-        ac->usernameField()->setInvalid();
-        ac->usernameField()->setTooltip("Username is already taken.\nPlease use another.");
+        signupWidget->usernameField()->setInvalid();
+        signupWidget->usernameField()->setTooltip("Username is already taken.\nPlease use another.");
     }
     emit usernameValidated(isAvailable);
 }
@@ -206,8 +207,8 @@ void GetUsername::onUnableToCheckUsernameAvailability() {
         retryAttempts++;
         usernameValidator->isUsernameAvailable(text);
     } else {
-        ac->usernameField()->setInvalid();
-        ac->usernameField()->setTooltip("Failed to check username availability.");
+        signupWidget->usernameField()->setInvalid();
+        signupWidget->usernameField()->setTooltip("Failed to check username availability.");
         retryAttempts = 0;
 
         Utils::cleanupMemory(text);
@@ -216,13 +217,13 @@ void GetUsername::onUnableToCheckUsernameAvailability() {
 }
     
 void GetUsername::onTimeout() {
-    if (!ac) return;
+    if (!signupWidget) return;
 
-    text = ac->usernameField()->text().toUtf8();
+    text = signupWidget->usernameField()->text().toUtf8();
 
     if (text.isEmpty()) {
-        ac->usernameField()->setInvalid();
-        ac->usernameField()->setTooltip("");
+        signupWidget->usernameField()->setInvalid();
+        signupWidget->usernameField()->setTooltip("");
         return;
     }
 
@@ -231,12 +232,12 @@ void GetUsername::onTimeout() {
     
     if (ok) {
         qDebug() << "Username is valid: " << text << "\n";
-        ac->usernameField()->setTooltip("");
+        signupWidget->usernameField()->setTooltip("");
         
         usernameValidator->isUsernameAvailable(text);
     } else {
-        ac->usernameField()->setInvalid();
-        ac->usernameField()->setTooltip(
+        signupWidget->usernameField()->setInvalid();
+        signupWidget->usernameField()->setTooltip(
         "Invalid username.\n\n"
         "Please ensure that:\n"
         "• 3-20 characters, starting with a letter\n"

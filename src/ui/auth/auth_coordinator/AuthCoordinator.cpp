@@ -3,22 +3,22 @@
 #include "../../../core/config/Constants.h"
 
 #include "../signup/Signup.h"
-#include "../../../core/services/auth/SignupService.h"
+#include "../../../core/services/auth/Signup.h"
 
 #include "../otp/Otp.h"
-#include "../../../core/services/auth/OTPService.h"
+#include "../../../core/services/auth/OTP.h"
 
 #include "../auth_window/AuthWindow.h"
 
 #include "../signin/Signin.h"
-#include "../../../core/services/auth/SigninService.h"
+#include "../../../core/services/auth/Signin.h"
 
 /* ========================================================================================= 
                               ACCOUNT AUTH COORDINATOR              
    ========================================================================================= */
 AuthCoordinator::AuthCoordinator(QObject *parent) : QObject(parent) {
     // Account Window
-    authWindow = new AuthWindow;
+    authWindow = new  Ui::Auth::AuthWindow;
 
     // Checking weather the user has already registered its account once
     if (!isAccountRegistered())
@@ -48,14 +48,14 @@ void AuthCoordinator::showSignIn() {
         accountSignIn = nullptr;
 
     // Create Account Sign In pointer
-    accountSignIn = new Signin;
+    accountSignIn = new Ui::Auth::Signin;
 
     // Account Sign In Service pointer
-    signinService = new SigninService(authWindow, this);
-    signinService->setAccountSignin(accountSignIn);
+    signinService = new Core::Services::Auth::Signin(authWindow, this);
+    signinService->setAccountSigninWidget(accountSignIn);
 
     // Signal Slot of Account Sign in service
-    connect(signinService, &SigninService::verificationNeeded, this, &AuthCoordinator::onVerificationNeeded);
+    connect(signinService, &Core::Services::Auth::Signin::verificationNeeded, this, &AuthCoordinator::onVerificationNeeded);
 
     // If account window already exists
     if (authWindow) 
@@ -72,22 +72,22 @@ void AuthCoordinator::showOTP(const QString &email) {
         accountOTP = nullptr;    
 
     // Make new pointer of account otp
-    accountOTP = new Otp;
+    accountOTP = new Ui::Auth::Otp;
 
     // If get get OTP pointer already exists
     if (getOTP) 
         getOTP = nullptr;
 
     // Make new get OTP pointer 
-    getOTP = new GetOTP(authWindow, this);
-    getOTP->setAccountOtp(accountOTP, email);
+    getOTP = new Core::Services::Auth::GetOTP(authWindow, this);
+    getOTP->setAccountOTPWidget(accountOTP, email);
 
     // If account window exists
     if (authWindow) 
         authWindow->setRightWidget(accountOTP);
     
     // Signal Slot
-    connect(getOTP, &GetOTP::OTPVerified, this, &AuthCoordinator::onOTPVerified);
+    connect(getOTP, &Core::Services::Auth::GetOTP::OTPVerified, this, &AuthCoordinator::onOTPVerified);
 }
 
 // Display Account Create page
@@ -97,7 +97,7 @@ void AuthCoordinator::showCreateAccount() {
         accountSignup = nullptr;
 
     // Make new account create
-    accountSignup = new Signup(nullptr, authWindow); // Here, we have passed authWindow pointer because inside Signup class we have used a dailog box for terms and conditions. To make it a child of parent (SubWindow)    
+    accountSignup = new  Ui::Auth::Signup(nullptr, authWindow); // Here, we have passed authWindow pointer because inside Signup class we have used a dailog box for terms and conditions. To make it a child of parent (SubWindow)    
     authWindow->setRightWidget(accountSignup);
 
     // Signal Slot of redirecting to Sign In page from Sign Up page.
@@ -108,11 +108,11 @@ void AuthCoordinator::showCreateAccount() {
         signupService = nullptr;
 
     // Making new pointer of account create manager
-    signupService = new SignupService(authWindow, this); // Similarly, authWindow is also passed here for dialogs parenting.
-    signupService->setAccountSignup(accountSignup);
+    signupService = new Core::Services::Auth::Signup(authWindow, this); // Similarly, authWindow is also passed here for dialogs parenting.
+    signupService->setAccountSignupWidget(accountSignup);
 
     // Connecting signal slot
-    connect(signupService, &SignupService::credentialsStoredSuccessfully, this, &AuthCoordinator::onCredentialsStoredSuccessfully);
+    connect(signupService, &Core::Services::Auth::Signup::credentialsStoredSuccessfully, this, &AuthCoordinator::onCredentialsStoredSuccessfully);
 }
 
 /* -----------------  Getters --------------------- */

@@ -4,6 +4,7 @@
 #include "../../../core/theme/ThemeManager.h"
 #include "../../dialogs/error_dialog/ErrorDialog.h"
 
+using namespace Ui::Auth;
 /* ========================================================================================= 
                               ACCOUNT WINDOW IMPLEMENTATION              
    ========================================================================================= */

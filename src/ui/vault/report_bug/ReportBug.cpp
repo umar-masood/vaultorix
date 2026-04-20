@@ -1,5 +1,11 @@
 #include "ReportBug.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../components/Label.h"
+#include "../../components/TextEdit.h"
+#include "../../components/TextField.h"
+#include "../../components/Button.h"
+
+using Ui::Vault::ReportBug;
 
 ReportBug::ReportBug(QWidget *parent) : SubWindow(QSize(390, 412), parent){
     setModal(true);

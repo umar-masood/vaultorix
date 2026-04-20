@@ -78,55 +78,57 @@ class TextWithBtn : public QWidget {
    void buttonClicked();
 };
 
-/* ------------------- Account OTP ------------------------ */
-class Otp : public QWidget {
-   Q_OBJECT
-
-   public:
-   explicit Otp(QWidget *parent = nullptr);
-   Q_INVOKABLE void setDarkMode(bool value);
-
-   void setEmail(const QString &email);
-   
-   OTPWidget *otpWidget() const;
-   Button *verifyButton() const;
-   TextWithBtn *resendOtpWidget() const;
-   AnimatedLabel *message() const;
-
-   private:
-   // Illustration
-   Label *illustration = nullptr;
-
-   // Heading
-   Label *heading = nullptr;
-
-   // Text
-   Label *text = nullptr;
-
-   // Error Message Displaying Label
-   AnimatedLabel *_message = nullptr;
-
-   // OTP Widget
-   OTPWidget *_otpWidget = nullptr;
-
-   // Resend OTP Widget
-   TextWithBtn *_resendOtpWidget = nullptr;
-
-   // Verify Button
-   Button *_verifyBtn = nullptr;
-
-   // Cancel Button
-   Button *_cancelBtn = nullptr;
-
-   // Main Layout
-   QVBoxLayout *layout = nullptr;
-
-   // Slot
-   void onEmailEntered(const QString &email);
-
-   signals:
-   void emailEntered(const QString &email);
-   void resendClicked();
-   void verifyClicked();
-   void cancelClicked();
+namespace Ui::Auth {
+    /* ------------------- Account OTP ------------------------ */
+    class Otp : public QWidget {
+       Q_OBJECT
+    
+       public:
+       explicit Otp(QWidget *parent = nullptr);
+       Q_INVOKABLE void setDarkMode(bool value);
+    
+       void setEmail(const QString &email);
+    
+       OTPWidget *otpWidget() const;
+       Button *verifyButton() const;
+       TextWithBtn *resendOtpWidget() const;
+       AnimatedLabel *message() const;
+    
+       private:
+       // Illustration
+       Label *illustration = nullptr;
+    
+       // Heading
+       Label *heading = nullptr;
+    
+       // Text
+       Label *text = nullptr;
+    
+       // Error Message Displaying Label
+       AnimatedLabel *_message = nullptr;
+    
+       // OTP Widget
+       OTPWidget *_otpWidget = nullptr;
+    
+       // Resend OTP Widget
+       TextWithBtn *_resendOtpWidget = nullptr;
+    
+       // Verify Button
+       Button *_verifyBtn = nullptr;
+    
+       // Cancel Button
+       Button *_cancelBtn = nullptr;
+    
+       // Main Layout
+       QVBoxLayout *layout = nullptr;
+    
+       // Slot
+       void onEmailEntered(const QString &email);
+    
+       signals:
+       void emailEntered(const QString &email);
+       void resendClicked();
+       void verifyClicked();
+       void cancelClicked();
+    };
 };

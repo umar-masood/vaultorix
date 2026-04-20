@@ -14,7 +14,7 @@ namespace Utils {
     }
 
     void BlacklistManager::setFileName(const std::string &filename) {
-        QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/config";
+        QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Config";
         QDir().mkpath(path);
         filePath = path.toStdString() + "/" + filename;
     }

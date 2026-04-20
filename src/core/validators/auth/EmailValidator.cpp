@@ -1,18 +1,19 @@
 #include "EmailValidator.h"
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
+#include "../../../ui/auth/signup/Signup.h"
 
 EmailValidator::EmailValidator(QObject *parent) : QObject(parent) {
-    bm = new Utils::BlacklistManager(this, "Email");
+    blacklistManager = new Utils::BlacklistManager(this, "Email");
     manager = new QNetworkAccessManager(this);
     
-    bm->setFileName(EMAIL_BLACKLIST_FILE);
-    if (bm->downloadList(QUrl(QString::fromUtf8(APIRoutes::EMAIL_BLACKLIST)))) 
+    blacklistManager->setFileName(EMAIL_BLACKLIST_FILE);
+    if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::EMAIL_BLACKLIST)))) 
        qDebug() << "Email blacklist download started.\n";
     else
         loadMailsFromFile();
 
-    connect(bm, &Utils::BlacklistManager::listDownloaded, this, [this]() {
+    connect(blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
         qDebug() << "Email blacklist download completed.\n";
         loadMailsFromFile();
     });
@@ -116,14 +117,12 @@ bool EmailValidator::isEmailBlacklisted(const std::string &domain) {
 }
 
 void EmailValidator::isEmailAvailable(QByteArray &email) {
-    QUrl url(route(APIRoutes::CHK_EMAIL));
-    url.setPath(QString::fromUtf8(email));    
+    QUrl url(route(APIRoutes::CHK_EMAIL) + QString::fromUtf8(email));
 
     QNetworkRequest request(url);
     request.setTransferTimeout(REQUEST_TIMEOUT);
     
     QNetworkReply *reply = manager->get(request);
-
     connect(reply, &QNetworkReply::finished, [this, reply, &email](){
         if (!reply)
             return;
@@ -170,7 +169,7 @@ void EmailValidator::isEmailAvailable(QByteArray &email) {
 }
 
 void EmailValidator::loadMailsFromFile() {
-    std::ifstream file(bm->filePath);
+    std::ifstream file(blacklistManager->filePath);
     if (!file.is_open()) {
         qDebug() << "Could not open domains list file.\n";
         return;
@@ -196,13 +195,13 @@ GetEmail::GetEmail(QObject *parent) : QObject(parent) {
     connect(timer, &QTimer::timeout, this, &GetEmail::onTimeout);
 }
 
-void GetEmail::setAccountSignup(Signup *instance) {
+void GetEmail::setAccountSignupWidget(Ui::Auth::Signup *instance) {
     if (!instance) 
         return;
 
-    ac = instance;
+    signupWidget = instance;
     
-    connect(ac->emailField(), &CustomTextField::textChanged, this, &GetEmail::onEmailChanged);
+    connect(signupWidget->emailField(), &CustomTextField::textChanged, this, &GetEmail::onEmailChanged);
     connect(emailValidator, &EmailValidator::emailAvailable, this, &GetEmail::onEmailAvailable);
     connect(emailValidator, &EmailValidator::unableToCheckEmailAvailability, this, &GetEmail::onUnableToCheckEmailAvailability);
 }
@@ -215,11 +214,11 @@ void GetEmail::onEmailChanged(const QString &text) {
 
 void GetEmail::onEmailAvailable(bool isAvailable) {
     if (isAvailable) {
-        ac->emailField()->setValid();
-        ac->emailField()->setTooltip("Email-address is available");
+        signupWidget->emailField()->setValid();
+        signupWidget->emailField()->setTooltip("Email-address is available");
     } else {
-        ac->emailField()->setInvalid();
-        ac->emailField()->setTooltip("Email-address already exists");
+        signupWidget->emailField()->setInvalid();
+        signupWidget->emailField()->setTooltip("Email-address already exists");
     }
     
     emit emailValidated(isAvailable);
@@ -236,8 +235,8 @@ void GetEmail::onUnableToCheckEmailAvailability() {
         set update tooltip text and update retryAttempts to 0 , so that 
         next time, when user entered text is changed then it will again check email availability in case of failure in handling
         network request by calling isEmailAvailable() recursively.*/
-        ac->emailField()->setInvalid();
-        ac->emailField()->setTooltip("Failed to check email availability.");
+        signupWidget->emailField()->setInvalid();
+        signupWidget->emailField()->setTooltip("Failed to check email availability.");
 
         retryAttempts = 0; // Resetting conter
 
@@ -247,14 +246,14 @@ void GetEmail::onUnableToCheckEmailAvailability() {
 }
 
 void GetEmail::onTimeout() {
-    if (!ac) return;
+    if (!signupWidget) return;
     
-    text = ac->emailField()->text().toUtf8(); // Getting data from TextField
+    text = signupWidget->emailField()->text().toUtf8(); // Getting data from TextField
     
     // In case if there's no text in the TextField
     if (text.isEmpty()) {
-        ac->emailField()->setInvalid(); 
-        ac->emailField()->setTooltip(""); // No tooltip will show when it is set to empty string
+        signupWidget->emailField()->setInvalid(); 
+        signupWidget->emailField()->setTooltip(""); // No tooltip will show when it is set to empty string
         return;
     }
 
@@ -263,7 +262,7 @@ void GetEmail::onTimeout() {
     if (ok) { // if it is True (it means email format is correct, now we have to check its availability.)
         qDebug() << "Email is Valid: " << text << "\n";
 
-        ac->emailField()->setTooltip(""); /* We have set empty string to tooltip (Reason: If we don`t do this, then the following behaviour might occurs:
+        signupWidget->emailField()->setTooltip(""); /* We have set empty string to tooltip (Reason: If we don`t do this, then the following behaviour might occurs:
             Suppose, first time, user enters invalid email, then tooltip will show "Invalid Email-Address" -> its fine
             BUT 
             Next time, when user enters correct email address, then it still shows "Invalid email-address" until the availability check is finished.
@@ -272,8 +271,8 @@ void GetEmail::onTimeout() {
         emailValidator->isEmailAvailable(text); // Check weather this email exists in DB
     } else {
         // if it is False (Invalid Email), thus we don`t need to check its availability anymore.
-        ac->emailField()->setInvalid();
-        ac->emailField()->setTooltip(
+        signupWidget->emailField()->setInvalid();
+        signupWidget->emailField()->setTooltip(
             "Invalid email address.\n\n"
             "Please ensure that:\n"
             "• The email format is correct\n"

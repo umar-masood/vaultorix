@@ -3,13 +3,18 @@
 #include <QSettings>
 #include <QObject>
 
-class AuthWindow;
-class Signin;
-class Signup;
-class GetOTP;
-class SigninService;
-class SignupService;
-class Otp;
+namespace Core::Services::Auth {
+    class Signin;
+    class GetOTP;
+    class Signup;
+};
+
+namespace Ui::Auth {
+    class AuthWindow;
+    class Signin;
+    class Signup;
+    class Otp;
+};
 
 class AuthCoordinator : public QObject {
     Q_OBJECT
@@ -23,25 +28,25 @@ class AuthCoordinator : public QObject {
     QSettings settings;
 
     // Account Window
-    AuthWindow *authWindow = nullptr;
+    Ui::Auth::AuthWindow *authWindow = nullptr;
 
     // Account Sign In
-    Signin *accountSignIn = nullptr;
+    Ui::Auth::Signin *accountSignIn = nullptr;
 
     // Account Create
-    Signup *accountSignup = nullptr;
+    Ui::Auth::Signup *accountSignup = nullptr;
 
     // Account OTP
-    Otp *accountOTP = nullptr;
+    Ui::Auth::Otp *accountOTP = nullptr;
 
     // Account Sign In Service
-    SigninService *signinService = nullptr;
+    Core::Services::Auth::Signin *signinService = nullptr;
 
     // Account Creation Service
-    SignupService *signupService = nullptr;
+    Core::Services::Auth::Signup *signupService = nullptr;
 
     // GetOTP
-    GetOTP *getOTP = nullptr;
+    Core::Services::Auth::GetOTP *getOTP = nullptr;
 
     void setAccountRegistered(bool isRegistered);
     bool isAccountRegistered() const;

@@ -4,10 +4,14 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <list>
-
-#include "../../../ui/auth/signup/Signup.h"
 #include "../../utils/Utils.h"
 
+namespace Ui::Auth { class Signup; };
+class PasswordRules;
+
+/**
+ * This class will check the password passed by the class GetPassword, whether it is valid?
+ */
 class PasswordValidator : public QObject{
     public:
     explicit PasswordValidator(QObject *parent = nullptr);
@@ -15,7 +19,7 @@ class PasswordValidator : public QObject{
 
     private:
     // Validator Utils
-    Utils::BlacklistManager *bm = nullptr;
+    Utils::BlacklistManager *blacklistManager = nullptr;
     
     // Caching Data Structures
     std::unordered_set<std::string> weakPwds;
@@ -30,12 +34,15 @@ class PasswordValidator : public QObject{
     void loadPwdsFromFile();
 };
 
+/**
+ * This class will take the password from password text field from Account Sign up widget in Ui and then passed it to the actual password validator class for validation.
+ */
 class GetPassword : public QObject {
     Q_OBJECT
 
     public:
     explicit GetPassword(QObject *parent = nullptr);
-    void setAccountSignup(Signup *instance = nullptr);
+    void setAccountSignupWidget(Ui::Auth::Signup *instance = nullptr);
 
     private:
     // Timer to delay checking of password while user typing
@@ -44,8 +51,8 @@ class GetPassword : public QObject {
     // Password Validator
     PasswordValidator *pwdValidate = nullptr;
 
-    // Current Account Create
-    Signup *ac = nullptr;
+    // Current Account Signup Widget
+    Ui::Auth::Signup *signupWidget = nullptr;
 
     // Slot
     void onPwdChanged(const QString &pwd);

@@ -1,23 +1,25 @@
 #include "User.h"
 #include "../../../../resources/IconManager.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../userMenu/UserMenu.h"
 
-User::User(QWidget *parent) : QWidget(parent)
-{
+using Ui::Vault::User;
+
+User::User(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_Hover);
     setAvator(QPixmap(IconManager::icon(Icons::Avator)), 36);
 
-    um = new UserMenu;
+    um = new Ui::Vault::UserMenu;
     um->setAvator(QPixmap((IconManager::icon(Icons::Avator)))
                       .scaled(100, 100, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
     um->setName("Umar Masood");
     um->setEmail("umarmasood8546@gmail.com");
 
-    connect(this, &User::clicked, this, [this]()
-            {
-    if (um)
-      um->showAt(this); });
+    connect(this, &User::clicked, this, [this]() {
+        if (um)
+            um->showAt(this); 
+    });
 
     // Installing Event Filter for auto closing on outside click
     qApp->installEventFilter(this);

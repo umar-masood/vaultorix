@@ -1,62 +1,67 @@
 #pragma once
 
-#include "../../components/Button.h"
-#include "../user/User.h"
-
 #include <QHBoxLayout>
 #include <QList>
 #include <QMap>
+#include <QWidget>
 
-/* ---------------------  Toolbar ---------------------- */
-class Toolbar : public QWidget {
-    Q_OBJECT
+class Button;
+class User;
 
-    public:
-    Toolbar(QWidget *parent = nullptr);
+namespace Ui::Vault { class User; };
 
-    Button* importButton() const;
-    Button* restoreButton() const;
-    Button* openButton() const;
-    Button* deleteButton() const;
-    Button* encryptButton() const;
-    Button* decryptButton() const;
+namespace Ui::Vault {
+    /* ---------------------  Toolbar ---------------------- */
+    class Toolbar : public QWidget {
+        Q_OBJECT
 
-    private:
-    void setDarkMode(bool isDarkMode);
+        public:
+        Toolbar(QWidget *parent = nullptr);
 
-    // Main Layout
-    QHBoxLayout *layout = nullptr;
+        Button* importButton() const;
+        Button* restoreButton() const;
+        Button* openButton() const;
+        Button* deleteButton() const;
+        Button* encryptButton() const;
+        Button* decryptButton() const;
 
-    // Import Action
-    Button *import_btn = nullptr;
+        private:
+        void setDarkMode(bool isDarkMode);
 
-    // Encrypt Action
-    Button *encrypt_btn = nullptr;
+        // Main Layout
+        QHBoxLayout *layout = nullptr;
 
-    // Decrypt Action
-    Button *decrypt_btn = nullptr;
+        // Import Action
+        Button *import_btn = nullptr;
 
-    // Open Action
-    Button *open_btn = nullptr;
+        // Encrypt Action
+        Button *encrypt_btn = nullptr;
 
-    // Delete Action
-    Button *delete_btn = nullptr;
+        // Decrypt Action
+        Button *decrypt_btn = nullptr;
 
-    // Restore Action
-    Button *restore_btn = nullptr;
+        // Open Action
+        Button *open_btn = nullptr;
 
-    // User Profile Widget
-    User *user_widget = nullptr;
-    
-    // Helpers
-    Button* createButton(const QString &text, const QString &iconPath);
+        // Delete Action
+        Button *delete_btn = nullptr;
 
-    // Icons
-    QString DecryptIcon, EncryptIcon , DeleteIcon , ImportIcon , OpenIcon, RestoreIcon; 
+        // Restore Action
+        Button *restore_btn = nullptr;
 
-    // List of Actions
-    QList<Button *> actions;
+        // User Profile Widget
+        Ui::Vault::User *user_widget = nullptr;
 
-    protected:
-    void paintEvent(QPaintEvent *event) override;
+        // Helpers
+        Button* createButton(const QString &text, const QString &iconPath);
+
+        // Icons
+        QString DecryptIcon, EncryptIcon , DeleteIcon , ImportIcon , OpenIcon, RestoreIcon; 
+
+        // List of Actions
+        QList<Button *> actions;
+
+        protected:
+        void paintEvent(QPaintEvent *event) override;
+    };
 };

@@ -116,11 +116,14 @@ add_executable(Vaultorix
 
     ## Services
     ### Auth
-    src/core/services/auth/SignupService.cpp
-    src/core/services/auth/SigninService.cpp
-    src/core/services/auth/OTPService.cpp
+    src/core/services/auth/Signup.cpp
+    src/core/services/auth/Signin.cpp
+    src/core/services/auth/OTP.cpp
     src/core/services/auth/TokenManager.cpp
 
+    ### App Update
+    src/core/services/update/Update.cpp
+    
     ## Device Info
     src/core/system/DeviceInfo.cpp
 

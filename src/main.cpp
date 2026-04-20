@@ -1,4 +1,5 @@
 #include "./ui/auth/auth_coordinator/AuthCoordinator.h"
+#include "./ui/vault/vault_window/VaultWindow.h"
 #include "./core/config/Constants.h"
 #include <QApplication>
 
@@ -11,5 +12,7 @@ int main(int argc, char *argv[]) {
     AuthCoordinator *c = new AuthCoordinator(&app);
     c->show();
   
+    // Ui::Vault::VaultWindow::instance()->show();
     return app.exec();
 }
+

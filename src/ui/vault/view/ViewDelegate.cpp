@@ -1,6 +1,11 @@
 #include "ViewDelegate.h"
 #include "../../../../resources/IconManager.h"
 
+using Ui::Vault::ViewItem;
+using Ui::Vault::ViewDelegate;
+using Ui::Vault::ItemsViewMode;
+using Ui::Vault::ItemDelegateRoles;
+
 ViewItem::ViewItem(const QString &title,
                    const QString &thumbnailPath,
                    const QString &type,

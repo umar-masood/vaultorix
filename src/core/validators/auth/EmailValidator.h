@@ -4,17 +4,19 @@
 #include <unordered_map>
 #include <list>
 #include <fstream>
-
 #include <QStringList>
 #include <QRegularExpression>
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonObject>
-
-#include "../../../ui/auth/signup/Signup.h"
 #include "../../utils/Utils.h"
 
+namespace Ui::Auth { class Signup; };
+
 /* ---------------------------   Email Validator -------------------------  */
+/**
+ * This class will check the name passed by the GetName class, whether it is valid?
+ */
 class EmailValidator : public QObject {
     Q_OBJECT
 
@@ -25,7 +27,7 @@ class EmailValidator : public QObject {
 
     private:
     // Blacklist Manager
-    Utils::BlacklistManager *bm = nullptr;
+    Utils::BlacklistManager *blacklistManager = nullptr;
 
     // Network Manager
     QNetworkAccessManager *manager = nullptr;
@@ -53,12 +55,15 @@ class EmailValidator : public QObject {
 };
 
 /*  -----------------------------  Get Email ------------------------------- */
+/**
+ * This class will take email from full email textfield in Account Sign up widget in Ui and passed it to the actual email validator class for validation
+ */
 class GetEmail : public QObject {
     Q_OBJECT
 
     public:
     explicit GetEmail(QObject *parent = nullptr);
-    void setAccountSignup(Signup *instance = nullptr);
+    void setAccountSignupWidget(Ui::Auth::Signup *instance = nullptr);
 
     private:
     // Timer 
@@ -68,7 +73,7 @@ class GetEmail : public QObject {
     EmailValidator *emailValidator = nullptr;
 
     // Account Create
-    Signup *ac = nullptr;
+    Ui::Auth::Signup *signupWidget = nullptr;
 
     // Attempts Tracker
     int retryAttempts = 0;

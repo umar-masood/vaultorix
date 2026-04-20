@@ -1,8 +1,19 @@
 #include "View.h"
+
 #include "../../../../resources/IconManager.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../empty_state/EmptyState.h"
+#include "../../components/ViewModeToggle.h"
+#include "../../components/TextField.h"
+#include "../../components/ButtonMenu.h"
+#include "../../components/ScrollBar.h"
+
+#include "ViewDelegate.h"
 #include <QTimer>
 #include <QRandomGenerator>
+
+using Ui::Vault::View;
+using Ui::Vault::ViewItem;
 
 View::View(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -13,7 +24,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     SearchIcon    = IconManager::icon(Icons::Search);
 
     // Empty State Widget
-    empty_state = new EmptyState(this);
+    empty_state = new Ui::Vault::EmptyState(this);
     empty_state->hide();
 
     // Menu Button (for testing)
@@ -65,7 +76,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     _list = new QListView;
 
     // Items View Delegate
-    _delegate = new ViewDelegate;
+    _delegate = new Ui::Vault::ViewDelegate;
     
     // Vertical Scroll Bar (Items List)
     vScroll = new ScrollBar(Qt::Vertical);
@@ -320,4 +331,4 @@ void View::setDarkMode(bool isDarkMode) {
 TextField* View::searchBox() const { return search_box; }
 ButtonMenu* View::filterMenu()  const { return filterButtonMenu; }
 ViewModeToggle* View::viewMode() const { return view_mode; }
-EmptyState* View::emptyStateWidget() const { return empty_state; }
+Ui::Vault::EmptyState* View::emptyStateWidget() const { return empty_state; }

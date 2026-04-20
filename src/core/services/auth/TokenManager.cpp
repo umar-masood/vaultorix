@@ -3,6 +3,8 @@
 #include "../../config/Constants.h"
 #include "../../utils/Utils.h"
 
+using Core::Services::Auth::TokenManager;
+
 TokenManager::TokenManager(QObject *parent) : QObject(parent) {
     // Network Manager
     manager = new QNetworkAccessManager(this);

@@ -5,6 +5,8 @@
 #include "../../components/Label.h"
 #include "../../../core/theme/ThemeManager.h"
 
+using Ui::Vault::About;
+
 About::About(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_TranslucentBackground);
 

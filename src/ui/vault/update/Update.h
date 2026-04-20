@@ -1,125 +1,106 @@
 #pragma once
 
-#include "../../components/LineProgress.h"
-#include "../../components/SpinnerProgress.h"
-#include "../../components/Button.h"
-#include "../../components/Seperator.h"
-#include "../../components/Label.h"
 #include "../../windows/subWindow/SubWindow.h"
+#include "../../components/LineProgress.h"
 
 #include <QVBoxLayout>
 #include <QDateTime>
 #include <QHBoxLayout>
 #include <QStackedWidget>
 
-struct Update {
-  QString _currentVersion = "0.0.0";
-  QString _newVersion = "0.0.0";
-  QString _size = "0 MB";
-  QDateTime _releasedDate;
-  QString _updateNotes;
+class SpinnerProgress;
+class Button;
+class Seperator;
+class Label;
 
-  Update(const QString &currentVersion, 
-         const QString &newVersion, 
-         const QString &size, 
-         const QDateTime releasedDate,
-         const QString &updateNotes);
-};
+namespace Ui::Vault {
+    struct Update {
+        QString _currentVersion = "0.0.0";
+        QString _newVersion = "0.0.0";
+        QString _size = "0 MB";
+        QDateTime _releasedDate;
+        QString _updateNotes;
 
-class UpdateInfo : public QWidget {
-  Q_OBJECT
+        Update(const QString &currentVersion,
+               const QString &newVersion,
+               const QString &size,
+               const QDateTime &releasedDate,
+               const QString &updateNotes);
+    };
 
-  public:
-  UpdateInfo(QWidget *parent = nullptr);
-  void setUpdate(const Update &update);
-  void setUpdateAvailable(bool isAvailable);
-  void setDarkMode(bool enable);
+    class AppUpdate : public SubWindow {
+        Q_OBJECT
 
-  signals:
-  void isUpdateAvailable(bool isAvailable);
+        public:
+        enum class UpdateState { 
+            Available, 
+            NotAvailable, 
+            NoInternet, 
+            SomethingWentWrong
+        };
 
-  private:
-  bool isDarkMode = false;
+        AppUpdate(QWidget *parent = nullptr);
+        void setUpdateDetails(const Update &update);
+        void setUpdateState(const UpdateState &state);
+        LineProgress *downloadProgressBar() const;
+        Button *updateButton() const;
 
-  // Update Version, Size , and Released Date
-  Label *update_ver_date_label = nullptr;
+        protected:
+        void showEvent(QShowEvent *event);
 
-  // What's new label
-  Label *whats_new_label = nullptr;
+        private:
+        void setDarkMode(bool isDarkMode);
+        QWidget* updateInfoWidget();
 
-  // Update Notes
-  Label *update_notes_label = nullptr;
+        // Window Title
+        Label *winTitle = nullptr;
 
-  // Seperator
-  Seperator *sep = nullptr;
-};
+        // Main Layout
+        QVBoxLayout *win_content_area_layout = nullptr;
 
-class AppUpdates : public SubWindow {
-  Q_OBJECT
+        // Stacked Widget (State Manager)
+        QStackedWidget *stacked_widget = nullptr;
 
-  public:
-  AppUpdates(QWidget *parent = nullptr);
-  UpdateInfo* updateInfoWidget() const;
-  
-  protected:
-  void showEvent(QShowEvent *event);
+        // Update Info Ui Widget
+        Label *update_ver_date_label = nullptr;
+        Label *whats_new_label = nullptr;
+        Label *update_notes_label = nullptr;
+        Seperator *update_sep = nullptr;
 
-  private:
-  void setDarkMode(bool isDarkMode);
+        /* ===============================================================
+                                    Pages
+           =============================================================== */
+        QWidget *checking_page = nullptr;
+        QWidget *no_update_page = nullptr;
+        QWidget *update_page = nullptr;
 
-  // Window Title
-  Label *winTitle = nullptr;
+        QStackedWidget *action_stack = nullptr;
+        QWidget *action_button_page = nullptr;
+        QWidget *action_progress_page = nullptr;
 
-  // Main Layout
-  QVBoxLayout *win_content_area_layout = nullptr;
+        /* ===============================================================
+                                    Checking Page
+           =============================================================== */
+        QWidget *spinner_wrapper = nullptr;
+        SpinnerProgress *spinner = nullptr;
+        Label *spinner_label = nullptr;
 
-  // Stacked Widget (State Manager)
-  QStackedWidget *stacked_widget = nullptr;
+        /* ===============================================================
+                          No Update/ No Internet Page
+           =============================================================== */
+        Label *no_update_label = nullptr;
 
-  /* ===============================================================
-                              Pages
-     =============================================================== */
-
-  QWidget *checking_page = nullptr;
-  QWidget *no_update_page = nullptr;
-  QWidget *update_page = nullptr;
-
-  QStackedWidget *action_stack = nullptr;
-  QWidget *action_button_page = nullptr;
-  QWidget *action_progress_page = nullptr;
-  /* ===============================================================
-                              Checking Page
-     =============================================================== */
-
-  QWidget *spinner_wrapper = nullptr;
-  SpinnerProgress *spinner = nullptr;
-  Label *spinner_label = nullptr;
-
-  /* ===============================================================
-                              No Update Page
-     =============================================================== */
-
-  Label *no_update_label = nullptr;
-
-  /* ===============================================================
+        /* ===============================================================
                               Update Available Page
-     =============================================================== */
+           =============================================================== */
+        Seperator *main_sep = nullptr;
+        Button *update_btn = nullptr;
 
-  UpdateInfo *update_details_widget = nullptr;
-  Seperator *sep = nullptr;
-  Button *update_btn = nullptr;
-
-  /* ===============================================================
+        /* ===============================================================
                               Downloading Page
-     =============================================================== */
-
-  Label *downloading_label = nullptr;
-  LineProgress *update_progressbar = nullptr;
-  Label *closing_app_label = nullptr;
-  /* ===============================================================
-                              Timer
-     =============================================================== */
-
-  QTimer *timer = nullptr;
-  int v = 0;
+           ============================================================== */
+        Label *downloading_label = nullptr;
+        LineProgress *download_progressbar = nullptr;
+        Label *closing_app_label = nullptr;
+    };
 };

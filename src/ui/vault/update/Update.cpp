@@ -1,13 +1,20 @@
 #include "Update.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../components/SpinnerProgress.h"
+#include "../../components/Button.h"
+#include "../../components/Seperator.h"
+#include "../../components/Label.h"
+
+using Ui::Vault::Update;
+using Ui::Vault::AppUpdate;
 
 /* ---------------------------------------------------------------
-                         Update Info Widget
+                         Update Struct
    --------------------------------------------------------------- */
 Update::Update(const QString &currentVersion, 
                const QString &newVersion,
                const QString &size, 
-               const QDateTime releasedDate, 
+               const QDateTime &releasedDate, 
                const QString &updateNotes) : 
                _currentVersion(currentVersion),
                _newVersion(newVersion),
@@ -15,91 +22,20 @@ Update::Update(const QString &currentVersion,
                _releasedDate(releasedDate),
                _updateNotes(updateNotes){}
 
-
-UpdateInfo::UpdateInfo(QWidget *parent) : QWidget(parent) {
-    setAttribute(Qt::WA_TranslucentBackground);
-
-    // Update Version Date Info Label
-    update_ver_date_label = new Label("Segoe UI", 10);
-    update_ver_date_label->setAlignment(Qt::AlignLeft);
-
-    // Seperator
-    sep = new Seperator( 1, width(), Qt::Horizontal);
-
-    // What's new label
-    whats_new_label = new Label("Segoe UI", 10, QFont::Medium, false, "What's new:", Qt::AlignLeft);
-
-    // Update notes label
-    update_notes_label = new Label("Segoe UI", 10);
-    update_notes_label->setWordWrap(true);
-    update_notes_label->setAlignment(Qt::AlignLeft);
-
-    // Layout
-    auto *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(update_ver_date_label, 0, Qt::AlignLeft);
-    layout->addSpacing(8);
-    layout->addWidget(sep, 0, Qt::AlignHCenter);
-    layout->addSpacing(8);
-    layout->addWidget(whats_new_label, 0, Qt::AlignLeft);
-    layout->addSpacing(8);
-    layout->addWidget(update_notes_label, 0, Qt::AlignLeft);
-    layout->addStretch();
-    
-    // Setting Default Update
-    setUpdate({"1.0.0", "1.1.0", "56 MB", QDateTime::currentDateTime(),  "Added dark mode\nImproved performance\nFixed login bug"});
-
-    // Initial Theme
-    setDarkMode(isDarkMode);
-}
-
-void UpdateInfo::setDarkMode(bool enable) {
-    isDarkMode = enable;
-
-    if (whats_new_label)
-        whats_new_label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
-
-    if (sep)
-        sep->setColor(isDarkMode ? "#334155" : "#E5E7EB");
-
-    for (auto *label : {update_ver_date_label, update_notes_label})
-        label->setTextColor(isDarkMode ? "#94A3B8" : "#6B7280");
-}
-
-void UpdateInfo::setUpdate(const Update &update) {
-    if (update_ver_date_label)
-        update_ver_date_label->setText(QString("Update available\
-                                              \nVersion %1  →  %2\
-                                              \n%3  •  Released %4\
-                                        ").arg(update._currentVersion)
-                                          .arg(update._newVersion)
-                                          .arg(update._size)
-                                          .arg(update._releasedDate.toString("dd-MMM-yyyy")));
-
-    if (update_notes_label) 
-        update_notes_label->setText(update._updateNotes);
-    
-    adjustSize();
-}
-
-void UpdateInfo::setUpdateAvailable(bool isAvailable) {
-    emit isUpdateAvailable(isAvailable);
-}
-
 /* ---------------------------------------------------------------
-                        App Update Subwindow
+                        App Update 
    --------------------------------------------------------------- */
-
-AppUpdates::AppUpdates(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
+AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     setFocusPolicy(Qt::StrongFocus);
     setModal(true);
 
     // ---------------- Titlebar Layout ----------------
     QHBoxLayout *_titlebarLayout = this->titlebarLayout();
 
+    // Window Title
     winTitle = new Label("Segoe UI", 10, QFont::Normal, false, "Vaultorix Updates", Qt::AlignLeft);
 
+    // Adding to titlebar layout
     _titlebarLayout->addSpacing(6);
     _titlebarLayout->addWidget(winTitle, 0, Qt::AlignLeft | Qt::AlignVCenter);
     _titlebarLayout->addStretch();
@@ -109,14 +45,15 @@ AppUpdates::AppUpdates(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     win_content_area_layout->setSpacing(0);
     win_content_area_layout->setContentsMargins(0,0,0,0);
 
-    // ---------------- Stacked Widget ----------------
+    // ---------------- Stacked Widget ----------------------
     stacked_widget = new QStackedWidget;
+
+    // Adding stacked layout to window content layout
     win_content_area_layout->addWidget(stacked_widget);
 
     /* ===============================================================
                             PAGE 1 - CHECKING
        =============================================================== */
-
     checking_page = new QWidget;
     auto *checking_layout = new QVBoxLayout(checking_page);
     checking_layout->setSpacing(8);
@@ -126,68 +63,84 @@ AppUpdates::AppUpdates(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     spinner_wrapper->setFixedSize(160,160);
     spinner_wrapper->setAttribute(Qt::WA_TranslucentBackground);
 
+    // Spinner Layout
     auto *spinner_layout = new QVBoxLayout(spinner_wrapper);
     spinner_layout->setContentsMargins(0,0,0,0);
     spinner_layout->setSpacing(8);
 
+    // Spinner
     spinner = new SpinnerProgress;
     spinner->setIndeterminate(true);
     spinner->setFixedSize(QSize(100, 140));
     spinner->setColor(SpinnerProgress::BackgroundLight, Qt::transparent);
     spinner->setColor(SpinnerProgress::BackgroundDark, Qt::transparent);
 
+    // Spinner Label
     spinner_label = new Label("Segoe UI", 10, QFont::Normal, false, "Checking for update");
 
+    // Adding to spinner layout
     spinner_layout->addWidget(spinner, 0, Qt::AlignHCenter);
     spinner_layout->addWidget(spinner_label, 0, Qt::AlignHCenter);
 
+    // Adding to checking layout
     checking_layout->addStretch();
     checking_layout->addWidget(spinner_wrapper, 0, Qt::AlignCenter);
     checking_layout->addStretch();
 
+    // Adding check_page widget to stacked widget
     stacked_widget->addWidget(checking_page);
 
     /* ===============================================================
                             PAGE 2 - NO UPDATE
        =============================================================== */
-
     no_update_page = new QWidget;
+
+    // Layout
     auto *no_update_layout = new QVBoxLayout(no_update_page);
     no_update_layout->setSpacing(8);
-    no_update_layout->setContentsMargins(14, 34, 14, 14);
+    no_update_layout->setContentsMargins(10, 34, 14, 10);
 
-    no_update_label = new Label("Segoe UI", 10, QFont::Normal, false, "There is no update available.");
+    // No Update Label
+    no_update_label = new Label("Segoe UI", 10, QFont::Normal, false, "Something went wrong.");
+    no_update_label->setMinimumWidth(250);
+    no_update_label->setWordWrap(true);
 
+    // Adding no update label to layout
     no_update_layout->addStretch();
     no_update_layout->addWidget(no_update_label, 0, Qt::AlignCenter);
     no_update_layout->addStretch();
 
+    // Adding widget to stacked layout
     stacked_widget->addWidget(no_update_page);
 
     /* ===============================================================
                     PAGE 3 - UPDATE AVAILABLE
    =============================================================== */
     update_page = new QWidget;
+    
+    // Layout
     auto *update_layout = new QVBoxLayout(update_page);
     update_layout->setSpacing(8);
     update_layout->setContentsMargins(14, 34, 14, 10);
 
-    update_details_widget = new UpdateInfo;
-    sep = new Seperator(1, width() - 28, Qt::Horizontal);
+    // Seperator
+    main_sep = new Seperator(1, width() - 28, Qt::Horizontal);
 
-    update_layout->addWidget(update_details_widget, 0, Qt::AlignHCenter);
-    update_layout->addWidget(sep, 0, Qt::AlignHCenter | Qt::AlignBottom);
+    // Adding updateInfoWidget, main seperator to update layout
+    update_layout->addWidget(updateInfoWidget(), 0, Qt::AlignHCenter);
+    update_layout->addWidget(main_sep, 0, Qt::AlignHCenter | Qt::AlignBottom);
 
     /* ---------------- Action Stack (Button / Progress) ---------------- */
-
     action_stack = new QStackedWidget;
 
     /* ---------- Button Page ---------- */
-
     action_button_page = new QWidget;
+
+    // Layout
     auto *btn_layout = new QVBoxLayout(action_button_page);
     btn_layout->setContentsMargins(0,0,0,0);
 
+    // Update now button
     update_btn = new Button("Update now");
     update_btn->setDisplayMode(Button::TextOnly);
     update_btn->setFixedSize(QSize(width() - 28, 36));
@@ -195,85 +148,57 @@ AppUpdates::AppUpdates(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     update_btn->setFontProperties("Segoe UI", 11, QFont::Normal);
     update_btn->setCursor(Qt::PointingHandCursor);
 
+    // Adding button to button layout
     btn_layout->addWidget(update_btn, 0, Qt::AlignHCenter);
 
     /* ---------- Progress Page ---------- */
-
     action_progress_page = new QWidget;
+
+    // Layout
     auto *progress_layout = new QVBoxLayout(action_progress_page);
     progress_layout->setSpacing(6);
     progress_layout->setContentsMargins(0,0,0,0);
 
+    // Downloading Label
     downloading_label = new Label("Segoe UI", 10, QFont::Normal, false, "Downloading");
 
-    update_progressbar = new LineProgress;
-    update_progressbar->setFixedSize(QSize(width() - 28, 20));
+    // Download Line Progress
+    download_progressbar = new LineProgress;
+    download_progressbar->setFixedSize(QSize(width() - 28, 20));
 
-    progress_layout->addWidget(downloading_label, 0, Qt::AlignHCenter);
-    progress_layout->addWidget(update_progressbar, 0, Qt::AlignHCenter | Qt::AlignBottom);
-
-    // Closing app after downloading
+    // Closing app label
     closing_app_label = new Label("Segoe UI", 10, QFont::Normal, false, "Download completed. We're closing this app to install update");
     closing_app_label->setWordWrap(true);
     closing_app_label->hide();
    
+    // Adding downloading, closing label to progress label    
+    progress_layout->addWidget(downloading_label, 0, Qt::AlignHCenter);
+    progress_layout->addWidget(download_progressbar, 0, Qt::AlignHCenter | Qt::AlignBottom);
     progress_layout->addWidget(closing_app_label, 0, Qt::AlignCenter);
 
     /* ---------- Add To Action Stack ---------- */
-
     action_stack->addWidget(action_button_page);
     action_stack->addWidget(action_progress_page);
 
     /* ---------- Add To Update Layout ---------- */
-
     update_layout->addWidget(action_stack, 0, Qt::AlignHCenter | Qt::AlignBottom);
 
     /* ---------- Add Update Page To Main Stack ---------- */
-
     stacked_widget->addWidget(update_page);
 
     /* ---------- Default Action Page ---------- */
-
     action_stack->setCurrentWidget(action_button_page);
-
-    /* ===============================================================
-                            Timer
-       =============================================================== */
-
-    timer = new QTimer;
-    timer->setInterval(30);
-
-    connect(timer, &QTimer::timeout, this, [this]{
-        if (v >= 100)
-            v = 0;
-
-        v++;
-        update_progressbar->setValue(v);
-        update_progressbar->setText(QString::number(v));
-    });
 
     /* ===============================================================
                             Connections
        =============================================================== */
-
-    connect(update_details_widget, &UpdateInfo::isUpdateAvailable, this, [this](bool isAvailable) {
-        spinner->stop();
-
-        if (isAvailable)
-            stacked_widget->setCurrentWidget(update_page);
-        else
-            stacked_widget->setCurrentWidget(no_update_page);
-    });
-
     connect(update_btn, &Button::clicked, this, [this] {
         action_stack->setCurrentWidget(action_progress_page);
-        update_progressbar->start();
-        timer->start();
     });
 
-    connect(update_progressbar, &LineProgress::completed, this, [this]{
+    connect(download_progressbar, &LineProgress::completed, this, [this]{
         downloading_label->hide();
-        update_progressbar->hide();
+        download_progressbar->hide();
         closing_app_label->show();
     });
 
@@ -282,43 +207,129 @@ AppUpdates::AppUpdates(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
 
     // Theme
     auto &tm = ThemeManager::instance();
-    connect(&tm, &ThemeManager::themeChanged, this, &AppUpdates::setDarkMode);
+    connect(&tm, &ThemeManager::themeChanged, this, &AppUpdate::setDarkMode);
     setDarkMode(tm.isDarkMode());
 }
 
-UpdateInfo* AppUpdates::updateInfoWidget() const {
-    return update_details_widget;
+QWidget* AppUpdate::updateInfoWidget() {
+    QWidget *main_widget = new QWidget;
+    main_widget->setAttribute(Qt::WA_TranslucentBackground);
+
+    // Release date
+    update_ver_date_label = new Label("Segoe UI", 10);
+    update_ver_date_label->setAlignment(Qt::AlignLeft);
+
+    // Seperator
+    update_sep = new Seperator(1, width(), Qt::Horizontal);
+
+    // Whats new 
+    whats_new_label = new Label("Segoe UI", 10, QFont::Medium, false, "What's new:", Qt::AlignLeft);
+
+    // Release notes
+    update_notes_label = new Label("Segoe UI", 10);
+    update_notes_label->setWordWrap(true);
+    update_notes_label->setAlignment(Qt::AlignLeft);
+
+    // Layout
+    auto *layout = new QVBoxLayout(main_widget);
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
+
+    layout->addWidget(update_ver_date_label);
+    layout->addSpacing(8);
+    layout->addWidget(update_sep);
+    layout->addSpacing(8);
+    layout->addWidget(whats_new_label);
+    layout->addSpacing(8);
+    layout->addWidget(update_notes_label);
+    layout->addStretch();
+
+    return main_widget;
 }
 
-void AppUpdates::setDarkMode(bool isDarkMode) {
-    // Seperator
-    if (sep)
+void AppUpdate::setDarkMode(bool isDarkMode) {
+    // Seperators
+    for (auto *sep : {main_sep, update_sep})
         sep->setColor(isDarkMode ? "#334155" : "#E5E7EB");
-
-    // Update Details Widget
-    update_details_widget->setDarkMode(isDarkMode);
 
     // Spinner
     if (spinner)
         spinner->setDarkMode(isDarkMode);
 
     // Update Progress Bar
-    if (update_progressbar)
-        update_progressbar->setDarkMode(isDarkMode);
+    if (download_progressbar)
+        download_progressbar->setDarkMode(isDarkMode);
 
     // Window Title, Spinner & No Update Labels
-    for (auto *label : {winTitle, spinner_label, no_update_label, downloading_label, closing_app_label}) 
+    for (auto *label : {winTitle, spinner_label, no_update_label, downloading_label, closing_app_label, whats_new_label}) 
         label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
 
+    // Update Widget labels
+    for (auto *label : { update_ver_date_label, update_notes_label }) 
+        if (label)
+            label->setTextColor(isDarkMode ? "#94A3B8" : "#6B7280");
+    
     // Window Theme
     SubWindow::setDarkMode(isDarkMode);
 }
 
-void AppUpdates::showEvent(QShowEvent *event) {
+void AppUpdate::setUpdateDetails(const Update &update) {
+    if (!update_ver_date_label || !update_notes_label)
+        return;
+
+    update_ver_date_label->setText(
+        QString("Update available\n"
+                "Version %1 → %2\n"
+                "%3 • Released %4")
+        .arg(update._currentVersion)
+        .arg(update._newVersion)
+        .arg(update._size)
+        .arg(update._releasedDate.toString("dd-MMM-yyyy"))
+    );
+
+    update_notes_label->setText(update._updateNotes);
+}
+
+void AppUpdate::showEvent(QShowEvent *event) {
     SubWindow::showEvent(event);
 
     stacked_widget->setCurrentWidget(checking_page);
 
     if (spinner)
         spinner->start();
+}
+
+LineProgress* AppUpdate::downloadProgressBar() const {
+    return download_progressbar;
+}
+
+Button* AppUpdate::updateButton() const {
+    return update_btn;
+}
+
+void AppUpdate::setUpdateState(const UpdateState &state) {
+    switch (state) {
+        case UpdateState::Available:
+        spinner->stop();
+        stacked_widget->setCurrentWidget(update_page);
+        break;
+
+        case UpdateState::NotAvailable:
+        spinner->stop();
+        no_update_label->setText("Your application is up to date.");
+        stacked_widget->setCurrentWidget(no_update_page);
+        break;
+
+        case UpdateState::NoInternet:
+        spinner->stop();
+        no_update_label->setText("Unable to check for updates. Please check your internet connection.");
+        stacked_widget->setCurrentWidget(no_update_page);
+        break;
+
+        case UpdateState::SomethingWentWrong:
+        spinner->stop();
+        no_update_label->setText("Oops! Something went wrong.");
+        stacked_widget->setCurrentWidget(no_update_page);
+        break;
+    }
 }

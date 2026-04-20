@@ -116,76 +116,78 @@ class CheckWithBtn : public QWidget {
     void boxChecked(bool checked);
 };
 
-/*  ------------------------- Account Signup ------------------ */
-class Signup : public QWidget {
-    Q_OBJECT
+namespace Ui::Auth {
+    /*  ------------------------- Account Signup ------------------ */
+    class Signup : public QWidget {
+        Q_OBJECT
 
-    public:
-    explicit Signup(QWidget *parent = nullptr, AuthWindow *authWindow = nullptr);
-    void setDarkMode(bool isDarkMode);
+        public:
+        explicit Signup(QWidget *parent = nullptr, AuthWindow *authWindow = nullptr);
+        void setDarkMode(bool isDarkMode);
 
-    Button *createAccountButton() const;
-    CustomTextField *nameField() const;
-    CustomTextField *usernameField() const;
-    CustomTextField *passwordField() const;
-    CustomTextField *emailField() const;
-    TextWithBtn *redirectToSignin() const;
-    CheckWithBtn *termsConditionsWidget() const;
-    PasswordRules *passwordValidatorWidget() const;
+        Button *createAccountButton() const;
+        CustomTextField *nameField() const;
+        CustomTextField *usernameField() const;
+        CustomTextField *passwordField() const;
+        CustomTextField *emailField() const;
+        TextWithBtn *redirectToSignin() const;
+        CheckWithBtn *termsConditionsWidget() const;
+        PasswordRules *passwordValidatorWidget() const;
 
-    private:
-    // Heading
-    QLabel *heading = nullptr;
+        private:
+        // Heading
+        QLabel *heading = nullptr;
 
-    // Name
-    CustomTextField *name = nullptr;
-    QVBoxLayout *nameLayout = nullptr;
+        // Name
+        CustomTextField *name = nullptr;
+        QVBoxLayout *nameLayout = nullptr;
 
-    // Password
-    CustomTextField *password = nullptr;
-    QVBoxLayout *passwordLayout = nullptr;
+        // Password
+        CustomTextField *password = nullptr;
+        QVBoxLayout *passwordLayout = nullptr;
 
-    // Username
-    CustomTextField *username = nullptr;
-    QVBoxLayout *usernameLayout = nullptr;
+        // Username
+        CustomTextField *username = nullptr;
+        QVBoxLayout *usernameLayout = nullptr;
 
-    // Email
-    CustomTextField *email = nullptr;
-    QVBoxLayout *emailLayout = nullptr;
+        // Email
+        CustomTextField *email = nullptr;
+        QVBoxLayout *emailLayout = nullptr;
 
-    // Holds all labels inside fields widgets
-    QVector<QLabel *> labels;
+        // Holds all labels inside fields widgets
+        QVector<QLabel *> labels;
 
-    // Hold all field widgets
-    QVector<QVBoxLayout *> fieldsLayouts;
+        // Hold all field widgets
+        QVector<QVBoxLayout *> fieldsLayouts;
 
-    // Layout
-    QVBoxLayout *layout = nullptr;
+        // Layout
+        QVBoxLayout *layout = nullptr;
 
-    // Password Rules Validator
-    PasswordRules *_passwordValidatorWidget = nullptr;
+        // Password Rules Validator
+        PasswordRules *_passwordValidatorWidget = nullptr;
 
-    // Terms & Conditions Cosent Widget
-    CheckWithBtn *_termsConditionsWidget = nullptr;
+        // Terms & Conditions Cosent Widget
+        CheckWithBtn *_termsConditionsWidget = nullptr;
 
-    // Terms & Conditions Dialog
-    Dialog *termsConditionsDialog = nullptr;
-    TermsConditions *termsConditionsDialogWidget = nullptr;
+        // Terms & Conditions Dialog
+        Dialog *termsConditionsDialog = nullptr;
+        TermsConditions *termsConditionsDialogWidget = nullptr;
 
-    // Create Account Button
-    Button *createAccBtn = nullptr;
+        // Create Account Button
+        Button *createAccBtn = nullptr;
 
-    // Redirect to Sign In page widget
-    TextWithBtn *_redirectToSignInWidget = nullptr;
+        // Redirect to Sign In page widget
+        TextWithBtn *_redirectToSignInWidget = nullptr;
 
-    // Helper Functions
-    CustomTextField *createTextField(const QString &placeholderText = QString(), bool hasValidity = false);
-    QVBoxLayout *createLabeledTextFieldLayout(const QString &labelName = QString(), CustomTextField *currField = nullptr);
-    QFont font(const QString &family = "Segoe UI", int fontSize = 10, QFont::Weight weight = QFont::Medium);
+        // Helper Functions
+        CustomTextField *createTextField(const QString &placeholderText = QString(), bool hasValidity = false);
+        QVBoxLayout *createLabeledTextFieldLayout(const QString &labelName = QString(), CustomTextField *currField = nullptr);
+        QFont font(const QString &family = "Segoe UI", int fontSize = 10, QFont::Weight weight = QFont::Medium);
 
-    signals:
-    void onNameEntered();
-    void onUsernameEntered();
-    void onEmailEntered();
-    void onPasswordEntered();
+        signals:
+        void onNameEntered();
+        void onUsernameEntered();
+        void onEmailEntered();
+        void onPasswordEntered();
+    };
 };

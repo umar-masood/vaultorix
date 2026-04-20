@@ -1,4 +1,5 @@
 #include "NameValidator.h"
+#include "../../../ui/auth/signup/Signup.h"
 
 /* -----------  Name Validator -------------------  */
 bool NameValidator::isValidName(const QByteArray &bytes) {
@@ -32,13 +33,13 @@ GetName::GetName(QObject *parent) : QObject(parent) {
     connect(timer, &QTimer::timeout, this, &GetName::onTimeout);
 }
 
-void GetName::setAccountSignup(Signup *instance) {
+void GetName::setAccountSignupWidget(Ui::Auth::Signup *instance) {
     if (!instance) 
         return;
     
-    ac = instance;
+    signupWidget = instance;
     
-    connect(ac->nameField(), &CustomTextField::textChanged, this, &GetName::onNameChanged);
+    connect(signupWidget->nameField(), &CustomTextField::textChanged, this, &GetName::onNameChanged);
 }
 
 void GetName::onNameChanged(const QString &text) {
@@ -48,13 +49,13 @@ void GetName::onNameChanged(const QString &text) {
 }
 
 void GetName::onTimeout() {
-    if (!ac) return;
+    if (!signupWidget) return;
 
-    QByteArray text = ac->nameField()->text().toUtf8();
+    QByteArray text = signupWidget->nameField()->text().toUtf8();
 
     if (text.isEmpty()) {
-        ac->nameField()->setInvalid();
-        ac->nameField()->setTooltip("");
+        signupWidget->nameField()->setInvalid();
+        signupWidget->nameField()->setTooltip("");
         return;
     }
 
@@ -66,10 +67,10 @@ void GetName::onTimeout() {
     Utils::cleanupMemory(text);
 
     if (ok) {
-        ac->nameField()->setValid();
-        ac->nameField()->setTooltip("Valid full name");
+        signupWidget->nameField()->setValid();
+        signupWidget->nameField()->setTooltip("Valid full name");
     } else {
-        ac->nameField()->setInvalid();
-        ac->nameField()->setTooltip("Invalid full name");
+        signupWidget->nameField()->setInvalid();
+        signupWidget->nameField()->setTooltip("Invalid full name");
     }
 }

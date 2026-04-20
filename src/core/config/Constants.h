@@ -24,3 +24,5 @@
 #define DEVICE_ID_SETTINGS_KEY "Device/DeviceId"
 #define ACCOUNT_REGISTERED_SETTINGS_KEY "Account/IsRegistered"
 #define DEVICE_THEME_KEY "Device/Theme"
+
+#define UPDATE_DOWNLOAD_FILE "Vaultorix-Setup.exe"
