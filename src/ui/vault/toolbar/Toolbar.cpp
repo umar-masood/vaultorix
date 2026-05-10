@@ -1,11 +1,15 @@
 #include "ToolBar.h"
-#include "../../../../resources/IconManager.h"
+
 #include "../../../core/theme/ThemeManager.h"
+#include "../../../core/session/SessionManager.h"
+
+#include "../../../../resources/IconManager.h"
 #include "../../components/Button.h"
 #include "../user/User.h"
 
-using Ui::Vault::Toolbar;
+#include <QHBoxLayout>
 
+using Ui::Vault::Toolbar;
 Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
     setFixedHeight(64);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -44,7 +48,10 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
 
     // User Profile Widget
     user_widget = new Ui::Vault::User();
-    user_widget->setName("Umar Masood");
+    user_widget->setName(SessionManager::instance().fullName());
+    connect(&SessionManager::instance(), &SessionManager::userInfoChanged, this, [this](){
+        user_widget->setName(SessionManager::instance().fullName());
+    });
 
     // Layout
     layout = new QHBoxLayout(this);

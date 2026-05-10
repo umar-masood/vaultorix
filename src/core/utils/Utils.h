@@ -20,7 +20,7 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 
-#include "../../../dependencies/qtkeychain/keychain.h"
+// #include "../../../dependencies/qtkeychain/keychain.h"
 #include "../../ui/dialogs/error_dialog/ErrorDialog.h"
 
 namespace Utils {
@@ -37,18 +37,48 @@ namespace Utils {
         static InternetConnectivity& instance();
         void checkConnectivity();
 
-        template<typename Function>
-        void runIfOnline(Function func, QObject *parent = nullptr, ErrorDialogManager *errorManager = nullptr) {
-            static_assert(std::is_invocable_v<Function> , "runIfOnline requires a callable.");
+        template<typename RequestCallable, typename NoInternetCallable = std::nullptr_t> 
+
+         /**
+         * This method is used to run a network request after checking whether there is an active internet connection?
+         * 
+         * If there is no, then it will show error dialog of no internet connectivity, we must pass current window key to correctly parented the dailog with its main window ("Auth for AuthWindow  AND   Vault for VaultWindow")
+         * 
+         * In case if we want to call our own function in case of no internet connection established then we can passed it as noInternetCallable
+         * 
+         * 
+         * Logic:
+         * We want the second template argument should be optional, as we know templates uses default type not default value and then they pass that type to function etc., 
+         * 
+         * Here we have passed default std::nullptr_t which only stores one value that is nullptr
+         * So when user does pass noInternetCallable then template deduces its default type which will be std::nullptr_t and then inside function parameter, it will assign a default value which will be nullptr
+         */
+        void runIfOnline(RequestCallable requestCallable, 
+                        QObject *parent = nullptr, 
+                        const QString &dialogCurrentWindowKey = "Auth",
+                        NoInternetCallable noInternetCallable = nullptr
+                    ) 
+        {
+            static_assert(std::is_invocable_v<RequestCallable> , "runIfOnline requires a request callable.");
+
+            if constexpr(!std::is_same_v<NoInternetCallable, std::nullptr_t>)
+                static_assert(std::is_invocable_v<NoInternetCallable> , "runIfOnline requires a no internet callable.");
+
             InternetConnectivity::instance().checkConnectivity();
+
             connect(&InternetConnectivity::instance(), &InternetConnectivity::connectivityChanged, parent, 
-            [func, errorManager](bool isOnline) {
+            [requestCallable, noInternetCallable, dialogCurrentWindowKey](bool isOnline) {
+
                 if (isOnline)
-                    func();
+                    requestCallable();
                 else {
-                    if (errorManager)
-                        errorManager->show("NoInternet", "Auth");
+                    if (ErrorDialogManager::instance() && !dialogCurrentWindowKey.isEmpty())
+                        ErrorDialogManager::instance()->show("NoInternet", dialogCurrentWindowKey);
+
+                    if constexpr (!std::is_same_v<NoInternetCallable, std::nullptr_t>) 
+                        noInternetCallable();
                 }
+                
             }, Qt::SingleShotConnection);
         }
 
@@ -57,33 +87,31 @@ namespace Utils {
 
         private:  
         InternetConnectivity();
-
         QNetworkAccessManager *manager = nullptr;        
-
     };
 
-    // Secrets Manager
-    class SecretsManager : public QObject {
-        Q_OBJECT
+    // // Secrets Manager
+    // class SecretsManager : public QObject {
+    //     Q_OBJECT
 
-        using Writer = QKeychain::WritePasswordJob;
-        using Reader = QKeychain::ReadPasswordJob;
-        using Remover = QKeychain::DeletePasswordJob;
+    //     using Writer = QKeychain::WritePasswordJob;
+    //     using Reader = QKeychain::ReadPasswordJob;
+    //     using Remover = QKeychain::DeletePasswordJob;
         
-        SecretsManager(QObject *parent = nullptr);
+    //     SecretsManager(QObject *parent = nullptr);
 
-        public:
-        static SecretsManager* instance(QObject *parent);
+    //     public:
+    //     static SecretsManager* instance(QObject *parent);
 
-        void addSecret(const QString &key, const QString &secret);
-        void removeSecret(const QString &key);
-        void retrieveSecret(const QString &key);
+    //     void addSecret(const QString &key, const QString &secret);
+    //     void removeSecret(const QString &key);
+    //     void retrieveSecret(const QString &key);
 
-        signals:
-        void secretAdded(const QString &key, bool isAdded);
-        void secretRetrieved(const QString &key, std::expected<QString, int>);
-        void secretRemoved(const QString &key, bool isRemoved);
-    };
+    //     signals:
+    //     void secretAdded(const QString &key, bool isAdded);
+    //     void secretRetrieved(const QString &key, std::expected<QString, int>);
+    //     void secretRemoved(const QString &key, bool isRemoved);
+    // };
 
     // BlacklistManager
     class BlacklistManager : public QObject {

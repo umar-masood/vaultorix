@@ -1,7 +1,6 @@
 #include "EmailValidator.h"
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
-#include "../../../ui/auth/signup/Signup.h"
 
 EmailValidator::EmailValidator(QObject *parent) : QObject(parent) {
     blacklistManager = new Utils::BlacklistManager(this, "Email");
@@ -9,17 +8,17 @@ EmailValidator::EmailValidator(QObject *parent) : QObject(parent) {
     
     blacklistManager->setFileName(EMAIL_BLACKLIST_FILE);
     if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::EMAIL_BLACKLIST)))) 
-       qDebug() << "Email blacklist download started.\n";
+        INFO_HERE("Email blacklist is being downloaded.");
     else
         loadMailsFromFile();
 
     connect(blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
-        qDebug() << "Email blacklist download completed.\n";
+        INFO_HERE("Email blacklist has been downloaded.");
         loadMailsFromFile();
     });
 }
 
-bool EmailValidator::isValidEmail(QByteArray &email) {
+bool EmailValidator::isValidEmail(const QString &email) {
     // Basic email validation checks
     if (email.isEmpty() || !email.contains('@')) 
         return false;
@@ -35,8 +34,8 @@ bool EmailValidator::isValidEmail(QByteArray &email) {
 
     // Split email into local and domain parts
     int atIndex = email.indexOf('@');
-    QByteArray local = email.left(atIndex);
-    QByteArray domain = email.mid(atIndex + 1);
+    QString local = email.left(atIndex);
+    QString domain = email.mid(atIndex + 1);
 
     if (local.isEmpty() || domain.isEmpty())
         return false;
@@ -51,35 +50,35 @@ bool EmailValidator::isValidEmail(QByteArray &email) {
         return false;
 
     // Check all characters are in valid range - ASCII
-    for (auto c : email) 
-        if (static_cast<unsigned char>(c) > 127)
+    for (QChar c : email) 
+        if (c.unicode() > 127)
             return false;
 
     // Regex patterns for local and domain
     static const QRegularExpression localRe("^[A-Za-z0-9._%+-]+$");
     static const QRegularExpression domainRe("^(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,24}$");
 
-    if (!localRe.match(QString::fromUtf8(local)).hasMatch())
+    if (!localRe.match(local).hasMatch())
         return false;
 
-    if (!domainRe.match(QString::fromUtf8(domain)).hasMatch())
+    if (!domainRe.match(domain).hasMatch())
         return false;
 
     // Check individual domain labels
-    QList<QByteArray> labels = domain.split('.');
-    for (const QByteArray &label : labels) {
+    QList<QString> labels = domain.split('.');
+    for (const QString &label : labels) {
         if (label.startsWith('-') || label.endsWith('-') || label.isEmpty())
             return false;
     }
 
     // Check if email is disposable
     if (tempMails.empty()) {
-        qDebug() << "Disposable domain list is not loaded.\n";
+        ERROR_HERE("Weak email lists cannot be loaded.");
         return false; // If disposable email list is not loaded, we cannot check
     }
 
     // Extract domain part
-    std::string domainStr(domain.constData(), domain.size());
+    std::string domainStr = domain.toStdString();
     Utils::lower(domainStr);
 
     // Check if the domain is disposable
@@ -87,8 +86,6 @@ bool EmailValidator::isValidEmail(QByteArray &email) {
 
     // Securely wipe temporary std::string and QByteArray
     Utils::cleanupMemory(domainStr);
-    Utils::cleanupMemory(domain);
-    Utils::cleanupMemory(local);
 
     // Return true if email is valid and not disposable
     return !isDisposable;
@@ -96,8 +93,7 @@ bool EmailValidator::isValidEmail(QByteArray &email) {
 
 bool EmailValidator::isEmailBlacklisted(const std::string &domain) {
     auto it = cacheMap.find(domain);
-    if (it != cacheMap.end()){
-        qDebug() << "Domain is already checked...";
+    if (it != cacheMap.end()) {
         order.splice(order.end(), order, it->second); 
         return true;
     }
@@ -116,8 +112,13 @@ bool EmailValidator::isEmailBlacklisted(const std::string &domain) {
     return result;
 }
 
-void EmailValidator::isEmailAvailable(QByteArray &email) {
-    QUrl url(route(APIRoutes::CHK_EMAIL) + QString::fromUtf8(email));
+void EmailValidator::checkEmailValidityAndAvailability(const QString &email) {
+    if (!isValidEmail(email)) {
+        emit emailInvalid();
+        return;
+    }
+
+    QUrl url(route(APIRoutes::CHK_EMAIL) + email);
 
     QNetworkRequest request(url);
     request.setTransferTimeout(REQUEST_TIMEOUT);
@@ -128,42 +129,28 @@ void EmailValidator::isEmailAvailable(QByteArray &email) {
             return;
 
         if (reply->error() != QNetworkReply::NoError) {
-            // Error detected
             reply->deleteLater();
-            qDebug() << "Error :  " << reply->errorString() << "\n";
-
-            emit unableToCheckEmailAvailability(); // Emit signal when there is an error while handling the request
+            ERROR_HERE("Network request failed:  " + reply->errorString());
+            emit failedToCheckEmail();
             return;
         }
 
         QByteArray data = reply->readAll();
         reply->deleteLater();
 
-        if (data.isEmpty()) {
-            qDebug() << "Data is empty." << "\n";
+        if (data.isEmpty())
             return;
-        }
 
         QJsonParseError parseError;
         QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
 
-        if (parseError.error != QJsonParseError::NoError) {
-            qDebug() << "Json parsing error." << "\n";
+        if (parseError.error != QJsonParseError::NoError || !jsonDoc.isObject())
             return;
-        }
-
-        if (!jsonDoc.isObject()) {
-            qDebug() << "Invalid json data" << "\n";
-            return;
-        }
 
         QJsonObject obj = jsonDoc.object();
-        message = obj["message"].toString();
-        statusCode = obj["status_code"].toInt();
+        int statusCode = obj["status_code"].toInt();
+        DEBUG_HERE(QString::number(statusCode) + "   " + obj["message"].toString());
         
-        qDebug() << "Email check response: " << message << " (Status Code: " << statusCode << ")\n";
-
-        Utils::cleanupMemory(email); // Cleaning the memory after successfult request handled
         emit emailAvailable(statusCode == 200);
     });
 }
@@ -171,7 +158,7 @@ void EmailValidator::isEmailAvailable(QByteArray &email) {
 void EmailValidator::loadMailsFromFile() {
     std::ifstream file(blacklistManager->filePath);
     if (!file.is_open()) {
-        qDebug() << "Could not open domains list file.\n";
+        ERROR_HERE("Email domains list does not open.");
         return;
     }
 
@@ -180,110 +167,14 @@ void EmailValidator::loadMailsFromFile() {
     while (std::getline(file, line)) {
         if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
             line.pop_back();
+
         Utils::lower(line);
+
         if (!line.empty())
             tempMails.insert(line);
     }
+
     file.close();
-    qDebug() << "Loaded " << tempMails.size() << " domains.\n";
-}
 
-GetEmail::GetEmail(QObject *parent) : QObject(parent) {
-    emailValidator = new EmailValidator(this);
-    timer = new QTimer(this);
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, this, &GetEmail::onTimeout);
-}
-
-void GetEmail::setAccountSignupWidget(Ui::Auth::Signup *instance) {
-    if (!instance) 
-        return;
-
-    signupWidget = instance;
-    
-    connect(signupWidget->emailField(), &CustomTextField::textChanged, this, &GetEmail::onEmailChanged);
-    connect(emailValidator, &EmailValidator::emailAvailable, this, &GetEmail::onEmailAvailable);
-    connect(emailValidator, &EmailValidator::unableToCheckEmailAvailability, this, &GetEmail::onUnableToCheckEmailAvailability);
-}
-
-void GetEmail::onEmailChanged(const QString &text) {
-    Q_UNUSED(text)
-    timer->stop();
-    timer->start(2000);
-}
-
-void GetEmail::onEmailAvailable(bool isAvailable) {
-    if (isAvailable) {
-        signupWidget->emailField()->setValid();
-        signupWidget->emailField()->setTooltip("Email-address is available");
-    } else {
-        signupWidget->emailField()->setInvalid();
-        signupWidget->emailField()->setTooltip("Email-address already exists");
-    }
-    
-    emit emailValidated(isAvailable);
-}
-
-void GetEmail::onUnableToCheckEmailAvailability() {
-    /* Every time, when this slot is called, it will increment the counter by 1. 
-    In each call of this function it will check the retryAttempts are less than 3*/
-    if (retryAttempts < 3) {
-        retryAttempts++;
-        emailValidator->isEmailAvailable(text); // It will call recursively isEmailAvailable() to check weather that entered email is available
-    } else {
-        /* if the retryAttempts limit reached, setInvalid(), 
-        set update tooltip text and update retryAttempts to 0 , so that 
-        next time, when user entered text is changed then it will again check email availability in case of failure in handling
-        network request by calling isEmailAvailable() recursively.*/
-        signupWidget->emailField()->setInvalid();
-        signupWidget->emailField()->setTooltip("Failed to check email availability.");
-
-        retryAttempts = 0; // Resetting conter
-
-        Utils::cleanupMemory(text); // We're clearning the memory when max retry attempts limit reached
-        return;
-    }
-}
-
-void GetEmail::onTimeout() {
-    if (!signupWidget) return;
-    
-    text = signupWidget->emailField()->text().toUtf8(); // Getting data from TextField
-    
-    // In case if there's no text in the TextField
-    if (text.isEmpty()) {
-        signupWidget->emailField()->setInvalid(); 
-        signupWidget->emailField()->setTooltip(""); // No tooltip will show when it is set to empty string
-        return;
-    }
-
-    bool ok = emailValidator->isValidEmail(text); // Returns true if the user entered email is correct.
-
-    if (ok) { // if it is True (it means email format is correct, now we have to check its availability.)
-        qDebug() << "Email is Valid: " << text << "\n";
-
-        signupWidget->emailField()->setTooltip(""); /* We have set empty string to tooltip (Reason: If we don`t do this, then the following behaviour might occurs:
-            Suppose, first time, user enters invalid email, then tooltip will show "Invalid Email-Address" -> its fine
-            BUT 
-            Next time, when user enters correct email address, then it still shows "Invalid email-address" until the availability check is finished.
-            On the basis of which, final message will show in tooltip.
-        */
-        emailValidator->isEmailAvailable(text); // Check weather this email exists in DB
-    } else {
-        // if it is False (Invalid Email), thus we don`t need to check its availability anymore.
-        signupWidget->emailField()->setInvalid();
-        signupWidget->emailField()->setTooltip(
-            "Invalid email address.\n\n"
-            "Please ensure that:\n"
-            "• The email format is correct\n"
-            "• No invalid or spam characters are used\n"
-            "• The domain name is valid\n"
-            "• The email address is unique"
-        );
-
-        qDebug() << "Email is not Valid: " << text << "\n";
-
-        emit emailValidated(false);    
-        Utils::cleanupMemory(text); // Cleaning data
-    }
+    INFO_HERE("Loaded " + QString::number(tempMails.size()) + " domains.");
 }

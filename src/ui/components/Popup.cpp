@@ -1,4 +1,13 @@
 #include "Popup.h"
+#include "RoundedBox.h"
+#include "ScrollBar.h"
+#include "SmoothOpacity.h"
+
+#include <QListView>
+#include <QVBoxLayout>
+#include <QPropertyAnimation>
+#include <QAbstractItemModel>
+#include <QAbstractItemDelegate>
 
 Popup::Popup(QWidget *parent) : RoundedBox(parent) {
     // Items List

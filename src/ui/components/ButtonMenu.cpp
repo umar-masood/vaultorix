@@ -1,4 +1,5 @@
 #include "ButtonMenu.h"
+#include "Menu.h"
 
 ButtonMenu::ButtonMenu(QWidget *parent) : Button(parent) {
     // Button properties

@@ -1,5 +1,11 @@
 #include "ViewDelegate.h"
+
 #include "../../../../resources/IconManager.h"
+
+#include <QTimer>
+#include <QPixmap>
+#include <QRect>
+#include <QIcon>
 
 using Ui::Vault::ViewItem;
 using Ui::Vault::ViewDelegate;

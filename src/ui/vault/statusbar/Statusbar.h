@@ -1,12 +1,12 @@
 #pragma once
 
 #include <QWidget>
-#include <QHBoxLayout>
 #include <QPaintEvent>
 #include <QPainter>
 
 class Label;
 class Seperator;
+class QHBoxLayout;
 
 namespace Ui::Vault {
     /* ---------------------  Statusbar ---------------------- */

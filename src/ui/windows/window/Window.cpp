@@ -13,7 +13,6 @@ Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
     _mainTitleBar->setAttribute(Qt::WA_TranslucentBackground);
     _mainTitleBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);    
     _mainTitleBar->installEventFilter(this);
-    _mainTitleBar->setMouseTracking(true);
     
     /* Sub Title Bar */
     _subTitleBar = new QWidget;
@@ -21,7 +20,6 @@ Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
     _subTitleBar->setContentsMargins(0, 0, 0, 0);
     _subTitleBar->setAttribute(Qt::WA_TranslucentBackground);
     _subTitleBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed); 
-    _subTitleBar->setMouseTracking(true);
 
     /* Title Bar Main Layout*/
     _mainTitleBarLayout = new QHBoxLayout(_mainTitleBar);
@@ -57,7 +55,6 @@ Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
     _contentArea->setContentsMargins(0, 0, 0, 0);
     _contentArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     _contentArea->installEventFilter(this);
-    _contentArea->setMouseTracking(true);
     setInteractiveTitleBarWidget(_contentArea);
 
     /* Entire Layout */
@@ -74,6 +71,7 @@ Window::Window(QWidget *parent) : QWidget(nullptr), isDarkMode(false) {
 
     /* Installing Event Filter */
     installEventFilter(this);
+    qApp->installEventFilter(this);
 }
 
 Button * Window::createWindowButton() {
@@ -213,12 +211,28 @@ bool Window::event(QEvent *event) {
 }
 
 bool Window::eventFilter(QObject *obj, QEvent *event) {
+    if (event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        QPoint windowPos = mapFromGlobal(mouseEvent->globalPosition().toPoint());
+
+        if (!isActiveWindow()) return QWidget::eventFilter(obj, event);
+
+        if (_isNormalWindow && rect().contains(windowPos)) {
+            ResizeRegion region = detectResizeRegion(windowPos);
+            updateCursorForRegion(region);
+            currentResizeRegion = region;
+        } else if (_isNormalWindow) {
+            unsetCursor();
+            currentResizeRegion = ResizeRegion::None;
+        }
+    }
+
     if (obj == _mainTitleBar) {
         if (event->type() == QEvent::MouseButtonDblClick) {
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if (mouseEvent->button() == Qt::LeftButton) {
-                onMaximizeClicked(); 
-                return true;          
+                onMaximizeClicked();
+                return true;
             }
         }
     }
@@ -231,7 +245,7 @@ void Window::paintEvent(QPaintEvent *event) {
     painter.setRenderHints(QPainter::Antialiasing);
 
     QColor brushColor = isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF");
-    QColor penColor   =  "#AFAFAF";
+    QColor penColor   =  "#109AC7";
 
     painter.setBrush(brushColor);
 
@@ -267,19 +281,27 @@ Window::ResizeRegion Window::detectResizeRegion(const QPoint &pos) {
 }
 
 void Window::mouseMoveEvent(QMouseEvent *event) {
+    if (_isDragging) {
+        QPoint delta = event->globalPosition().toPoint() - _dragStartGlobalPos;
+        move(_dragStartWindowPos + delta);
+        return; 
+    }
+
     if (_isNormalWindow) {
         QPoint pos = event->position().toPoint();
         ResizeRegion region = detectResizeRegion(pos);
-
-        // Always update the cursor
         updateCursorForRegion(region);
-
-        // Store current region
         currentResizeRegion = region;
     }
 
-    // Call base class for normal processing
     QWidget::mouseMoveEvent(event);
+}
+
+void Window::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton && _isDragging) {
+        _isDragging = false;
+    }
+    QWidget::mouseReleaseEvent(event);
 }
 
 void Window::mousePressEvent(QMouseEvent *event) {
@@ -288,29 +310,33 @@ void Window::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
-    if (_isNormalWindow && (currentResizeRegion != ResizeRegion::None)) {
+    // Resize
+    if (_isNormalWindow && currentResizeRegion != ResizeRegion::None) {
         if (windowHandle()) {
-            Qt::Edges edges = Qt::Edges();
+            Qt::Edges edges;
             switch (currentResizeRegion) {
-                case ResizeRegion::Left: edges = Qt::LeftEdge; break;
-                case ResizeRegion::Right: edges = Qt::RightEdge; break;
-                case ResizeRegion::Top: edges = Qt::TopEdge; break;
-                case ResizeRegion::Bottom: edges = Qt::BottomEdge; break;
-                case ResizeRegion::TopLeft: edges = Qt::TopEdge | Qt::LeftEdge; break;
-                case ResizeRegion::TopRight: edges = Qt::TopEdge | Qt::RightEdge; break;
-                case ResizeRegion::BottomLeft: edges = Qt::BottomEdge | Qt::LeftEdge; break;
+                case ResizeRegion::Left:        edges = Qt::LeftEdge; break;
+                case ResizeRegion::Right:       edges = Qt::RightEdge; break;
+                case ResizeRegion::Top:         edges = Qt::TopEdge; break;
+                case ResizeRegion::Bottom:      edges = Qt::BottomEdge; break;
+                case ResizeRegion::TopLeft:     edges = Qt::TopEdge | Qt::LeftEdge; break;
+                case ResizeRegion::TopRight:    edges = Qt::TopEdge | Qt::RightEdge; break;
+                case ResizeRegion::BottomLeft:  edges = Qt::BottomEdge | Qt::LeftEdge; break;
                 case ResizeRegion::BottomRight: edges = Qt::BottomEdge | Qt::RightEdge; break;
                 default: break;
             }
-
             windowHandle()->startSystemResize(edges);
         }
+        QWidget::mousePressEvent(event);
+        return;
+    }
 
-    } else if (_mainTitleBar->geometry().contains(event->pos()) && 
-                !isPointInsideInteractiveTitleBarWidgets(event->position().x(), event->position().y()))
+    if (_mainTitleBar->geometry().contains(event->pos()) &&
+        !isPointInsideInteractiveTitleBarWidgets(event->position().x(), event->position().y()))
     {
-        if (windowHandle())
-            windowHandle()->startSystemMove();
+        _isDragging = true;
+        _dragStartGlobalPos = event->globalPosition().toPoint();
+        _dragStartWindowPos = frameGeometry().topLeft();
     }
 
     QWidget::mousePressEvent(event);
@@ -337,6 +363,24 @@ void Window::changeEvent(QEvent *event) {
         updateMaximizeIcon();
 
     QWidget::changeEvent(event);
+}
+
+void Window::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
+
+    QPoint localPos = mapFromGlobal(QCursor::pos());
+    if (rect().contains(localPos) && _isNormalWindow) {
+        ResizeRegion region = detectResizeRegion(localPos);
+        updateCursorForRegion(region);
+        currentResizeRegion = region;
+    } else {
+        unsetCursor();
+        currentResizeRegion = ResizeRegion::None;
+    }
+}
+
+Window::~Window() {
+    qApp->removeEventFilter(this);
 }
 
 QWidget* Window::titleBar() const { return _subTitleBar; }

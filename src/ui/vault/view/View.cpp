@@ -1,16 +1,23 @@
 #include "View.h"
+#include "ViewDelegate.h"
+
+#include "../../../core/theme/ThemeManager.h"
 
 #include "../../../../resources/IconManager.h"
-#include "../../../core/theme/ThemeManager.h"
 #include "../empty_state/EmptyState.h"
+
 #include "../../components/ViewModeToggle.h"
 #include "../../components/TextField.h"
 #include "../../components/ButtonMenu.h"
 #include "../../components/ScrollBar.h"
+#include "../../components/Delegate.h"
+#include "../../components/Menu.h"
 
-#include "ViewDelegate.h"
 #include <QTimer>
 #include <QRandomGenerator>
+#include <QListView>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 using Ui::Vault::View;
 using Ui::Vault::ViewItem;
@@ -33,7 +40,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     filterButtonMenu->setIconPaths(FilterIcon, FilterIcon);
     filterButtonMenu->setRightSideIcon(ArrowDownIcon, ArrowDownIcon);
     filterButtonMenu->setFontProperties("Segoe UI", 10);
-    filterButtonMenu->setText("Filter");
+    filterButtonMenu->setText(tr("Filter"));
     filterButtonMenu->setFontXY(0, -1);
     filterButtonMenu->menu()->setItemSize(QSize(180, 36));
     filterButtonMenu->menu()->delegate()->setSelectionDotIndicator(true);
@@ -47,7 +54,7 @@ View::View(QWidget *parent) : QWidget(parent) {
 
     // Search Box
     search_box = new TextField;
-    search_box->setPlaceholderText("Type to search your files…");
+    search_box->setPlaceholderText(tr("Type to search your files…"));
     search_box->setFixedSize(QSize(400, 32));
     search_box->setClearButton(true);
     search_box->setIconic(true);

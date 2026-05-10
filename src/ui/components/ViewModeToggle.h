@@ -1,12 +1,13 @@
 #pragma once
 
 #include <QWidget>
-#include <QButtonGroup>
-#include <QHBoxLayout>
-#include <QPainter>
+#include <QString>
 
-#include "ToolTip.h"
-#include "Button.h"
+class QButtonGroup;
+class QHBoxLayout;
+class QPaintEvent;
+class ToolTip;
+class Button;
 
 class ViewModeToggle : public QWidget {
     Q_OBJECT

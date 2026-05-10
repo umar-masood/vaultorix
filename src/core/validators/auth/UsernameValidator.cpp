@@ -1,141 +1,104 @@
 #include "UsernameValidator.h"
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
-#include "../../../ui/auth/signup/Signup.h"
+#include "../../../ui/utils/Utils.h"
 
 UsernameValidator::UsernameValidator(QObject *parent) : QObject(parent) {
     manager = new QNetworkAccessManager(this);
 
     blacklistManager = new Utils::BlacklistManager(this, "Username");
     blacklistManager->setFileName(USERNAME_BLACKLIST_FILE);
-    
+
     if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::USERNAME_BLACKLIST))))
-        qDebug() << "Username blacklist download started.\n";
+        INFO_HERE("Username blacklist is being downloaded.");
     else
         loadUsernamesFromFile();
-    
+
     connect(blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
-        qDebug() << "Username blacklist download completed.\n";
+        INFO_HERE("Username blacklist has been downloaded.");
         loadUsernamesFromFile();
     });
 }
 
-bool UsernameValidator::isValidUsername(QByteArray &username) {
-    //  Length check
-    if (username.length() < 3 || username.length() > 20) {
+bool UsernameValidator::isValidUsername(const QString &username) {
+    if (username.length() < 3 || username.length() > 20)
         return false;
-    }
 
-    // First character must be a letter
-    if (!std::isalpha(static_cast<unsigned char>(username.at(0)))) {
+    if (!username.at(0).isLetter())
         return false;
-    }
 
-    // Start/end character restrictions
     if (username.startsWith("-") || username.startsWith(".") || username.startsWith("_") ||
-        username.endsWith("-") || username.endsWith(".") || username.endsWith("_")) {
+        username.endsWith("-") || username.endsWith(".") || username.endsWith("_"))
         return false;
-    }
 
-    // Non-ASCII check
-    for (auto c : username) {
-        if (static_cast<unsigned char>(c) > 127) {
+    for (QChar c : username)
+        if (c.unicode() > 127)
             return false;
-        }
-    }
 
-    // Allowed characters regex
     static const QRegularExpression pattern("^[A-Za-z0-9._-]+$");
-    if (!pattern.match(QString::fromUtf8(username)).hasMatch()) {
+    if (!pattern.match(username).hasMatch())
         return false;
-    }
 
-    // Convert to lowercase safely
-    std::string usernameStd = username.toStdString();                
+    std::string usernameStd = username.toStdString();
     Utils::lower(usernameStd);
 
-    // Check for repeated characters (>=3)
-    int count = 1;
-    for (size_t i = 0; i < usernameStd.size() - 1; i++) {
-        if (usernameStd[i] == usernameStd[i + 1]) {
-            count++;
-            if (count >= 3) {
-                Utils::cleanupMemory(usernameStd);
-                return false;
+    if (usernameStd.size() > 1) {
+        int count = 1;
+        for (size_t i = 0; i + 1 < usernameStd.size(); i++) {
+            if (usernameStd[i] == usernameStd[i + 1]) {
+                if (++count >= 3)
+                    return false;
+            } else {
+                count = 1;
             }
-        } else {
-            count = 1;
         }
     }
 
-    // In case if there was an issue loading the blacklist (not found or not downloaded)
     if (tempUsernames.empty()) {
-        Utils::cleanupMemory(usernameStd);
-        qDebug() << "Username blacklist is not loaded.\n";
+        ERROR_HERE("Username blacklist is not loaded.");
         return false;
     }
 
-    // Blacklist check
-    bool blacklisted = isUsernameBlacklisted(usernameStd);
-
-    Utils::cleanupMemory(usernameStd);
-
-    return !blacklisted;
+    return tempUsernames.find(usernameStd) == tempUsernames.end();
 }
 
-bool UsernameValidator::isUsernameBlacklisted(const std::string &username) const {
-    return tempUsernames.find(username) != tempUsernames.end(); // Username is blacklisted (True if found)
-}
-
-void UsernameValidator::isUsernameAvailable(QByteArray &username) {
-    QUrl url(route(APIRoutes::CHK_USERNAME) +  QString::fromUtf8(username));
-  
-    qDebug() << "Checking username availability for: " << QString::fromUtf8(username) << "\n";
-    QNetworkRequest request(url);
+void UsernameValidator::checkUsernameValidityAndAvailability(const QString &username) {
+    if (!isValidUsername(username)) {
+        emit usernameInvalid();
+        return;
+    }
+    QNetworkRequest request(QUrl(route(APIRoutes::CHK_USERNAME) + username));
     request.setTransferTimeout(REQUEST_TIMEOUT);
 
     QNetworkReply *reply = manager->get(request);
-
-    connect(reply, &QNetworkReply::finished, [this, reply, &username](){
+    connect(reply, &QNetworkReply::finished, this, [this, reply, username]() {
         if (!reply)
             return;
 
         if (reply->error() != QNetworkReply::NoError) {
+            ERROR_HERE("Network request failed: " + reply->errorString());
             reply->deleteLater();
-            qDebug() << "Error :  " << reply->errorString() << "\n";
-
-            emit unableToCheckUsernameAvailability(); // Emit signal when there is an error while handling the request
+            emit failedToCheckUsername();
             return;
         }
 
         QByteArray data = reply->readAll();
         reply->deleteLater();
 
-        if (data.isEmpty()) {
-            qDebug() << "Data is empty." << "\n"; 
+        if (data.isEmpty())
             return;
-        }
 
         QJsonParseError parseError;
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
+        QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
 
-        if (parseError.error != QJsonParseError::NoError) {
-            qDebug() << "Json parsing error." << "\n";
+        if (parseError.error != QJsonParseError::NoError || !doc.isObject())
             return;
-        }
 
-        if (!jsonDoc.isObject()) {
-            qDebug() << "Invalid json data" << "\n";
-            return;
-        }
+        QJsonObject obj = doc.object();
+        int statusCode = obj["status_code"].toInt();
 
-        QJsonObject obj = jsonDoc.object();
-        message = obj["message"].toString();
-        statusCode = obj["status_code"].toInt();
-        
-        qDebug() << "Username check response: " << message << " (Status Code: " << statusCode << ")\n";
+        DEBUG_HERE(QString::number(statusCode) + "   " + obj["message"].toString());
 
-        Utils::cleanupMemory(username);
         emit usernameAvailable(statusCode == 200);
     });
 }
@@ -143,14 +106,15 @@ void UsernameValidator::isUsernameAvailable(QByteArray &username) {
 void UsernameValidator::loadUsernamesFromFile() {
     std::ifstream file(blacklistManager->filePath);
     if (!file.is_open()) {
-        qDebug() << "Could not open usernames list file.\n";
+        ERROR_HERE("Unable to open username blacklist.");
         return;
     }
 
+    tempUsernames.clear();
     tempUsernames.reserve(430);
+
     std::string line;
     while (std::getline(file, line)) {
-        // Remove line endings
         while (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
             line.pop_back();
 
@@ -159,99 +123,6 @@ void UsernameValidator::loadUsernamesFromFile() {
         if (!line.empty())
             tempUsernames.insert(line);
     }
-    file.close();
 
-    qDebug() << "Loaded " << tempUsernames.size() << " usernames.\n";
+    INFO_HERE("Loaded " + QString::number(tempUsernames.size()) + " usernames.");
 }
-
-/* ==================== Get Username ==================== */
-GetUsername::GetUsername(QObject *parent) : QObject(parent) {
-    usernameValidator = new UsernameValidator(this);
-
-    timer = new QTimer(this);
-    timer->setSingleShot(true);
-
-    connect(timer, &QTimer::timeout, this, &GetUsername::onTimeout);
-    connect(usernameValidator, &UsernameValidator::usernameAvailable, this, &GetUsername::onUsernameAvailable);
-    connect(usernameValidator, &UsernameValidator::unableToCheckUsernameAvailability, this, &GetUsername::onUnableToCheckUsernameAvailability);
-}
-
-void GetUsername::setAccountSignupWidget(Ui::Auth::Signup *instance) {
-    if (!instance) 
-        return;
-
-    signupWidget = instance;
-    
-    connect(signupWidget->usernameField(), &CustomTextField::textChanged, this, &GetUsername::onUsernameChanged);
-}
-
-void GetUsername::onUsernameChanged(const QString &text) {
-    Q_UNUSED(text)
-    timer->stop();
-    timer->start(2000); 
-}
-
-void GetUsername::onUsernameAvailable(bool isAvailable) {
-    if (isAvailable) {
-        signupWidget->usernameField()->setValid();
-        signupWidget->usernameField()->setTooltip("Username is available.");
-    } else {
-        signupWidget->usernameField()->setInvalid();
-        signupWidget->usernameField()->setTooltip("Username is already taken.\nPlease use another.");
-    }
-    emit usernameValidated(isAvailable);
-}
-
-void GetUsername::onUnableToCheckUsernameAvailability() {
-    if (retryAttempts < 3) {
-        retryAttempts++;
-        usernameValidator->isUsernameAvailable(text);
-    } else {
-        signupWidget->usernameField()->setInvalid();
-        signupWidget->usernameField()->setTooltip("Failed to check username availability.");
-        retryAttempts = 0;
-
-        Utils::cleanupMemory(text);
-        return;
-    }
-}
-    
-void GetUsername::onTimeout() {
-    if (!signupWidget) return;
-
-    text = signupWidget->usernameField()->text().toUtf8();
-
-    if (text.isEmpty()) {
-        signupWidget->usernameField()->setInvalid();
-        signupWidget->usernameField()->setTooltip("");
-        return;
-    }
-
-    // Validate username
-    bool ok = usernameValidator->isValidUsername(text);
-    
-    if (ok) {
-        qDebug() << "Username is valid: " << text << "\n";
-        signupWidget->usernameField()->setTooltip("");
-        
-        usernameValidator->isUsernameAvailable(text);
-    } else {
-        signupWidget->usernameField()->setInvalid();
-        signupWidget->usernameField()->setTooltip(
-        "Invalid username.\n\n"
-        "Please ensure that:\n"
-        "• 3-20 characters, starting with a letter\n"
-        "• Letters, numbers, . _ - only\n"
-        "• Cannot start or end with . _ -\n"
-        "• No excessive character repetition\n"
-        "• Must not be reserved"
-        );
-
-        qDebug() << "Username is not Valid: " << text << "\n";
-
-        emit usernameValidated(false); 
-        Utils::cleanupMemory(text);
-    }
-    
-}
-

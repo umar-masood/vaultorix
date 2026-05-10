@@ -8,7 +8,7 @@
 
 class LineProgress;
 
-namespace Core::Services {
+namespace Core {
     /**
      * This class will:
      * - Sends get request to the server for checking is there any update available for this app?

@@ -1,30 +1,36 @@
 #pragma once
 
-#include "Button.h"
-#include "TextField.h"
-#include "SmoothShadow.h"
-#include "SmoothOpacity.h"
-#include "RoundedBox.h"
-#include "ScrollBar.h"
-#include "Delegate.h"
-#include "Popup.h"
-#include "../../../resources/IconManager.h"
 
-#include <QObject>
-#include <QEvent>
-#include <QApplication>
-#include <QPoint>
-#include <QScreen>
-#include <QKeyEvent>
-#include <QListView>
-#include <QAbstractItemView>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QCompleter>
-#include <QVBoxLayout>
-#include <QFrame>
-#include <QStringList>
+#include "../../../resources/IconManager.h"
+#include "TextField.h"
+
 #include <QVector>
+#include <QString>
+#include <QStandardItemModel>
+#include <QAbstractItemView>
+
+class QObject;
+class QEvent;
+class QPoint;
+class QScreen;
+class QKeyEvent;
+class QModelIndex;
+class QMouseEvent;
+class QContextMenuEvent;
+class QResizeEvent;
+
+class QStandardItem;
+class QCompleter;
+class QListView;
+class QVBoxLayout;
+
+class Button;
+class SmoothOpacity;
+class SmoothShadow;
+class RoundedBox;
+class Delegate;
+class ScrollBar;
+class Popup;
 
 class ComboBox : public TextField {
     Q_OBJECT
@@ -32,7 +38,11 @@ class ComboBox : public TextField {
     public:
     explicit ComboBox(QWidget *parent = nullptr);
 
-    struct ComboItem { QString text; QString lightIcon = ""; QString darkIcon = ""; };
+    struct ComboItem { 
+        QString text; 
+        QString lightIcon = ""; 
+        QString darkIcon = ""; 
+    };
 
     void setIconic(bool value);
     void setEditable(bool value);

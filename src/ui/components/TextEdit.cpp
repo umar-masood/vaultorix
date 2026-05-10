@@ -1,9 +1,20 @@
 #include "TextEdit.h"
+
 #include "../../../resources/IconManager.h"
+
+#include "Menu.h"
+#include "ScrollBar.h"
 
 #include <QPainter>
 #include <QPainterPath>
 #include <QScrollBar>
+#include <QApplication>
+#include <QClipboard>
+#include <QMimeData>
+#include <QPalette>
+#include <QTextDocument>
+#include <QDebug>
+#include <QContextMenuEvent>
 
 TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent) {    
     setFrameStyle(QFrame::NoFrame);    

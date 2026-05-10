@@ -1,17 +1,15 @@
 #pragma once
-#include "SmoothOpacity.h"
 
 #include <QWidget>
-#include <QPropertyAnimation>
-#include <QTimer>
-#include <QPainter>
-#include <QPaintEvent>
-#include <QColor>
-#include <QEasingCurve>
-#include <QFont>
-#include <QtMath>
-#include <algorithm>
 #include <QHash>
+
+class QPainter;
+class QPaintEvent;
+class QString;
+class QColor;
+class QTimer;
+class QPropertyAnimation;
+class SmoothOpacity;
 
 class LineProgress : public QWidget {
    Q_OBJECT

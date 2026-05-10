@@ -1,19 +1,30 @@
-#include "Otp.h"
+#include "OTP.h"
+
+#include "../../components/Button.h"
+#include "../../components/Label.h"
+#include "../../utils/Utils.h"
 #include "../../../../resources/IllustrationManager.h"
+#include "../../vault/vault_window/VaultWindow.h"
+#include "../auth_window/AuthWindow.h"
+
 #include "../../../core/config/Constants.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../../core/session/SessionManager.h"
+#include "../../../core/services/auth/TokenManager.h"
 
-using namespace Ui::Auth;
+using Ui::OTP;
+using Ui::Utils::TextWithBtn;
+
 /* =========================================================================================
                               ACCOUNT OTP IMPLEMENTATION
    ========================================================================================= */
-Otp::Otp(QWidget *parent) : QWidget(parent) {
+OTP::OTP(QWidget *parent, Ui::AuthWindow *authWindow) : QWidget(parent), _authWindow(authWindow) {
     setAttribute(Qt::WA_TranslucentBackground);
 
     // Illustration of OTP at the top
     illustration = new Label(true);
     illustration->setFixedSize(QSize(106, 106));
-    illustration->setPixmap(QPixmap(IllustrationManager::illustration(Illustrations::Otp)).scaled(106, 106, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    illustration->setPixmap(QPixmap(IllustrationManager::illustration(Illustrations::OTP)).scaled(106, 106, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     illustration->setScaledContents(true);
 
     // Main Heading
@@ -25,10 +36,15 @@ Otp::Otp(QWidget *parent) : QWidget(parent) {
     text->setWordWrap(true);
     text->setStyleSheet("color: #8D8D8D;");
     text->setFixedWidth(324);
-    connect(this, &Otp::emailEntered, this, &Otp::onEmailEntered);
+    connect(this, &OTP::emailEntered, this, &OTP::onEmailEntered);
 
     // OTP Widget (Contains 6 input OTP_BOXS)
-    _otpWidget = new OTPWidget;
+    _otpInputWidget = new OTPInputWidget;
+    connect(_otpInputWidget, &OTPInputWidget::OTPincomplete, this, [this]{  _verifyBtn->setEnabled(false); });
+    connect(_otpInputWidget, &OTPInputWidget::OTPcompleted, this, [this](const QString &otp){
+        currentOtp = otp;
+        _verifyBtn->setEnabled(true);
+    });
 
     // Message Label (For displaying error messages)
     _message = new AnimatedLabel("Segoe UI", 10, QFont::Medium, false);
@@ -38,7 +54,7 @@ Otp::Otp(QWidget *parent) : QWidget(parent) {
 
     // Resend OTP Widget (Resend Text + Button + Timer)
     _resendOtpWidget = new TextWithBtn("Didn`t receive the OTP?", QSize(136, 22), "Resend", QSize(50, 12), true);
-    connect(_resendOtpWidget, &TextWithBtn::buttonClicked, this, &Otp::resendClicked);
+    connect(_resendOtpWidget, &TextWithBtn::buttonClicked, this, &OTP::onResendClicked);
 
     // Verify Button
     _verifyBtn = new Button("Verify");
@@ -49,11 +65,8 @@ Otp::Otp(QWidget *parent) : QWidget(parent) {
     _verifyBtn->setFontProperties("Segoe UI", 10, QFont::DemiBold);
     _verifyBtn->setLoaderButton(true);
     _verifyBtn->setEnabled(false);
-
-    connect(_verifyBtn, &Button::clicked, this, &Otp::verifyClicked);
-    connect(_otpWidget, &OTPWidget::OTPincomplete, this, [this]{ 
-        _verifyBtn->setEnabled(false); 
-    });
+    connect(_verifyBtn, &Button::clicked, this, &OTP::onVerifyClicked);
+   
 
     // Cancel Button
     _cancelBtn = new Button("Cancel");
@@ -62,10 +75,10 @@ Otp::Otp(QWidget *parent) : QWidget(parent) {
     _cancelBtn->setSecondary(true);
     _cancelBtn->setFixedSize(QSize(360, 36));
     _cancelBtn->setFontProperties("Segoe UI", 10, QFont::DemiBold);
-    connect(_cancelBtn, &Button::clicked, this, &Otp::cancelClicked);
+    connect(_cancelBtn, &Button::clicked, this, &OTP::onCancelClicked);
 
     // Main Layout
-    layout = new QVBoxLayout;
+    auto *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->addWidget(illustration, 0, Qt::AlignHCenter);
     layout->addSpacing(20);
@@ -73,7 +86,7 @@ Otp::Otp(QWidget *parent) : QWidget(parent) {
     layout->addSpacing(20);
     layout->addWidget(text, 0, Qt::AlignHCenter);
     layout->addSpacing(20);
-    layout->addWidget(_otpWidget, 0, Qt::AlignHCenter);
+    layout->addWidget(_otpInputWidget, 0, Qt::AlignHCenter);
     layout->addSpacing(10);
     layout->addWidget(_message, 0, Qt::AlignHCenter);
     layout->addSpacing(16);
@@ -85,47 +98,55 @@ Otp::Otp(QWidget *parent) : QWidget(parent) {
     layout->addStretch();
     setLayout(layout);
 
+    // Timer
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &OTP::onOTPTimeout);
+
+    // OTP Core
+    otp_core = new OTPCore(this);
+
+    connect(otp_core, &OTPCore::somethingWentWrong, this, &OTP::onSomethingWentWrong);
+    connect(otp_core, &OTPCore::maxLimitReached,    this, &OTP::onMaxLimitReached);
+    connect(otp_core, &OTPCore::OTPSent,            this, &OTP::onOTPSent);
+    connect(otp_core, &OTPCore::OTPVerified,        this, &OTP::onOTPVerified);
+    connect(otp_core, &OTPCore::noInternet,         this, &OTP::onNoInternet);
+
     // Theme Mode
     auto &tm = ThemeManager::instance();
-    connect(&tm, &ThemeManager::themeChanged, this, &Otp::setDarkMode);
+    connect(&tm, &ThemeManager::themeChanged, this, &OTP::setDarkMode);
     setDarkMode((tm.isDarkMode()));  
 }
 
-/* --------------------  Getters  -----------------  */
-/**
- * @return OTP widget which contains 5 input OTP_BOXS
- */
-OTPWidget *Otp::otpWidget() const { return _otpWidget; }
-Button *Otp::verifyButton() const { return _verifyBtn; }
-/**
- * @return Resend OTP widget which contains a resend button for again requesting OTP
- */
-TextWithBtn *Otp::resendOtpWidget() const { return _resendOtpWidget; }
-/**
- * @brief It is a Label inside of Account OTP widget, which is used for displaying error messages
- */
-AnimatedLabel *Otp::message() const { return _message; }
-
 /* --------------------  Setters  -----------------  */
-void Otp::onEmailEntered(const QString &email)
-{
-    QString e = email;
-    int idx = e.indexOf('@');
+void OTP::onEmailEntered(const QString &email) {
+    QString emailStr = email;
+    int idx = emailStr.indexOf('@');
     if (idx > 3)
         for (int i = 3; i < idx; i++)
-            e[i] = '*';
+            emailStr[i] = '*';
 
     if (email.isEmpty())
         text->setText("");
     else
-        text->setText(QString("To confirm your identity, please enter the One-Time Password (OTP) sent to your registered email-address (%1) below.").arg(e));
+        text->setText(QString("To confirm your identity, please enter the One-Time Password (OTP) sent to your registered email-address (%1) below.").arg(emailStr));
 }
 
-void Otp::setEmail(const QString &email) {
-    emit emailEntered(email);
+void OTP::setEmail(const QString &email) {
+    _email = email;
+
+    _resendOtpWidget->button()->setEnabled(false);
+    isSendingOTP = true;
+
+    otp_core->sendOTP(_email);
+
+    emit emailEntered(_email);
 }
 
-void Otp::setDarkMode(bool isDarkMode) {
+void OTP::setAuthType(const QString &authType) {
+    _authType = authType;
+}
+
+void OTP::setDarkMode(bool isDarkMode) {
     // Header (Verify with OTP)
     heading->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
 
@@ -136,16 +157,148 @@ void Otp::setDarkMode(bool isDarkMode) {
     _resendOtpWidget->text()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black"));
     _resendOtpWidget->timer()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black"));
 
-    // OTP code input box widgets
-    _otpWidget->setDarkMode(isDarkMode);
+    // OTP input box widgets
+    _otpInputWidget->setDarkMode(isDarkMode);
 }
+
+/* -------- Slots ----------------- */
+void OTP::onOTPSent() {
+    isSendingOTP = false;
+    disableResendAndSetTimer();
+    _message->setAnimatedText("");
+}
+
+void OTP::onOTPVerified(bool isVerified, const QJsonObject &obj) {
+    if (isVerified) {
+        disableControls("Verified");
+
+        if (obj.isEmpty()) {
+            emit OTPVerified(isVerified);
+        } else {
+            // User Account Details
+            SessionManager::instance().loadFromJson(obj);
+
+            if (_authWindow) {
+                _authWindow->close();
+                _authWindow->deleteLater();
+            }
+
+            Ui::Vault::VaultWindow::instance()->show();
+        }
+    } else {
+        _verifyBtn->setText(tr("Verify"));
+        _verifyBtn->setEnabled(true);
+        _message->setAnimatedText(tr("Your entered OTP is incorrect or expired."));
+    }
+}
+
+void OTP::onResendClicked() {
+    if (isSendingOTP)
+        return;
+
+    isSendingOTP = true;
+    _resendOtpWidget->button()->setEnabled(false);
+
+    if (otp_core) 
+        otp_core->sendOTP(_email);
+}
+
+void OTP::onVerifyClicked() {
+    _verifyBtn->setEnabled(false);
+    _verifyBtn->setText("");
+
+    if (otp_core)
+        otp_core->verifyOTP(currentOtp, _email, _authType);
+}
+
+void OTP::onCancelClicked() {
+    QApplication::quit();
+}
+
+void OTP::onOTPTimeout() {
+    totalSecs--;
+
+    if (totalSecs < 0) {
+        timer->stop();
+        _resendOtpWidget->button()->setEnabled(true);
+        _resendOtpWidget->timer()->hide();
+        return;
+    }
+
+    int mins = totalSecs / 60;
+    int secs = totalSecs % 60;
+
+    timeString = QString("%1:%2").arg(mins, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
+
+    _resendOtpWidget->timer()->setText(timeString);
+}
+
+void OTP::disableResendAndSetTimer() {
+    _resendOtpWidget->button()->setEnabled(false);
+
+    _resendOtpWidget->timer()->setText(OTP_INITIAL_TIME_STR); // Initial time
+    _resendOtpWidget->timer()->show();
+    
+    totalSecs = OTP_TIME;
+
+    if (timer) 
+        timer->start(1000); // 1 sec
+}
+
+void OTP::disableControls(const QString &buttonText, const QString &errorMessage) {
+    _verifyBtn->setText(buttonText);
+    _verifyBtn->setEnabled(false);                 // Disables the verify button after successful OTP matching
+
+    _resendOtpWidget->button()->setEnabled(false); // Disables the resend button when otp is verified
+    _resendOtpWidget->timer()->hide();             // Hides the timer
+    
+    _message->setAnimatedText(errorMessage);
+
+    if (timer) 
+        timer->stop();
+
+    _otpInputWidget->setEnabled(false);
+}
+
+using OTPAction =  Core::OTPService::OTPAction;
+void OTP::onSomethingWentWrong(const OTPAction &action) {
+    if (action == OTPAction::Send) {
+        isSendingOTP = false;
+
+        _message->setAnimatedText(tr("Failed to send OTP to your email address. Try again later"));
+
+        _verifyBtn->setText(tr("Verify"));
+        _verifyBtn->setEnabled(false);                 
+
+        _resendOtpWidget->button()->setEnabled(true); 
+    } else {
+        _message->setAnimatedText(tr("Failed to verify your entered OTP"));   
+
+        _verifyBtn->setText(tr("Verify"));
+        _verifyBtn->setEnabled(true);
+    }
+}
+
+void OTP::onMaxLimitReached() {
+    disableControls("Verify");
+
+    if (_message)
+        _message->setAnimatedText(tr("Maximum limit reached. Try again after 24hrs."));
+}
+
+void OTP::onNoInternet() {
+    _verifyBtn->setEnabled(true);
+    _verifyBtn->setText(tr("Verify"));
+}
+
+
 
 /* =========================================================================================
                            CUSTOMIZED WIDGETS FOR ABOVE CLASS
    ========================================================================================= */
 
 /* ---------------- OTP Widget ------------------------  */
-OTPWidget::OTPWidget(QWidget *parent) : QWidget(parent) {
+OTPInputWidget::OTPInputWidget(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_TranslucentBackground);
     setFixedSize(QSize(360, 60));
     setFocusPolicy(Qt::StrongFocus);
@@ -178,13 +331,13 @@ OTPWidget::OTPWidget(QWidget *parent) : QWidget(parent) {
     layout->addStretch();
 
     // Theme Connection
-    connect(&ThemeManager::instance(), &ThemeManager::themeChanged, this, &OTPWidget::setDarkMode);
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged, this, &OTPInputWidget::setDarkMode);
 
     updateStyles();
     updateHighlight();
 }
 
-void OTPWidget::checkOtpCompletion() {
+void OTPInputWidget::checkOtpCompletion() {
     QString otp_text;
     bool allFilled = true;
 
@@ -201,7 +354,7 @@ void OTPWidget::checkOtpCompletion() {
 }
 
 /* --------------------  Overrided Event Methods  -----------------  */
-void OTPWidget::keyPressEvent(QKeyEvent *event) {
+void OTPInputWidget::keyPressEvent(QKeyEvent *event) {
     const int n = OTPBoxes.size();
 
     if ((event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9) ||
@@ -240,14 +393,13 @@ void OTPWidget::keyPressEvent(QKeyEvent *event) {
     }
 }
 
-void OTPWidget::showEvent(QShowEvent *event) {
+void OTPInputWidget::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
     this->setFocus(Qt::OtherFocusReason);
 }
 
 /* --------------------  Setters  -----------------  */
-void OTPWidget::updateStyles()
-{
+void OTPInputWidget::updateStyles() {
     bg_color_normal = _isDarkMode ? "#2D2D2D" : "#FBFBFB";
     bg_color_focused = _isDarkMode ? "#242424" : "#FFFFFF";
     text_color = _isDarkMode ? "white" : "black";
@@ -270,8 +422,7 @@ void OTPWidget::updateStyles()
                         .arg(border_color);
 }
 
-void OTPWidget::updateHighlight()
-{
+void OTPInputWidget::updateHighlight() {
     for (int i = 0; i < OTPBoxes.size(); i++) {
         if (!isEnabled())
             OTPBoxes[i]->setStyleSheet(disabledStyle);
@@ -282,64 +433,14 @@ void OTPWidget::updateHighlight()
     }
 }
 
-void OTPWidget::setDarkMode(bool isDarkMode)
-{
-    this->_isDarkMode = isDarkMode;
+void OTPInputWidget::setDarkMode(bool isDarkMode) {
+    _isDarkMode = isDarkMode;
     updateStyles();
     updateHighlight();
 }
 
-void OTPWidget::setEnabled(bool enabled)
-{
+void OTPInputWidget::setEnabled(bool enabled) {
     QWidget::setEnabled(enabled);
     updateStyles();
     updateHighlight();
 }
-
-/* ------------------------ Text with Button Widget (Used in Account OTP for resend OTP) ------------------------ */
-TextWithBtn::TextWithBtn(const QString &promptText,
-                         const QSize &promptTextSize,
-                         const QString &hyperlinkText,
-                         const QSize &hyperlinkSize,
-                         bool hasTimer,
-                         QWidget *parent) : QWidget(parent)
-{
-    setAttribute(Qt::WA_TranslucentBackground);
-
-    // Text
-    _text = new Label("Segoe UI", 10, QFont::Normal, false, promptText, Qt::AlignHCenter);
-    _text->setStyleSheet("color: black;");
-    _text->setParent(this);
-    _text->setFixedSize(promptTextSize);
-    _text->move(0, 0);
-
-    // Resend Button
-    _button = new Button(this);
-    _button->setDisplayMode(Button::TextOnly);
-    _button->setFixedSize(hyperlinkSize);
-    _button->setText(hyperlinkText);
-    _button->setFontProperties("Segoe UI", 10);
-    _button->setHyperLink(true);
-    _button->move(_text->width() + 4, 2);
-
-    // Signal Slot
-    connect(_button, &Button::clicked, this, &TextWithBtn::buttonClicked);
-
-    setFixedSize(QSize(_text->width() + _button->width() + 2, 18));
-
-    // Timer Label
-    if (hasTimer) {
-        _timer = new Label("Segoe UI", 10, QFont::Normal, false, "00:00", Qt::AlignHCenter);
-        _timer->setStyleSheet("color: black;");
-        _timer->setParent(this);
-        _timer->setFixedSize(36, 22);
-        _timer->move(_text->width() + _button->width() + 4, 0);
-
-        setFixedSize(QSize(_text->width() + _button->width() + _timer->width() + 2, 18));
-    }
-}
-
-/* --------------------  Getters  -----------------  */
-Label *TextWithBtn::text() const { return _text; }
-Button *TextWithBtn::button() const { return _button; }
-Label *TextWithBtn::timer() const { return _timer; }

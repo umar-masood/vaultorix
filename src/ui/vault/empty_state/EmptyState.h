@@ -1,13 +1,12 @@
 #pragma once
 
-#include <QVBoxLayout>
 #include <QWidget>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QMouseEvent>
-#include <QPixmap>
 
 class Label;
+class QVBoxLayout;
 
 namespace Ui::Vault {
     class EmptyState : public QWidget {

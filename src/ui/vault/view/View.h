@@ -1,18 +1,18 @@
 #pragma once
 
-#include <QListView>
-#include <QStandardItemModel>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QWidget>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QResizeEvent>
+#include <QStandardItemModel>
 
 class ViewModeToggle;
 class TextField;
 class ButtonMenu;
 class ScrollBar;
+class QHBoxLayout;
+class QVBoxLayout;
+class QListView;
 
 namespace Ui::Vault {
     class EmptyState;

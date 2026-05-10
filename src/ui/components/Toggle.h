@@ -1,15 +1,15 @@
 #pragma once
-#include "SmoothShadow.h"
 
 #include <QPushButton>
-#include <QPainter>
-#include <QPaintEvent>
-#include <QEnterEvent>
-#include <QMouseEvent>
-#include <QPropertyAnimation>
 #include <QColor>
-#include <QRect>
-#include <algorithm>
+#include <QHash>
+
+class QPaintEvent;
+class QEnterEvent;
+class QMouseEvent;
+class QEvent;
+class QPropertyAnimation;
+class SmoothShadow;
 
 class Toggle : public QPushButton {
   Q_OBJECT
@@ -46,9 +46,7 @@ class Toggle : public QPushButton {
   void setShadow(bool value);
   void setDarkMode(bool value);
 
-  inline uint qHash(const ToggleColor &state, uint seed = 0) {
-    return ::qHash(static_cast<int>(state), seed);
-  }
+  inline uint qHash(const ToggleColor &state, uint seed = 0) { return ::qHash(static_cast<int>(state), seed); }
 
   protected:
   void paintEvent(QPaintEvent *event) override;

@@ -1,10 +1,13 @@
 #include "Statusbar.h"
+
 #include "../../../core/theme/ThemeManager.h"
+
 #include "../../components/Label.h"
 #include "../../components/Seperator.h"
 
-using Ui::Vault::Statusbar;
+#include <QHBoxLayout>
 
+using Ui::Vault::Statusbar;
 Statusbar::Statusbar(QWidget *parent) : QWidget(parent) {
     setFixedHeight(30);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);

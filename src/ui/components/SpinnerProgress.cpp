@@ -1,4 +1,16 @@
 #include "SpinnerProgress.h"
+#include "SmoothOpacity.h"
+
+#include <QPainter>
+#include <QPaintEvent>
+#include <QPen>
+#include <QFont>
+#include <QTimer>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
+#include <QtMath>
+#include <QDebug>
+#include <algorithm>
 
 SpinnerProgress::SpinnerProgress(QWidget *parent) : QWidget(parent) {
    hide();

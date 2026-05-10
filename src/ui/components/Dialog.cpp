@@ -1,5 +1,7 @@
 #include "Dialog.h"
 
+#include <QVBoxLayout>
+
 Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool hasCloseButton) : 
         SubWindow(centralWidget->size(), parent, hasCloseButton, false), 
         contentWidget(centralWidget) 

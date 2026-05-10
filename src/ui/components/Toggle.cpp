@@ -1,4 +1,17 @@
 #include "Toggle.h"
+#include "SmoothShadow.h"
+
+#include <QPainter>
+#include <QPaintEvent>
+#include <QEnterEvent>
+#include <QMouseEvent>
+#include <QEvent>
+#include <QPropertyAnimation>
+#include <QPen>
+#include <QBrush>
+#include <QEasingCurve>
+#include <QtMath>
+#include <algorithm>
 
 Toggle::Toggle(QWidget *parent) : QPushButton(parent), scale(1.0), offset(0.0), KW(14) {
   init();

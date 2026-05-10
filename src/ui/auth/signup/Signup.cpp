@@ -1,18 +1,34 @@
 #include "Signup.h"
+
 #include "../../../../resources/IconManager.h"
 #include "../../../core/theme/ThemeManager.h"
 
-using namespace Ui::Auth;
+#include "../../components/TextField.h"
+#include "../../components/CheckBox.h"
+#include "../../components/Button.h"
+#include "../../components/ToolTip.h"
+#include "../../components/Dialog.h"
+#include "../../utils/Utils.h"
+
+#include "../auth_window/AuthWindow.h"
+
+#include "../../dialogs/error_dialog/ErrorDialog.h"
+#include "../../dialogs/terms_conditions/TermsConditions.h"
+
+using Ui::AuthWindow;
+using Ui::Signup;
+using namespace Ui::Utils;
+
 /* =========================================================================================
                               ACCOUNT SIGN UP IMPLEMENTATION
    ========================================================================================= */
-Signup::Signup(QWidget *parent, AuthWindow *authWindow) : QWidget(parent)
+Signup::Signup(QWidget *parent, Ui::AuthWindow *authWindow) : QWidget(parent)
 {
     setAttribute(Qt::WA_TranslucentBackground);
     setFocusPolicy(Qt::StrongFocus);
 
     // Heading
-    heading = new QLabel("Create an Account");
+    heading = new QLabel(tr("Create an Account"));
     heading->setAttribute(Qt::WA_TranslucentBackground);
     heading->setFixedSize(QSize(276, 36));
     heading->setAlignment(Qt::AlignCenter);
@@ -20,25 +36,100 @@ Signup::Signup(QWidget *parent, AuthWindow *authWindow) : QWidget(parent)
     labels.append(heading);
 
     // Name
-    name = createTextField("Enter your full name", true);
-    name->setContextMenu(true);
-    nameLayout = createLabeledTextFieldLayout("Full Name", name);
+    _nameField = createTextField(tr("Enter your full name"), true);
+    _nameField->setContextMenu(true);
+    auto *nameLayout = createLabeledTextFieldLayout(tr("Full Name"), _nameField);
+    connect(_nameField, &CustomTextField::textChanged, this, [this](){
+        if (nameValidator)
+            nameValidator->checkNameValidity(_nameField->text());
+    });
 
     // Username
-    username = createTextField("Enter unique username", true);
-    username->setContextMenu(false);
-    usernameLayout = createLabeledTextFieldLayout("Username", username);
+    _usernameField = createTextField(tr("Enter unique username"), true);
+    _usernameField->setContextMenu(false);
+    auto *usernameLayout = createLabeledTextFieldLayout(tr("Username"), _usernameField);
+
+    usernameTimer = new QTimer(this);
+    usernameTimer->setSingleShot(true);
+    connect(usernameTimer, &QTimer::timeout, this, [this]() {
+        QString text = _usernameField->text();
+
+        if (text.isEmpty()) {
+            _usernameField->setInvalid();
+            _usernameField->setTooltip("Username is empty.");
+            signupCore->setUsernameValidity(false);
+            return;
+        }
+
+        if (usernameValidator)
+            usernameValidator->checkUsernameValidityAndAvailability(text);
+    });
+
+    connect(_usernameField, &CustomTextField::textChanged, this, [this]() {
+        usernameTimer->stop();
+        usernameTimer->start(400);
+    });
 
     // Email
-    email = createTextField("Enter your email-address", true);
-    email->setContextMenu(false);
-    emailLayout = createLabeledTextFieldLayout("Email-Address", email);
+    _emailField = createTextField(tr("Enter your email-address"), true);
+    _emailField->setContextMenu(false);
+    auto *emailLayout = createLabeledTextFieldLayout(tr("Email-Address"), _emailField);
+
+    emailTimer = new QTimer(this);
+    emailTimer->setSingleShot(true);
+    connect(emailTimer, &QTimer::timeout, this, [this]() {
+        QString text = _emailField->text();
+
+        if (text.isEmpty()) {
+            _emailField->setInvalid();
+            _emailField->setTooltip("Email-address is empty.");
+            signupCore->setEmailValidity(false);
+            return;
+        }
+
+        if (emailValidator)
+            emailValidator->checkEmailValidityAndAvailability(text);
+    });
+
+    connect(_emailField, &CustomTextField::textChanged, this, [this]() {
+        emailTimer->stop();
+        emailTimer->start(400);
+    });
 
     // Password
-    password = createTextField("Enter strong password");
-    password->setContextMenu(false);
-    password->setPasswordMode(true);
-    passwordLayout = createLabeledTextFieldLayout("Password", password);
+    _passwordField = createTextField(tr("Enter strong password"));
+    _passwordField->setContextMenu(false);
+    _passwordField->setPasswordMode(true);
+    auto *passwordLayout = createLabeledTextFieldLayout(tr("Password"), _passwordField);
+
+    passwordTimer = new QTimer(this);
+    passwordTimer->setSingleShot(true);
+
+    connect(passwordTimer, &QTimer::timeout, this, [this]() {
+        if (!passwordValidator)
+            return;
+
+        QString text = _passwordField->text();
+
+        if (text.isEmpty()) {
+            _passwordValidatorWidget->atLeastEight()->setInvalid();
+            _passwordValidatorWidget->atLeastOneUpperCaseChar()->setInvalid();
+            _passwordValidatorWidget->atLeastOneLowerCaseChar()->setInvalid();
+            _passwordValidatorWidget->atLeastOneDigit()->setInvalid();
+            _passwordValidatorWidget->atLeastOneSpecialChar()->setInvalid();
+            _passwordValidatorWidget->strongPassword()->setInvalid();
+
+            signupCore->setPasswordValidity(false);
+            return;
+        }
+
+        passwordValidator->checkPasswordValidity(text);
+    });
+
+    connect(_passwordField, &CustomTextField::textChanged, this, [this]() {
+        passwordTimer->stop();
+        passwordTimer->start(400);
+    });
 
     // Adding all field layouts to a vector
     fieldsLayouts = {nameLayout, usernameLayout, emailLayout, passwordLayout};
@@ -53,10 +144,13 @@ Signup::Signup(QWidget *parent, AuthWindow *authWindow) : QWidget(parent)
     termsConditionsDialogWidget = new TermsConditions;
     termsConditionsDialog = new Dialog(termsConditionsDialogWidget, authWindow, true);
     // Signal Slot of T&Cs Dialog
+    connect(_termsConditionsWidget, &CheckWithBtn::boxChecked, this, [this](bool checked) {
+        signupCore->setTCValidity(checked);
+    });
     connect(_termsConditionsWidget, &CheckWithBtn::onButtonClicked, this, [=]() { termsConditionsDialog->show(); });
 
     // Layout
-    layout = new QVBoxLayout;
+    auto *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(heading, 0, Qt::AlignHCenter);
@@ -73,22 +167,23 @@ Signup::Signup(QWidget *parent, AuthWindow *authWindow) : QWidget(parent)
     layout->addWidget(_termsConditionsWidget, 0, Qt::AlignLeft);
 
     // Create Account Button
-    createAccBtn = new Button;
-    createAccBtn->setCursor(Qt::PointingHandCursor);
-    createAccBtn->setDisplayMode(Button::TextOnly);
-    createAccBtn->setFixedSize(QSize(360, 36));
-    createAccBtn->setLoaderButton(true);
-    createAccBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
-    createAccBtn->setText("Create Account");
-    createAccBtn->setFontProperties("Segoe UI", 10, QFont::Normal);
-    createAccBtn->setEnabled(false);
-
+    _createAccountBtn = new Button;
+    _createAccountBtn->setCursor(Qt::PointingHandCursor);
+    _createAccountBtn->setDisplayMode(Button::TextOnly);
+    _createAccountBtn->setFixedSize(QSize(360, 36));
+    _createAccountBtn->setLoaderButton(true);
+    _createAccountBtn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
+    _createAccountBtn->setText(tr("Create Account"));
+    _createAccountBtn->setFontProperties("Segoe UI", 10, QFont::Normal);
+    _createAccountBtn->setEnabled(false);
+    connect(_createAccountBtn, &Button::clicked, this, &Signup::onCreateAccountBtnClicked);
+    
     // Redirect to Sign In page widget
-    _redirectToSignInWidget = new TextWithBtn("Already have an account?", QSize(150, 22), "Sign In", QSize(46, 20), false);
+    _redirectToSignInWidget = new TextWithBtn(tr("Already have an account?"), QSize(150, 22), "Sign In", QSize(46, 20), false);
     _redirectToSignInWidget->button()->move(_redirectToSignInWidget->text()->width() + 4, -2); // Used manual movement to proper align it with prompt text of this widget.
 
     layout->addSpacing(18);
-    layout->addWidget(createAccBtn, 0, Qt::AlignLeft);
+    layout->addWidget(_createAccountBtn, 0, Qt::AlignLeft);
     layout->addSpacing(16);
     layout->addWidget(_redirectToSignInWidget, 0, Qt::AlignCenter);
     layout->addSpacing(10);
@@ -101,6 +196,32 @@ Signup::Signup(QWidget *parent, AuthWindow *authWindow) : QWidget(parent)
     auto &tm = ThemeManager::instance();
     connect(&tm, &ThemeManager::themeChanged, this, &Signup::setDarkMode);
     setDarkMode((tm.isDarkMode())); 
+
+    // Signup Core
+    signupCore = new Core::SignupService(this);
+    connect(signupCore, &Core::SignupService::credentialsStored, this, &Signup::credentialsStored);
+    connect(signupCore, &Core::SignupService::failedToStoreCredentials, this, &Signup::onFailedToStoreCredentials);
+    connect(signupCore, &Core::SignupService::validationDone, this, [this](bool isDone) {
+        _createAccountBtn->setEnabled(isDone);
+    });
+
+    // Validators
+    nameValidator = new NameValidator(this);
+    connect(nameValidator, &NameValidator::nameValidated, this, &Signup::onNameValidated);
+
+    usernameValidator = new UsernameValidator(this);
+    connect(usernameValidator, &UsernameValidator::usernameAvailable, this, &Signup::onUsernameAvailable);
+    connect(usernameValidator, &UsernameValidator::usernameInvalid, this, &Signup::onUsernameInvalid);
+    connect(usernameValidator, &UsernameValidator::failedToCheckUsername, this, &Signup::onFailedToCheckUsername);
+
+    emailValidator = new EmailValidator(this);
+    connect(emailValidator, &EmailValidator::emailAvailable, this, &Signup::onEmailAvailable);
+    connect(emailValidator, &EmailValidator::emailInvalid, this, &Signup::onEmailInvalid);
+    connect(emailValidator, &EmailValidator::failedToCheckEmail, this, &Signup::onFailedToCheckEmail);
+
+    passwordValidator = new PasswordValidator(this);
+    connect(passwordValidator, &PasswordValidator::validationUpdated, this, &Signup::onPasswordValidationUpdated);
+
 }
 
 /* --------------------  Setters  -----------------  */
@@ -110,7 +231,7 @@ void Signup::setDarkMode(bool isDarkMode) {
         label->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
 
     // TextFields inside fields layouts such as emailLayout, usernameLayout etc.
-    for (auto *field : {name, username, password, email})
+    for (auto *field : {_nameField, _usernameField, _passwordField, _emailField})
         field->setDarkMode(isDarkMode);
 
     // T&Cs Consent Widget (CheckBox + Button to T&Cs dialog)
@@ -125,27 +246,164 @@ void Signup::setDarkMode(bool isDarkMode) {
 }
 
 /* ------------------  Getters -------------------  */
-Button *Signup::createAccountButton() const { return createAccBtn; }
-CustomTextField *Signup::nameField() const { return name; }
-CustomTextField *Signup::usernameField() const { return username; }
-CustomTextField *Signup::passwordField() const { return password; }
-CustomTextField *Signup::emailField() const { return email; }
 TextWithBtn *Signup::redirectToSignin() const { return _redirectToSignInWidget; }
-/**
- * @return A widget contains a checkbox and hyperlink button to the terms and conditions dialog box
- */
 CheckWithBtn *Signup::termsConditionsWidget() const { return _termsConditionsWidget; }
-/**
- * @return Password rules widget such as it must have eight digits, one uppercase and one lowercase letter etc.
- */
 PasswordRules *Signup::passwordValidatorWidget() const { return _passwordValidatorWidget; }
 
+/* --------------------  Slots    -----------------  */
+void Signup::onCreateAccountBtnClicked() {
+    updateCreateAccountBtnState(false, "");
+    
+    Core::SignupService::SignupData data;
+    data.fullName = _nameField->text();
+    data.username = _usernameField->text();
+    data.password = _passwordField->text();
+    data.email    = _emailField->text();
+
+    if (signupCore)
+        signupCore->storeCredentials(data);
+}
+
+void Signup::onFailedToStoreCredentials(const Core::SignupService::Error &error) {
+    switch (error) {
+        case Core::SignupService::Error::SomethingWentWrong:
+        handleCreateAccountError("SomethingWentWrong", true);
+        break;
+
+        case Core::SignupService::Error::MaxAttemptsLimitReached:
+        handleCreateAccountError("MaxAttempts");
+    }
+}
+
+void Signup::onNameValidated(bool isValid) {
+    QString text = _nameField->text();
+
+    if (text.isEmpty()) {
+        _nameField->setInvalid();
+        _nameField->setTooltip("Full name is empty.");
+
+        signupCore->setNameValidity(false);
+        return;
+    }
+    
+    signupCore->setNameValidity(isValid);
+
+    if (isValid) {        
+        _nameField->setValid();
+        _nameField->setTooltip("Valid full name");
+    } else {
+        _nameField->setInvalid();
+        _nameField->setTooltip("Invalid full name");
+    }
+}
+
+void Signup::onUsernameInvalid() {
+    _usernameField->setInvalid();
+    _usernameField->setTooltip(
+    "Invalid username.\n\n"
+    "Please ensure that:\n"
+    "• 3-20 characters, starting with a letter\n"
+    "• Letters, numbers, . _ - only\n"
+    "• Cannot start or end with . _ -\n"
+    "• No excessive character repetition"
+    );
+
+    signupCore->setUsernameValidity(false);
+}
+
+void Signup::onUsernameAvailable(bool isAvailable) {
+    if (isAvailable) {
+        _usernameField->setValid();
+        _usernameField->setTooltip("Username is available.");
+    } else {
+        _usernameField->setInvalid();
+        _usernameField->setTooltip("Username is already taken.\nPlease use another.");
+    }
+    
+    signupCore->setUsernameValidity(isAvailable);
+}
+
+void Signup::onFailedToCheckUsername() {
+    if (usernameRetryAttempts < 3) {
+        usernameRetryAttempts++;
+        usernameValidator->checkUsernameValidityAndAvailability(_usernameField->text());
+    } else {
+        _usernameField->setInvalid();
+        _usernameField->setTooltip("Failed to check username availability.");
+        usernameRetryAttempts = 0;
+        signupCore->setUsernameValidity(false);
+    }
+}
+
+void Signup::onEmailInvalid() {
+    _emailField->setInvalid();
+    _emailField->setTooltip(
+        "Invalid email address.\n\n"
+        "Please ensure that:\n"
+        "• The email format is correct\n"
+        "• No invalid or spam characters are used\n"
+        "• The domain name is valid\n"
+        "• The email address is unique"
+    );
+    signupCore->setEmailValidity(false);
+}
+
+void Signup::onEmailAvailable(bool isAvailable) {
+    if (isAvailable) {
+        _emailField->setValid();
+        _emailField->setTooltip("Email-address is available.");
+    } else {
+        _emailField->setInvalid();
+        _emailField->setTooltip("Email-address is already taken.\nPlease use another.");
+    }
+    
+    signupCore->setEmailValidity(isAvailable);
+}
+
+void Signup::onFailedToCheckEmail() {
+    if (emailRetryAttempts < 3) {
+        emailRetryAttempts++;
+        emailValidator->checkEmailValidityAndAvailability(_emailField->text());
+    } else {
+        _emailField->setInvalid();
+        _emailField->setTooltip("Failed to check email availability.");
+        emailRetryAttempts = 0;
+        signupCore->setEmailValidity(false);
+    }
+}
+
+void Signup::onPasswordValidationUpdated(const PasswordValidator::PasswordValidationResult &result) {
+    signupCore->setPasswordValidity(result.isStrong);
+
+    result.hasLength ?
+        _passwordValidatorWidget->atLeastEight()->setValid() :
+        _passwordValidatorWidget->atLeastEight()->setInvalid();
+
+    result.hasUpper ?
+        _passwordValidatorWidget->atLeastOneUpperCaseChar()->setValid() :
+        _passwordValidatorWidget->atLeastOneUpperCaseChar()->setInvalid();
+
+    result.hasLower ?
+        _passwordValidatorWidget->atLeastOneLowerCaseChar()->setValid() :
+        _passwordValidatorWidget->atLeastOneLowerCaseChar()->setInvalid();
+
+    result.hasDigit ?
+        _passwordValidatorWidget->atLeastOneDigit()->setValid() :
+        _passwordValidatorWidget->atLeastOneDigit()->setInvalid();
+
+    result.hasSpecial ?
+        _passwordValidatorWidget->atLeastOneSpecialChar()->setValid() :
+        _passwordValidatorWidget->atLeastOneSpecialChar()->setInvalid();
+
+    result.isStrong ?
+        _passwordValidatorWidget->strongPassword()->setValid() :
+        _passwordValidatorWidget->strongPassword()->setInvalid();
+}
 /* --------------------  Helpers  -----------------  */
 CustomTextField *Signup::createTextField(const QString &placeholderText, bool hasValidity) {
     auto *field = new CustomTextField(hasValidity);
     field->setPlaceholderText(placeholderText);
     field->setFixedSize(QSize(360, 36));
-    // field->setDarkMode(isDarkMode);
     return field;
 }
 
@@ -167,6 +425,16 @@ QVBoxLayout *Signup::createLabeledTextFieldLayout(const QString &labelName, Cust
     return layout;
 }
 
+void Signup::updateCreateAccountBtnState(bool isEnabled, const QString &text) {
+    _createAccountBtn->setEnabled(isEnabled);
+    _createAccountBtn->setText(text);
+}
+
+void Signup::handleCreateAccountError(const QString &errorName, bool createAccButtonEnabled, const QString &createAccButtonText) {
+    ErrorDialogManager::instance()->show(errorName, "Auth"); 
+    updateCreateAccountBtnState(createAccButtonEnabled, createAccButtonText);
+}
+
 QFont Signup::font(const QString &family, int fontSize, QFont::Weight weight) {
     QFont font;
     font.setFamily(family);
@@ -174,197 +442,3 @@ QFont Signup::font(const QString &family, int fontSize, QFont::Weight weight) {
     font.setWeight(weight);
     return font;
 }
-
-/* =========================================================
-             CUSTOMIZED WIDGETS FOR ABOVE CLASS
-   ========================================================= */
-
-// ------------  PASSWORD RULES ITEMS WIDGET  ------------
-RuleItem::RuleItem(const QString &ruleTxt, QWidget *parent) : QWidget(parent) {
-    setFixedHeight(22);
-    setAttribute(Qt::WA_TranslucentBackground);
-
-    text = ruleTxt;
-
-    validIcon = IconManager::renderSvg(IconManager::icon(Icons::Valid), iconSize);
-    invalidIcon = IconManager::renderSvg(IconManager::icon(Icons::Invalid), iconSize);
-
-    font.setFamily("Segoe UI");
-    font.setPointSize(10);
-    font.setWeight(QFont::Normal);
-
-    setInvalid();
-}
-
-void RuleItem::paintEvent(QPaintEvent *event) {
-    QPainter painter(this);
-    painter.setRenderHints(QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
-
-    // Icon
-    const QPixmap &icon = validityState ? validIcon : invalidIcon;
-    int iconY = (height() - iconSize.height()) / 2;
-    painter.drawPixmap(0, iconY, iconSize.width(), iconSize.height(), icon);
-
-    // Text
-    painter.setFont(font);
-    painter.setPen(QColor(validityState ? coloredText : uncoloredText));
-
-    int textX = iconSize.width() + 8;
-    painter.drawText(QRect(textX, 2, width() - textX, height()), 0, text);
-}
-
-void RuleItem::setValid() {
-    validityState = true;
-    update();
-}
-
-void RuleItem::setInvalid() {
-    validityState = false;
-    update();
-}
-
-/* --------------- Password Rules Widget ------------- */
-PasswordRules::PasswordRules(QWidget *parent) : QWidget(parent) {
-    setAttribute(Qt::WA_TranslucentBackground);
-    setFixedSize(QSize(300, 176));
-
-    // Main Layout
-    mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-
-    // Rules Items
-    _atLeastEightChars = new RuleItem("At least 8 characters");
-    _atLeastOneLowerChar = new RuleItem("At least one lowercase letter");
-    _atLeastOneUpperChar = new RuleItem("At least one uppercase letter");
-    _atLeastOneDigit = new RuleItem("At least one digit");
-    _atLeastOneSpecialChar = new RuleItem("At least one special character");
-    _strongPassword = new RuleItem("Strong Password");
-
-    // Adding into Layout
-    mainLayout->addWidget(_strongPassword);
-    mainLayout->addSpacing(8);
-    mainLayout->addWidget(_atLeastEightChars);
-    mainLayout->addSpacing(8);
-    mainLayout->addWidget(_atLeastOneLowerChar);
-    mainLayout->addSpacing(8);
-    mainLayout->addWidget(_atLeastOneUpperChar);
-    mainLayout->addSpacing(8);
-    mainLayout->addWidget(_atLeastOneDigit);
-    mainLayout->addSpacing(8);
-    mainLayout->addWidget(_atLeastOneSpecialChar);
-    mainLayout->addStretch();
-}
-
-RuleItem *PasswordRules::atLeastEight() const { return _atLeastEightChars; }
-RuleItem *PasswordRules::atLeastOneLowerCaseChar() const { return _atLeastOneLowerChar; }
-RuleItem *PasswordRules::atLeastOneUpperCaseChar() const { return _atLeastOneUpperChar; }
-RuleItem *PasswordRules::atLeastOneDigit() const { return _atLeastOneDigit; }
-RuleItem *PasswordRules::atLeastOneSpecialChar() const { return _atLeastOneSpecialChar; }
-RuleItem *PasswordRules::strongPassword() const { return _strongPassword; }
-
-/* ------------------  CUSTOM TEXT FIELD ------------------- */
-CustomTextField::CustomTextField(bool hasValidity, QWidget *parent) : TextField(parent) {
-    if (hasValidity) {
-        // Check Icon
-        _validityIcon = new QLabel(this);
-        _validityIcon->setAttribute(Qt::WA_TranslucentBackground);
-        _validityIcon->setFixedSize(QSize(20, 20));
-
-        setPadding(0, 0, _validityIcon->width() + 24);
-
-        QTimer::singleShot(0, this, [this]() {
-            int x = width() - (_validityIcon->width() + 12);
-            int y = (height() - _validityIcon->height()) / 2;
-            _validityIcon->move(x, y); 
-        });
-
-        // ToolTip showing over check icon inside textfield
-        tooltip = new ToolTip;
-
-        // Initially set invalid
-        setInvalid();
-    }
-}
-
-/* --------------------  Setters  -----------------  */
-void CustomTextField::setTooltip(const QString &tooltipText) {
-    if (tooltipText.isEmpty()) {
-        if (tooltip) {
-            tooltip->hide();
-            tooltip->setTargetWidget(nullptr);
-        }
-
-        hasTip = false;
-        return;
-    }
-
-    if (tooltip) {
-        tooltip->setTargetWidget(_validityIcon);
-        tooltip->setText(tooltipText);
-    }
-
-    hasTip = true;
-}
-
-void CustomTextField::setValid() {
-    if (_validityIcon)
-        _validityIcon->setPixmap(QPixmap(IconManager::icon(Icons::Valid)).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-}
-
-void CustomTextField::setInvalid() {
-    if (_validityIcon)
-        _validityIcon->setPixmap(QPixmap(IconManager::icon(Icons::Invalid)).scaled(QSize(20, 20), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-}
-
-void CustomTextField::setDarkMode(bool value) {
-    TextField::setDarkMode(value);
-    if (tooltip)
-        tooltip->setDarkMode(value);
-}
-
-QLabel *CustomTextField::validityIcon() const {
-    return _validityIcon;
-}
-
-/* ------------------  CHECKBOX WITH HYPERLINK BUTTON CUSTOM WIDGET ------------------- */
-CheckWithBtn::CheckWithBtn(QWidget *parent) : QWidget(parent) {
-    setAttribute(Qt::WA_TranslucentBackground);
-
-    // Checkbox
-    _checkbox = new CheckBox("I agree to our");
-    _checkbox->setParent(this);
-    _checkbox->move(0, 0);
-
-    // Button
-    _button = new Button;
-    _button->setCursor(Qt::PointingHandCursor);
-    _button->setParent(this);
-    _button->setDisplayMode(Button::TextOnly);
-    _button->setFixedSize(QSize(160, 12));
-    _button->setText("Terms & Conditions");
-    _button->setFontProperties("Segoe UI", 10);
-    _button->setHyperLink(true);
-    _button->move(_checkbox->width() + 4, 4);
-
-    // Signals Slots
-    connect(_button, &Button::clicked, this, [this]() { emit onButtonClicked(); });
-    connect(_checkbox, &CheckBox::toggled, this, [this](bool checked) { emit boxChecked(checked); });
-
-    // Setting fixed size
-    setFixedSize(QSize((_checkbox->width() + _button->width() + 5), 22));
-}
-
-/* --------------------  Setters  -----------------  */
-void CheckWithBtn::setDarkMode(bool value) {
-    if (isDarkMode == value)
-        return;
-
-    isDarkMode = value;
-
-    _checkbox->setDarkMode(isDarkMode);
-}
-
-/* --------------------  Getters  -----------------  */
-Button *CheckWithBtn::button() const { return _button; }
-CheckBox *CheckWithBtn::checkBox() const { return _checkbox; }

@@ -1,24 +1,50 @@
 #include "User.h"
-#include "../../../../resources/IconManager.h"
+
 #include "../../../core/theme/ThemeManager.h"
+#include "../../../core/session/SessionManager.h"
+
 #include "../userMenu/UserMenu.h"
+#include "../../utils/Utils.h"
+#include "../../../../resources/IconManager.h"
+
+#include <QFont>
+#include <QPixmap>
+#include <QRect>
 
 using Ui::Vault::User;
-
 User::User(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_Hover);
-    setAvator(QPixmap(IconManager::icon(Icons::Avator)), 36);
+    _avator = Ui::Utils::cropToCircle(IconManager::icon(Icons::Avator), 36);        
 
-    um = new Ui::Vault::UserMenu;
-    um->setAvator(QPixmap((IconManager::icon(Icons::Avator)))
-                      .scaled(100, 100, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+    auto &sm = SessionManager::instance();
 
-    um->setName("Umar Masood");
-    um->setEmail("umarmasood8546@gmail.com");
+    userMenu = new Ui::Vault::UserMenu;
+    userMenu->setName(sm.fullName());
+    userMenu->setEmail(sm.email());
+    userMenu->setAvator(QPixmap(IconManager::icon(Icons::Avator))
+                        .scaled(100, 100, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
+    connect(&sm, &SessionManager::avatorUpdated, this, [this](){
+        auto &sm = SessionManager::instance();
+        if (!sm.avatar().isNull()) {
+            _avator = Ui::Utils::cropToCircle(sm.avatar(), 36); 
+            userMenu->setAvator(Ui::Utils::cropToCircle(sm.avatar(), 100));   
+        } else {
+            _avator = Ui::Utils::cropToCircle(IconManager::icon(Icons::Avator), 36);        
+            userMenu->setAvator(QPixmap(IconManager::icon(Icons::Avator))
+                                .scaled(100, 100, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+        }
+    });
+
+    connect(&sm, &SessionManager::userInfoChanged, this, [this](){
+        auto &sm = SessionManager::instance();
+        userMenu->setName(sm.fullName());
+        userMenu->setEmail(sm.email());
+    });
+   
     connect(this, &User::clicked, this, [this]() {
-        if (um)
-            um->showAt(this); 
+        if (userMenu)
+            userMenu->showAt(this); 
     });
 
     // Installing Event Filter for auto closing on outside click
@@ -30,9 +56,8 @@ User::User(QWidget *parent) : QWidget(parent) {
     setDarkMode(tm.isDarkMode());
 }
 
-bool User::eventFilter(QObject *o, QEvent *event)
-{
-    if (!um || !um->isVisible())
+bool User::eventFilter(QObject *o, QEvent *event) {
+    if (!userMenu || !userMenu->isVisible())
         return QWidget::eventFilter(o, event);
 
     if (event->type() == QEvent::MouseButtonPress)
@@ -42,21 +67,20 @@ bool User::eventFilter(QObject *o, QEvent *event)
         QWidget *clickedWidget = QApplication::widgetAt(globalPos);
 
         // Click outside everything
-        if (!clickedWidget)
-        {
-            um->fadeOut();
+        if (!clickedWidget) {
+            userMenu->fadeOut();
             return QWidget::eventFilter(o, event);
         }
 
-        bool clickedInsideMenu = um->isAncestorOf(clickedWidget);
+        bool clickedInsideMenu = userMenu->isAncestorOf(clickedWidget);
         bool clickedOnUser = this->isAncestorOf(clickedWidget);
 
         if (!clickedInsideMenu && !clickedOnUser)
-            um->fadeOut();
+            userMenu->fadeOut();
     }
 
     if (event->type() == QEvent::ApplicationDeactivate)
-        um->fadeOut();
+        userMenu->fadeOut();
 
     return QWidget::eventFilter(o, event);
 }
@@ -65,25 +89,22 @@ void User::setDarkMode(bool isDarkMode) {
     update();
 }
 
-void User::setName(const QString &name)
-{
+void User::setName(const QString &name) {
     _name = name;
     adjustWidgetSize();
 }
 
-void User::adjustWidgetSize()
-{
+void User::adjustWidgetSize() {
     QFontMetrics fm(font());
     int textW = fm.horizontalAdvance(_name);
 
     const int spacing = 12;
-    int totalW = 12 + avator.width() + 12 + textW + 12;
+    int totalW = 12 + _avator.width() + 12 + textW + 12;
 
     setFixedSize(totalW, 58);
 }
 
-QFont User::font()
-{
+QFont User::font() {
     QFont fnt;
     fnt.setFamily("Segoe UI");
     fnt.setPixelSize(14);
@@ -91,47 +112,7 @@ QFont User::font()
     return fnt;
 }
 
-void User::setAvator(const QPixmap &pixmap, int size)
-{
-    if (pixmap.isNull())
-    {
-        qWarning() << "\nError: setAvator() :: Loading avator";
-        return;
-    }
-
-    // Getting minimum dimension
-    int s = qMin(pixmap.width(), pixmap.height());
-
-    // Define the Square
-    QRect square((pixmap.width() - s) / 2, (pixmap.height() - s) / 2, s, s);
-
-    // Extracting the defined square from whole image
-    QPixmap image = pixmap.copy(square).scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-    // Transparent Pixmap of 'size'
-    QPixmap circle(size, size);
-    circle.fill(Qt::transparent);
-
-    // Painting on Transparent Pixmap
-    QPainter painter(&circle);
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-
-    // Defining circular path for clipping on Transparent Pixmap
-    QPainterPath path;
-    path.addRoundedRect(0, 0, size, size, size / 2, size / 2);
-
-    // Clip circle on transparent pixmap
-    painter.setClipPath(path);
-
-    // Draw squared image inside this circle
-    painter.drawPixmap(0, 0, image);
-
-    // Inserting into class member for paint event
-    this->avator = circle;
-}
-
-void User::paintEvent(QPaintEvent *event)
-{
+void User::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
@@ -153,22 +134,21 @@ void User::paintEvent(QPaintEvent *event)
     painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 6, 6);
 
     // Avator
-    int avatarY = (height() - avator.height()) / 2;
-    painter.drawPixmap(12, avatarY, avator.width(), avator.height(), avator);
+    int avatarY = (height() - _avator.height()) / 2;
+    painter.drawPixmap(12, avatarY, _avator.width(), _avator.height(), _avator);
 
     // Name Text
     painter.setFont(font());
     painter.setPen(isDarkMode ? Qt::white : Qt::black);
 
-    int textX = 12 + avator.width() + 12;
+    int textX = 12 + _avator.width() + 12;
     int textW = width() - textX - 12;
 
     QRect textRect(textX, 0, textW, height());
     painter.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft, _name);
 }
 
-void User::mousePressEvent(QMouseEvent *event)
-{
+void User::mousePressEvent(QMouseEvent *event) {
     isPressed = true;
 
     if (event->button() == Qt::LeftButton)

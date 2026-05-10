@@ -1,33 +1,40 @@
+
 #include "PasswordValidator.h"
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
-#include "../../../ui/auth/signup/Signup.h"
+#include "../../utils/Utils.h"
+#include <QDebug>
+#include <QUrl>
+#include <fstream>
 
-/* -------------------- Password Validator --------------------- */
 PasswordValidator::PasswordValidator(QObject *parent) : QObject(parent) {
     blacklistManager = new Utils::BlacklistManager(this, "Password");
     blacklistManager->setFileName(PWD_BLACKLIST_FILE);
-    
-    if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::PWD_BLACKLIST)))) 
-        qDebug() << "Password blacklist downloaded started.\n";
+
+    if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::PWD_BLACKLIST))))
+        INFO_HERE("Password blacklist is being downloaded.");
     else
         loadPwdsFromFile();
 
     connect(blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
-        qDebug() << "Password blacklist download completed.\n";
+        INFO_HERE("Password blacklist has been downloaded.");
         loadPwdsFromFile();
     });
 }
 
-bool PasswordValidator::isValidPwd(QByteArray &pwdBytes, PasswordRules *pwdRules) {    
-    bool hasLength = pwdBytes.size() >= 8;
+void PasswordValidator::checkPasswordValidity(const QString &password) {
+    PasswordValidationResult result;
+
+    result.hasLength = password.size() >= 8;
+
     bool hasUpper = false;
     bool hasLower = false;
     bool hasDigit = false;
     bool hasSpecial = false;
 
-    for (char ch : pwdBytes) {
-        unsigned char c = static_cast<unsigned char>(ch);
+    for (QChar ch : password) {
+        ushort c = ch.unicode();
+
         if (c >= 'A' && c <= 'Z')
             hasUpper = true;
         else if (c >= 'a' && c <= 'z')
@@ -36,119 +43,83 @@ bool PasswordValidator::isValidPwd(QByteArray &pwdBytes, PasswordRules *pwdRules
             hasDigit = true;
         else
             hasSpecial = true;
-    }
+    }   
 
-    hasLength ?  pwdRules->atLeastEight()->setValid()            : pwdRules->atLeastEight()->setInvalid();
-    hasUpper ?   pwdRules->atLeastOneUpperCaseChar()->setValid() : pwdRules->atLeastOneUpperCaseChar()->setInvalid();
-    hasLower ?   pwdRules->atLeastOneLowerCaseChar()->setValid() : pwdRules->atLeastOneLowerCaseChar()->setInvalid();
-    hasDigit ?   pwdRules->atLeastOneDigit()->setValid()         : pwdRules->atLeastOneDigit()->setInvalid();
-    hasSpecial ? pwdRules->atLeastOneSpecialChar()->setValid()   : pwdRules->atLeastOneSpecialChar()->setInvalid();
+    result.hasUpper = hasUpper;
+    result.hasLower = hasLower;
+    result.hasDigit = hasDigit;
+    result.hasSpecial = hasSpecial;
 
-    for (int i = 0; i < pwdBytes.size(); i++) 
-        pwdBytes[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(pwdBytes[i])));
-
-    std::string pwdStd = pwdBytes.toStdString();    
-    Utils::cleanupMemory(pwdBytes);
+    QString lowerPwd = password.toLower();
+    std::string pwdStd = lowerPwd.toStdString();
 
     if (weakPwds.empty()) {
-        Utils::cleanupMemory(pwdStd);
-        pwdRules->strongPassword()->setInvalid();
-        qDebug() << "Weak password list is not loaded.\n";
-        return false; // If weak password list is not loaded, we cannot check for weak passwords
+        result.notWeak = false;
+        result.isStrong = false;
+
+        emit validationUpdated(result);
+
+        ERROR_HERE("Weak passwords list is not loaded.");
+        return;
     }
 
-    bool notWeak = !isPwdBlacklisted(pwdStd);
-    Utils::cleanupMemory(pwdStd);
+    result.notWeak = !isPasswordBlacklisted(pwdStd);
 
-    bool isStrongPwd = hasLength && hasUpper && hasLower && hasDigit && hasSpecial && notWeak;
-    isStrongPwd ? pwdRules->strongPassword()->setValid() : pwdRules->strongPassword()->setInvalid();
+    result.isStrong = result.hasLength  &&
+                      result.hasUpper   &&
+                      result.hasLower   &&
+                      result.hasDigit   &&
+                      result.hasSpecial &&
+                      result.notWeak;
 
-    return isStrongPwd;
+    emit validationUpdated(result);
 }
 
-bool PasswordValidator::isPwdBlacklisted(const std::string &password) {
-    auto it = cacheMap.find(password); // We make a search in the cache map to see if the password has been checked before using an iterator.
-    if (it != cacheMap.end()) { // If the password is found in the cache map (means the iterator does not reached at the end of the map)
-        qDebug() << "Password is already checked...";
-        order.splice(order.end(), order, it->second); /* Splice method is used to move an element from one position to another. It takes three arguments where the first 
-        argument is the destination (where) you want to move value, second argument is the current data structure and the last one is the value which you want to move.
-        Basically here we are moving the iterator(it->second) which points to the password in the list to the end of the list (most recently used position).
-        In the start of list, all previously used passwords are stored in the order of their usage (least recently used at front and most recently used at end).
-        So, when user enters a password which is already checked, we move that password to the end of the list to mark it as most recently used.
-        */
-        return true; // True because password is weak
+bool PasswordValidator::isPasswordBlacklisted(const std::string &password) {
+    auto it = cacheMap.find(password);
+
+    if (it != cacheMap.end()) {
+        order.splice(order.end(), order, it->second);
+        return true;
     }
 
-    bool result = weakPwds.find(password) != weakPwds.end(); // In case if the entered password is not found in the cache map, we check it in the weak password set.
-    // When a weak password is found in the set
-    if (result) {
-        order.push_back(password); // We will add the new weak password in the order list 
-        cacheMap[password] = std::prev(order.end()); /* std::prev returns the element before end(), here we are add iterator in map that points to the last inserted password at the end in the list */
+    bool result = weakPwds.find(password) != weakPwds.end();
 
-        if (cacheMap.size() > MAX_CACHE_SIZE) { // If the size of the cache map exceeds the maximum limit defined
-            std::string oldestPwd = order.front(); // We get the oldest password from the front of the list
-            cacheMap.erase(oldestPwd); // We remove that oldest password from the cache map
-            order.pop_front(); // We also remove that oldest password from the order list to maintain the size of the cache
+    if (result) {
+        order.push_back(password);
+        cacheMap[password] = std::prev(order.end());
+        if (cacheMap.size() > MAX_CACHE_SIZE) {
+            std::string oldestPwd = order.front();
+            cacheMap.erase(oldestPwd);
+            order.pop_front();
         }
     }
 
-    return result; 
+    return result;
 }
 
 void PasswordValidator::loadPwdsFromFile() {
     std::ifstream file(blacklistManager->filePath);
+
     if (!file.is_open()) {
-        qDebug() << "Could not open weak pwd list file.\n";
+        ERROR_HERE("Could not open file.");
         return;
     }
 
     weakPwds.reserve(131554);
+
     std::string line;
     while (std::getline(file, line)) {
         if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
             line.pop_back();
-        
+
         Utils::lower(line);
 
         if (!line.empty())
             weakPwds.insert(line);
     }
-    
+
     file.close();
-    qDebug() << "Loaded " << weakPwds.size() << " weak passwords.\n";
-}
 
-/* -----------------------  Get Password ----------------------- */
-GetPassword::GetPassword(QObject *parent) : QObject(parent) {
-    timer = new QTimer(this);
-    timer->setSingleShot(true);
-
-    pwdValidate = new PasswordValidator(this);
-
-    connect(timer, &QTimer::timeout, this, [this](){
-        if (!signupWidget) return;
-        
-        QByteArray bytes = signupWidget->passwordField()->text().toUtf8();
-        bool ok = pwdValidate->isValidPwd(bytes, signupWidget->passwordValidatorWidget());
-        
-        // Emit signal
-        emit pwdValidated(ok);
-
-        Utils::cleanupMemory(bytes);
-    });
-}
-
-void GetPassword::setAccountSignupWidget(Ui::Auth::Signup *instance) {
-    if (!instance) 
-        return;
-
-    signupWidget = instance;
-
-    connect(signupWidget->passwordField(), &CustomTextField::textChanged, this, &GetPassword::onPwdChanged);
-}
-
-void GetPassword::onPwdChanged(const QString &text) {
-    Q_UNUSED(text);
-    timer->stop();
-    timer->start(2000);
+    INFO_HERE("Loaded " + QString::number(weakPwds.size()) + " passwords.");
 }

@@ -1,10 +1,9 @@
 #pragma once
 
 #include <QWidget>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QPen>
-#include <QBrush>
+
+class QPaintEvent;
+class QString;
 
 class Seperator : public QWidget {
     public:

@@ -6,16 +6,24 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QShowEvent>
+#include <QVector>
+#include <QLabel>
+#include <QTimer>
+#include "../../../core/services/auth/OTPService.h"
 
-#include "../../components/Button.h"
-#include "../../components/Label.h"
+class Button;
+class Label;
+class AnimatedLabel;
+
+namespace Ui::Utils { class TextWithBtn; };
+namespace Ui  { class AuthWindow; };
 
 /* ---------------- OTP Input Boxs Widget ----------------- */
-class OTPWidget : public QWidget {
+class OTPInputWidget : public QWidget {
    Q_OBJECT
 
    public:
-   explicit OTPWidget(QWidget *parent = nullptr);
+   explicit OTPInputWidget(QWidget *parent = nullptr);
    void setDarkMode(bool isDarkMode);
    void setEnabled(bool enabled);
 
@@ -48,56 +56,24 @@ class OTPWidget : public QWidget {
    void checkOtpCompletion();
 };
 
-/* ----------------- Text with Button ------------------ */
-class TextWithBtn : public QWidget {
-   Q_OBJECT
-
-   public:
-   explicit TextWithBtn(const QString &promptText = QString(),
-                        const QSize &promptTextSize = QSize(), 
-                        const QString &hyperlinkText =  QString(), 
-                        const QSize &hyperlinkSize = QSize(), 
-                        bool hasTimer = false,
-                        QWidget *parent = nullptr);
-                     
-   Label* text() const;
-   Button* button() const;
-   Label* timer() const;
-
-   private:
-   // Text Label
-   Label *_text = nullptr;
-
-   // Timer Label
-   Label *_timer = nullptr;
-   
-   // Resend Button
-   Button *_button = nullptr;
-
-   signals:
-   void buttonClicked();
-};
-
-namespace Ui::Auth {
+namespace Ui {
     /* ------------------- Account OTP ------------------------ */
-    class Otp : public QWidget {
+    class OTP : public QWidget {
        Q_OBJECT
     
-       public:
-       explicit Otp(QWidget *parent = nullptr);
-       Q_INVOKABLE void setDarkMode(bool value);
-    
+       public:       
+       explicit OTP(QWidget *parent = nullptr, Ui::AuthWindow *authWindow = nullptr);
+       void setDarkMode(bool value);
        void setEmail(const QString &email);
-    
-       OTPWidget *otpWidget() const;
-       Button *verifyButton() const;
-       TextWithBtn *resendOtpWidget() const;
-       AnimatedLabel *message() const;
+       void setAuthType(const QString &authType);
     
        private:
+       // Email
+       QString _email;
+
        // Illustration
        Label *illustration = nullptr;
-    
+
        // Heading
        Label *heading = nullptr;
     
@@ -108,27 +84,51 @@ namespace Ui::Auth {
        AnimatedLabel *_message = nullptr;
     
        // OTP Widget
-       OTPWidget *_otpWidget = nullptr;
+       OTPInputWidget *_otpInputWidget = nullptr;
     
        // Resend OTP Widget
-       TextWithBtn *_resendOtpWidget = nullptr;
+       Ui::Utils::TextWithBtn *_resendOtpWidget = nullptr;
     
        // Verify Button
        Button *_verifyBtn = nullptr;
     
        // Cancel Button
        Button *_cancelBtn = nullptr;
+
+       // Auth Window
+       Ui::AuthWindow *_authWindow = nullptr;
+       
+       // OTP Core
+       using OTPCore = Core::OTPService;
+       OTPCore *otp_core = nullptr;
+
+       QString _authType, currentOtp;
+       bool isSendingOTP = false;
+
+       // Timer
+       int totalSecs = 90;
+       QTimer *timer = nullptr;
+       QString timeString;
+
+       // Helpers
+       void disableResendAndSetTimer();
+       void disableControls(const QString &buttonText, const QString &errorMessage = "");
     
-       // Main Layout
-       QVBoxLayout *layout = nullptr;
-    
-       // Slot
+       private slots:
+       void onMaxLimitReached();
+       void onSomethingWentWrong(const Core::OTPService::OTPAction &action);
+       void onNoInternet();
+       void onOTPSent();
+       void onOTPVerified(bool isVerified, const QJsonObject &obj = QJsonObject());
        void onEmailEntered(const QString &email);
+
+       void onResendClicked();
+       void onVerifyClicked();
+       void onCancelClicked();
+       void onOTPTimeout();
     
        signals:
        void emailEntered(const QString &email);
-       void resendClicked();
-       void verifyClicked();
-       void cancelClicked();
+       void OTPVerified(bool isVerified);
     };
 };

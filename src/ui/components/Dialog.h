@@ -2,8 +2,7 @@
 
 #include "../windows/subWindow/SubWindow.h"
 
-#include <QVBoxLayout>
-#include <QApplication>
+class QVBoxLayout;
 
 class Dialog : public SubWindow {
    Q_OBJECT

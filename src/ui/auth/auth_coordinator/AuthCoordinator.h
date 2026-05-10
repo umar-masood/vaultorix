@@ -3,24 +3,18 @@
 #include <QSettings>
 #include <QObject>
 
-namespace Core::Services::Auth {
-    class Signin;
-    class GetOTP;
-    class Signup;
-};
-
-namespace Ui::Auth {
+namespace Ui {
     class AuthWindow;
     class Signin;
     class Signup;
-    class Otp;
+    class OTP;
 };
 
 class AuthCoordinator : public QObject {
     Q_OBJECT
 
     public:
-    AuthCoordinator(QObject *parent = nullptr);
+    explicit AuthCoordinator(QObject *parent = nullptr);
     void show();
     
     private:
@@ -28,35 +22,26 @@ class AuthCoordinator : public QObject {
     QSettings settings;
 
     // Account Window
-    Ui::Auth::AuthWindow *authWindow = nullptr;
+    Ui::AuthWindow *authWindow = nullptr;
 
-    // Account Sign In
-    Ui::Auth::Signin *accountSignIn = nullptr;
+    // Account Sign In Widget
+    Ui::Signin *accountSigninWidget = nullptr;
 
-    // Account Create
-    Ui::Auth::Signup *accountSignup = nullptr;
+    // Account Sign Up Widget
+    Ui::Signup *accountSignupWidget = nullptr;
 
-    // Account OTP
-    Ui::Auth::Otp *accountOTP = nullptr;
-
-    // Account Sign In Service
-    Core::Services::Auth::Signin *signinService = nullptr;
-
-    // Account Creation Service
-    Core::Services::Auth::Signup *signupService = nullptr;
-
-    // GetOTP
-    Core::Services::Auth::GetOTP *getOTP = nullptr;
+    // Account OTP Widget
+    Ui::OTP *accountOTPWidget = nullptr;
 
     void setAccountRegistered(bool isRegistered);
     bool isAccountRegistered() const;
 
-    void showOTP(const QString &email);
+    void showOTP(const QString &email, const QString &authType = QString());
     void showSignIn();
     void showCreateAccount();
 
-    // Slots
-    void onCredentialsStoredSuccessfully();
-    void onVerificationNeeded(const QString &email);
+    private slots:
+    void onCredentialsStored(const QString &email);
+    void onVerificationRequired(const QString &email, const QString &authType = QString());
     void onOTPVerified(bool isVerified);
 };

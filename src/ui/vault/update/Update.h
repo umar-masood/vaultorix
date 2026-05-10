@@ -1,17 +1,17 @@
 #pragma once
 
 #include "../../windows/subWindow/SubWindow.h"
-#include "../../components/LineProgress.h"
 
-#include <QVBoxLayout>
 #include <QDateTime>
-#include <QHBoxLayout>
-#include <QStackedWidget>
 
 class SpinnerProgress;
+class LineProgress;
 class Button;
 class Seperator;
 class Label;
+class QStackedWidget;
+class QVBoxLayout;
+class QHBoxLayout;
 
 namespace Ui::Vault {
     struct Update {

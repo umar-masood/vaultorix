@@ -133,5 +133,9 @@
         <file>icons/about-light.svg</file>
         <file>icons/bug-dark.svg</file>
         <file>icons/bug-light.svg</file>
+        <file>icons/upload-light.svg</file>
+        <file>icons/upload-dark.svg</file>
+        <file>illustrations/deleteAccount.png</file>
     </qresource>
+    <qresource prefix="/translations"/>
 </RCC>

@@ -1,6 +1,17 @@
 #include "ScrollBar.h"
 
-ScrollBar::ScrollBar(Qt::Orientation orientation, QWidget *parent) : QScrollBar(orientation, parent) {
+#include <QPropertyAnimation>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QColor>
+#include <QEasingCurve>
+#include <QMouseEvent>
+#include <QEnterEvent>
+#include <algorithm>
+
+ScrollBar::ScrollBar(Qt::Orientation orientation, QWidget *parent) 
+          : QScrollBar(orientation, parent) 
+{
   init();
 }
 

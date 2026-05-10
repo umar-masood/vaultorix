@@ -1,10 +1,32 @@
 #include "AuthWindow.h"
+
+#include "../../components/Button.h"
+#include "../../components/Seperator.h"
+#include "../../components/SmoothOpacity.h"
+
 #include "../../../../resources/IconManager.h"
 #include "../../../../resources/IllustrationManager.h"
+
 #include "../../../core/theme/ThemeManager.h"
 #include "../../dialogs/error_dialog/ErrorDialog.h"
 
-using namespace Ui::Auth;
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QPropertyAnimation>
+#include <QAbstractAnimation>
+#include <QEasingCurve>
+#include <QFont>
+#include <QFontMetrics>
+#include <QPixmap>
+#include <QPen>
+#include <QIcon>
+#include <QSize>
+#include <QWidget>
+#include <QLabel>
+
+using namespace Ui;
 /* ========================================================================================= 
                               ACCOUNT WINDOW IMPLEMENTATION              
    ========================================================================================= */

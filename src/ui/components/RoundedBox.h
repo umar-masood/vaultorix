@@ -1,15 +1,9 @@
 #pragma once
 
 #include <QWidget>
-#include <QPainter>
-#include <QPainterPath>
-#include <QPen>
-#include <QColor>
-#include <QFont>
-#include <QFontMetrics>
-#include <QPaintEvent>
-#include <QSize>
 #include <QString>
+
+class QPaintEvent;
 
 class RoundedBox : public QWidget {
     Q_OBJECT

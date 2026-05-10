@@ -2,19 +2,17 @@
 #include "SmoothOpacity.h"
 
 #include <QWidget>
-#include <QPainter>
-#include <QPaintEvent>
-#include <QPen>
 #include <QColor>
-#include <QFont>
-#include <QTimer>
-#include <QPropertyAnimation>
-#include <QEasingCurve>
-#include <QShowEvent>
 #include <QString>
-#include <QtMath>
-#include <algorithm>
 #include <QHash>
+
+class QPainter;
+class QPaintEvent;
+class QPen;
+class QFont;
+class QTimer;
+class QPropertyAnimation;
+class SmoothOpacity;
 
 class SpinnerProgress : public QWidget {
    Q_OBJECT

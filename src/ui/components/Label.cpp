@@ -1,5 +1,12 @@
 #include "Label.h"
 
+#include <QString>
+#include <QPropertyAnimation>
+#include <QTimer>
+#include <QFont>
+#include <QColor>
+#include <QGraphicsOpacityEffect>
+
 /* --------------- Custom Text Label (With and Without Icon) ------------------ */
 Label::Label(bool isIconic, 
             Qt::Alignment alignment, 

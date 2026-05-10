@@ -1,21 +1,27 @@
 #include "VaultWindow.h"
 
+#include "../../../core/theme/ThemeManager.h"
+#include "../../../core/services/update/Update.h"
+#include "../../../core/services/report_bug/ReportBug.h"
+
 #include "../statusbar/Statusbar.h"
-#include "../preferences/Preferences.h"
+// #include "../preferences/Preferences.h"
 #include "../view/View.h"
 #include "../user/User.h"
 #include "../toolbar/Toolbar.h"
 #include "../update/Update.h"
 #include "../about/About.h"
 #include "../report_bug/ReportBug.h"
+
+#include "../../dialogs/error_dialog/ErrorDialog.h"
 #include "../../../../resources/IconManager.h"
-#include "../../../core/theme/ThemeManager.h"
-#include "../../../core/services/update/Update.h"
 #include "../../components/Seperator.h"
 #include "../../components/Label.h"
 
-using Ui::Vault::VaultWindow;
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
+using Ui::Vault::VaultWindow;
 VaultWindow *VaultWindow::instance(QWidget *parent) {
     static VaultWindow *vw = nullptr;
 
@@ -65,10 +71,10 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     updates_download_btn->setToolTip("Vaultorix Updates");
     connect(updates_download_btn, &Button::clicked, this, &VaultWindow::onAppUpdateBtnClicked);
 
-    // Preferences Button
-    preferences_btn = createButton(IconManager::icon(Icons::PreferencesLight), IconManager::icon(Icons::PreferencesDark));
-    preferences_btn->setToolTip("Preferences");
-    connect(preferences_btn, &Button::clicked, this, &VaultWindow::onPreferencesBtnClicked);
+    // // Preferences Button
+    // preferences_btn = createButton(IconManager::icon(Icons::PreferencesLight), IconManager::icon(Icons::PreferencesDark));
+    // preferences_btn->setToolTip("Preferences");
+    // connect(preferences_btn, &Button::clicked, this, &VaultWindow::onPreferencesBtnClicked);
 
     // About Button
     about_btn = createButton(IconManager::icon(Icons::AboutLight), IconManager::icon(Icons::AboutDark));
@@ -92,7 +98,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
 
     titlebar_layout->addStretch();
 
-    for (auto *btn : {report_bug_btn, about_btn, updates_download_btn, preferences_btn, theme_mode_btn})
+    for (auto *btn : {report_bug_btn, about_btn, updates_download_btn, /*preferences_btn*/ theme_mode_btn})
     {
         titlebar_layout->addWidget(btn, 0, Qt::AlignRight);
         titlebar_layout->addSpacing(10);
@@ -125,7 +131,10 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     // Theme Mode
     auto &tm = ThemeManager::instance();
     connect(&tm, &ThemeManager::themeChanged, this, &VaultWindow::setDarkMode);
-    setDarkMode((tm.isDarkMode()));
+    setDarkMode(tm.isDarkMode());
+    
+    // Error Dailog Manager Registry Window
+    ErrorDialogManager::instance()->registerWindow("Vault", this);
 }
 
 Button *VaultWindow::createButton(const QString &iconPathLight, const QString &iconPathDark) {
@@ -149,7 +158,7 @@ void VaultWindow::setDarkMode(bool isDarkMode) {
     isDarkMode ? app_name->setStyleSheet("color: white;") : app_name->setStyleSheet("color: black;");
 
     // Buttons
-    for (auto *btn : {theme_mode_btn, preferences_btn, updates_download_btn, about_btn, report_bug_btn})
+    for (auto *btn : {theme_mode_btn, /*preferences_btn,*/ updates_download_btn, about_btn, report_bug_btn})
         btn->setDarkMode(isDarkMode);
 
     isDarkMode ? theme_mode_btn->setIconPaths(LightModeIcon, LightModeIcon) 
@@ -172,18 +181,18 @@ void VaultWindow::onAboutBtnClicked() {
 }
 
 void VaultWindow::onPreferencesBtnClicked() {
-    if (!pref) {
-        pref = new Ui::Vault::Preferences(this);
-        pref->setAttribute(Qt::WA_DeleteOnClose);   
+    // if (!pref) {
+    //     pref = new Ui::Vault::Preferences(this);
+    //     pref->setAttribute(Qt::WA_DeleteOnClose);   
 
-        connect(pref, &QObject::destroyed, this, [this](){
-            pref = nullptr;
-            VaultWindow::instance()->updateGeometry(); 
-        });
-    }
+    //     connect(pref, &QObject::destroyed, this, [this](){
+    //         pref = nullptr;
+    //         VaultWindow::instance()->updateGeometry(); 
+    //     });
+    // }
 
-    pref->show();
-    pref->raise();
+    // pref->show();
+    // pref->raise();
 }
 
 void VaultWindow::onAppUpdateBtnClicked() {
@@ -193,7 +202,7 @@ void VaultWindow::onAppUpdateBtnClicked() {
         appUpdateWidget->setAttribute(Qt::WA_DeleteOnClose);
 
         // Backend
-        appUpdateCore = new Core::Services::AppUpdate(this);
+        appUpdateCore = new Core::AppUpdate(this);
         appUpdateCore->setAppUpdateWidget(appUpdateWidget);
 
         connect(appUpdateWidget, &QObject::destroyed, this, [this](){
@@ -212,8 +221,12 @@ void VaultWindow::onReportBugBtnClicked() {
         report_bug = new Ui::Vault::ReportBug(this);
         report_bug->setAttribute(Qt::WA_DeleteOnClose);
 
+        report_bug_core = new Core::ReportBug(this);
+        report_bug_core->setReportBugWidget(report_bug);
+
         connect(report_bug, &QObject::destroyed, this, [this]() {
             report_bug = nullptr;
+            report_bug_core = nullptr;
             VaultWindow::instance()->updateGeometry(); 
         });
     }

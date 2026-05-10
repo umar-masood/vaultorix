@@ -1,5 +1,31 @@
 #include "TextField.h"
+#include "Button.h"
+#include "Menu.h"
+#include "SmoothShadow.h"
+
 #include "../../../resources/IconManager.h"
+
+#include <QResizeEvent>
+#include <QFocusEvent>
+#include <QContextMenuEvent>
+#include <QTimer>
+#include <QApplication>
+#include <QClipboard>
+#include <QMimeData>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QPainterPath>
+#include <QEnterEvent>
+#include <QKeyEvent>
+#include <QPropertyAnimation>
+#include <QColor>
+#include <QEvent>
+#include <QSize>
+#include <QString>
+#include <QWidget>
+#include <QEasingCurve>
+#include <QPixmap>
+#include <algorithm>
 
 TextField::TextField(const QString &text, QWidget *parent) : QLineEdit(text, parent) { init(); }
 TextField::TextField(QWidget *parent) : QLineEdit(parent) { init(); }

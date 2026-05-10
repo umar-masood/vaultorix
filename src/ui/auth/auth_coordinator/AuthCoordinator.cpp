@@ -2,23 +2,18 @@
 
 #include "../../../core/config/Constants.h"
 
-#include "../signup/Signup.h"
-#include "../../../core/services/auth/Signup.h"
-
-#include "../otp/Otp.h"
-#include "../../../core/services/auth/OTP.h"
-
-#include "../auth_window/AuthWindow.h"
-
 #include "../signin/Signin.h"
-#include "../../../core/services/auth/Signin.h"
+#include "../signup/Signup.h"
+#include "../otp/OTP.h"
+#include "../auth_window/AuthWindow.h"
+#include "../../utils/Utils.h"
 
 /* ========================================================================================= 
                               ACCOUNT AUTH COORDINATOR              
    ========================================================================================= */
 AuthCoordinator::AuthCoordinator(QObject *parent) : QObject(parent) {
     // Account Window
-    authWindow = new  Ui::Auth::AuthWindow;
+    authWindow = new  Ui::AuthWindow;
 
     // Checking weather the user has already registered its account once
     if (!isAccountRegistered())
@@ -44,75 +39,56 @@ void AuthCoordinator::setAccountRegistered(bool isRegistered) {
 // Display sign in page
 void AuthCoordinator::showSignIn() {
     // If account sign in pointer already exists
-    if (accountSignIn) 
-        accountSignIn = nullptr;
+    if (accountSigninWidget) 
+        accountSigninWidget = nullptr;
 
     // Create Account Sign In pointer
-    accountSignIn = new Ui::Auth::Signin;
-
-    // Account Sign In Service pointer
-    signinService = new Core::Services::Auth::Signin(authWindow, this);
-    signinService->setAccountSigninWidget(accountSignIn);
-
-    // Signal Slot of Account Sign in service
-    connect(signinService, &Core::Services::Auth::Signin::verificationNeeded, this, &AuthCoordinator::onVerificationNeeded);
+    accountSigninWidget = new Ui::Signin(nullptr, authWindow);
 
     // If account window already exists
     if (authWindow) 
-        authWindow->setRightWidget(accountSignIn);
+        authWindow->setRightWidget(accountSigninWidget);
 
-    // Signal Slot of Account Sign in
-    connect(accountSignIn->redirectToSignup(), &TextWithBtn::buttonClicked, this, &AuthCoordinator::showCreateAccount);
+    // Signal Slots of Account Sign in
+    connect(accountSigninWidget, &Ui::Signin::verificationRequired, this, &AuthCoordinator::onVerificationRequired);
+    connect(accountSigninWidget->redirectToSignUpWidget(), &Ui::Utils::TextWithBtn::buttonClicked, this, &AuthCoordinator::showCreateAccount);
 }
 
 // Display OTP Verification page 
-void AuthCoordinator::showOTP(const QString &email) {
+void AuthCoordinator::showOTP(const QString &email, const QString &authType) {
     // If account OTP pointer already exists
-    if (accountOTP) 
-        accountOTP = nullptr;    
+    if (accountOTPWidget) 
+        accountOTPWidget = nullptr;    
 
     // Make new pointer of account otp
-    accountOTP = new Ui::Auth::Otp;
-
-    // If get get OTP pointer already exists
-    if (getOTP) 
-        getOTP = nullptr;
-
-    // Make new get OTP pointer 
-    getOTP = new Core::Services::Auth::GetOTP(authWindow, this);
-    getOTP->setAccountOTPWidget(accountOTP, email);
+    accountOTPWidget = new Ui::OTP(nullptr, authWindow);
+    accountOTPWidget->setEmail(email);
+    accountOTPWidget->setAuthType(authType);
 
     // If account window exists
     if (authWindow) 
-        authWindow->setRightWidget(accountOTP);
+        authWindow->setRightWidget(accountOTPWidget);
     
     // Signal Slot
-    connect(getOTP, &Core::Services::Auth::GetOTP::OTPVerified, this, &AuthCoordinator::onOTPVerified);
+    // OTPVerified signal only emits in case if OTP is required after Sign Up
+    connect(accountOTPWidget, &Ui::OTP::OTPVerified, this, &AuthCoordinator::onOTPVerified);
 }
 
 // Display Account Create page
 void AuthCoordinator::showCreateAccount() {
     // If account create pointer already exists
-    if (accountSignup) 
-        accountSignup = nullptr;
+    if (accountSignupWidget) 
+        accountSignupWidget = nullptr;
 
     // Make new account create
-    accountSignup = new  Ui::Auth::Signup(nullptr, authWindow); // Here, we have passed authWindow pointer because inside Signup class we have used a dailog box for terms and conditions. To make it a child of parent (SubWindow)    
-    authWindow->setRightWidget(accountSignup);
+    accountSignupWidget = new Ui::Signup(nullptr, authWindow); 
+    authWindow->setRightWidget(accountSignupWidget);
 
     // Signal Slot of redirecting to Sign In page from Sign Up page.
-    connect(accountSignup->redirectToSignin(), &TextWithBtn::buttonClicked, this, &AuthCoordinator::showSignIn);
-
-    // If account create manager already exists
-    if (signupService) 
-        signupService = nullptr;
-
-    // Making new pointer of account create manager
-    signupService = new Core::Services::Auth::Signup(authWindow, this); // Similarly, authWindow is also passed here for dialogs parenting.
-    signupService->setAccountSignupWidget(accountSignup);
+    connect(accountSignupWidget->redirectToSignin(), &Ui::Utils::TextWithBtn::buttonClicked, this, &AuthCoordinator::showSignIn);
 
     // Connecting signal slot
-    connect(signupService, &Core::Services::Auth::Signup::credentialsStoredSuccessfully, this, &AuthCoordinator::onCredentialsStoredSuccessfully);
+    connect(accountSignupWidget, &Ui::Signup::credentialsStored, this, &AuthCoordinator::onCredentialsStored);
 }
 
 /* -----------------  Getters --------------------- */
@@ -124,19 +100,19 @@ bool AuthCoordinator::isAccountRegistered() const {
 }
 
 /* ------------------- Slots -------------------------*/
-void AuthCoordinator::onCredentialsStoredSuccessfully() {
+void AuthCoordinator::onCredentialsStored(const QString &email) {
     // Show OTP
-    showOTP(accountSignup->emailField()->text());
+    showOTP(email);
 
     // Updating status in registry
     if (!isAccountRegistered())
         setAccountRegistered(true);
 }
 
-// Verification needed slot (emit when user account verification is incomplete)
-void AuthCoordinator::onVerificationNeeded(const QString &email) {
-    // Show OTP page
-    showOTP(email);
+// Verification needed slot
+void AuthCoordinator::onVerificationRequired(const QString &email, const QString &authType) {
+    // Show OTP 
+    showOTP(email, authType);
 }
 
 // When otp is verified then show Sign in page,

@@ -10,20 +10,12 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 
-namespace Ui::Auth { class Signup; };
-
-/* ----------------- Username Validator -------------------- */
-
-/**
- * This class will the check the username passed by the class GetUsername, whether it is valid and available?
- */
 class UsernameValidator : public QObject {
     Q_OBJECT
     
     public:
     explicit UsernameValidator(QObject *parent = nullptr);
-    bool isValidUsername(QByteArray &username);
-    void isUsernameAvailable(QByteArray &username);
+    void checkUsernameValidityAndAvailability(const QString &username);
 
     private:
     // Validator Utils
@@ -32,56 +24,15 @@ class UsernameValidator : public QObject {
     // Network Manager
     QNetworkAccessManager *manager = nullptr;
 
-    // API Response
-    QString message;
-    int statusCode;
-
-    // Stores temporary usernames fetched using an API
+    // Stores temporary usernames
     std::unordered_set<std::string> tempUsernames;
 
-    // Helper Methods
-    bool isUsernameBlacklisted(const std::string &username) const;
+    // Helper
     void loadUsernamesFromFile();
+    bool isValidUsername(const QString &username);
 
     signals:
-    void usernameAvailable(bool isavailable);
-    void unableToCheckUsernameAvailability();
-};
-
-/* ---------------  Get Username ------------------ */
-
-/**
- * This class will take the username from username text field from Account Sign up widget in Ui and then passed it to the actual username validator class for validation.
- */
-class GetUsername : public QObject {
-    Q_OBJECT
-
-    public:
-    explicit GetUsername(QObject *parent = nullptr);
-    void setAccountSignupWidget(Ui::Auth::Signup *instance = nullptr);
-
-    private:
-    // Timer to delay username checking on every key stroke being pressed
-    QTimer *timer = nullptr;
-
-    // Username Validator
-    UsernameValidator *usernameValidator = nullptr;
-
-    // Current Account Signup
-    Ui::Auth::Signup *signupWidget = nullptr;
-
-    // Retry Attempts Tracker
-    int retryAttempts = 0;
-
-    // Stores username from TextField
-    QByteArray text;
-
-    // Slots
-    void onUsernameChanged(const QString &text);
-    void onUsernameAvailable(bool isAvailable);
-    void onUnableToCheckUsernameAvailability();
-    void onTimeout();
-
-    signals:
-    void usernameValidated(bool isValid);
+    void usernameInvalid();
+    void usernameAvailable(bool isAvailable);
+    void failedToCheckUsername();
 };

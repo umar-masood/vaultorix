@@ -1,7 +1,22 @@
 #include "Delegate.h"
+
 #include "../../../resources/IconManager.h"
 
-Delegate::Delegate(const QSize& itemSize, QObject *parent) : QStyledItemDelegate(parent), m_itemSize(itemSize) {}
+#include <QPainter>
+#include <QPainterPath>
+#include <QStyleOptionViewItem>
+
+#include <QIcon>
+#include <QPixmap>
+#include <QFont>
+#include <QFontMetrics>
+#include <QVariant>
+#include <QColor>
+#include <QRect>
+#include <QString>
+
+Delegate::Delegate(const QSize& itemSize, QObject *parent) 
+         : QStyledItemDelegate(parent), m_itemSize(itemSize) { }
 
 void Delegate::setDarkMode(bool value) { isDarkMode = value; }
 void Delegate::setIconic(bool value) { isIconic = value; }

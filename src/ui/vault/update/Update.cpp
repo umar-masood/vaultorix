@@ -1,13 +1,19 @@
 #include "Update.h"
 #include "../../../core/theme/ThemeManager.h"
+
+#include "../../dialogs/error_dialog/ErrorDialog.h"
+#include "../../components/LineProgress.h"
 #include "../../components/SpinnerProgress.h"
 #include "../../components/Button.h"
 #include "../../components/Seperator.h"
 #include "../../components/Label.h"
 
+#include <QStackedWidget>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+
 using Ui::Vault::Update;
 using Ui::Vault::AppUpdate;
-
 /* ---------------------------------------------------------------
                          Update Struct
    --------------------------------------------------------------- */
@@ -76,7 +82,7 @@ AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     spinner->setColor(SpinnerProgress::BackgroundDark, Qt::transparent);
 
     // Spinner Label
-    spinner_label = new Label("Segoe UI", 10, QFont::Normal, false, "Checking for update");
+    spinner_label = new Label("Segoe UI", 10, QFont::Normal, false, tr("Checking for update"));
 
     // Adding to spinner layout
     spinner_layout->addWidget(spinner, 0, Qt::AlignHCenter);
@@ -101,7 +107,7 @@ AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     no_update_layout->setContentsMargins(10, 34, 14, 10);
 
     // No Update Label
-    no_update_label = new Label("Segoe UI", 10, QFont::Normal, false, "Something went wrong.");
+    no_update_label = new Label("Segoe UI", 10, QFont::Normal, false, tr("Something went wrong."));
     no_update_label->setMinimumWidth(250);
     no_update_label->setWordWrap(true);
 
@@ -141,7 +147,7 @@ AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     btn_layout->setContentsMargins(0,0,0,0);
 
     // Update now button
-    update_btn = new Button("Update now");
+    update_btn = new Button(tr("Update now"));
     update_btn->setDisplayMode(Button::TextOnly);
     update_btn->setFixedSize(QSize(width() - 28, 36));
     update_btn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
@@ -160,14 +166,14 @@ AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     progress_layout->setContentsMargins(0,0,0,0);
 
     // Downloading Label
-    downloading_label = new Label("Segoe UI", 10, QFont::Normal, false, "Downloading");
+    downloading_label = new Label("Segoe UI", 10, QFont::Normal, false, tr("Downloading"));
 
     // Download Line Progress
     download_progressbar = new LineProgress;
     download_progressbar->setFixedSize(QSize(width() - 28, 20));
 
     // Closing app label
-    closing_app_label = new Label("Segoe UI", 10, QFont::Normal, false, "Download completed. We're closing this app to install update");
+    closing_app_label = new Label("Segoe UI", 10, QFont::Normal, false, tr("Download completed. We're closing this app to install update"));
     closing_app_label->setWordWrap(true);
     closing_app_label->hide();
    
@@ -209,6 +215,9 @@ AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     auto &tm = ThemeManager::instance();
     connect(&tm, &ThemeManager::themeChanged, this, &AppUpdate::setDarkMode);
     setDarkMode(tm.isDarkMode());
+
+    // Registering window for Error Dialog Manager
+    ErrorDialogManager::instance()->registerWindow("AppUpdate", this);
 }
 
 QWidget* AppUpdate::updateInfoWidget() {
@@ -223,7 +232,7 @@ QWidget* AppUpdate::updateInfoWidget() {
     update_sep = new Seperator(1, width(), Qt::Horizontal);
 
     // Whats new 
-    whats_new_label = new Label("Segoe UI", 10, QFont::Medium, false, "What's new:", Qt::AlignLeft);
+    whats_new_label = new Label("Segoe UI", 10, QFont::Medium, false, tr("What's new:"), Qt::AlignLeft);
 
     // Release notes
     update_notes_label = new Label("Segoe UI", 10);
@@ -316,19 +325,19 @@ void AppUpdate::setUpdateState(const UpdateState &state) {
 
         case UpdateState::NotAvailable:
         spinner->stop();
-        no_update_label->setText("Your application is up to date.");
+        no_update_label->setText(tr("Your application is up to date."));
         stacked_widget->setCurrentWidget(no_update_page);
         break;
 
         case UpdateState::NoInternet:
         spinner->stop();
-        no_update_label->setText("Unable to check for updates. Please check your internet connection.");
+        no_update_label->setText(tr("Unable to check for updates. Please check your internet connection."));
         stacked_widget->setCurrentWidget(no_update_page);
         break;
 
         case UpdateState::SomethingWentWrong:
         spinner->stop();
-        no_update_label->setText("Oops! Something went wrong.");
+        no_update_label->setText(tr("Oops! Something went wrong."));
         stacked_widget->setCurrentWidget(no_update_page);
         break;
     }

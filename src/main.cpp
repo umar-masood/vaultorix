@@ -11,8 +11,8 @@ int main(int argc, char *argv[]) {
     
     AuthCoordinator *c = new AuthCoordinator(&app);
     c->show();
-  
-    // Ui::Vault::VaultWindow::instance()->show();
+
+    Ui::Vault::VaultWindow::instance()->show();
     return app.exec();
 }
 

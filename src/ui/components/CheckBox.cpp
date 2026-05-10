@@ -1,6 +1,15 @@
 #include "CheckBox.h"
 #include "../../../resources/IconManager.h"
 
+#include <QPixmap>
+#include <QFont>
+#include <QFontMetrics>
+#include <QPen>
+#include <QBrush>
+#include <QColor>
+#include <QRect>
+#include <QString>
+
 CheckBox::CheckBox(const QString &text, QWidget *parent) : QWidget(parent), text(text) {
    setAttribute(Qt::WA_TranslucentBackground);
    setAttribute(Qt::WA_Hover);

@@ -4,12 +4,15 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>
-#include <QPixmap>
-#include <QRect>
 #include <QPainterPath>
-#include <QFont>
 
-namespace Ui::Vault { class UserMenu; };
+class QPixmap;
+class QFont;
+class QRect;
+
+namespace Ui::Vault { 
+    class UserMenu; 
+};
 
 namespace Ui::Vault {
     class User : public QWidget {
@@ -18,7 +21,6 @@ namespace Ui::Vault {
         public:
         explicit User(QWidget *parent = nullptr);
         void setName(const QString &name);
-        void setAvator(const QPixmap &pixmap, int size);
 
         protected:
         void paintEvent(QPaintEvent *event) override;
@@ -41,12 +43,12 @@ namespace Ui::Vault {
         bool isPressed = false;
 
         // Profile Icon
-        QPixmap avator;
+        QPixmap _avator;
 
         // Name
         QString _name = "Umar Masood Khan";
 
         // Menu
-        Ui::Vault::UserMenu *um = nullptr;
+        Ui::Vault::UserMenu *userMenu = nullptr;
     };
 };

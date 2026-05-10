@@ -6,18 +6,12 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include <QEnterEvent>
-#include <QPixmap>
-#include <QFont>
-#include <QFontMetrics>
-#include <QPen>
-#include <QBrush>
-#include <QColor>
-#include <QRect>
-#include <QString>
 
+class QPixmap;
+class QString;
+class QFont;
 
-class CheckBox : public QWidget
-{
+class CheckBox : public QWidget {
    Q_OBJECT
    
    public:

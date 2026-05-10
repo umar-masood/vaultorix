@@ -1,13 +1,18 @@
 #include "UserMenu.h"
-#include "../vault_window/VaultWindow.h"
-#include "../../../../resources/IconManager.h"
+
 #include "../../../core/theme/ThemeManager.h"
+
+#include "../../../../resources/IconManager.h"
 #include "../../components/Button.h"
 #include "../../components/SmoothOpacity.h"
 #include "../account_settings/AccountSettings.h"
+#include "../vault_window/VaultWindow.h"
+
+#include <QVBoxLayout>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
 
 using Ui::Vault::UserMenu;
-
 UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     setFixedHeight(254);
     setFixedWidth(280);
@@ -42,11 +47,10 @@ UserMenu::UserMenu(QWidget *parent) : RoundedBox(parent) {
     layout->addWidget(manage_subscription_btn, 0, Qt::AlignHCenter);
     layout->addStretch();
 
-    // Signal Slots
-    for (auto *btn : option_buttons)
-        connect(btn, &Button::clicked, this, &QWidget::hide);
-
-    connect(account_settings_btn, &Button::clicked, this, &UserMenu::onAccountSettingsBtnClicked);   
+    connect(account_settings_btn, &Button::clicked, this, [this]() {
+        fadeOut();
+        onAccountSettingsBtnClicked();
+    });
 
     // Theme
     auto &tm = ThemeManager::instance();

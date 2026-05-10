@@ -1,17 +1,18 @@
 #pragma once
 
 #include <QTextEdit>
-#include <QPainter>
-#include <QFocusEvent>
-#include <QEnterEvent>
 #include <QMap>
-#include <QContextMenuEvent>
-#include <QApplication>
-#include <QClipboard>
-#include <QMimeData>
+#include <QColor>
+#include <QString>
 
-#include "Menu.h"
-#include "ScrollBar.h"
+class QPainter;
+class QFocusEvent;
+class QEnterEvent;
+class QContextMenuEvent;
+class QEvent;
+
+class Menu;
+class ScrollBar;
 
 class TextEdit : public QTextEdit {
     Q_OBJECT

@@ -1,5 +1,13 @@
 #include "RoundedBox.h"
 
+#include <QPainter>
+#include <QPainterPath>
+#include <QPen>
+#include <QColor>
+#include <QFont>
+#include <QFontMetrics>
+#include <QPaintEvent>
+
 RoundedBox::RoundedBox(bool isToolTip, QWidget *parent) : QWidget(nullptr), isDarkMode(false), _isToolTip(isToolTip) {
     if (isToolTip) {
         setWindowFlags( Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::ToolTip);

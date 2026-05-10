@@ -1,15 +1,19 @@
 #include "Update.h"
+
 #include "../../config/Constants.h"
 #include "../../config/APIConfig.h"
-#include "../../utils/Utils.h"
 #include "../auth/TokenManager.h"
+#include "../../utils/Utils.h"
+
+#include "../../../ui/components/LineProgress.h"
+#include "../../../ui/components/Button.h"
 
 #include <QDateTime>
 #include <QCoreApplication>
 #include <QProcess>
 
-using Core::Services::AppUpdate;
-using Core::Services::Auth::TokenManager;
+using Core::AppUpdate;
+using Core::TokenManager;
 
 AppUpdate::AppUpdate(QObject *parent) : QObject(parent) {
     updateFilePath();
@@ -31,7 +35,18 @@ void AppUpdate::setAppUpdateWidget(Ui::Vault::AppUpdate *instance) {
 
     isUpdateAvailable(APP_VERSION);
 
-    connect(updateWidget->updateButton(), &Button::clicked, this, &AppUpdate::downloadUpdate);
+    connect(updateWidget->updateButton(), &Button::clicked, this, [this](){
+        Utils::InternetConnectivity::instance().runIfOnline(
+            [this](){
+                downloadUpdate();
+            },
+            this,
+            "",
+            [this]() {
+                emit noInternetConnection();
+            }
+        );
+    });
 }
 
 void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
@@ -39,15 +54,14 @@ void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
         return;
 
     // Function for handling response from server
-    auto func = [this](const QJsonObject &obj){
+    auto responseCallable = [this](const QJsonObject &obj){
         if (obj.contains("status_code") && obj.contains("message")) {
             if (obj["status_code"].toInt() == 200) {
-                qDebug() << "No update is available.";
+                INFO_HERE("No update is available.");
                 emit updateAvailable(std::nullopt);
                 return; 
             } else {
-                qDebug() << "Status Code: " << obj["status_code"].toInt();
-                qDebug() << "Message:     " << obj["message"].toString();
+                DEBUG_HERE(QString::number(obj["status_code"].toInt()) + "   " + obj["message"].toString());
                 emit somethingWentWrong();
             }
         } else {
@@ -65,7 +79,7 @@ void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
                     'f', // Fixed-point
                     2 // Decimal precision
                 ) + " MB",
-                QDateTime::fromSecsSinceEpoch(obj["release_date"].toVariant().toLongLong()),
+                QDateTime::fromString(obj["release_date"].toString(), "M-d-yyyy"),
                 obj["release_notes"].toString()
             );
 
@@ -75,13 +89,13 @@ void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
 
     using IC = Utils::InternetConnectivity; // Alias
     IC::instance().checkConnectivity();
-    connect(&IC::instance(), &IC::connectivityChanged, this, [this, func](bool isOnline){
+    connect(&IC::instance(), &IC::connectivityChanged, this, [this, responseCallable](bool isOnline){
         if (isOnline)
             TokenManager::instance()->sendRequest(
                 route(APIRoutes::CHK_UPDATE) + APP_VERSION,
                 QByteArray(), // Empty Because of Get Request
                 QNetworkAccessManager::GetOperation,
-                func
+                responseCallable
             );
         else 
             emit noInternetConnection();
@@ -102,7 +116,7 @@ void AppUpdate::downloadUpdate() {
 
     auto *file = new QFile(filePath);
     if (!file->open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        qDebug() << "Failed to open file for writing update data.";
+        ERROR_HERE("Failed to open file for writing update.");
         reply->abort();
         reply->deleteLater();
         file->deleteLater();
@@ -147,7 +161,7 @@ void AppUpdate::downloadUpdate() {
             downloadProgressBar->stop();
             emit updateDownloaded();
         } else {
-            qDebug() << "Failed to complete downloading update : " << reply->errorString();
+            ERROR_HERE("Failed to complete downloading update : " + reply->errorString());
             QFile::remove(filePath);
         }
 

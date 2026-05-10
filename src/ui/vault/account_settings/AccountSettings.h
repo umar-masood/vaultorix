@@ -1,18 +1,28 @@
 #pragma once
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QScrollArea>
+#include <QCloseEvent>
+#include <QPointer>
 
 #include "../../windows/subWindow/SubWindow.h"
+#include "../../../core/services/account_settings/AccountSettingsService.h"
+#include "../../../core/validators/auth/UsernameValidator.h"
+#include "../../../core/validators/auth/PasswordValidator.h"
 
-class CustomTextField;
 class Label;
 class Button;
 class Toggle;
 class Seperator;
 class TextField;
 class ScrollBar;
+class ComboBox;
+class ScrollArea;
+class QVBoxLayout;
+class QHBoxLayout;
+class QTimer;
+
+namespace Ui::Utils { 
+    class CustomTextField; 
+};
 
 namespace Ui::Vault {
     class AccountSettings : public SubWindow {
@@ -20,34 +30,50 @@ namespace Ui::Vault {
 
         public:
         explicit AccountSettings(QWidget *parent = nullptr);
+            
+        protected:
+        void closeEvent(QCloseEvent *event) override;
 
-        TextField* nameField() const;
-        CustomTextField* usernameField() const;
-        TextField* emailField() const;
-        TextField* currentPasswordField() const;
-        TextField* newPasswordField() const;
-        Toggle* twoFAToggle() const;
-        Label* emailStatus() const;
-        Button* saveButton() const;
-        Button* deleteAccountButton() const;
-        Button* uploadPictureButton() const;
-        Button* deletePictureButton() const;
-        Button* changeUsernameButton() const;
+        private slots:
+        void onUsernameUpdated();
+        void onPasswordUpdated();
+        void onAccountDeleted();
+
+        void onUploadPictureButtonClicked();
+        void onDeletePictureButtonClicked();
+        void onDeleteAccountButtonClicked();
+        void onChangeUsernameButtonClicked();
+        void onEnableChangeUsernameButtonClicked();
+        void onChangePasswordButtonClicked();
+        void onAccountSettingsClosed();
+        void onProfilePictureDeleted();
+
+        void onUsernameAvailable(bool isAvailable);
+        void onPasswordValidationUpdated(const PasswordValidator::PasswordValidationResult &result);
+        
+        void onFailedToUpdatePassword(Core::AccountSettingsService::Error failure);
+        void onFailedToDeleteAccount(Core::AccountSettingsService::Error failure);
+        void onFailedToUpdateProfilePicture(Core::AccountSettingsService::Error failure);
+        void onFailedToDeleteProfilePicture(Core::AccountSettingsService::Error failure);
+        void onFailedToUpdateUsername(Core::AccountSettingsService::Error failure);
+
+        signals:
+        void accountSettingsClosed();
 
         private:
-        void setDarkMode(bool isDarkMode);
+        QString _profilePicturePath;
+        
+        void setDarkMode(bool isDarkMode);        
+        void setUserDetailsFromSessionManager();
+        void onProfilePictureUpdated();
 
-        // Save Button
-        Button *save_btn = nullptr;
+        Core::AccountSettingsService *account_settings_core = nullptr;
 
         // Window Title Label
         Label *winTitle = nullptr;
 
-        // Seperator
-        Seperator *titlebar_sep = nullptr;
-
         // Scrollbar
-        ScrollBar *scrollbar = nullptr;
+        QPointer<ScrollBar> scrollbar = nullptr;
 
         // Main Header Layout
         QVBoxLayout *main_header_layout = nullptr;
@@ -83,10 +109,18 @@ namespace Ui::Vault {
                 // Field & Button Layout
                 QHBoxLayout *field_button_layout = nullptr;
                     // Username TextField
-                    CustomTextField *username_field = nullptr;
-                    // Change username hyperlink button
+                    Ui::Utils::CustomTextField *username_field = nullptr;
+                    // Enable change username hyperlink button
+                    Button *enable_username_change_btn = nullptr;
+                    // Change button
                     Button *change_username_btn = nullptr;
-
+                    // Username Note
+                    Label *username_note = nullptr;
+                    // Username Validator
+                    UsernameValidator *username_validator = nullptr;
+                    // Timer
+                    QTimer *usernameTimer = nullptr;
+                    
         // ------- Seperator ---------------
         Seperator *sep_2 = nullptr;
 
@@ -114,11 +148,19 @@ namespace Ui::Vault {
             Label *password_text = nullptr;
             // Current Password TextField
             TextField *curr_password_field = nullptr;
-            // New Password TextField
-            TextField *new_password_field = nullptr;
+            // New Password + Change Button Layout
+            QHBoxLayout *new_password_field_change_button_layout = nullptr;
+                // New Password TextField
+                Ui::Utils::CustomTextField *new_password_field = nullptr;
+                // Change Password Button
+                Button *change_password_btn = nullptr;
+                // Password Validator
+                PasswordValidator *password_validator = nullptr;
+                // Timer
+                QTimer *passwordTimer = nullptr;
             // Password Note
             Label *password_note = nullptr;
-
+    
         // ------- Seperator ---------------
         Seperator *sep_4 = nullptr;
 
@@ -146,5 +188,18 @@ namespace Ui::Vault {
                 Label *delete_acc_text = nullptr;
             // Delete Account Button
             Button *delete_acc_btn = nullptr;
+        
+        // ------- Seperator ---------------
+        Seperator *sep_6 = nullptr;
+
+        // Lock Timeout Option
+        // Icon
+        Label *lock_timeout_icon = nullptr;
+            // Header
+            Label *lock_timeout_header = nullptr;
+            // Subtext
+            Label *lock_timeout_subText = nullptr;
+        // Combo Box
+        ComboBox *lock_timeout_combobox = nullptr;
     };  
 };

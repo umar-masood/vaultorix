@@ -1,5 +1,11 @@
 #include "TermsConditions.h"
 
+#include "../../components/ScrollBar.h"
+#include "../../components/Label.h"
+
+#include <QTextBrowser>
+#include <QVBoxLayout>
+
 TermsConditions::TermsConditions(QWidget *parent) : QWidget(parent) {
    setFixedSize(500, 600);
    setAttribute(Qt::WA_TranslucentBackground);

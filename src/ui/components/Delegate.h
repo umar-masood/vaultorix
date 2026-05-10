@@ -1,19 +1,11 @@
 #pragma once
 
 #include <QStyledItemDelegate>
-#include <QPainter>
-#include <QPainterPath>
-#include <QStyleOptionViewItem>
 #include <QModelIndex>
-#include <QIcon>
-#include <QPixmap>
-#include <QFont>
-#include <QFontMetrics>
-#include <QVariant>
-#include <QColor>
 #include <QSize>
-#include <QRect>
-#include <QString>
+
+class QPainter;
+class QStyleOptionViewItem;
 
 class Delegate : public QStyledItemDelegate {
     Q_OBJECT

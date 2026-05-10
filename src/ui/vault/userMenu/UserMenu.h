@@ -3,13 +3,12 @@
 #include "../../components/RoundedBox.h"
 
 #include <QApplication>
-#include <QVBoxLayout>
 #include <QVector>
 
 class Button;
 class SmoothOpacity;
-class AccountSettings;
 class QPropertyAnimation;
+class QVBoxLayout;
 
 namespace Ui::Vault { class AccountSettings; };
 namespace Ui::Vault {

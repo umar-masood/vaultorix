@@ -1,4 +1,18 @@
 #include "Button.h"
+#include "ToolTip.h"
+#include "SmoothShadow.h"
+#include "SpinnerProgress.h"
+
+#include <QGraphicsEffect>
+#include <QGraphicsDropShadowEffect>
+#include <QLinearGradient>
+#include <QBrush>
+#include <QPixmap>
+#include <QSize>
+#include <QRect>
+#include <QFont>
+#include <QColor>
+#include <QPropertyAnimation>
 
 Button::Button(const QString &text, QWidget *parent) : QPushButton(text, parent) { init(); }
 Button::Button(QWidget *parent) : QPushButton(parent) { init(); }
@@ -193,13 +207,13 @@ void Button::loadDefaultColors() {
   _colors[SecondaryNormalLight]   = QColor("#FBFBFB");
   _colors[SecondaryHoverLight]    = QColor("#F2F2F2");
   _colors[SecondaryPressedLight]  = QColor("#FFFFFF");
-  _colors[DisabledSecondaryLight] = QColor("#E0E0E0");
+  _colors[DisabledSecondaryLight] = QColor("#E8E8E8");
 
   // Secondary Dark
   _colors[SecondaryNormalDark]   = QColor("#2D2D2D");
   _colors[SecondaryHoverDark]    = QColor("#323232");
   _colors[SecondaryPressedDark]  = QColor("#242424");
-  _colors[DisabledSecondaryDark] = QColor("#555555");
+  _colors[DisabledSecondaryDark] = QColor("#262626");
 
   // Hyperlink
   _colors[HyperLinkNormal]       = QColor("#008EDE");

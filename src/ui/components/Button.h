@@ -1,23 +1,27 @@
 #pragma once 
-#include "SmoothShadow.h"
-#include "SpinnerProgress.h"
 
 #include "../../../resources/IconManager.h"
-#include "ToolTip.h"
 
 #include <QPushButton>
 #include <QPainterPath>
 #include <QMouseEvent>
 #include <QHideEvent>
 #include <QEnterEvent>
-#include <QGraphicsEffect>
-#include <QGraphicsDropShadowEffect>
-#include <QLinearGradient>
-#include <QBrush>
-#include <QPixmap>
-#include <QSize>
-#include <QRect>
 #include <QHash>
+
+class QGraphicsEffect;
+class QLinearGradient;
+class QBrush;
+class QPixmap;
+class QSize;
+class QRect;
+class QGraphicsDropShadowEffect;
+class ToolTip;
+class SpinnerProgress;
+class SmoothShadow;
+class QFont;
+class QColor;
+class QPropertyAnimation;
 
 class Button : public QPushButton {
   Q_OBJECT
@@ -77,9 +81,6 @@ class Button : public QPushButton {
   void setShadow(bool enable);
   void setToolTip(const QString &text);
   void setHyperLink(bool enable);
-  /**
-   * @brief Sets the background color of button
-   */
   void setColor(const ButtonStateColor &state, const QColor &color);
   void setTextColor(const ButtonTextColor &type, const QColor &color);
   void setFontProperties(const QString &family, int pointSize, QFont::Weight weight = QFont::Normal, bool italic = false);

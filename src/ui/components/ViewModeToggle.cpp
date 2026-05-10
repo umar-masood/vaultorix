@@ -1,5 +1,14 @@
 #include "ViewModeToggle.h"
+#include "Button.h"
+#include "ToolTip.h"
+
 #include "../../../resources/IconManager.h"
+
+#include <QButtonGroup>
+#include <QHBoxLayout>
+#include <QPainter>
+#include <QPen>
+#include <QSize>
 
 ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
     setFixedSize(QSize(60, 32));
@@ -18,7 +27,7 @@ ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
 
     // ToolTip
     list_view_tip = new ToolTip(list_view_btn);
-    list_view_tip->setText("List View");
+    list_view_tip->setText(tr("List View"));
 
     // Grid View Button
     grid_view_btn = createButton();
@@ -27,7 +36,7 @@ ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
 
     // ToolTip
     grid_view_tip = new ToolTip(grid_view_btn);
-    grid_view_tip->setText("Grid View");
+    grid_view_tip->setText(tr("Grid View"));
 
     // Button Group
     group = new QButtonGroup(this);

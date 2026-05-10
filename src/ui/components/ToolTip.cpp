@@ -1,6 +1,23 @@
 #include "ToolTip.h"
 
-ToolTip::ToolTip(QWidget *target, const QString &text, QObject *parent) : QObject(parent), _target(target) {
+#include "RoundedBox.h"
+#include "SmoothOpacity.h"
+
+#include <QWidget>
+#include <QScreen>
+#include <QApplication>
+#include <QEvent>
+#include <QTimer>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
+#include <QPoint>
+#include <QRect>
+#include <QSize>
+#include <algorithm>
+
+ToolTip::ToolTip(QWidget *target, QObject *parent) 
+        : QObject(parent), _target(target) 
+{
   tooltipWidget = new RoundedBox(true, nullptr);
   tooltipWidget->setAsToolTip(true);
   tooltipWidget->setDarkMode(isDarkMode);
@@ -18,7 +35,7 @@ ToolTip::ToolTip(QWidget *target, const QString &text, QObject *parent) : QObjec
 
   animation = new QPropertyAnimation(opacityEffect, "opacity");
   animation->setEasingCurve(QEasingCurve::InOutQuad);
-  animation->setDuration(300);
+  animation->setDuration(200);
 
   connect(this, &ToolTip::textEntered, this, &ToolTip::onTextEntered);
   connect(&timer, &QTimer::timeout, this, &ToolTip::onTimeout);
@@ -108,10 +125,10 @@ bool ToolTip::eventFilter(QObject *obj, QEvent *event) {
     }
   }
 
-  if (event->type() == QEvent::ApplicationStateChange) {
-    timer.stop();
-    fadeOutAnimation();
-  }
+    if (obj == _target && event->type() == QEvent::ApplicationStateChange) {
+      timer.stop();
+      fadeOutAnimation();
+    }
   
   return false;
 }
@@ -159,7 +176,7 @@ void ToolTip::onTimeout() { showToolTip(); }
 void ToolTip::setText(const QString &text){ emit textEntered(text); }
 
 void ToolTip::showToolTip() {
-  if (tooltipWidget) {
+  if (tooltipWidget && _target && _target->isVisible() && _target->isEnabled()) {
     position(_target);
     fadeInAnimation();
   }
@@ -180,9 +197,9 @@ void ToolTip::setTargetWidget(QWidget *target) {
     _target->removeEventFilter(this);
 
   _target = target;
+    timer.stop();
 
   if (!target) {
-    timer.stop();
 
     if (animation) 
       animation->stop();
@@ -197,4 +214,8 @@ void ToolTip::setTargetWidget(QWidget *target) {
 void ToolTip::hide() {
   if (tooltipWidget) 
     tooltipWidget->hide();
+}
+
+ToolTip::~ToolTip() {
+  delete tooltipWidget;
 }

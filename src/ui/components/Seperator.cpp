@@ -1,6 +1,14 @@
 #include "Seperator.h"
 
-Seperator::Seperator(int height, int width, Qt::Orientation o, QWidget *parent) : QWidget(parent), orientation(o) {
+#include <QPaintEvent>
+#include <QPainter>
+#include <QPen>
+#include <QBrush>
+#include <QString>
+
+Seperator::Seperator(int height, int width, Qt::Orientation o, QWidget *parent) 
+          : QWidget(parent), orientation(o) 
+{
     setFixedSize(width, height);
 }
 

@@ -1,5 +1,29 @@
 #include "ComboBox.h"
 
+#include "Button.h"
+#include "SmoothShadow.h"
+#include "SmoothOpacity.h"
+#include "RoundedBox.h"
+#include "ScrollBar.h"
+#include "Delegate.h"
+#include "Popup.h"
+
+#include <QApplication>
+#include <QScreen>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QContextMenuEvent>
+#include <QResizeEvent>
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QModelIndex>
+#include <QCompleter>
+#include <QVBoxLayout>
+#include <QListView>
+#include <QTimer>
+#include <algorithm>
+
 ComboBox::ComboBox(QWidget *parent) : TextField(parent) {
     setFixedSize(QSize(250, 36));
     setDropDownButton();

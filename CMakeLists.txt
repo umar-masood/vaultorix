@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED Core Gui Widgets Svg Network)
+find_package(Qt6 REQUIRED Core Gui Widgets Svg Network LinguistTools)
 
 add_executable(Vaultorix
     # ------------------------------------------------------------
@@ -49,7 +49,7 @@ add_executable(Vaultorix
     src/ui/vault/update/Update.cpp
     
     ## App Preferences
-    src/ui/vault/preferences/Preferences.cpp
+    # src/ui/vault/preferences/Preferences.cpp
     
     ## Report a Bug
     ./src/ui/vault/report_bug/ReportBug.cpp
@@ -62,7 +62,7 @@ add_executable(Vaultorix
     src/ui/auth/signup/Signup.cpp
     
     ## Account OTP
-    src/ui/auth/otp/Otp.cpp
+    src/ui/auth/otp/OTP.cpp
 
     ## Account Signin
     src/ui/auth/signin/Signin.cpp
@@ -74,8 +74,14 @@ add_executable(Vaultorix
     # Error Dialogs
     src/ui/dialogs/error_dialog/ErrorDialog.cpp
 
+    # Confirmation Dailogs
+    ./src/ui/dialogs/confirm_dialog/ConfirmDialog.cpp
+    
     ## Terms & Conditions
     src/ui/dialogs/terms_conditions/TermsConditions.cpp
+
+    # ----------------- Utils ---------------------------
+    src/ui/Utils/Utils.cpp
 
     # ----------------- Compoenents ---------------------------
     src/ui/components/Button.cpp
@@ -116,22 +122,32 @@ add_executable(Vaultorix
 
     ## Services
     ### Auth
-    src/core/services/auth/Signup.cpp
-    src/core/services/auth/Signin.cpp
-    src/core/services/auth/OTP.cpp
+    src/core/services/auth/SignupService.cpp
+    src/core/services/auth/SigninService.cpp
+    src/core/services/auth/OTPService.cpp
     src/core/services/auth/TokenManager.cpp
 
     ### App Update
-    src/core/services/update/Update.cpp
+    src/core/services/update/Update.cpp    
     
+    ### Report Bug
+    src/core/services/report_bug/ReportBug.cpp
+    
+    ### Account Settings
+    src/core/services/account_settings/AccountSettingsService.cpp
+
     ## Device Info
     src/core/system/DeviceInfo.cpp
 
+    ## Session
+    src/core/session/SessionManager.cpp
+    
     ## Config
     src/core/config/APIConfig.h
 
     ## Theme Manager
     src/core/theme/ThemeManager.cpp
+    
     # ------------------------------------------------------------
     #                   ENTRY POINT & RESOURCES
     # ------------------------------------------------------------
@@ -147,11 +163,12 @@ add_executable(Vaultorix
     resources/resources.qrc
 )
 
+target_compile_options(Vaultorix PRIVATE /EHsc)
 target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt6::Network Qt6::Gui Qt6::Svg Qt6::Widgets dwmapi user32)
 set_target_properties(Vaultorix PROPERTIES WIN32_EXECUTABLE TRUE)
 
 # ------------------------------------------------------------
 #                   EXTERNAL DEPENDENCIES
 # ------------------------------------------------------------
-add_subdirectory(${PROJECT_SOURCE_DIR}/dependencies/qtkeychain)
-target_link_libraries(Vaultorix PRIVATE Qt6::Core QtKeychain)
+# add_subdirectory(${PROJECT_SOURCE_DIR}/dependencies/qtkeychain)
+# target_link_libraries(Vaultorix PRIVATE Qt6::Core QtKeychain)

@@ -107,61 +107,61 @@ namespace Utils {
     /*---------------------------------------------------------------
                              SECRETS MANAGER 
     -----------------------------------------------------------------*/
-    SecretsManager::SecretsManager(QObject *parent) : QObject(parent) {}
+    // SecretsManager::SecretsManager(QObject *parent) : QObject(parent) {}
 
-    SecretsManager* SecretsManager::instance(QObject *parent) {
-        static auto *sm = new SecretsManager(parent);
-        return sm;
-    }
+    // SecretsManager* SecretsManager::instance(QObject *parent) {
+    //     static auto *sm = new SecretsManager(parent);
+    //     return sm;
+    // }
 
-    void SecretsManager::addSecret(const QString &key, const QString &secret) {
-        auto *writer = new Writer(APP_NAME, this);
-        writer->setKey(key);
-        writer->setTextData(secret);
+    // void SecretsManager::addSecret(const QString &key, const QString &secret) {
+    //     auto *writer = new Writer(APP_NAME, this);
+    //     writer->setKey(key);
+    //     writer->setTextData(secret);
         
-        connect(writer, &Writer::finished, this, [this, writer, key](){
-            if (writer->error())
-                emit secretAdded(key, false);
-            else
-                emit secretAdded(key, true);
+    //     connect(writer, &Writer::finished, this, [this, writer, key](){
+    //         if (writer->error())
+    //             emit secretAdded(key, false);
+    //         else
+    //             emit secretAdded(key, true);
             
-            writer->deleteLater();
-        }, Qt::SingleShotConnection);
+    //         writer->deleteLater();
+    //     }, Qt::SingleShotConnection);
 
-        writer->start();
-    }
+    //     writer->start();
+    // }
 
-    void SecretsManager::removeSecret(const QString &key) {
-        auto *remover = new Remover(APP_NAME, this);
-        remover->setKey(key);
+    // void SecretsManager::removeSecret(const QString &key) {
+    //     auto *remover = new Remover(APP_NAME, this);
+    //     remover->setKey(key);
 
-        connect(remover, &Remover::finished, this, [this, remover, key](){
-            if (remover->error())
-                emit secretRemoved(key, false);
-            else
-                emit secretRemoved(key, true);
+    //     connect(remover, &Remover::finished, this, [this, remover, key](){
+    //         if (remover->error())
+    //             emit secretRemoved(key, false);
+    //         else
+    //             emit secretRemoved(key, true);
 
-            remover->deleteLater();
-        }, Qt::SingleShotConnection);
+    //         remover->deleteLater();
+    //     }, Qt::SingleShotConnection);
 
-        remover->start();
-    }
+    //     remover->start();
+    // }
 
-    void SecretsManager::retrieveSecret(const QString &key) {
-        auto *reader = new Reader(APP_NAME, this);
-        reader->setKey(key);
+    // void SecretsManager::retrieveSecret(const QString &key) {
+    //     auto *reader = new Reader(APP_NAME, this);
+    //     reader->setKey(key);
 
-        connect(reader, &Reader::finished, this, [this, reader, key](){
-            if (reader->error())
-                emit secretRetrieved(key, std::unexpected(-1));
-            else
-                emit secretRetrieved(key, reader->textData());
+    //     connect(reader, &Reader::finished, this, [this, reader, key](){
+    //         if (reader->error())
+    //             emit secretRetrieved(key, std::unexpected(-1));
+    //         else
+    //             emit secretRetrieved(key, reader->textData());
 
-            reader->deleteLater();
-        }, Qt::SingleShotConnection);
+    //         reader->deleteLater();
+    //     }, Qt::SingleShotConnection);
 
-        reader->start();
-    }
+    //     reader->start();
+    // }
 
     /*---------------------------------------------------------------
                             INTERNET CONNECTIVITY
@@ -189,3 +189,4 @@ namespace Utils {
         });
     }
 }
+

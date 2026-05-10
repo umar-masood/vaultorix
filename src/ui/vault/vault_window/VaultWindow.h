@@ -2,16 +2,13 @@
 
 #include "../../windows/window/Window.h"
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-
-/* ------------------- Forward Declarations ---------------------------*/
 class Seperator;
 class Label;
+class QHBoxLayout;
+class QVBoxLayout;
 
 namespace Ui::Vault {
     class Statusbar;
-    class Preferences;
     class View;
     class User;
     class Toolbar;
@@ -20,8 +17,9 @@ namespace Ui::Vault {
     class ReportBug;
 }
 
-namespace Core::Services {
+namespace Core {
     class AppUpdate;
+    class ReportBug;
 };
 
 namespace Ui::Vault { 
@@ -63,7 +61,7 @@ namespace Ui::Vault {
         Button *preferences_btn  = nullptr;
 
         // Preferences Settings
-        Ui::Vault::Preferences *pref = nullptr;
+        // Ui::Vault::Preferences *pref = nullptr;
 
         // Updates Download Button
         Button *updates_download_btn = nullptr;
@@ -74,7 +72,7 @@ namespace Ui::Vault {
         // App Updates 
         Ui::Vault::AppUpdate *appUpdateWidget = nullptr;
         // Core
-        Core::Services::AppUpdate *appUpdateCore = nullptr;
+        Core::AppUpdate *appUpdateCore = nullptr;
             
         // App About
         Ui::Vault::About *about = nullptr;
@@ -84,6 +82,8 @@ namespace Ui::Vault {
 
         // Report Bug
         Ui::Vault::ReportBug *report_bug = nullptr;
+        // Core
+        Core::ReportBug *report_bug_core = nullptr;
 
         // Content Area
         // Main Layout

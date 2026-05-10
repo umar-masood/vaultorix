@@ -145,6 +145,8 @@ enum class Icons {
     DownloadUpdateDark  = 0x90,
 
     AboutDark           = 0x9A,
-    BugDark             = 0x9B
+    BugDark             = 0x9B,
 
+    UploadLight         = 0x9C,
+    UploadDark          = 0x9D
 };

@@ -1,12 +1,15 @@
 #pragma once
-#include <QListView>
-#include <QVBoxLayout>
-#include <QPropertyAnimation>
-#include <QAbstractItemModel>
-#include <QAbstractItemDelegate>
+
 #include "RoundedBox.h"
-#include "ScrollBar.h"
-#include "SmoothOpacity.h"
+#include <QAbstractItemView>
+
+class QListView;
+class QVBoxLayout;
+class QPropertyAnimation;
+class QAbstractItemModel;
+class QAbstractItemDelegate;
+class ScrollBar;
+class SmoothOpacity;
 
 class Popup : public RoundedBox {
     Q_OBJECT

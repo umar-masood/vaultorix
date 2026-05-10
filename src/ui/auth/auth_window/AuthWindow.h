@@ -2,14 +2,23 @@
 
 #include "../../windows/subWindow/SubWindow.h"
 
-#include "../../components/TextField.h"
-#include "../../components/Button.h"
-#include "../../components/Dialog.h"
-#include "../../components/Seperator.h"
-
-#include <QVBoxLayout>
-#include <QVector>
 #include <QLabel>
+#include <QVector>
+#include <QPixmap>
+#include <QString>
+
+class QWidget;
+class QVBoxLayout;
+class QHBoxLayout;
+class QPaintEvent;
+
+class TextField;
+class Button;
+class Dialog;
+class Seperator;
+
+class SmoothOpacity;
+class ThemeManager;
 
 /* ---------------- Branding Widget ---------------- */
 class Branding : public QWidget {
@@ -49,7 +58,7 @@ class BulletPoint : public QLabel {
 
 class ThemeManager;
 
-namespace Ui::Auth {
+namespace Ui {
     /* ---------------- Account Window ---------------- */
     class AuthWindow : public SubWindow {
        Q_OBJECT

@@ -1,7 +1,18 @@
 #include "LineProgress.h"
+#include "SmoothOpacity.h"
 
-LineProgress::LineProgress(QWidget *parent) : QWidget(parent)
-{
+#include <QPainter>
+#include <QPaintEvent>
+#include <QPropertyAnimation>
+#include <QTimer>
+#include <QColor>
+#include <QEasingCurve>
+#include <QFont>
+#include <QFontMetrics>
+#include <QtMath>
+#include <algorithm>
+
+LineProgress::LineProgress(QWidget *parent) : QWidget(parent) {
     hide();
     setAttribute(Qt::WA_TranslucentBackground, true);
 

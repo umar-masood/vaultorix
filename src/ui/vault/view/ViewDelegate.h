@@ -1,15 +1,16 @@
 #pragma once
 
 #include <QStyledItemDelegate>
-#include <QPixmap>
 #include <QPainter>
-#include <QRect>
 #include <QModelIndex>
-#include <QIcon>
 #include <QStandardItem>
 #include <algorithm>
 #include <QtMath>
-#include <QTimer>
+
+class QIcon;
+class QTimer;
+class QRect;
+class QPixmap;
 
 namespace Ui::Vault {
     enum ItemDelegateRoles {

@@ -22,7 +22,7 @@ QString IllustrationManager::illustration(Illustrations illustration)
     case Illustrations::NoInternet:
         return ":/illustrations/noInternet.png";
 
-    case Illustrations::Otp:
+    case Illustrations::OTP:
         return ":/illustrations/otp.png";
 
     case Illustrations::SignIn:
@@ -36,6 +36,9 @@ QString IllustrationManager::illustration(Illustrations illustration)
 
     case Illustrations::UnknownDevice:
         return ":/illustrations/unknownDevice.png";
+
+    case Illustrations::DeleteAccount:
+        return ":/illustrations/deleteAccount.png";
 
     case Illustrations::WrongCredentials:
         return ":/illustrations/wrongCredentials.png";

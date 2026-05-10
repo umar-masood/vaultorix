@@ -1,33 +1,31 @@
 #pragma once
+#pragma once
 
-#include "ScrollBar.h"
-#include "RoundedBox.h"
-#include "Delegate.h"
-#include "SmoothOpacity.h"
-
-#include <QStandardItem>
 #include <QListView>
+#include <QStandardItem>
 #include <QStandardItemModel>
-#include <QMouseEvent>
-#include <QApplication>
-#include <QGuiApplication>
-#include <QScreen>
-#include <QVBoxLayout>
-#include <QAbstractItemModel>
-#include <QAbstractItemView>
-#include <QAbstractScrollArea>
-#include <QPropertyAnimation>
-#include <QEasingCurve>
-#include <QFrame>
-#include <QTimer>
-#include <QCursor>
 #include <QMap>
-#include <QEvent>
-#include <algorithm>
+#include <QSize>
+#include <QString>
+
+class QVBoxLayout;
+class QPropertyAnimation;
+class QTimer;
+class QMouseEvent;
+class QEvent;
+
+class ScrollBar;
+class RoundedBox;
+class Delegate;
+class SmoothOpacity;
 
 class MenuItem : public QStandardItem {
    public:
-   explicit MenuItem(const QString &iconPath, const QString &text, const QString &shortcut, bool hasSubMenu);
+   explicit MenuItem(const QString &iconPath, 
+                     const QString &text, 
+                     const QString &shortcut, 
+                     bool hasSubMenu
+                );
 };
 
 class Menu : public QListView {

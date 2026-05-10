@@ -6,9 +6,11 @@
 #include <QWidget>
 
 class Button;
-class User;
+class QHBoxLayout;
 
-namespace Ui::Vault { class User; };
+namespace Ui::Vault { 
+    class User; 
+};
 
 namespace Ui::Vault {
     /* ---------------------  Toolbar ---------------------- */

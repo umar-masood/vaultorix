@@ -1,16 +1,19 @@
 #pragma once
 
-#include "../../components/Dialog.h"
-#include "../../components/Button.h"
-#include "../../components/Label.h"
-
-#include "../../windows/subWindow/SubWindow.h"
-
 #include "../../../../resources/IllustrationManager.h"
 
 #include <QObject>
-#include <QMap>
 #include <QList>
+#include <QPointer>
+#include <QHash>
+#include <QWidget>
+
+class Dialog;
+class Button;
+class Label;
+class QVBoxLayout;
+class QSize;
+class QString;
 
 /*  ----- Error Widget for using inside dialog ------------ */
 class Error : public QWidget {
@@ -63,9 +66,9 @@ class ErrorDialogManager : public QObject {
     explicit ErrorDialogManager(QObject *parent = nullptr);
 
     // Structure for error dialogs
-    struct ErrorDialog {
-        Error *widget = nullptr;
-        Dialog *dialog = nullptr;
+    struct ErrorDialogItem {
+        QPointer<Error> widget = nullptr;
+        QPointer<Dialog> dialog = nullptr;
     };
 
     // Icons
@@ -78,11 +81,15 @@ class ErrorDialogManager : public QObject {
     const QString TimeoutIllustration                   = IllustrationManager::illustration(Illustrations::Timeout); 
 
     // Map to stored different Error Dialogs for efficiency
-    QMap<QString, ErrorDialog*> dialogs;
+    QHash<QString, ErrorDialogItem*> dialogs;
 
     // Map to store parent windows
-    QMap<QString, QWidget *> parentWindows;
+    QHash<QString, QPointer<QWidget>> parentWindows;
 
     // Helper Function to create error dialog box
-    void create(const QString &key, const QString &text, const QString &actionButtonText, const QString &iconPath);
+    void create(const QString &key, 
+                const QString &text, 
+                const QString &actionButtonText, 
+                const QString &iconPath
+            );
 };

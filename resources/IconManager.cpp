@@ -154,6 +154,9 @@ QString IconManager::icon(Icons icon) {
         case Icons::LanguagesLight:    return ":/icons/languages-light.svg";
         case Icons::LanguagesDark:     return ":/icons/languages-dark.svg";
 
+        case Icons::UploadLight:       return ":/icons/upload-light.svg";
+        case Icons::UploadDark:        return ":/icons/upload-dark.svg";
+
         case Icons::DownloadUpdateLight: return ":/icons/update-download-light.svg";
         case Icons::DownloadUpdateDark:  return ":/icons/update-download-dark.svg";
     }

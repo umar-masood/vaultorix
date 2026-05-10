@@ -1,13 +1,19 @@
 #include "ReportBug.h"
 #include "../../../core/theme/ThemeManager.h"
+
 #include "../../components/Label.h"
 #include "../../components/TextEdit.h"
 #include "../../components/TextField.h"
 #include "../../components/Button.h"
+#include "../../../../resources/IconManager.h"
+#include "../../dialogs/error_dialog/ErrorDialog.h"
+
+#include <QVBoxLayout>
+#include <QFileDialog>
+#include <QStandardPaths>
 
 using Ui::Vault::ReportBug;
-
-ReportBug::ReportBug(QWidget *parent) : SubWindow(QSize(390, 412), parent){
+ReportBug::ReportBug(QWidget *parent) : SubWindow(QSize(390, 454), parent){
     setModal(true);
     setFocusPolicy(Qt::StrongFocus);
 
@@ -24,7 +30,7 @@ ReportBug::ReportBug(QWidget *parent) : SubWindow(QSize(390, 412), parent){
     // ---------------- Content Area Layout ----------------
     win_content_area_layout = new QVBoxLayout(contentArea());
     win_content_area_layout->setSpacing(8);
-    win_content_area_layout->setContentsMargins(14, 34, 14, 14);
+    win_content_area_layout->setContentsMargins(14, 34, 14, 12);
 
     // ------------ Label -----------
     label = new Label("Segoe UI", 10, QFont::Normal, false, "Let us know any specific issue you experienced", Qt::AlignCenter);
@@ -42,32 +48,74 @@ ReportBug::ReportBug(QWidget *parent) : SubWindow(QSize(390, 412), parent){
     _descp_field->setFixedSize(QSize(360, 250));
     _descp_field->setPlaceholderText("Describe the bug experienced as detailed as you can");
 
-    // ------------- Submit Button ------------------
-    submit_btn = new Button("Submit");
-    submit_btn->setCursor(Qt::PointingHandCursor);
-    submit_btn->setDisplayMode(Button::TextOnly);
-    submit_btn->setFixedSize(QSize(360, 36));
-    submit_btn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
-    submit_btn->setFontProperties("Segoe UI", 10, QFont::Normal);
-    submit_btn->setLoaderButton(true);
-    submit_btn->setEnabled(false);
+    // -------------- Upload Screenshot --------------
+    // Label
+    screenshot_label = new Label("Segoe UI", 10, QFont::Normal, false, "Upload a screenshot (Optional):", Qt::AlignLeft);
+    screenshot_label->setMinimumWidth(250);
+    
+    // Button
+    screenshot_btn = new Button("Upload");
+    screenshot_btn->setCursor(Qt::PointingHandCursor);
+    screenshot_btn->setDisplayMode(Button::IconText);
+    screenshot_btn->setFontProperties("Segoe UI", 10, QFont::Normal);
+    screenshot_btn->setIconSize(QSize(18, 18));
+    screenshot_btn->setIconPaths(IconManager::icon(Icons::UploadLight), IconManager::icon(Icons::UploadDark));
+    screenshot_btn->setSecondary(true);
 
-    // Adding label, fields and buttons to layout
+    // Layout
+    auto *screenshot_layout = new QHBoxLayout;
+    screenshot_layout->setContentsMargins(2, 0, 2, 0);
+    screenshot_layout->setSpacing(0);
+    screenshot_layout->addWidget(screenshot_label, 0, Qt::AlignLeft | Qt::AlignVCenter);
+    screenshot_layout->addStretch();
+    screenshot_layout->addWidget(screenshot_btn, 0, Qt::AlignRight | Qt::AlignVCenter);
+
+    // ------------- Submit Button ------------------
+    _submit_btn = new Button("Submit");
+    _submit_btn->setCursor(Qt::PointingHandCursor);
+    _submit_btn->setDisplayMode(Button::TextOnly);
+    _submit_btn->setFixedSize(QSize(360, 36));
+    _submit_btn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
+    _submit_btn->setFontProperties("Segoe UI", 10, QFont::Normal);
+    _submit_btn->setLoaderButton(true);
+    _submit_btn->setEnabled(false);
+
+    // Adding label, fields, screenshot layout and button to layout
     win_content_area_layout->addWidget(label);
     win_content_area_layout->addWidget(_subject_field);
     win_content_area_layout->addWidget(_descp_field);
-    win_content_area_layout->addWidget(submit_btn);
-    win_content_area_layout->addStretch(); 
+    win_content_area_layout->addLayout(screenshot_layout);
+    win_content_area_layout->addWidget(_submit_btn);
 
     // Signal Slots
     connect(_subject_field, &TextField::textChanged, this, &ReportBug::onTextChanged);
     connect(_descp_field, &TextEdit::textChanged, this, &ReportBug::onTextChanged);
-    connect(submit_btn, &Button::clicked, this, &ReportBug::reportFinished);
+    connect(_submit_btn, &Button::clicked, this, &ReportBug::reportFinished);
+    connect(screenshot_btn, &Button::clicked, this, [this](){
+        QString path = QFileDialog::getOpenFileName(
+            this,
+            tr("Select a Screenshot"),
+            QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+            "Image Files (*.png *jpg)"
+        );
+
+        if (!path.isEmpty()) {
+            _filePath = path;
+            screenshot_btn->hide();
+
+            QFontMetrics fm(screenshot_label->font());
+            QString elidedText = fm.elidedText(_filePath, Qt::ElideRight, 280);
+            screenshot_label->setText(tr("Screenshot: ") + elidedText);
+        }
+    });
 
     // Theme
     auto &tm = ThemeManager::instance();
     connect(&tm, &ThemeManager::themeChanged, this, &ReportBug::setDarkMode);
     setDarkMode(tm.isDarkMode());
+
+    // Registering this window for ErrorDialogManager
+    ErrorDialogManager::instance()->registerWindow("ReportBug", this);
 }
 
 void ReportBug::onTextChanged() {
@@ -77,7 +125,7 @@ void ReportBug::onTextChanged() {
     if (!_descp_field)
         return;
 
-    if (!submit_btn)
+    if (!_submit_btn)
         return;
 
     QString subText = _subject_field->text().trimmed();
@@ -86,7 +134,7 @@ void ReportBug::onTextChanged() {
     bool enableButton = (!subText.isEmpty() && subText.length() > 10) &&
                         (!descpText.isEmpty() && descpText.length() > 10);
 
-    submit_btn->setEnabled(enableButton);
+    _submit_btn->setEnabled(enableButton);
 }
 
 void ReportBug::setDarkMode(bool isDarkMode) {
@@ -98,8 +146,8 @@ void ReportBug::setDarkMode(bool isDarkMode) {
         winTitle->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
 
     // Label, TextField, TextEdit
-    if (label)
-        label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
+    for (auto *l : {label, screenshot_label})
+        l->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
     
     if (_subject_field)
         _subject_field->setDarkMode(isDarkMode);
@@ -108,9 +156,11 @@ void ReportBug::setDarkMode(bool isDarkMode) {
         _descp_field->setDarkMode(isDarkMode);
 
     // Button
-    if (submit_btn)
-        submit_btn->setDarkMode(isDarkMode);
+    for (auto *b : {_submit_btn, screenshot_btn})
+        b->setDarkMode(isDarkMode);
 }
 
+QString ReportBug::filePath() const { return _filePath; }
 TextEdit *ReportBug::descp_field() const { return _descp_field; }
 TextField *ReportBug::subject_field() const { return _subject_field; }
+Button* ReportBug::submit_btn() const { return _submit_btn; }

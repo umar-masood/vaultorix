@@ -1,17 +1,8 @@
 #pragma once
 
 #include "Button.h"
-#include "Menu.h"
 
-#include <QStandardItemModel>
-#include <QVector>
-#include <QModelIndex>
-#include <QEvent>
-#include <QApplication>
-#include <QListView>
-#include <QMouseEvent>
-#include <QScreen>
-#include <algorithm>
+class Menu;
 
 class ButtonMenu : public Button {
     Q_OBJECT
@@ -19,11 +10,10 @@ class ButtonMenu : public Button {
     public:
     explicit ButtonMenu(QWidget *parent = nullptr);
     void setDarkMode(bool enable);
-
     Menu* menu() const;
 
     private:
-    // Theme flags
+    // Theme flag
     bool isDarkMode = false;
 
     // Menu

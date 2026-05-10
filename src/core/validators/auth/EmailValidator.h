@@ -11,19 +11,12 @@
 #include <QJsonObject>
 #include "../../utils/Utils.h"
 
-namespace Ui::Auth { class Signup; };
-
-/* ---------------------------   Email Validator -------------------------  */
-/**
- * This class will check the name passed by the GetName class, whether it is valid?
- */
 class EmailValidator : public QObject {
     Q_OBJECT
 
     public:
     explicit EmailValidator(QObject *parent = nullptr);
-    bool isValidEmail(QByteArray &email);
-    void isEmailAvailable(QByteArray &email);
+    void checkEmailValidityAndAvailability(const QString &email);
 
     private:
     // Blacklist Manager
@@ -31,10 +24,6 @@ class EmailValidator : public QObject {
 
     // Network Manager
     QNetworkAccessManager *manager = nullptr;
-
-    // API Response
-    int statusCode;
-    QString message;
 
     // Caching Data Structures
     std::unordered_set<std::string> tempMails;
@@ -44,49 +33,13 @@ class EmailValidator : public QObject {
     // Max Size of Cache
     const size_t MAX_CACHE_SIZE = 5000;
 
-    // Helper Methods
-    std::string getFilePath() const;
+    // Helpers
     bool isEmailBlacklisted(const std::string &domain);
     void loadMailsFromFile();
+    bool isValidEmail(const QString &email);
 
     signals:
     void emailAvailable(bool isAvailable);
-    void unableToCheckEmailAvailability();
-};
-
-/*  -----------------------------  Get Email ------------------------------- */
-/**
- * This class will take email from full email textfield in Account Sign up widget in Ui and passed it to the actual email validator class for validation
- */
-class GetEmail : public QObject {
-    Q_OBJECT
-
-    public:
-    explicit GetEmail(QObject *parent = nullptr);
-    void setAccountSignupWidget(Ui::Auth::Signup *instance = nullptr);
-
-    private:
-    // Timer 
-    QTimer *timer = nullptr;
-
-    // Email Validator
-    EmailValidator *emailValidator = nullptr;
-
-    // Account Create
-    Ui::Auth::Signup *signupWidget = nullptr;
-
-    // Attempts Tracker
-    int retryAttempts = 0;
-
-    // Stores Email Field Text
-    QByteArray text;
-
-    // Slots
-    void onEmailChanged(const QString &pwd);
-    void onEmailAvailable(bool isAvailable);    
-    void onUnableToCheckEmailAvailability();
-    void onTimeout();
-
-    signals:
-    void emailValidated(bool isValid);
+    void failedToCheckEmail();
+    void emailInvalid();
 };

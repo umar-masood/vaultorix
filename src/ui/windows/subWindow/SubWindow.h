@@ -1,10 +1,20 @@
 #pragma once
-#include "../../components/Button.h"
 #include "../../../../resources/IconManager.h"
 
 #include <QWindow>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QObject>
+#include <QWidget>
+
+class QVBoxLayout;
+class QHBoxLayout;
+class Button;
+class QSize;
+class QPaintEvent;
+class QCloseEvent;
+class QShowEvent;
+class QMouseEvent;
+class QString;
+class QEvent;
 
 class SubWindowOverlay : public QWidget {
    public:
@@ -27,10 +37,10 @@ class SubWindow : public QWidget {
 
     void setModal(bool enable);
     void setDarkMode(bool value);
+    void setInteractionBlocked(bool enable);
 
     QWidget* contentArea() const;
     QHBoxLayout* titlebarLayout() const;
-
     SubWindowOverlay *modalOverlay() const;
 
     protected: 
@@ -52,7 +62,6 @@ class SubWindow : public QWidget {
     bool _interactionBlocked = false;
 
     bool event(QEvent *event);
-    void setInteractionBlocked(bool enable);
     void createOverlay();
     void centerInParent();
     void destroyOverlay();

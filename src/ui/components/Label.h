@@ -1,12 +1,13 @@
 #pragma once
 
 #include <QLabel>
-#include <QFont>
-#include <QWidget>
-#include <QString>
-#include <QPropertyAnimation>
-#include <QTimer>
-#include <QGraphicsOpacityEffect>
+
+class QTimer;
+class QPropertyAnimation;
+class QGraphicsOpacityEffect;
+class QFont;
+class QString;
+class QColor;
 
 class Label : public QLabel {
    Q_OBJECT 

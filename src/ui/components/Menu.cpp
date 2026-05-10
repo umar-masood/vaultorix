@@ -1,5 +1,27 @@
 #include "Menu.h"
 
+#include "Delegate.h"
+#include "RoundedBox.h"
+#include "ScrollBar.h"
+#include "SmoothOpacity.h"
+
+#include <QAbstractItemView>
+#include <QApplication>
+#include <QCursor>
+#include <QEasingCurve>
+#include <QEvent>
+#include <QFrame>
+#include <QGuiApplication>
+#include <QMouseEvent>
+#include <QPropertyAnimation>
+#include <QScreen>
+#include <QScrollBar>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QWidget>
+
+#include <algorithm>
+
 MenuItem::MenuItem(const QString &iconPath, const QString &text, const QString &shortcut, bool hasSubMenu) : QStandardItem(text) {
     setData(shortcut, Qt::UserRole + 1);
     setData(hasSubMenu, Qt::UserRole + 2);

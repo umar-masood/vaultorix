@@ -1,4 +1,5 @@
 #pragma once
+#include <QFileInfo>
 
 #define APP_VERSION "1.0.0"
 #define APP_NAME "Vaultorix"
@@ -8,21 +9,32 @@
 #define OTP_INITIAL_TIME_STR "02:00"
 #define OTP_BOXS 5
 
+#define PROFILE_PICTURE_MAX_SIZE 2097152
 #define REQUEST_TIMEOUT 10000
-
 #define OLDER_LIST_TIME 172800
-
 #define REDOWNLOAD_INTERVAL 10000
 
-#define EMAIL_BLACKLIST_FILE "BadDomains.config"
-#define PWD_BLACKLIST_FILE "BadPwds.config"
-#define USERNAME_BLACKLIST_FILE "BadUsernames.config"
+#define EMAIL_BLACKLIST_FILE "WeakDomains.config"
+#define PWD_BLACKLIST_FILE "WeakPasswords.config"
+#define USERNAME_BLACKLIST_FILE "WeakUsernames.config"
+#define UPDATE_DOWNLOAD_FILE "Vaultorix-Setup-v1.0.0.exe"
 
 #define ACCESS_TOKEN_EXPIRY 600
 #define REFRESH_TOKEN_EXPIRY 86400
+#define USERNAME_CHANGE_INTERVAL 2592000
 
 #define DEVICE_ID_SETTINGS_KEY "Device/DeviceId"
 #define ACCOUNT_REGISTERED_SETTINGS_KEY "Account/IsRegistered"
 #define DEVICE_THEME_KEY "Device/Theme"
 
-#define UPDATE_DOWNLOAD_FILE "Vaultorix-Setup.exe"
+#define DEBUG_HERE(msg)\
+    qDebug().noquote() << "[DEBUG]" << " " << QFileInfo(__FILE__).fileName() << ":"  << __LINE__ << " " << QString(__FUNCTION__) + "()" << " - " << msg 
+
+#define WARN_HERE(msg)\
+    qDebug().noquote() << "[WARNING]" << " " << QFileInfo(__FILE__).fileName() << ":"  << __LINE__ << " " << QString(__FUNCTION__) + "()" << " - " << msg 
+
+#define ERROR_HERE(msg)\
+    qDebug().noquote() << "[ERROR]" << " " << QFileInfo(__FILE__).fileName() << ":"  << __LINE__ << " " << QString(__FUNCTION__) + "()" << " - " << msg 
+
+#define INFO_HERE(msg)\
+    qDebug().noquote() << "[INFO]" << " " << QFileInfo(__FILE__).fileName() << ":"  << __LINE__ << " " << QString(__FUNCTION__) + "()" << " - " << msg 

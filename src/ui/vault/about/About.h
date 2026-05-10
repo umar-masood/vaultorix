@@ -2,13 +2,13 @@
 
 #include <QWidget>
 #include <QVector>
-#include <QVBoxLayout>
 #include <QCoreApplication>
-#include <QFontMetrics>
 #include <QDebug>
 
 class Label;
 class Dialog;
+class QVBoxLayout;
+class QFontMetrics;
 
 namespace Ui::Vault {
     class About : public QWidget {

@@ -1,6 +1,20 @@
 #include "SubWindow.h"
 #include "../window/Window.h"
 
+#include "../../components/Button.h"
+
+#include <QString>
+#include <QMouseEvent>
+#include <QCloseEvent>
+#include <QPaintEvent>
+#include <QSize>
+#include <QShowEvent>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QApplication>
+#include <QScreen>
+#include <QEvent>
+
 SubWindowOverlay::SubWindowOverlay(QWidget *parent) : QWidget(parent) {
    setWindowFlags(Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
    setAttribute(Qt::WA_TranslucentBackground);
@@ -198,7 +212,7 @@ void SubWindow::paintEvent(QPaintEvent *event) {
     painter.setRenderHints(QPainter::Antialiasing);
 
     QColor brushColor = isDarkMode ? QColor("#1F1F1F") : QColor("#FFFFFF");
-    QColor penColor = "#AFAFAF";
+    QColor penColor = "#109AC7";
 
     painter.setBrush(brushColor);
     painter.setPen(QPen(penColor, 0.5));

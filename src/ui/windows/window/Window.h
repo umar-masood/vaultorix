@@ -15,7 +15,7 @@ class Window : public QWidget {
 
     public:
     explicit Window( QWidget *parent = nullptr);
-    virtual ~Window() = default;
+    ~Window();
 
     enum class ResizeRegion {
         None,
@@ -33,7 +33,7 @@ class Window : public QWidget {
     void setInteractiveTitleBarWidget(QWidget *widget);
     void setInteractionBlocked(bool enable);
 
-    QWidget* titleBar() const;
+    QWidget *titleBar() const;
     QWidget* contentArea() const;
 
     bool isWindowNormal() const;
@@ -44,8 +44,10 @@ class Window : public QWidget {
     void changeEvent(QEvent *event) override;
     void showEvent(QShowEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event) override;
     void leaveEvent(QEvent *event);
+    void resizeEvent(QResizeEvent *event);
     bool event(QEvent *event) override;
 
     private:
@@ -71,6 +73,11 @@ class Window : public QWidget {
     // Set Window Controls Icons
     void setWindowControlsIcons();
     void updateMaximizeIcon();
+
+    // Window Dragging
+    bool _isDragging = false;
+    QPoint _dragStartGlobalPos;
+    QPoint _dragStartWindowPos;
 
     // Window Resizing 
     void updateCursorForRegion(ResizeRegion region);

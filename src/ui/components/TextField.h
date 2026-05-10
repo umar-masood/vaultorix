@@ -1,20 +1,28 @@
 #pragma once
 
-#include "Button.h"
-#include "Menu.h"
-#include "SmoothShadow.h"
-
-#include <QResizeEvent>
-#include <QFocusEvent>
-#include <QContextMenuEvent>
-#include <QTimer>
-#include <QDebug>
-#include <algorithm>
 #include <QLineEdit>
 #include <QHash>
-#include <QApplication>
-#include <QClipboard>
-#include <QMimeData>
+#include <QColor>
+#include <QString>
+#include <QSize>
+
+class QMimeData;
+class QResizeEvent;
+class QFocusEvent;
+class QTimer;
+class QApplication;
+class QClipboard;
+class QContextMenuEvent;
+class QPaintEvent;
+class QEnterEvent;
+class QEvent;
+class QKeyEvent;
+class QPropertyAnimation;
+class QWidget;
+
+class Menu;
+class Button;
+class SmoothShadow;
 
 class TextField : public QLineEdit {
   Q_OBJECT

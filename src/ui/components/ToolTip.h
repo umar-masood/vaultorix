@@ -1,24 +1,28 @@
 #pragma once
-#include "RoundedBox.h"
-#include "SmoothOpacity.h"
 
 #include <QObject>
-#include <QPropertyAnimation>
+#include <QString>
 #include <QTimer>
-#include <QEvent>
-#include <QScreen>
-#include <QApplication>
-#include <algorithm>
+#include <QPropertyAnimation>
+
+class QWidget;
+class QScreen;
+class QEvent;
+class RoundedBox;
+class SmoothOpacity;
 
 class ToolTip : public QObject {
   Q_OBJECT
   
   public:
-  explicit ToolTip(QWidget *target = nullptr, const QString &text = QString(), QObject *parent = nullptr);
+  explicit ToolTip(QWidget *target = nullptr, QObject *parent = nullptr);
+  ~ToolTip();
+
   void setText(const QString &text);
   void setDarkMode(bool enable);
   void setTargetWidget(QWidget *target);
   void hide();
+
 
   protected:
   bool eventFilter(QObject *obj, QEvent *event) override;

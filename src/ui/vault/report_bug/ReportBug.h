@@ -1,12 +1,12 @@
 #pragma once
 
 #include "../../windows/subWindow/SubWindow.h"
-#include <QVBoxLayout>
 
 class Label;
 class Button;
 class TextField;
 class TextEdit;
+class QVBoxLayout;
 
 namespace Ui::Vault {
     class ReportBug : public SubWindow {
@@ -15,8 +15,10 @@ namespace Ui::Vault {
         public:
         explicit ReportBug(QWidget *parent = nullptr);
 
+        QString filePath() const;
         TextEdit *descp_field() const;
         TextField *subject_field() const;
+        Button *submit_btn() const;
 
         private:
         void setDarkMode(bool isDarkMode);
@@ -36,8 +38,15 @@ namespace Ui::Vault {
         // Bug Descp 
         TextEdit *_descp_field = nullptr;
 
+        // Upload Screenshot Label
+        Label *screenshot_label = nullptr;
+        // Upload Screenshot Button
+        Button *screenshot_btn = nullptr;
+        // Screenshot file path
+        QString _filePath;
+
         // Submit
-        Button *submit_btn = nullptr;
+        Button *_submit_btn = nullptr;
 
         signals:
         void reportFinished();

@@ -1,15 +1,13 @@
 #pragma once
 
 #include <QScrollBar>
-#include <QPropertyAnimation>
-#include <QPainter>
-#include <QPaintEvent>
-#include <QColor>
-#include <QEasingCurve>
-#include <QMouseEvent>
-#include <QEnterEvent>
-#include <QEvent>
-#include <algorithm>
+
+class QPropertyAnimation;
+class QPainter;
+class QPaintEvent;
+class QMouseEvent;
+class QEnterEvent;
+class QEvent;
 
 class ScrollBar : public QScrollBar {
   Q_OBJECT

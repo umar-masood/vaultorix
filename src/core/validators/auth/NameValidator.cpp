@@ -1,76 +1,31 @@
 #include "NameValidator.h"
-#include "../../../ui/auth/signup/Signup.h"
 
-/* -----------  Name Validator -------------------  */
-bool NameValidator::isValidName(const QByteArray &bytes) {
-    if (bytes.isEmpty())
-        return false;
+NameValidator::NameValidator(QObject *parent) : QObject(parent) { }
 
-    if (bytes.length() < 3 || bytes.length() > 50)
-        return false;
+void NameValidator::checkNameValidity(const QString &name) {
+    bool valid = true;
 
-    if (bytes.contains("  "))
-        return false;
+    if (name.isEmpty()) {
+        emit nameValidated(false);
+        return;
+    }
 
-    if (bytes.startsWith(' ') || bytes.endsWith(' '))
-        return false;
+    if (name.length() < 3 || name.length() > 50)
+        valid = false;
+
+    if (name.contains("  "))
+        valid = false;
+
+    if (name.startsWith(' ') || name.endsWith(' '))
+        valid = false;
 
     static const QRegularExpression re("^[A-Za-z ']+$");
-    if (!re.match(QString::fromUtf8(bytes)).hasMatch())
-        return false;
+    if (!re.match(name).hasMatch())
+        valid = false;
 
-    unsigned char ch = bytes[0];
+    QChar ch = name.at(0);
     if (ch < 'A' || ch > 'Z')
-        return false;
+        valid = false;
 
-    return true;
-}
-
-/* ----------------- GetName ----------------------  */
-GetName::GetName(QObject *parent) : QObject(parent) {
-    timer = new QTimer(this);
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, this, &GetName::onTimeout);
-}
-
-void GetName::setAccountSignupWidget(Ui::Auth::Signup *instance) {
-    if (!instance) 
-        return;
-    
-    signupWidget = instance;
-    
-    connect(signupWidget->nameField(), &CustomTextField::textChanged, this, &GetName::onNameChanged);
-}
-
-void GetName::onNameChanged(const QString &text) {
-    Q_UNUSED(text)
-    timer->stop();
-    timer->start(2000);
-}
-
-void GetName::onTimeout() {
-    if (!signupWidget) return;
-
-    QByteArray text = signupWidget->nameField()->text().toUtf8();
-
-    if (text.isEmpty()) {
-        signupWidget->nameField()->setInvalid();
-        signupWidget->nameField()->setTooltip("");
-        return;
-    }
-
-    bool ok = nameValidator.isValidName(text);
-
-    // Emit signal
-    emit nameValidated(ok);
-
-    Utils::cleanupMemory(text);
-
-    if (ok) {
-        signupWidget->nameField()->setValid();
-        signupWidget->nameField()->setTooltip("Valid full name");
-    } else {
-        signupWidget->nameField()->setInvalid();
-        signupWidget->nameField()->setTooltip("Invalid full name");
-    }
+    emit nameValidated(valid);
 }
