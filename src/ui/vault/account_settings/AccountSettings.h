@@ -3,7 +3,7 @@
 #include <QCloseEvent>
 #include <QPointer>
 
-#include "../../windows/subWindow/SubWindow.h"
+#include "../../windows/subwindow/Subwindow.h"
 #include "../../../core/services/account_settings/AccountSettingsService.h"
 #include "../../../core/validators/auth/UsernameValidator.h"
 #include "../../../core/validators/auth/PasswordValidator.h"
@@ -51,6 +51,8 @@ namespace Ui::Vault {
         void onUsernameAvailable(bool isAvailable);
         void onPasswordValidationUpdated(const PasswordValidator::PasswordValidationResult &result);
         
+        void onStartLockTimeoutTimer(int msec);
+
         void onFailedToUpdatePassword(Core::AccountSettingsService::Error failure);
         void onFailedToDeleteAccount(Core::AccountSettingsService::Error failure);
         void onFailedToUpdateProfilePicture(Core::AccountSettingsService::Error failure);
@@ -59,6 +61,7 @@ namespace Ui::Vault {
 
         signals:
         void accountSettingsClosed();
+        void startLockTimeoutTimer(int msec);
 
         private:
         QString _profilePicturePath;
@@ -68,7 +71,7 @@ namespace Ui::Vault {
         void onProfilePictureUpdated();
 
         Core::AccountSettingsService *account_settings_core = nullptr;
-
+        QTimer *lockTimer;
         // Window Title Label
         Label *winTitle = nullptr;
 

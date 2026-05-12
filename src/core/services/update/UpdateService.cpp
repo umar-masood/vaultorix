@@ -1,55 +1,41 @@
-#include "Update.h"
+#include "UpdateService.h"
 
 #include "../../config/Constants.h"
 #include "../../config/APIConfig.h"
 #include "../auth/TokenManager.h"
 #include "../../utils/Utils.h"
 
-#include "../../../ui/components/LineProgress.h"
-#include "../../../ui/components/Button.h"
-
 #include <QDateTime>
 #include <QCoreApplication>
 #include <QProcess>
 
-using Core::AppUpdate;
+using Core::UpdateService;
 using Core::TokenManager;
 
-AppUpdate::AppUpdate(QObject *parent) : QObject(parent) {
+UpdateService::UpdateService(QObject *parent) : QObject(parent) {
     updateFilePath();
 
     manager = new QNetworkAccessManager(this);
 
-    connect(this, &AppUpdate::updateAvailable, this, &AppUpdate::onUpdateAvailable);
-    connect(this, &AppUpdate::updateDownloaded, this, &AppUpdate::installUpdate);
-    connect(this, &AppUpdate::somethingWentWrong, this, &AppUpdate::onSomethingWentWrong);
-    connect(this, &AppUpdate::noInternetConnection, this, &AppUpdate::onInternetConnectionError);
+    connect(this, &UpdateService::updateDownloaded, this, &UpdateService::installUpdate);
 }
 
-void AppUpdate::setAppUpdateWidget(Ui::Vault::AppUpdate *instance) {
-    if (!instance)
-        return;
+UpdateService::UpdateData::UpdateData(const QString &currentVersion, 
+                          const QString &newVersion,
+                          const QString &size, 
+                          const QDateTime &releasedDate, 
+                          const QString &updateNotes) : 
+                          _currentVersion(currentVersion),
+                          _newVersion(newVersion),
+                          _size(size),
+                          _releasedDate(releasedDate),
+                          _updateNotes(updateNotes)
+{
 
-    updateWidget = instance;
-    downloadProgressBar = updateWidget->downloadProgressBar();
-
-    isUpdateAvailable(APP_VERSION);
-
-    connect(updateWidget->updateButton(), &Button::clicked, this, [this](){
-        Utils::InternetConnectivity::instance().runIfOnline(
-            [this](){
-                downloadUpdate();
-            },
-            this,
-            "",
-            [this]() {
-                emit noInternetConnection();
-            }
-        );
-    });
 }
 
-void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
+
+void UpdateService::isUpdateAvailable(const QString &currentVersion) {
     if (currentVersion.isEmpty())
         return;
 
@@ -59,10 +45,11 @@ void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
             if (obj["status_code"].toInt() == 200) {
                 INFO_HERE("No update is available.");
                 emit updateAvailable(std::nullopt);
+                emit updateCurrentState(State::Unavailable);
                 return; 
             } else {
                 DEBUG_HERE(QString::number(obj["status_code"].toInt()) + "   " + obj["message"].toString());
-                emit somethingWentWrong();
+                emit updateError(Error::SomethingWentWrong);
             }
         } else {
             // Saving download link
@@ -71,7 +58,7 @@ void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
             double sizeBytes = obj["file_size"].toVariant().toLongLong();
             double sizeMB = sizeBytes / (1024.0 * 1024.0);
             
-            Ui::Vault::Update update(
+            UpdateData update(
                 APP_VERSION,
                 obj["latest_version"].toString(),
                 QString::number(
@@ -84,6 +71,7 @@ void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
             );
 
             emit updateAvailable(update);
+            emit updateCurrentState(State::Available);
         }
     };
 
@@ -95,20 +83,25 @@ void AppUpdate::isUpdateAvailable(const QString &currentVersion) {
                 route(APIRoutes::CHK_UPDATE) + APP_VERSION,
                 QByteArray(), // Empty Because of Get Request
                 QNetworkAccessManager::GetOperation,
-                responseCallable
+                responseCallable,
+                    [this](QNetworkReply *reply) {
+                        ERROR_HERE("Update check failed: " + reply->errorString());
+                        emit updateError(Error::SomethingWentWrong);
+                    }
             );
         else 
-            emit noInternetConnection();
+            emit updateError(Error::NoInternet);
     }, Qt::SingleShotConnection);
 }
 
-void AppUpdate::downloadUpdate() {
+void UpdateService::downloadUpdate() {
     QUrl url(updateDownloadUrl);
     QNetworkRequest request(url);
     request.setTransferTimeout(REQUEST_TIMEOUT);
 
+    emit updateDownloadStarted();
+
     QNetworkReply *reply = manager->get(request);
-    reply->setParent(updateWidget);
    
     QFileInfo fileInfo(filePath);
     if (fileInfo.exists()) 
@@ -123,24 +116,10 @@ void AppUpdate::downloadUpdate() {
         return;
     }
 
-    if (!updateWidget)
-        return;
-
-    updateWidget->downloadProgressBar()->setIndeterminate(true);
-    updateWidget->downloadProgressBar()->start();
-
     connect(reply, &QNetworkReply::downloadProgress, this, [this](qint64 bytesReceived, qint64 bytesTotal){
         if (bytesTotal > 0) {
             int percent = static_cast<int>((bytesReceived * 100.0) / bytesTotal);
-
-            if (!downloadProgressBar)
-                return;
-
-            if (downloadProgressBar->indeterminate())
-                downloadProgressBar->setIndeterminate(false);
-
-            downloadProgressBar->setValue(percent);
-            downloadProgressBar->setText(QString::number(percent));
+            emit updateDownloadProgress(percent);
         }
     });
 
@@ -153,12 +132,6 @@ void AppUpdate::downloadUpdate() {
             file->flush();
             file->close();
 
-            if (!updateWidget)
-                return;
-            
-            downloadProgressBar->setValue(100);
-            downloadProgressBar->setText(QString::number(100));
-            downloadProgressBar->stop();
             emit updateDownloaded();
         } else {
             ERROR_HERE("Failed to complete downloading update : " + reply->errorString());
@@ -173,47 +146,23 @@ void AppUpdate::downloadUpdate() {
         QFile::remove(filePath);
 
         // Restarting download
-        QTimer::singleShot(15000, this, &AppUpdate::downloadUpdate);
+        QTimer::singleShot(15000, this, &UpdateService::downloadUpdate);
 
         reply->abort();
         reply->disconnect();
+
         reply->deleteLater();
         file->deleteLater();
     });
 }
 
-void AppUpdate::onInternetConnectionError() {
-    if (!updateWidget)
-        return;
-
-    updateWidget->setUpdateState(Ui::Vault::AppUpdate::UpdateState::NoInternet);
-}
-
-void AppUpdate::onSomethingWentWrong() {
-    if (!updateWidget)
-        return;
-
-    updateWidget->setUpdateState(Ui::Vault::AppUpdate::UpdateState::SomethingWentWrong);
-}
-
-void AppUpdate::updateFilePath() {
+void UpdateService::updateFilePath() {
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Updates/Installer/" + QString(APP_VERSION);
     QDir().mkpath(path);
     this->filePath = (path + "/" + UPDATE_DOWNLOAD_FILE);
 }
 
-void AppUpdate::onUpdateAvailable(std::optional<Ui::Vault::Update> info) {
-    if (!updateWidget)
-        return;
-
-    if (info) {
-        updateWidget->setUpdateDetails(info.value());
-        updateWidget->setUpdateState(Ui::Vault::AppUpdate::UpdateState::Available);
-    } else 
-        updateWidget->setUpdateState(Ui::Vault::AppUpdate::UpdateState::NotAvailable);
-}
-
-void AppUpdate::installUpdate() {
+void UpdateService::installUpdate() {
     if (!QFileInfo::exists(filePath))
         return;
 

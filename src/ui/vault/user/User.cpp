@@ -3,7 +3,7 @@
 #include "../../../core/theme/ThemeManager.h"
 #include "../../../core/session/SessionManager.h"
 
-#include "../userMenu/UserMenu.h"
+#include "../user_menu/UserMenu.h"
 #include "../../utils/Utils.h"
 #include "../../../../resources/IconManager.h"
 

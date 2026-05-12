@@ -12,15 +12,10 @@ namespace Ui::Vault {
     class View;
     class User;
     class Toolbar;
-    class AppUpdate;
+    class Update;
     class About;
     class ReportBug;
 }
-
-namespace Core {
-    class AppUpdate;
-    class ReportBug;
-};
 
 namespace Ui::Vault { 
     /* --------------------- Vault Main Window --------------------------- */
@@ -70,9 +65,7 @@ namespace Ui::Vault {
         Button *about_btn = nullptr;
 
         // App Updates 
-        Ui::Vault::AppUpdate *appUpdateWidget = nullptr;
-        // Core
-        Core::AppUpdate *appUpdateCore = nullptr;
+        Ui::Vault::Update *appUpdateWidget = nullptr;
             
         // App About
         Ui::Vault::About *about = nullptr;
@@ -82,8 +75,6 @@ namespace Ui::Vault {
 
         // Report Bug
         Ui::Vault::ReportBug *report_bug = nullptr;
-        // Core
-        Core::ReportBug *report_bug_core = nullptr;
 
         // Content Area
         // Main Layout

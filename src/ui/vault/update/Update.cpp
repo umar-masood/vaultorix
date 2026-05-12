@@ -1,5 +1,6 @@
 #include "Update.h"
 #include "../../../core/theme/ThemeManager.h"
+#include "../../../core/config/Constants.h"
 
 #include "../../dialogs/error_dialog/ErrorDialog.h"
 #include "../../components/LineProgress.h"
@@ -13,25 +14,11 @@
 #include <QVBoxLayout>
 
 using Ui::Vault::Update;
-using Ui::Vault::AppUpdate;
-/* ---------------------------------------------------------------
-                         Update Struct
-   --------------------------------------------------------------- */
-Update::Update(const QString &currentVersion, 
-               const QString &newVersion,
-               const QString &size, 
-               const QDateTime &releasedDate, 
-               const QString &updateNotes) : 
-               _currentVersion(currentVersion),
-               _newVersion(newVersion),
-               _size(size),
-               _releasedDate(releasedDate),
-               _updateNotes(updateNotes){}
 
 /* ---------------------------------------------------------------
                         App Update 
    --------------------------------------------------------------- */
-AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
+Update::Update(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     setFocusPolicy(Qt::StrongFocus);
     setModal(true);
 
@@ -153,6 +140,10 @@ AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     update_btn->setGradientColors("#008EDE", "#15F2FF", "#008EDE");
     update_btn->setFontProperties("Segoe UI", 11, QFont::Normal);
     update_btn->setCursor(Qt::PointingHandCursor);
+    connect(update_btn, &Button::clicked, this, &Update::onUpdateNowButtonClicked);
+    connect(update_btn, &Button::clicked, this, [this]{
+        action_stack->setCurrentWidget(action_progress_page);
+    });
 
     // Adding button to button layout
     btn_layout->addWidget(update_btn, 0, Qt::AlignHCenter);
@@ -195,13 +186,6 @@ AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
     /* ---------- Default Action Page ---------- */
     action_stack->setCurrentWidget(action_button_page);
 
-    /* ===============================================================
-                            Connections
-       =============================================================== */
-    connect(update_btn, &Button::clicked, this, [this] {
-        action_stack->setCurrentWidget(action_progress_page);
-    });
-
     connect(download_progressbar, &LineProgress::completed, this, [this]{
         downloading_label->hide();
         download_progressbar->hide();
@@ -213,14 +197,26 @@ AppUpdate::AppUpdate(QWidget *parent) : SubWindow(QSize(300, 300), parent) {
 
     // Theme
     auto &tm = ThemeManager::instance();
-    connect(&tm, &ThemeManager::themeChanged, this, &AppUpdate::setDarkMode);
+    connect(&tm, &ThemeManager::themeChanged, this, &Update::setDarkMode);
     setDarkMode(tm.isDarkMode());
 
     // Registering window for Error Dialog Manager
     ErrorDialogManager::instance()->registerWindow("AppUpdate", this);
+
+    // Update Core
+    update_core = new Core::UpdateService(this);
+    update_core->isUpdateAvailable(APP_VERSION);
+
+    connect(update_core, &Core::UpdateService::updateAvailable, this, &Update::onUpdateAvailable);
+    connect(update_core, &Core::UpdateService::updateDownloaded, this, &Update::onUpdateDownloaded);
+    connect(update_core, &Core::UpdateService::updateError, this, &Update::onUpdateError);
+    connect(update_core, &Core::UpdateService::updateDownloadStarted, this, &Update::onUpdateDownloadStarted);
+    connect(update_core, &Core::UpdateService::updateDownloadProgress, this, &Update::onUpdateDownloadProgress);
+    connect(update_core, &Core::UpdateService::updateCurrentState, this, &Update::onUpdateCurrentState);
+
 }
 
-QWidget* AppUpdate::updateInfoWidget() {
+QWidget* Update::updateInfoWidget() {
     QWidget *main_widget = new QWidget;
     main_widget->setAttribute(Qt::WA_TranslucentBackground);
 
@@ -256,7 +252,7 @@ QWidget* AppUpdate::updateInfoWidget() {
     return main_widget;
 }
 
-void AppUpdate::setDarkMode(bool isDarkMode) {
+void Update::setDarkMode(bool isDarkMode) {
     // Seperators
     for (auto *sep : {main_sep, update_sep})
         sep->setColor(isDarkMode ? "#334155" : "#E5E7EB");
@@ -282,7 +278,7 @@ void AppUpdate::setDarkMode(bool isDarkMode) {
     SubWindow::setDarkMode(isDarkMode);
 }
 
-void AppUpdate::setUpdateDetails(const Update &update) {
+void Update::setUpdateDetails(const Core::UpdateService::UpdateData &update) {
     if (!update_ver_date_label || !update_notes_label)
         return;
 
@@ -299,7 +295,7 @@ void AppUpdate::setUpdateDetails(const Update &update) {
     update_notes_label->setText(update._updateNotes);
 }
 
-void AppUpdate::showEvent(QShowEvent *event) {
+void Update::showEvent(QShowEvent *event) {
     SubWindow::showEvent(event);
 
     stacked_widget->setCurrentWidget(checking_page);
@@ -308,37 +304,69 @@ void AppUpdate::showEvent(QShowEvent *event) {
         spinner->start();
 }
 
-LineProgress* AppUpdate::downloadProgressBar() const {
+LineProgress* Update::downloadProgressBar() const {
     return download_progressbar;
 }
 
-Button* AppUpdate::updateButton() const {
+Button* Update::updateButton() const {
     return update_btn;
 }
 
-void AppUpdate::setUpdateState(const UpdateState &state) {
+void Update::onUpdateCurrentState(const Core::UpdateService::State &state) {
     switch (state) {
-        case UpdateState::Available:
+        case Core::UpdateService::State::Available:
         spinner->stop();
         stacked_widget->setCurrentWidget(update_page);
         break;
 
-        case UpdateState::NotAvailable:
+        case Core::UpdateService::State::Unavailable:
         spinner->stop();
         no_update_label->setText(tr("Your application is up to date."));
         stacked_widget->setCurrentWidget(no_update_page);
         break;
+    }
+}
 
-        case UpdateState::NoInternet:
+void Update::onUpdateError(const Core::UpdateService::Error &error) {
+    switch (error) {
+        case Core::UpdateService::Error::NoInternet:
         spinner->stop();
         no_update_label->setText(tr("Unable to check for updates. Please check your internet connection."));
         stacked_widget->setCurrentWidget(no_update_page);
         break;
 
-        case UpdateState::SomethingWentWrong:
+        case Core::UpdateService::Error::SomethingWentWrong:
         spinner->stop();
         no_update_label->setText(tr("Oops! Something went wrong."));
         stacked_widget->setCurrentWidget(no_update_page);
         break;
     }
+}
+void Update::onUpdateAvailable(std::optional<Core::UpdateService::UpdateData> data) {
+    setUpdateDetails(data.value());
+}
+
+void Update::onUpdateDownloaded() {
+    download_progressbar->setValue(100);
+    download_progressbar->setText(QString::number(100));
+    download_progressbar->stop();
+}
+
+void Update::onUpdateDownloadProgress(int percent) {
+    if (download_progressbar->indeterminate())
+        download_progressbar->setIndeterminate(false);
+
+    download_progressbar->setValue(percent);
+    download_progressbar->setText(QString::number(percent));
+}
+
+void Update::onUpdateDownloadStarted() {
+    if (!download_progressbar->indeterminate())
+        download_progressbar->setIndeterminate(true);
+
+    download_progressbar->start();
+}
+
+void Update::onUpdateNowButtonClicked() {
+    update_core->downloadUpdate();
 }

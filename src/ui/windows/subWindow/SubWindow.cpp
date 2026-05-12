@@ -1,4 +1,4 @@
-#include "SubWindow.h"
+#include "Subwindow.h"
 #include "../window/Window.h"
 
 #include "../../components/Button.h"

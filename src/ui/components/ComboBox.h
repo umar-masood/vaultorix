@@ -63,6 +63,10 @@ class ComboBox : public TextField {
     void setMaxVisibleItems(int items);
     int maxVisibleItems() const;
 
+    signals:
+    void itemDeleted(int index);
+    void selectionChanged(int index, const QString &text);
+
     private slots:
     void onDropDownButtonClicked();
     void onComboItemClicked(const QModelIndex &index);

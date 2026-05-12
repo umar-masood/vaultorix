@@ -4,6 +4,7 @@
 #include "../../../core/theme/ThemeManager.h"
 #include "../../../core/config/Constants.h"
 #include "../../../core/session/SessionManager.h"
+#include "../../../core/services/auth/TokenManager.h"
 
 #include "../../components/Label.h"
 #include "../../components/Button.h"
@@ -108,8 +109,8 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
     // Profile Picture
     pic = new Label(true);
     pic->setFixedSize(QSize(80, 80));
-    onDeletePictureButtonClicked(); // for initial
-    
+    pic->setPixmap(Ui::Utils::cropToCircle(IconManager::icon(Icons::Avator), 80));
+
     // Profile Labels Layout
     profile_pic_labels_layout = new QVBoxLayout;
     profile_pic_labels_layout->setContentsMargins(0, 0, 0, 0);
@@ -559,12 +560,10 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
     // ComboBox
     lock_timeout_combobox = new ComboBox;
     lock_timeout_combobox->setFieldSize(QSize(160, 36));
-    lock_timeout_combobox->addItem("Immediately");
-    lock_timeout_combobox->addItem("5 Minutes");
     lock_timeout_combobox->addItem("15 Minutes");
     lock_timeout_combobox->addItem("30 Minutes");
-    lock_timeout_combobox->setCurrentItem(0);
-    lock_timeout_combobox->setDarkMode(false);
+    lock_timeout_combobox->addItem("45 Minutes");
+    lock_timeout_combobox->addItem("60 Minutes");
 
     // Adding lock_timeout_sublayout, and combo box to layout
     lock_timeout_layout->addLayout(lock_timeout_sublayout);
@@ -625,7 +624,7 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
         if (!sm.avatar().isNull()) 
             pic->setPixmap(Ui::Utils::cropToCircle(sm.avatar(), 80));   
         else
-            pic->setPixmap(Ui::Utils::cropToCircle(IconManager::icon(Icons::Avator), 36));        
+            pic->setPixmap(Ui::Utils::cropToCircle(IconManager::icon(Icons::Avator), 80));        
     });
 
     // Registering Window for Error Dialog Manager;
@@ -646,8 +645,37 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
 
     // Core Account Settings
     using ASCore = Core::AccountSettingsService;
-    account_settings_core = new ASCore;
+    account_settings_core = new ASCore(this);
 
+    // Lock Timeout Combo Box 
+    lockTimer = new QTimer;
+    lockTimer->setSingleShot(true);
+    connect(lockTimer, &QTimer::timeout, this, [this](){
+        Core::TokenManager::instance()->revokeRefreshToken();
+        QApplication::quit();
+    });
+
+    auto lockTimeoutFunction = [this](int index) {
+        if (index == 0) 
+            emit startLockTimeoutTimer(15 * 60 * 100);
+        else if (index == 1)
+            emit startLockTimeoutTimer(30 * 60 * 100);
+        else if (index == 2)
+            emit startLockTimeoutTimer(45 * 60 * 100);
+        else if (index == 3)
+            emit startLockTimeoutTimer(60 * 60 * 100);
+    };
+
+    int index = account_settings_core->fetchLockTimeout();
+    lockTimeoutFunction(index); 
+    lock_timeout_combobox->setCurrentItem(index);
+
+    connect(lock_timeout_combobox, &ComboBox::selectionChanged, this, [this, lockTimeoutFunction](int index, const QString &) {
+        lockTimeoutFunction(index);        
+        account_settings_core->updateLockTimeout(index);
+    });
+
+    connect(this, &AccountSettings::startLockTimeoutTimer, this, &AccountSettings::onStartLockTimeoutTimer);
     connect(account_settings_core, &ASCore::failedToUpdateUsername, this, &AccountSettings::onFailedToUpdateUsername);
     connect(account_settings_core, &ASCore::usernameUpdated, this, &AccountSettings::onUsernameUpdated);
     connect(account_settings_core, &ASCore::failedToUpdateProfilePicture, this, &AccountSettings::onFailedToUpdateProfilePicture);
@@ -896,6 +924,13 @@ void AccountSettings::setUserDetailsFromSessionManager() {
         delete_pic_btn->show();
     } else
         pic->setPixmap(Ui::Utils::cropToCircle(IconManager::icon(Icons::Avator), 80));
+}
+
+void AccountSettings::onStartLockTimeoutTimer(int msec) {
+    if (lockTimer) {
+        lockTimer->stop();
+        lockTimer->start(msec);
+    }
 }
 
 void AccountSettings::setDarkMode(bool isDarkMode) {

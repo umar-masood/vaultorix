@@ -116,6 +116,32 @@ ReportBug::ReportBug(QWidget *parent) : SubWindow(QSize(390, 454), parent){
 
     // Registering this window for ErrorDialogManager
     ErrorDialogManager::instance()->registerWindow("ReportBug", this);
+
+    // Bug report code
+    report_bug_core = new Core::ReportBugService(this);
+
+    connect(report_bug_core, &Core::ReportBugService::somethingWentWrong, this, &ReportBug::onSomethingWentWrong);
+    connect(this, &ReportBug::reportFinished, this, [this](){
+        if (report_bug_core) {
+            Core::ReportBugService::BugData data;
+            data.description = _descp_field->document()->toPlainText();
+            data.subject = _subject_field->text();
+            data.screenshotPath = this->filePath();
+
+            report_bug_core->sendBugReport(data);
+
+            changeSubmitBtnState("", false);
+        }
+    });
+
+    connect(report_bug_core, &Core::ReportBugService::reportSubmitted, this, [this](){
+        changeSubmitBtnState("Submitted", false);
+        close();
+    });
+
+    connect(report_bug_core, &Core::ReportBugService::noInternet, this, [this](){
+        changeSubmitBtnState("Submit", true);
+    });
 }
 
 void ReportBug::onTextChanged() {
@@ -158,6 +184,16 @@ void ReportBug::setDarkMode(bool isDarkMode) {
     // Button
     for (auto *b : {_submit_btn, screenshot_btn})
         b->setDarkMode(isDarkMode);
+}
+
+void ReportBug::changeSubmitBtnState(const QString &buttonText, bool isEnabled) {
+    _submit_btn->setText(buttonText);
+    _submit_btn->setEnabled(isEnabled);
+}
+
+void ReportBug::onSomethingWentWrong() {
+    changeSubmitBtnState("Submit", true);
+    ErrorDialogManager::instance()->show("SomethingWentWrong", "ReportBug");
 }
 
 QString ReportBug::filePath() const { return _filePath; }

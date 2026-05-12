@@ -166,6 +166,8 @@ void ComboBox::onComboItemClicked(const QModelIndex &index) {
         setIconPaths(ci.lightIcon, ci.darkIcon);
     }
 
+    emit selectionChanged(index.row(), index.data(Qt::DisplayRole).toString());
+
     repaint();
     popup->fadeOut();
 }
@@ -234,8 +236,11 @@ void ComboBox::updateItemIcons() {
 void ComboBox::deleteItem(int index) {
     if (index < 0 || index >= items.size()) 
         return;
+
     items.removeAt(index);
     model.removeRow(index);
+
+    emit itemDeleted(index);
 
     popup->updatePopup();
 }
@@ -259,7 +264,7 @@ void ComboBox::setCurrentItem(int index) {
 
     if (isIconic)
         setIconPaths(items[index].lightIcon, items[index].darkIcon);
-
+    
     update();
 }
 

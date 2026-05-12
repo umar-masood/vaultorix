@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../windows/subWindow/SubWindow.h"
+#include "../../windows/subwindow/Subwindow.h"
 
 class Label;
 class Toggle;

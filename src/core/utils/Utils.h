@@ -64,8 +64,6 @@ namespace Utils {
             if constexpr(!std::is_same_v<NoInternetCallable, std::nullptr_t>)
                 static_assert(std::is_invocable_v<NoInternetCallable> , "runIfOnline requires a no internet callable.");
 
-            InternetConnectivity::instance().checkConnectivity();
-
             connect(&InternetConnectivity::instance(), &InternetConnectivity::connectivityChanged, parent, 
             [requestCallable, noInternetCallable, dialogCurrentWindowKey](bool isOnline) {
 
@@ -80,6 +78,8 @@ namespace Utils {
                 }
                 
             }, Qt::SingleShotConnection);
+
+            InternetConnectivity::instance().checkConnectivity();
         }
 
         signals:

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "../../windows/subWindow/SubWindow.h"
+#include "../../windows/subwindow/Subwindow.h"
+#include "../../../core/services/update/UpdateService.h"
 
 #include <QDateTime>
+#include <optional>
 
 class SpinnerProgress;
 class LineProgress;
@@ -14,43 +16,33 @@ class QVBoxLayout;
 class QHBoxLayout;
 
 namespace Ui::Vault {
-    struct Update {
-        QString _currentVersion = "0.0.0";
-        QString _newVersion = "0.0.0";
-        QString _size = "0 MB";
-        QDateTime _releasedDate;
-        QString _updateNotes;
-
-        Update(const QString &currentVersion,
-               const QString &newVersion,
-               const QString &size,
-               const QDateTime &releasedDate,
-               const QString &updateNotes);
-    };
-
-    class AppUpdate : public SubWindow {
+    class Update : public SubWindow {
         Q_OBJECT
 
         public:
-        enum class UpdateState { 
-            Available, 
-            NotAvailable, 
-            NoInternet, 
-            SomethingWentWrong
-        };
-
-        AppUpdate(QWidget *parent = nullptr);
-        void setUpdateDetails(const Update &update);
-        void setUpdateState(const UpdateState &state);
+        Update(QWidget *parent = nullptr);
         LineProgress *downloadProgressBar() const;
         Button *updateButton() const;
 
         protected:
         void showEvent(QShowEvent *event);
 
+        private slots:
+        void onUpdateCurrentState(const Core::UpdateService::State &state);
+        void onUpdateError(const Core::UpdateService::Error &error);
+        void onUpdateAvailable(std::optional<Core::UpdateService::UpdateData> data);
+        void onUpdateDownloaded();
+        void onUpdateDownloadProgress(int percent);
+        void onUpdateDownloadStarted();
+        void onUpdateNowButtonClicked();
+
         private:
         void setDarkMode(bool isDarkMode);
         QWidget* updateInfoWidget();
+        void setUpdateDetails(const Core::UpdateService::UpdateData &data);
+
+        // Update Core
+        Core::UpdateService *update_core = nullptr;
 
         // Window Title
         Label *winTitle = nullptr;

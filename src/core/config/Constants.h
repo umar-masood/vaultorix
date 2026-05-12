@@ -23,9 +23,10 @@
 #define REFRESH_TOKEN_EXPIRY 86400
 #define USERNAME_CHANGE_INTERVAL 2592000
 
-#define DEVICE_ID_SETTINGS_KEY "Device/DeviceId"
-#define ACCOUNT_REGISTERED_SETTINGS_KEY "Account/IsRegistered"
-#define DEVICE_THEME_KEY "Device/Theme"
+#define DEVICE_ID_SETTINGS_KEY "Device/Device Id"
+#define SHOW_SIGN_IN_SETTINGS_KEY "Application/Sign in" // When an account is registered first time then on each app run, show sign in screem.
+#define DEVICE_THEME_KEY "Device/Default Theme"
+#define LOCKOUT_SETTINGS_KEY "Application/Quit"
 
 #define DEBUG_HERE(msg)\
     qDebug().noquote() << "[DEBUG]" << " " << QFileInfo(__FILE__).fileName() << ":"  << __LINE__ << " " << QString(__FUNCTION__) + "()" << " - " << msg 

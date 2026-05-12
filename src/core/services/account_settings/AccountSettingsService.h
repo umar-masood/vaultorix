@@ -24,33 +24,15 @@ namespace Core {
         void setPassword(const QString &old_pass, const QString &new_pass);
         void deleteProfilePicture();
         void deleteAccount();
+        void updateLockTimeout(int index);
+        int fetchLockTimeout();
 
         private:
-        bool isValidResponse(const QJsonObject & obj);
-
-        /**
-         * This method loads and copy the profile picture to app directory
-         */
+        bool isValidResponse(const QJsonObject &obj);
         bool loadProfilePicture();
-
-        /**
-         * This method will make a request to server to update profile picture
-         */
         void updateProfilePicture();
-
-        /**
-         * This method makes a request to server to update the username with new one
-         */
         void updateUsername();
-
-        /**
-         * This method sends a request to update the status of 2FA to the server
-         */
         void update2FAStatus();
-
-        /**
-         * Checks whether the current value and previous value of 2FA is same?
-         */
         bool is2FAStatusSame();
 
         QSettings settings;

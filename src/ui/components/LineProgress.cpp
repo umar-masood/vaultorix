@@ -76,14 +76,20 @@ void LineProgress::start()
 {
     if (timer && !timer->isActive() && isIndeterminate)
         timer->start(10);
+
     fadeIn();
+
+    isStarted = true;
 }
 
 void LineProgress::stop()
 {
     if (timer && isIndeterminate)
         timer->stop();
+
     fadeOut();
+
+    isStarted = false;
 }
 
 void LineProgress::setText(const QString &text)
@@ -106,6 +112,10 @@ void LineProgress::setIndeterminate(bool value)
          offset = std::fmod(offset + 0.01, 1.0);
          update(); });
     }
+}
+
+bool LineProgress::started() const {
+    return isStarted;
 }
 
 bool LineProgress::indeterminate() const

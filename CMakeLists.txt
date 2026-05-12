@@ -15,7 +15,7 @@ add_executable(Vaultorix
 
     # Windows
     src/ui/windows/window/Window.cpp
-    src/ui/windows/subWindow/SubWindow.cpp
+    src/ui/windows/subwindow/SubWindow.cpp
 
     # ----------------- MAIN APP VAULT ---------------------------
     # Vault Window
@@ -27,7 +27,7 @@ add_executable(Vaultorix
     ## User
     src/ui/vault/user/User.cpp
     ### User Menu
-    src/ui/vault/userMenu/UserMenu.cpp
+    src/ui/vault/user_menu/UserMenu.cpp
     #### Account Settings
     src/ui/vault/account_settings/AccountSettings.cpp
 
@@ -128,10 +128,10 @@ add_executable(Vaultorix
     src/core/services/auth/TokenManager.cpp
 
     ### App Update
-    src/core/services/update/Update.cpp    
+    src/core/services/update/UpdateService.cpp    
     
     ### Report Bug
-    src/core/services/report_bug/ReportBug.cpp
+    src/core/services/report_bug/ReportBugService.cpp
     
     ### Account Settings
     src/core/services/account_settings/AccountSettingsService.cpp

@@ -338,3 +338,20 @@ bool AccountSettingsService::is2FAStatusSame() {
     bool curr2FAStatus = SessionManager::instance().twoFAStatus();
     return curr2FAStatus == new2FAStatus;
 }
+
+int AccountSettingsService::fetchLockTimeout() {
+    if (!settings.contains(LOCKOUT_SETTINGS_KEY)) {
+        settings.setValue(LOCKOUT_SETTINGS_KEY, 0);
+        return 0;
+    }
+    
+   return (settings.value(LOCKOUT_SETTINGS_KEY).toInt());
+}
+
+void AccountSettingsService::updateLockTimeout(int index) {
+    if (index == settings.value(LOCKOUT_SETTINGS_KEY).toInt())
+        return;
+        
+    settings.setValue(LOCKOUT_SETTINGS_KEY, index);
+    settings.sync();
+}

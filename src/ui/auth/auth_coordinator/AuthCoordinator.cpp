@@ -33,7 +33,7 @@ void AuthCoordinator::show() {
 
 // Set account registered status in registry key
 void AuthCoordinator::setAccountRegistered(bool isRegistered) {
-    settings.setValue(ACCOUNT_REGISTERED_SETTINGS_KEY, isRegistered);
+    settings.setValue(SHOW_SIGN_IN_SETTINGS_KEY, isRegistered);
 }  
 
 // Display sign in page
@@ -93,10 +93,10 @@ void AuthCoordinator::showCreateAccount() {
 
 /* -----------------  Getters --------------------- */
 bool AuthCoordinator::isAccountRegistered() const {
-    if (!settings.contains(ACCOUNT_REGISTERED_SETTINGS_KEY)) 
+    if (!settings.contains(SHOW_SIGN_IN_SETTINGS_KEY)) 
         return false;
 
-    return settings.value(ACCOUNT_REGISTERED_SETTINGS_KEY).toBool();
+    return settings.value(SHOW_SIGN_IN_SETTINGS_KEY).toBool();
 }
 
 /* ------------------- Slots -------------------------*/

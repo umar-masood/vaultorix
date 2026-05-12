@@ -1,8 +1,6 @@
 #include "VaultWindow.h"
 
 #include "../../../core/theme/ThemeManager.h"
-#include "../../../core/services/update/Update.h"
-#include "../../../core/services/report_bug/ReportBug.h"
 
 #include "../statusbar/Statusbar.h"
 // #include "../preferences/Preferences.h"
@@ -197,17 +195,11 @@ void VaultWindow::onPreferencesBtnClicked() {
 
 void VaultWindow::onAppUpdateBtnClicked() {
     if (!appUpdateWidget) {
-        // Frontend
-        appUpdateWidget = new Ui::Vault::AppUpdate(this);
+        appUpdateWidget = new Ui::Vault::Update(this);
         appUpdateWidget->setAttribute(Qt::WA_DeleteOnClose);
-
-        // Backend
-        appUpdateCore = new Core::AppUpdate(this);
-        appUpdateCore->setAppUpdateWidget(appUpdateWidget);
 
         connect(appUpdateWidget, &QObject::destroyed, this, [this](){
             appUpdateWidget = nullptr;
-            appUpdateCore = nullptr;
             VaultWindow::instance()->updateGeometry(); 
         });
 
@@ -220,15 +212,6 @@ void VaultWindow::onReportBugBtnClicked() {
     if (!report_bug) {
         report_bug = new Ui::Vault::ReportBug(this);
         report_bug->setAttribute(Qt::WA_DeleteOnClose);
-
-        report_bug_core = new Core::ReportBug(this);
-        report_bug_core->setReportBugWidget(report_bug);
-
-        connect(report_bug, &QObject::destroyed, this, [this]() {
-            report_bug = nullptr;
-            report_bug_core = nullptr;
-            VaultWindow::instance()->updateGeometry(); 
-        });
     }
 
     report_bug->show();

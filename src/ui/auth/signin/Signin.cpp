@@ -125,7 +125,7 @@ Signin::Signin(QWidget *parent, Ui::AuthWindow *authWindow) : QWidget(parent), _
     setDarkMode((tm.isDarkMode())); 
 
     // Signin Core
-    signInCore = new Core::SigninService();
+    signInCore = new Core::SigninService(this);
 
     // Signal Slots
     connect(signInCore, &Core::SigninService::failedToSignIn, this, &Signin::onFailedToSignIn);

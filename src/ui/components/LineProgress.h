@@ -36,6 +36,8 @@ class LineProgress : public QWidget {
    void start();
    void stop();
 
+   bool started() const;
+   
    void setValue(int value);
    int getValue() const;
 
@@ -61,6 +63,7 @@ class LineProgress : public QWidget {
    bool isDarkMode = false;
    bool isIndeterminate = false;
    bool isCompleted = false;
+   bool isStarted = false;
 
    double offset = 0.0;
    double currentValue = 0.0;

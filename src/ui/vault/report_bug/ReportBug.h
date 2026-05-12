@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../../windows/subWindow/SubWindow.h"
+#include "../../windows/subwindow/Subwindow.h"
+#include "../../../core/services/report_bug/ReportBugService.h"
 
 class Label;
 class Button;
@@ -22,6 +23,7 @@ namespace Ui::Vault {
 
         private:
         void setDarkMode(bool isDarkMode);
+        void changeSubmitBtnState(const QString &buttonText, bool isEnabled);
 
         // Window Title
         Label *winTitle = nullptr;
@@ -48,10 +50,14 @@ namespace Ui::Vault {
         // Submit
         Button *_submit_btn = nullptr;
 
+        // Bug Report Core
+        Core::ReportBugService *report_bug_core = nullptr;
+
         signals:
         void reportFinished();
 
         private slots:
         void onTextChanged();
+        void onSomethingWentWrong();
     };
 };

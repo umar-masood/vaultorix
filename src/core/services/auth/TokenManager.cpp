@@ -184,8 +184,12 @@ void TokenManager::performRequest(const QString &route,
             return;
 
         // Request Error Handling
-        connect(reply, &QNetworkReply::errorOccurred, this, [this, reply, networkRequestFailureCallable](){
-            networkRequestFailureCallable(reply);
+        connect(reply, &QNetworkReply::errorOccurred, this, [reply, networkRequestFailureCallable](QNetworkReply::NetworkError) {
+            if (networkRequestFailureCallable) {
+                networkRequestFailureCallable(reply);
+            } else {
+                WARN_HERE("Network Request Error: " + reply->errorString());
+            }
         });
 
         // Server Reply
@@ -193,6 +197,12 @@ void TokenManager::performRequest(const QString &route,
             auto doc = parseNetworkReply(reply);
             if (!doc)
                 return;
+
+            
+            if (!responseCallable) {
+                WARN_HERE("Response callback is empty.");
+                return;
+            }
             
             QJsonObject mainObj = doc.value().object();
             responseCallable(mainObj); // Calling user provided function
