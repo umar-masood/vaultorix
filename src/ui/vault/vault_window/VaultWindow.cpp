@@ -1,6 +1,7 @@
 #include "VaultWindow.h"
 
 #include "../../../core/theme/ThemeManager.h"
+#include "../../../core/config/Constants.h"
 
 #include "../statusbar/Statusbar.h"
 // #include "../preferences/Preferences.h"
@@ -18,6 +19,9 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QFileInfo>
 
 using Ui::Vault::VaultWindow;
 VaultWindow *VaultWindow::instance(QWidget *parent) {
@@ -85,7 +89,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     connect(report_bug_btn, &Button::clicked, this, &VaultWindow::onReportBugBtnClicked);
 
     // Title Bar Layout
-    titlebar_layout = new QHBoxLayout(titleBar());
+    auto *titlebar_layout = new QHBoxLayout(titleBar());
     titlebar_layout->setSpacing(0);
     titlebar_layout->setContentsMargins(0, 0, 0, 0);
 
@@ -108,6 +112,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     // Content Area
     // Toolbar
     toolbar = new Ui::Vault::Toolbar;
+    connect(toolbar->importButton(), &Button::clicked, this, &VaultWindow::onImportButtonClicked);
 
     // View
     view = new Ui::Vault::View;
@@ -116,7 +121,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     _statusbar = new Ui::Vault::Statusbar;
 
     // Layout
-    content_layout = new QVBoxLayout(contentArea());
+    auto *content_layout = new QVBoxLayout(contentArea());
     content_layout->setContentsMargins(6, 0, 6, 4);
     content_layout->setSpacing(0);
     content_layout->addSpacing(2);
@@ -176,6 +181,22 @@ void VaultWindow::onAboutBtnClicked() {
 
     about->show();
     about->raise();
+}
+
+void VaultWindow::onImportButtonClicked() {
+    _filePath = QFileDialog::getOpenFileName(
+        this,
+        tr("Select a file to import"),
+        QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
+        "All Files (*.*)"
+    );
+    
+    QFileInfo info(_filePath);
+            
+    if (info.size() > MAX_FILE_SIZE) {
+        WARN_HERE("File size is too large to import in Vault.");
+        return;
+    }
 }
 
 void VaultWindow::onPreferencesBtnClicked() {

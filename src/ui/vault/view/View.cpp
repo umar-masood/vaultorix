@@ -2,7 +2,7 @@
 #include "ViewDelegate.h"
 
 #include "../../../core/theme/ThemeManager.h"
-
+#include "../../../core/config/Constants.h"
 #include "../../../../resources/IconManager.h"
 #include "../empty_state/EmptyState.h"
 
@@ -18,6 +18,9 @@
 #include <QListView>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QFileInfo>
 
 using Ui::Vault::View;
 using Ui::Vault::ViewItem;
@@ -43,7 +46,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     filterButtonMenu->setText(tr("Filter"));
     filterButtonMenu->setFontXY(0, -1);
     filterButtonMenu->menu()->setItemSize(QSize(180, 36));
-    filterButtonMenu->menu()->delegate()->setSelectionDotIndicator(true);
+    filterButtonMenu->menu()->delegate()->setSelectionCheckIndicator(true);
     filterButtonMenu->menu()->setIconic(true);
     filterButtonMenu->menu()->addAction({"All file types",false, "", IconManager::icon(Icons::Files), IconManager::icon(Icons::Files)});
     filterButtonMenu->menu()->addAction({"Documents", false, "",  IconManager::icon(Icons::Document), IconManager::icon(Icons::Document)});
@@ -103,36 +106,22 @@ View::View(QWidget *parent) : QWidget(parent) {
 
     onListViewModeSelected();
 
-    connect(view_mode, &ViewModeToggle::list_view_selected, this, &View::onListViewModeSelected);
-    connect(view_mode, &ViewModeToggle::grid_view_selected, this, &View::onGridViewModeSelected);
+    connect(view_mode, &ViewModeToggle::ListViewModeSelected, this, &View::onListViewModeSelected);
+    connect(view_mode, &ViewModeToggle::GridViewModeSelected, this, &View::onGridViewModeSelected);
 
     // ================== TEST ITEMS ==================
-    _model.appendRow(new ViewItem("Notes.txt",  IconManager::icon(Icons::File_TXT),  "TXT",  "3 KB",   "12 Feb 2026", false, false));
-    _model.appendRow(new ViewItem("Resume.pdf", IconManager::icon(Icons::File_PDF),  "PDF",  "210 KB", "11 Feb 2026", false, false));
-    _model.appendRow(new ViewItem("Photo.jpg",  IconManager::icon(Icons::File_JPG),  "JPEG", "1.9 MB", "10 Feb 2026", false, true));
-    _model.appendRow(new ViewItem("Music.mp3",  IconManager::icon(Icons::File_MP3),  "MP3",  "5.4 MB", "09 Feb 2026", false, false));
-    _model.appendRow(new ViewItem("Video.mp4",  IconManager::icon(Icons::File_MP4),  "MP4",  "88 MB",  "08 Feb 2026", false, false));
-    _model.appendRow(new ViewItem("Meeting notes.txt", IconManager::icon(Icons::File_TXT), "TXT", "12 KB", "07 Feb 2026", true, false));
-    _model.appendRow(new ViewItem("Project overview.pdf", IconManager::icon(Icons::File_PDF), "PDF", "1.1 MB", "06 Feb 2026", false, false));
-    _model.appendRow(new ViewItem("Travel itinerary.pdf", IconManager::icon(Icons::File_PDF), "PDF", "380 KB", "22 Jan 2026", false, false));
-    _model.appendRow(new ViewItem("Old project code backup.zip", IconManager::icon(Icons::File_ZIP), "ZIP", "720 MB", "21 Jan 2026", true, false));
-    _model.appendRow(new ViewItem("Company logo vector.ai", IconManager::icon(Icons::File_AI), "AI", "3.3 MB", "20 Jan 2026", false, false));
-    _model.appendRow(new ViewItem("Personal journal entry.txt", IconManager::icon(Icons::File_TXT), "TXT", "8 KB", "19 Jan 2026", true, false));
-    _model.appendRow(new ViewItem("Birthday celebration photos.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "5.8 MB", "18 Jan 2026", false, true));
-    _model.appendRow(new ViewItem("Meeting agenda.txt", IconManager::icon(Icons::File_TXT), "TXT", "4 KB", "05 Dec 2025", false, false));
-    _model.appendRow(new ViewItem("Landscape photography.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "7.2 MB", "04 Dec 2025", false, false));
-    _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
-    _model.appendRow(new ViewItem("Meeting notes.txt", IconManager::icon(Icons::File_TXT), "TXT", "12 KB", "07 Feb 2026", true, false));
-    _model.appendRow(new ViewItem("Team photos.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "6.7 MB", "03 Jan 2026", false, false));
-    _model.appendRow(new ViewItem("Fitness tutorial.mp4", IconManager::icon(Icons::File_MP4), "MP4", "380 MB", "02 Jan 2026", false, true));
-    _model.appendRow(new ViewItem("Draft manuscript.docx", IconManager::icon(Icons::File_DOC), "DOCX", "150 KB", "01 Jan 2026", false, false));
-    _model.appendRow(new ViewItem("Landscape photo.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "7.2 MB", "04 Dec 2025", false, false));
-    _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
-    _model.appendRow(new ViewItem("Team report.docx", IconManager::icon(Icons::File_DOC), "DOCX", "112 KB", "02 Dec 2025", false, false));
-    _model.appendRow(new ViewItem("Annual calendar.psd", IconManager::icon(Icons::File_PSD), "PSD", "28 MB", "01 Dec 2025", false, false));
-    _model.appendRow(new ViewItem("Notes.txt",  IconManager::icon(Icons::File_TXT),  "TXT",  "3 KB",   "12 Feb 2026", false, false));
-    _model.appendRow(new ViewItem("Resume.pdf", IconManager::icon(Icons::File_PDF),  "PDF",  "210 KB", "11 Feb 2026", false, false));
-    _model.appendRow(new ViewItem("Photo.jpg",  IconManager::icon(Icons::File_JPG),  "JPEG", "1.9 MB", "10 Feb 2026", false, true));
+    // _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
+    // _model.appendRow(new ViewItem("Meeting notes.txt", IconManager::icon(Icons::File_TXT), "TXT", "12 KB", "07 Feb 2026", true, false));
+    // _model.appendRow(new ViewItem("Team photos.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "6.7 MB", "03 Jan 2026", false, false));
+    // _model.appendRow(new ViewItem("Fitness tutorial.mp4", IconManager::icon(Icons::File_MP4), "MP4", "380 MB", "02 Jan 2026", false, true));
+    // _model.appendRow(new ViewItem("Draft manuscript.docx", IconManager::icon(Icons::File_DOC), "DOCX", "150 KB", "01 Jan 2026", false, false));
+    // _model.appendRow(new ViewItem("Landscape photo.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "7.2 MB", "04 Dec 2025", false, false));
+    // _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
+    // _model.appendRow(new ViewItem("Team report.docx", IconManager::icon(Icons::File_DOC), "DOCX", "112 KB", "02 Dec 2025", false, false));
+    // _model.appendRow(new ViewItem("Annual calendar.psd", IconManager::icon(Icons::File_PSD), "PSD", "28 MB", "01 Dec 2025", false, false));
+    // _model.appendRow(new ViewItem("Notes.txt",  IconManager::icon(Icons::File_TXT),  "TXT",  "3 KB",   "12 Feb 2026", false, false));
+    // _model.appendRow(new ViewItem("Resume.pdf", IconManager::icon(Icons::File_PDF),  "PDF",  "210 KB", "11 Feb 2026", false, false));
+    // _model.appendRow(new ViewItem("Photo.jpg",  IconManager::icon(Icons::File_JPG),  "JPEG", "1.9 MB", "10 Feb 2026", false, true));
 
     // Layout
     _layout = new QVBoxLayout(this);
@@ -152,9 +141,11 @@ View::View(QWidget *parent) : QWidget(parent) {
     connect(&tm, &ThemeManager::themeChanged, this, &View::setDarkMode);
     setDarkMode(tm.isDarkMode());
 
-    // Positioning Empty State
+    // Empty State Widget
     updateEmptyStatePosition();
+    updateEmptyState();
 
+    connect(empty_state, &EmptyState::clicked, this, &View::onEmptyStateWidgetClicked);
 
     //  QTimer *timer = new QTimer(this);
 
@@ -272,13 +263,33 @@ void View::onGridViewModeSelected() {
         _list->setDefaultDropAction(Qt::IgnoreAction); 
         updateGridLayout();
     }
-};
+}
+
+void View::onEmptyStateWidgetClicked() {
+    _filePath = QFileDialog::getOpenFileName(
+        this,
+        tr("Select a file to import"),
+        QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
+        "All Files (*.*)"
+    );
+    
+    QFileInfo info(_filePath);
+            
+    if (info.size() > MAX_FILE_SIZE) {
+        WARN_HERE("File size is too large to import in Vault.");
+        return;
+    }
+}
 
 void View::updateEmptyState() {
     bool isEmpty = (_model.rowCount() == 0);
 
-    if (empty_state)
-        empty_state->setVisible(isEmpty); 
+    if (empty_state) {
+        empty_state->setVisible(isEmpty);
+
+        if (isEmpty)
+            empty_state->raise();
+    }
 }
 
 void View::updateEmptyStatePosition() {
@@ -334,7 +345,7 @@ void View::setDarkMode(bool isDarkMode) {
     
     update();
 }
-
+QStandardItemModel& View::model() { return _model; }
 TextField* View::searchBox() const { return search_box; }
 ButtonMenu* View::filterMenu()  const { return filterButtonMenu; }
 ViewModeToggle* View::viewMode() const { return view_mode; }

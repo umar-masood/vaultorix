@@ -247,9 +247,13 @@ QColor Button::getEndColor() const { return QColor(color2); }
 
 // ---------------------------------- Button Background, Border Colors, Icon (Getters) ---------------------------
 QColor Button::brush() const {
-  if (isDisabledState()) 
-    return isSecondary ? brushColor(isDarkMode ? DisabledSecondaryDark : DisabledSecondaryLight)
-                       : brushColor(DisabledPrimary);
+    if (isDisabledState()) {
+        if (displayMode == TextUnderIcon)
+            return Qt::transparent;
+    
+        return isSecondary ? brushColor(isDarkMode ? DisabledSecondaryDark : DisabledSecondaryLight)
+                           : brushColor(DisabledPrimary);
+    }
 
   if (isCheckable() && isChecked())
     return brushColor(PrimaryPressed);
@@ -292,16 +296,55 @@ QColor Button::pen() const {
   return penColor(PrimaryText);
 }
 
-QPixmap Button::pixmap() const {
-  if (isUnicodeIcon)
-    return QPixmap();  
+QPixmap Button::disabledPixmap(const QPixmap &src) const {
+    if (src.isNull())
+        return src;
 
-  if (isCheckable() && isChecked())
-    return _checkedButtonIcon;
-  else if (!isSecondary)
-    return _primaryButtonIcon;
-  else
-    return isDarkMode ? _darkIcon : _lightIcon;
+    // Convert to image
+    QImage img = src.toImage().convertToFormat(QImage::Format_ARGB32);
+
+    // Convert RGB to grayscale while preserving alpha
+    for (int y = 0; y < img.height(); ++y) {
+        QRgb *line = reinterpret_cast<QRgb*>(img.scanLine(y));
+
+        for (int x = 0; x < img.width(); ++x) {
+            QColor c = QColor::fromRgba(line[x]);
+
+            // Standard luminance grayscale formula
+            int gray =
+                static_cast<int>(
+                    0.299 * c.red() +
+                    0.587 * c.green() +
+                    0.114 * c.blue()
+                );
+
+            // Keep original alpha but reduce opacity
+            int alpha = static_cast<int>(c.alpha() * 0.45);
+
+            line[x] = qRgba(gray, gray, gray, alpha);
+        }
+    }
+
+    return QPixmap::fromImage(img);
+}
+
+QPixmap Button::pixmap() const {
+    if (isUnicodeIcon)
+        return QPixmap();  
+
+    QPixmap icon;
+
+    if (isCheckable() && isChecked())
+        icon = _checkedButtonIcon;
+    else if (!isSecondary)
+        icon = _primaryButtonIcon;
+    else
+        icon = isDarkMode ? _darkIcon : _lightIcon;
+
+    if (isDisabledState())
+        icon = disabledPixmap(icon);
+        
+    return icon;
 }
 
 QFont Button::font() const {

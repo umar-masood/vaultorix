@@ -24,6 +24,7 @@ Toolbar::Toolbar(QWidget *parent) : QWidget(parent) {
 
     // Import Action
     import_btn = createButton("Import", ImportIcon);
+    import_btn->setEnabled(true);
     import_btn->setToolTip("Import files into the vault");
 
     // Encrypt Action
@@ -85,10 +86,10 @@ void Toolbar::setDarkMode(bool isDarkMode) {
 
 Button* Toolbar::decryptButton() const { return decrypt_btn; }
 Button* Toolbar::encryptButton() const { return encrypt_btn; }
-Button* Toolbar::deleteButton() const { return delete_btn; }
-Button* Toolbar::openButton() const { return open_btn; }
-Button* Toolbar::importButton() const { return import_btn; }
-Button *Toolbar::restoreButton() const { return restore_btn; }
+Button* Toolbar::deleteButton()  const { return delete_btn; }
+Button* Toolbar::openButton()    const { return open_btn; }
+Button* Toolbar::importButton()  const { return import_btn; }
+Button* Toolbar::restoreButton() const { return restore_btn; }
 
 Button* Toolbar::createButton(const QString &text, const QString &iconPath) {
     auto *btn = new Button(text);
@@ -101,6 +102,7 @@ Button* Toolbar::createButton(const QString &text, const QString &iconPath) {
     btn->setBorderTransparent(true);
     btn->setIconPaths(iconPath, iconPath);
     btn->setNormalBackgroundTransparent(true);
+    btn->setEnabled(false);
     return btn;
 }
 

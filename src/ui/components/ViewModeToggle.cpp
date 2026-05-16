@@ -48,9 +48,9 @@ ViewModeToggle::ViewModeToggle(QWidget *parent) : QWidget(parent) {
             return;
         
         if (id == 1) 
-            emit list_view_selected();
+            emit ListViewModeSelected();
         else 
-            emit grid_view_selected();
+            emit GridViewModeSelected();
     });
 
     // Layout

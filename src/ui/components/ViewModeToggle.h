@@ -20,8 +20,8 @@ class ViewModeToggle : public QWidget {
     void paintEvent(QPaintEvent *event) override;
 
     signals:
-    void list_view_selected();
-    void grid_view_selected();
+    void ListViewModeSelected();
+    void GridViewModeSelected();
     
     private:
     Button* createButton();

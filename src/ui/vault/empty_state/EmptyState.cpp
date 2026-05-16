@@ -77,13 +77,15 @@ void EmptyState::setDarkMode(bool enable) {
 }
 
 void EmptyState::mousePressEvent(QMouseEvent *event) {
-  isPressed = true;
-
-  if (event->button() == Qt::LeftButton)
+  if (event->button() == Qt::LeftButton) {
+    isPressed = true;
+    update();    
     emit clicked();
+    event->accept();
+    return;
+  }
 
   QWidget::mousePressEvent(event);
-  update();
 }
 
 void EmptyState::mouseReleaseEvent(QMouseEvent *event) {
@@ -102,8 +104,10 @@ void EmptyState::enterEvent(QEnterEvent *event) {
 
 void EmptyState::leaveEvent(QEvent *event) {
   isHover = false;
+  isPressed = false;
+
   setCursor(Qt::ArrowCursor);
-  
+
   QWidget::leaveEvent(event);
   update();
 }

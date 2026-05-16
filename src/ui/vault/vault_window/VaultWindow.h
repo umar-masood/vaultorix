@@ -30,15 +30,8 @@ namespace Ui::Vault {
         explicit VaultWindow(QWidget *parent = nullptr);
         Button* createButton(const QString &iconPathLight, const QString &iconPathDark);
         void setDarkMode(bool isDarkMode);
-        void onAboutBtnClicked();
-        void onPreferencesBtnClicked();
-        void onAppUpdateBtnClicked();
-        void onReportBugBtnClicked();
 
         // Title Bar
-        // Layout
-        QHBoxLayout *titlebar_layout = nullptr;
-
         // App name & icon
         Label *app_icon = nullptr;
         Label *app_name = nullptr;
@@ -77,16 +70,21 @@ namespace Ui::Vault {
         Ui::Vault::ReportBug *report_bug = nullptr;
 
         // Content Area
-        // Main Layout
-        QVBoxLayout *content_layout = nullptr;
-
         // Toolbar
         Ui::Vault::Toolbar *toolbar = nullptr;
+        QString _filePath;
 
         // View
         Ui::Vault::View *view = nullptr;
 
         // Statusbar
         Ui::Vault::Statusbar *_statusbar = nullptr;
+
+        private slots:
+        void onAboutBtnClicked();
+        void onImportButtonClicked();
+        void onPreferencesBtnClicked();
+        void onAppUpdateBtnClicked();
+        void onReportBugBtnClicked();
     };
 };

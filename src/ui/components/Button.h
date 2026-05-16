@@ -153,6 +153,8 @@ class Button : public QPushButton {
   QColor penColor(const ButtonTextColor &type) const;
   QColor pen() const;
 
+  QPixmap disabledPixmap(const QPixmap &src) const;
+
   QPixmap pixmap() const;
   QFont font() const;
 

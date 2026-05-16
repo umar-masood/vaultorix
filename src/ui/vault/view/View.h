@@ -30,6 +30,7 @@ namespace Ui::Vault {
         ButtonMenu* filterMenu() const;
         ViewModeToggle* viewMode() const;
         Ui::Vault::EmptyState* emptyStateWidget() const; 
+        QStandardItemModel& model();
 
         protected:
         void paintEvent(QPaintEvent *event) override;
@@ -67,6 +68,8 @@ namespace Ui::Vault {
 
         // Model
         QStandardItemModel _model;
+        // File Path
+        QString _filePath;
 
         // Scroll Bars
         ScrollBar *vScroll = nullptr;
@@ -87,5 +90,7 @@ namespace Ui::Vault {
         // Slots
         void onListViewModeSelected();
         void onGridViewModeSelected();
+        void onEmptyStateWidgetClicked();
+
     };
 };
