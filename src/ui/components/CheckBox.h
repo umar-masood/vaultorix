@@ -6,10 +6,11 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include <QEnterEvent>
+#include <QPixmap>
+#include <QString>
+#include <QFont>
 
-class QPixmap;
-class QString;
-class QFont;
+class QVariantAnimation;
 
 class CheckBox : public QWidget {
    Q_OBJECT
@@ -29,9 +30,17 @@ class CheckBox : public QWidget {
    private:
    QFont font() const;
 
+   // Animation functions
+   void startCheckAnimation(bool checked);
+   void drawAnimatedCheck(QPainter &painter, const QRectF &rec, qreal progress);
+
    bool isDarkMode = false;
    bool isHover = false;
    bool _isChecked = false;
+
+   // Animation values
+   qreal checkProgress = 0.0;
+   QVariantAnimation *checkAnimation = nullptr;
 
    QPixmap pixmap;
    QString text;

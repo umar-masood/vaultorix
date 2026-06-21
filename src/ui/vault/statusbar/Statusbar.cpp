@@ -19,10 +19,10 @@ Statusbar::Statusbar(QWidget *parent) : QWidget(parent) {
     seperator = new Seperator( 18);
 
     // Selected Items
-    selected_items = createLabel("69 items selected");
+    selected_items = createLabel("");
 
     // Total Size
-    total_size = createLabel("56,789 bytes");
+    total_size = createLabel("");
 
     // Layout
     layout = new QHBoxLayout(this);

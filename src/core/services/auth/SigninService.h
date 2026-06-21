@@ -30,10 +30,16 @@ namespace Core {
         // Network Manager
         QNetworkAccessManager *manager = nullptr;
 
+        QByteArray _password;
+
         // Signals
         signals:
         void verificationRequired(const QString &email, const QString &authType);
         void failedToSignIn(const SignInError &error);
         void signedIn(const QJsonObject &obj);
+
+        // Slots
+        private slots:
+        void onSignedIn(const QJsonObject &);
     };
 };

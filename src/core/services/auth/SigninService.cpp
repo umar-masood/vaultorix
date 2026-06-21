@@ -3,14 +3,18 @@
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
 #include "../../utils/Utils.h"
+#include "../../crypto/key/KeyManager.h"
 
 using Core::SigninService;
 
 SigninService::SigninService(QObject *parent) : QObject(parent) {
     manager = new QNetworkAccessManager(this);
+    connect(this, &SigninService::signedIn, this, &SigninService::onSignedIn);
 }
 
 void SigninService::verifyCredentials(const QString &username, const QString &password) {
+    _password = password.toUtf8();
+
     auto requestFunction = [this, username, password]() {
         QNetworkRequest request(QUrl(route(APIRoutes::SIGNIN)));
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -70,4 +74,8 @@ void SigninService::verifyCredentials(const QString &username, const QString &pa
         this,
         "Auth"
     );
+}
+
+void SigninService::onSignedIn(const QJsonObject &) {
+    Core::Crypto::KeyManager::instance()->unlock(_password);
 }

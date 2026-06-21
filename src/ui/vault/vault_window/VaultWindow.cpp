@@ -3,16 +3,23 @@
 #include "../../../core/theme/ThemeManager.h"
 #include "../../../core/config/Constants.h"
 
+#include "../../../core/services/vault/storage/StorageService.h"
+#include "../../../core/services/vault/repository/FileRepository.h"
+#include "../../../core/crypto/key/KeyManager.h"
+
 #include "../statusbar/Statusbar.h"
-// #include "../preferences/Preferences.h"
 #include "../view/View.h"
 #include "../user/User.h"
 #include "../toolbar/Toolbar.h"
 #include "../update/Update.h"
 #include "../about/About.h"
 #include "../report_bug/ReportBug.h"
+#include "../empty_state/EmptyState.h"
+#include "../view/ViewDelegate.h"
 
 #include "../../dialogs/error_dialog/ErrorDialog.h"
+#include "../../dialogs/confirm_dialog/ConfirmDialog.h"
+
 #include "../../../../resources/IconManager.h"
 #include "../../components/Seperator.h"
 #include "../../components/Label.h"
@@ -22,6 +29,10 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QFileInfo>
+#include <QListView>
+#include <QAbstractItemModel>
+#include <QSortFilterProxyModel>
+#include <QItemSelectionModel>
 
 using Ui::Vault::VaultWindow;
 VaultWindow *VaultWindow::instance(QWidget *parent) {
@@ -100,8 +111,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
 
     titlebar_layout->addStretch();
 
-    for (auto *btn : {report_bug_btn, about_btn, updates_download_btn, /*preferences_btn*/ theme_mode_btn})
-    {
+    for (auto *btn : {report_bug_btn, about_btn, updates_download_btn, /*preferences_btn*/ theme_mode_btn}) {
         titlebar_layout->addWidget(btn, 0, Qt::AlignRight);
         titlebar_layout->addSpacing(10);
     }
@@ -113,10 +123,29 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     // Toolbar
     toolbar = new Ui::Vault::Toolbar;
     connect(toolbar->importButton(), &Button::clicked, this, &VaultWindow::onImportButtonClicked);
-
+    connect(toolbar->deleteButton(), &Button::clicked, this, &VaultWindow::onDeleteBtnClicked);
+    connect(toolbar->encryptButton(), &Button::clicked, this, &VaultWindow::onEncryptBtnClicked);
+    connect(toolbar->decryptButton(), &Button::clicked, this, &VaultWindow::onDecryptBtnClicked);
+    
     // View
     view = new Ui::Vault::View;
+    connect(view->emptyStateWidget(), &EmptyState::clicked, this, &VaultWindow::onImportButtonClicked);
 
+    // Core
+    storage_core = new Core::Vault::StorageService(this);
+    connect(storage_core, &Core::Vault::StorageService::importQueued, this, &VaultWindow::onImportQueued);
+    connect(storage_core, &Core::Vault::StorageService::importStatusChanged, this, &VaultWindow::onImportStatusChanged);
+    connect(storage_core, &Core::Vault::StorageService::importProgressChanged, this, &VaultWindow::onImportProgressChanged);
+    connect(storage_core, &Core::Vault::StorageService::deleteQueued, this, &VaultWindow::onDeleteQueued);
+    connect(storage_core, &Core::Vault::StorageService::deleteStatusChanged, this, &VaultWindow::onDeleteStatusChanged);
+    connect(storage_core, &Core::Vault::StorageService::deleteProgressChanged, this, &VaultWindow::onDeleteProgressChanged);
+    connect(storage_core, &Core::Vault::StorageService::encryptQueued, this, &VaultWindow::onEncryptQueued);
+    connect(storage_core, &Core::Vault::StorageService::encryptStatusChanged, this, &VaultWindow::onEncryptStatusChanged);
+    connect(storage_core, &Core::Vault::StorageService::encryptProgressChanged, this, &VaultWindow::onEncryptProgressChanged);
+    connect(storage_core, &Core::Vault::StorageService::decryptQueued, this, &VaultWindow::onDecryptQueued);
+    connect(storage_core, &Core::Vault::StorageService::decryptStatusChanged, this, &VaultWindow::onDecryptStatusChanged);
+    connect(storage_core, &Core::Vault::StorageService::decryptProgressChanged, this, &VaultWindow::onDecryptProgressChanged);
+        
     // Statusbar
     _statusbar = new Ui::Vault::Statusbar;
 
@@ -138,6 +167,32 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     
     // Error Dailog Manager Registry Window
     ErrorDialogManager::instance()->registerWindow("Vault", this);
+    ConfirmDialogManager::instance()->registerWindow("Vault", this);
+
+    // Init Key Manager in Current GUI Thread so that no other worker thread can do this to prevent illegal
+    //Core::Crypto::KeyManager::instance();
+    QByteArray p = QString("Umar@123").toUtf8();
+    Core::Crypto::KeyManager::instance()->unlock(p);
+
+    // Updating Files Status on Startup
+    Core::Vault::FileRepository::markEncryptingFilesImported(); // In case if app quit while file is encrypting
+    Core::Vault::FileRepository::markImportingFilesAsFailed(); // In case if app quit while file is importing
+    Core::Vault::FileRepository::markDecryptingFilesEncrypted(); // In case if app quit while file is decrypting
+
+    // Fetching files metadata from Database
+    auto files = Core::Vault::FileRepository::fetchFiles();
+    if (files.has_value()) {
+        for (auto i = 0; i < files.value().size(); i++)
+            view->model().appendRow(new Ui::Vault::ViewItem(files.value()[i]));
+    } else {
+        ERROR_HERE("Failed to fetch files data from database.");
+    }
+    
+    _statusbar->totalItemsLabel()->setText(QString("%1 items").arg(view->model().rowCount()));
+
+    connect(view->list(), &QListView::clicked, this, &VaultWindow::onViewItemClicked);
+    connect(&view->model(), &QAbstractItemModel::rowsInserted, this, &VaultWindow::onRowsInserted);
+    connect(&view->model(), &QAbstractItemModel::rowsRemoved, this, &VaultWindow::onRowsRemoved);
 }
 
 Button *VaultWindow::createButton(const QString &iconPathLight, const QString &iconPathDark) {
@@ -184,19 +239,15 @@ void VaultWindow::onAboutBtnClicked() {
 }
 
 void VaultWindow::onImportButtonClicked() {
-    _filePath = QFileDialog::getOpenFileName(
+    QString _filePath = QFileDialog::getOpenFileName(
         this,
         tr("Select a file to import"),
         QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
         "All Files (*.*)"
     );
-    
-    QFileInfo info(_filePath);
-            
-    if (info.size() > MAX_FILE_SIZE) {
-        WARN_HERE("File size is too large to import in Vault.");
-        return;
-    }
+
+    if (storage_core)
+        storage_core->importFile(_filePath);
 }
 
 void VaultWindow::onPreferencesBtnClicked() {
@@ -239,4 +290,149 @@ void VaultWindow::onReportBugBtnClicked() {
     report_bug->raise();
 }
 
-Ui::Vault::Statusbar *VaultWindow::statusbar() const { return _statusbar; }
+void VaultWindow::onDeleteBtnClicked() {
+    auto CDM = ConfirmDialogManager::instance();
+    CDM->show("FileDelete", "Vault");
+
+    connect(CDM, &ConfirmDialogManager::actionTriggered, this, [this](const QString &key, const QString &actionButtonKey) {
+        if (key == "FileDelete" && actionButtonKey == "Accept") {
+            toolbar->deleteButton()->setEnabled(false);
+            auto proxyIndex = view->list()->currentIndex();
+            if (proxyIndex.isValid()) {
+                auto sourceIndex = view->proxyModel()->mapToSource(proxyIndex);
+                storage_core->deleteFile(sourceIndex.data(ViewItemRoles::FileId).toInt());
+            }
+        }
+    }, Qt::SingleShotConnection);
+}
+
+void VaultWindow::onEncryptBtnClicked() {
+    auto proxyIndex = view->list()->currentIndex();
+    if (proxyIndex.isValid()) {
+        auto sourceIndex = view->proxyModel()->mapToSource(proxyIndex);
+        storage_core->encryptFile(sourceIndex.data(ViewItemRoles::FileId).toInt());
+    }
+}
+
+void VaultWindow::onDecryptBtnClicked() {
+    auto proxyIndex = view->list()->currentIndex();
+    if (proxyIndex.isValid()) {
+        auto sourceIndex = view->proxyModel()->mapToSource(proxyIndex);
+        storage_core->decryptFile(sourceIndex.data(ViewItemRoles::FileId).toInt());
+    }
+}
+
+void VaultWindow::onViewItemClicked(const QModelIndex &index) {
+    using FS = Core::Vault::FileStatus;
+    
+    int _fileId = index.data(ViewItemRoles::FileId).toInt();
+    auto status = index.data(ViewItemRoles::FileStatus).value<Core::Vault::FileStatus>();
+    
+    toolbar->encryptButton()->setEnabled(status == FS::Imported || status == FS::Decrypted);
+    toolbar->decryptButton()->setEnabled(status == FS::Encrypted);
+    toolbar->restoreButton()->setEnabled(status == FS::Decrypted || status == FS::Imported);
+    toolbar->deleteButton()->setEnabled(status == FS::Imported || status == FS::Decrypted || status == FS::Failed);
+    toolbar->openButton()->setEnabled(status == FS::Decrypted);
+
+    _statusbar->selectedItemsLabel()->setText(QString("%1 item selected").arg(1));
+    // _statusbar->totalSizeLabel()->setText(
+    //     index.data(ViewItemRoles::FileSize).toString()
+    // );
+}
+
+void VaultWindow::onImportQueued(const Core::Vault::FileMetadata &metadata) {
+    view->model().appendRow(new Ui::Vault::ViewItem(metadata));
+}
+
+void VaultWindow::onDeleteQueued(int fileId) {
+    updateModelItemData(
+        fileId,
+        QVariant::fromValue(Core::Vault::FileStatus::Queued),
+        ViewItemRoles::FileStatus
+    );
+}
+
+void VaultWindow::updateModelItemData(int fileId, const QVariant &variant, int role) {
+    auto &model = view->model();
+    for (auto i = 0; i < model.rowCount(); i++) {
+        QModelIndex index = model.index(i, 0);
+        int storedFileId = index.data(ViewItemRoles::FileId).toInt();
+
+        if (storedFileId == fileId) {
+            model.setData(index, variant, role);
+
+            if (role == ViewItemRoles::FileStatus) {
+                auto status = variant.value<Core::Vault::FileStatus>();
+                if (status == Core::Vault::FileStatus::Deleted) {
+                    model.removeRow(index.row());
+                    _statusbar->selectedItemsLabel()->setText("");
+                }
+            } 
+
+            view->list()->update(index);
+
+            // Refresh toolbar state
+            auto currentIndex = view->list()->currentIndex();
+            if (currentIndex.isValid())
+                onViewItemClicked(currentIndex);
+
+            break;
+        }
+    }
+}
+
+void VaultWindow::onImportStatusChanged(int fileId, const Core::Vault::FileStatus &status) {
+    updateModelItemData(fileId, QVariant::fromValue(status), ViewItemRoles::FileStatus);
+}
+
+void VaultWindow::onImportProgressChanged(int fileId, int progress) {
+    updateModelItemData(fileId, progress, ViewItemRoles::ProgressCurrentValue);
+}
+
+void VaultWindow::onDeleteStatusChanged(int fileId, const Core::Vault::FileStatus &status) {
+    updateModelItemData(fileId, QVariant::fromValue(status), ViewItemRoles::FileStatus);
+}
+
+void VaultWindow::onDeleteProgressChanged(int fileId, int progress) {
+    updateModelItemData(fileId, progress, ViewItemRoles::ProgressCurrentValue);
+}
+
+void VaultWindow::onEncryptQueued(int fileId) {
+    updateModelItemData(
+        fileId,
+        QVariant::fromValue(Core::Vault::FileStatus::Queued),
+        ViewItemRoles::FileStatus
+    );
+}
+
+void VaultWindow::onEncryptStatusChanged(int fileId, const Core::Vault::FileStatus &status) {
+    updateModelItemData(fileId, QVariant::fromValue(status), ViewItemRoles::FileStatus);
+}
+
+void VaultWindow::onEncryptProgressChanged(int fileId, int progress) {
+    updateModelItemData(fileId, progress, ViewItemRoles::ProgressCurrentValue);
+}
+
+void VaultWindow::onDecryptQueued(int fileId) {
+    updateModelItemData(
+        fileId,
+        QVariant::fromValue(Core::Vault::FileStatus::Queued),
+        ViewItemRoles::FileStatus
+    );
+}
+
+void VaultWindow::onDecryptStatusChanged(int fileId, const Core::Vault::FileStatus &status) {
+    updateModelItemData(fileId, QVariant::fromValue(status), ViewItemRoles::FileStatus);
+}
+
+void VaultWindow::onDecryptProgressChanged(int fileId, int progress) {
+    updateModelItemData(fileId, progress, ViewItemRoles::ProgressCurrentValue);
+}
+
+void VaultWindow::onRowsInserted(const QModelIndex &, int, int) {
+    _statusbar->totalItemsLabel()->setText(QString("%1 items").arg(view->model().rowCount()));
+}
+
+void VaultWindow::onRowsRemoved(const QModelIndex &, int, int) {
+    _statusbar->totalItemsLabel()->setText(QString("%1 items").arg(view->model().rowCount()));
+}

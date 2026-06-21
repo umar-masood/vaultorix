@@ -1,5 +1,6 @@
 #pragma once
 #include <QFileInfo>
+#include <QProcessEnvironment>
 
 #define APP_VERSION "1.0.0"
 #define APP_NAME "Vaultorix"
@@ -10,7 +11,7 @@
 #define OTP_BOXS 5
 
 #define PROFILE_PICTURE_MAX_SIZE 2097152
-#define MAX_FILE_SIZE 1073741824
+#define MAX_IMPORT_FILE_SIZE 2147483648
 #define REQUEST_TIMEOUT 10000
 #define OLDER_LIST_TIME 172800
 #define REDOWNLOAD_INTERVAL 10000
@@ -20,12 +21,29 @@
 #define USERNAME_BLACKLIST_FILE "WeakUsernames.config"
 #define UPDATE_DOWNLOAD_FILE "Vaultorix-Setup-v1.0.0.exe"
 
+#define VAULT_IMPORT_CHUNK_SIZE 4 * 1024 * 1024
+#define VAULT_ENCRYPT_CHUNK_SIZE 6 * 1024 * 1024
+
+#ifdef Q_OS_WIN
+    #define VAULT_SECRET_PATH \
+        (QProcessEnvironment::systemEnvironment().value("ProgramData") + "/Vaultorix")
+
+#elif defined(Q_OS_MAC)
+    #define VAULT_SECRET_PATH \
+        "/Library/Application Support/Vaultorix"
+
+#elif defined(Q_OS_LINUX)
+    #define VAULT_SECRET_PATH \
+        "/var/lib/Vaultorix"
+
+#endif
+
 #define ACCESS_TOKEN_EXPIRY 600
 #define REFRESH_TOKEN_EXPIRY 86400
 #define USERNAME_CHANGE_INTERVAL 2592000
 
 #define DEVICE_ID_SETTINGS_KEY "Device/Device Id"
-#define SHOW_SIGN_IN_SETTINGS_KEY "Application/Sign in" // When an account is registered first time then on each app run, show sign in screem.
+#define SHOW_SIGN_IN_SETTINGS_KEY "Application/Sign in" // When an account is registered first time then on each app run, show sign in screen.
 #define DEVICE_THEME_KEY "Device/Default Theme"
 #define LOCKOUT_SETTINGS_KEY "Application/Quit"
 

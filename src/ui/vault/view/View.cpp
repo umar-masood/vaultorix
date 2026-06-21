@@ -3,9 +3,10 @@
 
 #include "../../../core/theme/ThemeManager.h"
 #include "../../../core/config/Constants.h"
-#include "../../../../resources/IconManager.h"
-#include "../empty_state/EmptyState.h"
 
+#include "../../../../resources/IconManager.h"
+
+#include "../empty_state/EmptyState.h"
 #include "../../components/ViewModeToggle.h"
 #include "../../components/TextField.h"
 #include "../../components/ButtonMenu.h"
@@ -21,6 +22,10 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QFileInfo>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QResizeEvent>
+#include <QSortFilterProxyModel>
 
 using Ui::Vault::View;
 using Ui::Vault::ViewItem;
@@ -45,15 +50,20 @@ View::View(QWidget *parent) : QWidget(parent) {
     filterButtonMenu->setFontProperties("Segoe UI", 10);
     filterButtonMenu->setText(tr("Filter"));
     filterButtonMenu->setFontXY(0, -1);
-    filterButtonMenu->menu()->setItemSize(QSize(180, 36));
-    filterButtonMenu->menu()->delegate()->setSelectionCheckIndicator(true);
-    filterButtonMenu->menu()->setIconic(true);
-    filterButtonMenu->menu()->addAction({"All file types",false, "", IconManager::icon(Icons::Files), IconManager::icon(Icons::Files)});
-    filterButtonMenu->menu()->addAction({"Documents", false, "",  IconManager::icon(Icons::Document), IconManager::icon(Icons::Document)});
-    filterButtonMenu->menu()->addAction({"Pictures", false, "",  IconManager::icon(Icons::Picture), IconManager::icon(Icons::Picture)});
-    filterButtonMenu->menu()->addAction({"Music", false, "",  IconManager::icon(Icons::Music), IconManager::icon(Icons::Music)});
-    filterButtonMenu->menu()->addAction({"Videos", false, "",  IconManager::icon(Icons::Video), IconManager::icon(Icons::Video)});
-    filterButtonMenu->menu()->delegate()->setActiveIndex(filterButtonMenu->menu()->itemIndex("All file types")); // Setting Default one
+
+    auto menu = filterButtonMenu->menu();
+    menu->setItemSize(QSize(180, 36));
+    menu->delegate()->setSelectionCheckIndicator(true);
+    menu->setIconic(true);
+    menu->addAction({"All file types",false, "", IconManager::icon(Icons::Files), IconManager::icon(Icons::Files)});
+    menu->addAction({"Document", false, "",  IconManager::icon(Icons::Document), IconManager::icon(Icons::Document)});
+    menu->addAction({"Picture", false, "",  IconManager::icon(Icons::Picture), IconManager::icon(Icons::Picture)});
+    menu->addAction({"Music", false, "",  IconManager::icon(Icons::Music), IconManager::icon(Icons::Music)});
+    menu->addAction({"Video", false, "",  IconManager::icon(Icons::Video), IconManager::icon(Icons::Video)});
+    menu->addAction({"Application", false, "",  IconManager::icon(Icons::Application), IconManager::icon(Icons::Application)});
+    menu->addAction({"Archive", false, "",  IconManager::icon(Icons::Archive), IconManager::icon(Icons::Archive)});
+    menu->addAction({"Other", false, "",  "", ""});
+    menu->delegate()->setActiveIndex(filterButtonMenu->menu()->itemIndex("All file types")); // Setting Default one
 
     // Search Box
     search_box = new TextField;
@@ -75,7 +85,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     view_toolbar_wrapper->setContentsMargins(0, 0, 0, 0);
     
     // Wrapper Action Toolbar Layout
-    wrapper_layout = new QHBoxLayout(view_toolbar_wrapper);
+    auto *wrapper_layout = new QHBoxLayout(view_toolbar_wrapper);
     wrapper_layout->setSpacing(0);
     wrapper_layout->setContentsMargins(0, 0, 0, 0);
     wrapper_layout->addWidget(filterButtonMenu, 0, Qt::AlignLeft | Qt::AlignVCenter);
@@ -95,7 +105,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     _list->setModel(&_model);
     _list->setMouseTracking(true);
     _list->setItemDelegate(_delegate);
-    _list->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    _list->setSelectionMode(QAbstractItemView::SingleSelection);
     _list->setFrameShape(QFrame::NoFrame);
     _list->setEditTriggers(QAbstractItemView::NoEditTriggers);
     _list->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -109,22 +119,19 @@ View::View(QWidget *parent) : QWidget(parent) {
     connect(view_mode, &ViewModeToggle::ListViewModeSelected, this, &View::onListViewModeSelected);
     connect(view_mode, &ViewModeToggle::GridViewModeSelected, this, &View::onGridViewModeSelected);
 
-    // ================== TEST ITEMS ==================
-    // _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
-    // _model.appendRow(new ViewItem("Meeting notes.txt", IconManager::icon(Icons::File_TXT), "TXT", "12 KB", "07 Feb 2026", true, false));
-    // _model.appendRow(new ViewItem("Team photos.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "6.7 MB", "03 Jan 2026", false, false));
-    // _model.appendRow(new ViewItem("Fitness tutorial.mp4", IconManager::icon(Icons::File_MP4), "MP4", "380 MB", "02 Jan 2026", false, true));
-    // _model.appendRow(new ViewItem("Draft manuscript.docx", IconManager::icon(Icons::File_DOC), "DOCX", "150 KB", "01 Jan 2026", false, false));
-    // _model.appendRow(new ViewItem("Landscape photo.jpg", IconManager::icon(Icons::File_JPG), "JPEG", "7.2 MB", "04 Dec 2025", false, false));
-    // _model.appendRow(new ViewItem("Tutorial video.mp4", IconManager::icon(Icons::File_MP4), "MP4", "340 MB", "03 Dec 2025", false, true));
-    // _model.appendRow(new ViewItem("Team report.docx", IconManager::icon(Icons::File_DOC), "DOCX", "112 KB", "02 Dec 2025", false, false));
-    // _model.appendRow(new ViewItem("Annual calendar.psd", IconManager::icon(Icons::File_PSD), "PSD", "28 MB", "01 Dec 2025", false, false));
-    // _model.appendRow(new ViewItem("Notes.txt",  IconManager::icon(Icons::File_TXT),  "TXT",  "3 KB",   "12 Feb 2026", false, false));
-    // _model.appendRow(new ViewItem("Resume.pdf", IconManager::icon(Icons::File_PDF),  "PDF",  "210 KB", "11 Feb 2026", false, false));
-    // _model.appendRow(new ViewItem("Photo.jpg",  IconManager::icon(Icons::File_JPG),  "JPEG", "1.9 MB", "10 Feb 2026", false, true));
+    // Filter Proxy Model
+    proxy_model = new QSortFilterProxyModel(this);
+    proxy_model->setSourceModel(&_model);
+    proxy_model->setFilterRole(ViewItemRoles::FileTitle);
+    proxy_model->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    proxy_model->setDynamicSortFilter(true);
+    _list->setModel(proxy_model);
+    connect(search_box, &TextField::textChanged, this, [this](const QString &text){
+        proxy_model->setFilterFixedString(text.trimmed());
+    });
 
     // Layout
-    _layout = new QVBoxLayout(this);
+    auto *_layout = new QVBoxLayout(this);
     _layout->setContentsMargins(4, 4, 4, 4);
     _layout->setSpacing(0);
     _layout->addWidget(view_toolbar_wrapper, 0, Qt::AlignTop);
@@ -144,71 +151,6 @@ View::View(QWidget *parent) : QWidget(parent) {
     // Empty State Widget
     updateEmptyStatePosition();
     updateEmptyState();
-
-    connect(empty_state, &EmptyState::clicked, this, &View::onEmptyStateWidgetClicked);
-
-    //  QTimer *timer = new QTimer(this);
-
-    // connect(timer, &QTimer::timeout, this, [this]() {
-
-    //     if (_model.rowCount() == 0)
-    //         return;
-
-    //     // Pick random row
-    //     int randomRow = QRandomGenerator::global()->bounded(_model.rowCount());
-    //     QModelIndex index = _model.index(randomRow, 0);
-
-    //     // Get current progress
-    //     int currentProgress = index.data(ItemDelegateRoles::ProgressCurrentValue).toInt();
-
-    //     // If not started, initialize it
-    //     if (!index.data(ItemDelegateRoles::ShowProgress).toBool()) {
-
-    //         _model.setData(index, true, ItemDelegateRoles::ShowProgress);
-
-    //        // Randomly pick one operation: 0=Encrypt, 1=Decrypt, 2=Restore, 3=Delete, 4=Import
-    //         int op = QRandomGenerator::global()->bounded(5);
-                    
-    //         // Reset all flags first
-    //         _model.setData(index, false, ItemDelegateRoles::EncryptionStatus);
-    //         _model.setData(index, false, ItemDelegateRoles::DecryptionStatus);
-    //         _model.setData(index, false, ItemDelegateRoles::RestoreStatus);
-    //         _model.setData(index, false, ItemDelegateRoles::DeleteStatus);
-    //         _model.setData(index, false, ItemDelegateRoles::ImportStatus);
-                    
-    //         switch(op) {
-    //             case 0: _model.setData(index, true, ItemDelegateRoles::EncryptionStatus); break;
-    //             case 1: _model.setData(index, true, ItemDelegateRoles::DecryptionStatus); break;
-    //             case 2: _model.setData(index, true, ItemDelegateRoles::RestoreStatus); break;
-    //             case 3: _model.setData(index, true, ItemDelegateRoles::DeleteStatus); break;
-    //             case 4: _model.setData(index, true, ItemDelegateRoles::ImportStatus); break;
-    //         }
-    //         return;
-    //     }
-
-    //     // Increase progress randomly
-    //     int step = QRandomGenerator::global()->bounded(5, 15);
-    //     currentProgress += step;
-
-    //     if (currentProgress >= 100) {
-    //         currentProgress = 100;
-
-    //         // Stop progress when complete
-    //         _model.setData(index, false, ItemDelegateRoles::ShowProgress);
-    //         _model.setData(index, false, ItemDelegateRoles::EncryptionStatus);
-    //         _model.setData(index, false, ItemDelegateRoles::DecryptionStatus);
-    //         _model.setData(index, false, ItemDelegateRoles::RestoreStatus);
-    //         _model.setData(index, false, ItemDelegateRoles::DeleteStatus);
-    //         _model.setData(index, false, ItemDelegateRoles::ImportStatus);
-    //     }
-
-    //     _model.setData(index, currentProgress, ItemDelegateRoles::ProgressCurrentValue);
-
-        // Force repaint
-        // _list->update(index);
-    // });
-
-    // timer->start(100); // update every 300ms
 }
 
 void View::updateGridLayout() {
@@ -232,7 +174,7 @@ void View::updateGridLayout() {
 
 void View::onListViewModeSelected() {
     if (_delegate) {
-        _delegate->setViewMode(ItemsViewMode::ListMode);
+        _delegate->setViewMode(ViewItemsMode::ListMode);
         _delegate->setItemHeight(70);
     }
 
@@ -248,7 +190,7 @@ void View::onListViewModeSelected() {
 
 void View::onGridViewModeSelected() {
     if (_delegate) {
-        _delegate->setViewMode(ItemsViewMode::GridMode);
+        _delegate->setViewMode(ViewItemsMode::GridMode);
     }
 
     if (_list) {
@@ -262,22 +204,6 @@ void View::onGridViewModeSelected() {
         _list->setDragDropMode(QAbstractItemView::NoDragDrop);  
         _list->setDefaultDropAction(Qt::IgnoreAction); 
         updateGridLayout();
-    }
-}
-
-void View::onEmptyStateWidgetClicked() {
-    _filePath = QFileDialog::getOpenFileName(
-        this,
-        tr("Select a file to import"),
-        QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
-        "All Files (*.*)"
-    );
-    
-    QFileInfo info(_filePath);
-            
-    if (info.size() > MAX_FILE_SIZE) {
-        WARN_HERE("File size is too large to import in Vault.");
-        return;
     }
 }
 
@@ -345,7 +271,10 @@ void View::setDarkMode(bool isDarkMode) {
     
     update();
 }
+
+QListView* View::list() const { return _list; }
 QStandardItemModel& View::model() { return _model; }
+QSortFilterProxyModel * Ui::Vault::View::proxyModel() const { return proxy_model; }
 TextField* View::searchBox() const { return search_box; }
 ButtonMenu* View::filterMenu()  const { return filterButtonMenu; }
 ViewModeToggle* View::viewMode() const { return view_mode; }

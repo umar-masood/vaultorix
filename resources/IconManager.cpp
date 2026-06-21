@@ -157,8 +157,14 @@ QString IconManager::icon(Icons icon) {
         case Icons::UploadLight:       return ":/icons/upload-light.svg";
         case Icons::UploadDark:        return ":/icons/upload-dark.svg";
 
+        case Icons::QueuedLight:       return ":/icons/queued-light.svg";
+        case Icons::QueuedDark:        return ":/icons/queued-dark.svg";
+
         case Icons::DownloadUpdateLight: return ":/icons/update-download-light.svg";
         case Icons::DownloadUpdateDark:  return ":/icons/update-download-dark.svg";
+
+        case Icons::Application:        return ":/icons/application.svg";
+        case Icons::Archive:            return ":/icons/archive.svg";
     }
 
     qWarning("The requested icon is not found");

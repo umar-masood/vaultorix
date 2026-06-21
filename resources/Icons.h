@@ -148,5 +148,11 @@ enum class Icons {
     BugDark             = 0x9B,
 
     UploadLight         = 0x9C,
-    UploadDark          = 0x9D
+    UploadDark          = 0x9D,
+
+    QueuedLight         = 0x9E,
+    QueuedDark          = 0x9F,
+
+    Application         = 0xA0,
+    Archive             = 0xA1
 };

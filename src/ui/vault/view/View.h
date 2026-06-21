@@ -1,9 +1,6 @@
 #pragma once
 
 #include <QWidget>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QResizeEvent>
 #include <QStandardItemModel>
 
 class ViewModeToggle;
@@ -13,6 +10,10 @@ class ScrollBar;
 class QHBoxLayout;
 class QVBoxLayout;
 class QListView;
+class QPainter;
+class QResizeEvent;
+class QPaintEvent;
+class QSortFilterProxyModel;
 
 namespace Ui::Vault {
     class EmptyState;
@@ -31,6 +32,8 @@ namespace Ui::Vault {
         ViewModeToggle* viewMode() const;
         Ui::Vault::EmptyState* emptyStateWidget() const; 
         QStandardItemModel& model();
+        QSortFilterProxyModel* proxyModel() const;
+        QListView *list() const;
 
         protected:
         void paintEvent(QPaintEvent *event) override;
@@ -48,8 +51,6 @@ namespace Ui::Vault {
 
         // Wrapper (View Action Toolbar)
         QWidget *view_toolbar_wrapper = nullptr;
-        // Wrapper Action Toolbar Layout
-        QHBoxLayout *wrapper_layout = nullptr;
 
         // View Mode Toggle
         ViewModeToggle *view_mode = nullptr;
@@ -62,35 +63,27 @@ namespace Ui::Vault {
 
         // Search Box
         TextField *search_box = nullptr;
+        QSortFilterProxyModel *proxy_model;
 
         // Items View List
         QListView *_list = nullptr;
 
         // Model
         QStandardItemModel _model;
-        // File Path
-        QString _filePath;
 
-        // Scroll Bars
+        // Scroll Bar
         ScrollBar *vScroll = nullptr;
 
         // Items View Delegate
         Ui::Vault::ViewDelegate *_delegate = nullptr;
-
-        // Main Layout
-        QVBoxLayout *_layout = nullptr;
-
-        QTimer *progressTimer = nullptr;
 
         // Helpers
         void updateEmptyState();
         void updateEmptyStatePosition();
         void updateGridLayout();
 
-        // Slots
+        private slots:
         void onListViewModeSelected();
         void onGridViewModeSelected();
-        void onEmptyStateWidgetClicked();
-
     };
 };

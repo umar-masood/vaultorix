@@ -136,6 +136,10 @@
         <file>icons/upload-light.svg</file>
         <file>icons/upload-dark.svg</file>
         <file>illustrations/deleteAccount.png</file>
+        <file>icons/queued-light.svg</file>
+        <file>icons/queued-dark.svg</file>
+        <file>icons/application.svg</file>
+        <file>icons/archive.svg</file>
     </qresource>
     <qresource prefix="/translations"/>
 </RCC>

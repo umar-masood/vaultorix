@@ -6,45 +6,37 @@
 #include <QStandardItem>
 #include <algorithm>
 #include <QtMath>
+#include <QPixmap>
+#include <QRect>
+#include <QSize>
+#include <QUuid>
+
+#include "../../../core/services/vault/models/FileMetadata.h"
+#include "../../../core/services/vault/models/FileStatus.h"
 
 class QIcon;
 class QTimer;
-class QRect;
-class QPixmap;
 
 namespace Ui::Vault {
-    enum ItemDelegateRoles {
+    enum ViewItemRoles {
         FileTitle               =   Qt::DisplayRole,
         FileThumbnail           =   Qt::UserRole + 1,
-        FileType                =   Qt::UserRole + 2,
-        FileSize                =   Qt::UserRole + 3,
-        DateModified            =   Qt::UserRole + 4,
-        EncryptionStatus        =   Qt::UserRole + 5,
-        DecryptionStatus        =   Qt::UserRole + 6,
-        ImportStatus            =   Qt::UserRole + 7,
-        RestoreStatus           =   Qt::UserRole + 8,
-        DeleteStatus            =   Qt::UserRole + 9,
-        ShowProgress            =   Qt::UserRole + 10,
-        ProgressCurrentValue    =   Qt::UserRole + 11,
+        FileType ,               
+        FileSize,                
+        FileCreatedAt,            
+        FileStatus,              
+        FileId,
+        ProgressCurrentValue,                
     };
 
-    enum ItemsViewMode {
+    enum ViewItemsMode {
         ListMode = 0x1,
         GridMode = 0x2,
     };
 
     class ViewItem : public QStandardItem {
         public:
-        ViewItem(const QString &title, 
-                const QString &thumbnailPath,
-                const QString &type,
-                const QString &sizem,
-                const QString &lastModifiedDate,
-                bool isEncrypted = false,
-                bool isDecrypted = false,
-                bool isImporting = false,
-                bool isRestoring = false,
-                bool isDeleting  = false);
+        ViewItem(const Core::Vault::FileMetadata &metadata);
     };
 
     class ViewDelegate : public QStyledItemDelegate {
@@ -54,7 +46,7 @@ namespace Ui::Vault {
         explicit ViewDelegate(QObject *parent = nullptr);
         void setDarkMode(bool enable);
         void setItemHeight(int itemHeight);
-        void setViewMode(ItemsViewMode mode);
+        void setViewMode(ViewItemsMode mode);
 
         protected:
         QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -68,7 +60,7 @@ namespace Ui::Vault {
         int _itemHeight;
 
         // Items View Mode
-        ItemsViewMode _viewMode;
+        ViewItemsMode _viewMode;
 
         // Spacing
         const int spacing = 30;

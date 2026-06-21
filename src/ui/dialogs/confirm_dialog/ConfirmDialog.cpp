@@ -94,6 +94,13 @@ ConfirmDialogManager::ConfirmDialogManager(QObject *parent) : QObject(parent) {
            DeleteAccountIllustration,
            true
         );
+
+    create("FileDelete",
+           tr("Are you sure you want to permanently delete this file? Once deleted, it cannot be recovered."),
+           tr("Confirm"), tr("Cancel"),
+           DeleteAccountIllustration,
+           true
+        );
 }
 
 ConfirmDialogManager* ConfirmDialogManager::instance() {
