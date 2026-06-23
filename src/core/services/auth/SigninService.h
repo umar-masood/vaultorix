@@ -40,6 +40,6 @@ namespace Core {
 
         // Slots
         private slots:
-        void onSignedIn(const QJsonObject &);
+        void onSignedIn(const QJsonObject &obj);
     };
 };

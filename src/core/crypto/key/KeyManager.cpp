@@ -7,9 +7,8 @@
 #include <QApplication>
 
 using Core::Crypto::KeyManager;
-KeyManager::KeyManager(QObject *parent) : QObject(parent),  _salt(QByteArray::fromHex("A1B2C3D4E5F60718293A4B5C6D7E8F90")) {
 
-}
+KeyManager::KeyManager(QObject *parent) : QObject(parent) {}
 
 KeyManager* Core::Crypto::KeyManager::instance() {
     static KeyManager *km = new KeyManager(qApp);
@@ -217,20 +216,18 @@ std::optional<QByteArray> KeyManager::unwrapFileKey(const Core::Crypto::WrappedK
     return result;
 }
 
-bool KeyManager::unlock(QByteArray &password) {
-    if (password.isEmpty())
+bool KeyManager::unlock(QByteArray &password, QByteArray &salt) {
+    if (password.isEmpty() || salt.isEmpty())
         return false;
     
-    // Salt (It will store on server later)
-    // if (RAND_bytes(reinterpret_cast<unsigned char *>(_salt.data()), _salt.size()) != 1)
-    //     return false;
-
     // Derive AES Key
-    if (!deriveKey(password, _salt, _masterKey))
+    if (!deriveKey(password, salt, _masterKey))
         return false;
 
     _isUnlocked = true;
+    
     Utils::cleanupMemory(password);
+    Utils::cleanupMemory(salt);
 
     return true;
 }
@@ -238,7 +235,6 @@ bool KeyManager::unlock(QByteArray &password) {
 void KeyManager::lock() {
     _isUnlocked = false;
     Utils::cleanupMemory(_masterKey);
-    Utils::cleanupMemory(_salt);
 }
 
 const QByteArray& KeyManager::masterKey() const {

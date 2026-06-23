@@ -4,6 +4,8 @@
 #include "../../config/Constants.h"
 #include "../../utils/Utils.h"
 
+#include <openssl/rand.h>
+
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrl>
@@ -32,13 +34,18 @@ void SignupService::checkValidationStatus() {
 
 // Preparing json data for request
 QJsonDocument SignupService::prepareRequestData(const SignupData &data) {
+    // Salt
+    QByteArray salt(16, Qt::Uninitialized);
+    RAND_bytes(reinterpret_cast<unsigned char *>(salt.data()), 16);
+
     QJsonObject userObj {
         {"full_name",   data.fullName},
         {"username",    data.username},
         {"email",       data.email},
         {"password",    data.password},
         {"created_at",  QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
-        {"is_active",   true}
+        {"is_active",   true},
+        {"salt",        QString::fromUtf8(salt.toHex())}
     };
 
     QJsonObject deviceObj {

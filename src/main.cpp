@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
         pool->waitForDone(3000);
     });
 
-    // AuthCoordinator *c = new AuthCoordinator(&app);
-    // c->show();
+    AuthCoordinator *c = new AuthCoordinator(&app);
+    c->show();
 
-    Ui::Vault::VaultWindow::instance()->show();
+    // Ui::Vault::VaultWindow::instance()->show();
     return app.exec();
 }

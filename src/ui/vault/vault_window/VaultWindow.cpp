@@ -176,9 +176,7 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     ConfirmDialogManager::instance()->registerWindow("Vault", this);
 
     // Init Key Manager in Current GUI Thread so that no other worker thread can do this to prevent illegal
-    //Core::Crypto::KeyManager::instance();
-    QByteArray p = QString("Umar@123").toUtf8();
-    Core::Crypto::KeyManager::instance()->unlock(p);
+    Core::Crypto::KeyManager::instance();
 
     // Updating Files Status on Startup
     Core::Vault::FileRepository::markEncryptingFilesImported(); // In case if app quit while file is encrypting

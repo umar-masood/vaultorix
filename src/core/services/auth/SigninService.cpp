@@ -5,6 +5,8 @@
 #include "../../utils/Utils.h"
 #include "../../crypto/key/KeyManager.h"
 
+#include <QByteArray>
+
 using Core::SigninService;
 
 SigninService::SigninService(QObject *parent) : QObject(parent) {
@@ -76,6 +78,8 @@ void SigninService::verifyCredentials(const QString &username, const QString &pa
     );
 }
 
-void SigninService::onSignedIn(const QJsonObject &) {
-    Core::Crypto::KeyManager::instance()->unlock(_password);
+void SigninService::onSignedIn(const QJsonObject &obj) {
+    QString storedSalt = obj["user"].toObject()["salt"].toString();
+    QByteArray salt = QByteArray::fromHex(storedSalt.toUtf8());
+    Core::Crypto::KeyManager::instance()->unlock(_password, salt);
 }

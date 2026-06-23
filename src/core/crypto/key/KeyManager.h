@@ -18,7 +18,7 @@ namespace Core::Crypto {
         public:
         static KeyManager* instance();
 
-        bool unlock(QByteArray &password);
+        bool unlock(QByteArray &password, QByteArray &salt);
         void lock();
         const QByteArray& masterKey() const;
 
@@ -31,6 +31,5 @@ namespace Core::Crypto {
         private:
         bool _isUnlocked = false;
         QByteArray _masterKey;
-        QByteArray _salt;
     };
 };
