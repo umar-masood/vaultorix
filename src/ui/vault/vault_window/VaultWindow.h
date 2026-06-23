@@ -100,6 +100,8 @@ namespace Ui::Vault {
         void onDeleteBtnClicked();
         void onEncryptBtnClicked();
         void onDecryptBtnClicked();
+        void onRestoreBtnClicked();
+        void onOpenBtnClicked();
 
         void onViewItemClicked(const QModelIndex &index);
         void onRowsInserted(const QModelIndex &, int, int);
@@ -120,6 +122,10 @@ namespace Ui::Vault {
         void onDecryptQueued(int fileId);
         void onDecryptStatusChanged(int fileId, const Core::Vault::FileStatus &status);
         void onDecryptProgressChanged(int fileId, int progress);
+
+        void onRestoreQueued(int fileId);
+        void onRestoreStatusChanged(int fileId, const Core::Vault::FileStatus &status);
+        void onRestoreProgressChanged(int fileId, int progress);
     
     };
 };

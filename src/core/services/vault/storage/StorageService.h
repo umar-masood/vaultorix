@@ -25,6 +25,7 @@ namespace Core::Vault {
         void deleteFile(int fileId);
         void encryptFile(int fileId);
         void decryptFile(int fileId);
+        void restoreFile(int fileId);
         
         private:
         // Mime Types
@@ -84,5 +85,9 @@ namespace Core::Vault {
         void decryptQueued(int fileId);
         void decryptStatusChanged(int fileId, const Core::Vault::FileStatus &status);
         void decryptProgressChanged(int fileId, int progress);
+
+        void restoreQueued(int fileId);
+        void restoreStatusChanged(int fileId, const Core::Vault::FileStatus &status);
+        void restoreProgressChanged(int fileId, int progress);
     };
 };

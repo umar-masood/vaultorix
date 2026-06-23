@@ -13,6 +13,7 @@ namespace Core::Vault {
         QString actualName;
         QString tempName        =   QString();
         QString encryptedName   =   QString();
+        QString decryptedName   =   QString();
         
         QString extension;
         Core::Vault::FileType type;

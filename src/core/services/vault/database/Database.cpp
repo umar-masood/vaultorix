@@ -28,6 +28,7 @@ QString Database::filesTableCreateQuery() {
             original_path           TEXT NOT NULL,
             temp_path               TEXT,
             encrypted_path          TEXT DEFAULT NULL,
+            decrypted_name          TEXT DEFAULT NULL,
             decrypted_path          TEXT DEFAULT NULL,
             key                     TEXT DEFAULT NULL,
             iv                      TEXT DEFAULT NULL,

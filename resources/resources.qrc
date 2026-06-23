@@ -140,6 +140,7 @@
         <file>icons/queued-dark.svg</file>
         <file>icons/application.svg</file>
         <file>icons/archive.svg</file>
+        <file>app-icon.ico</file>
     </qresource>
     <qresource prefix="/translations"/>
 </RCC>

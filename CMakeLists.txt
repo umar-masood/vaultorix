@@ -149,9 +149,11 @@ add_executable(Vaultorix
     src/core/theme/ThemeManager.cpp
 
     ## Errors
-    ## Import Error
     ./src/core/errors/ImportError.h
     ./src/core/errors/DeleteError.h
+    ./src/core/errors/RestoreError.h
+    ./src/core/errors/EncryptError.h
+    ./src/core/errors/DecryptError.h
     
     ## Vault
     ### Tasks
@@ -160,6 +162,7 @@ add_executable(Vaultorix
     ./src/core/services/vault/tasks/DeleteTask.cpp
     ./src/core/services/vault/tasks/EncryptTask.cpp
     ./src/core/services/vault/tasks/DecryptTask.cpp
+    ./src/core/services/vault/tasks/RestoreTask.cpp
 
     ### Crypto
     ./src/core/crypto/key/KeyManager.cpp
@@ -198,11 +201,9 @@ target_compile_options(Vaultorix PRIVATE /EHsc)
 target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt6::Network Qt6::Gui Qt6::Svg Qt6::Widgets Qt6::Sql dwmapi user32)
 set_target_properties(Vaultorix PROPERTIES WIN32_EXECUTABLE TRUE)
 
-# ------------------------------------------------------------
-#                   EXTERNAL DEPENDENCIES
-# ------------------------------------------------------------
-# add_subdirectory(${PROJECT_SOURCE_DIR}/dependencies/qtkeychain)
-# target_link_libraries(Vaultorix PRIVATE Qt6::Core QtKeychain)
+if (MSVC)
+    set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_SOURCE_DIR}/app.rc")
+endif()
 
 # ------------------------------------------------------------
 #                        OPENSSL
@@ -217,8 +218,6 @@ target_include_directories(Vaultorix PRIVATE
 target_link_directories(Vaultorix PRIVATE
     "$<$<CONFIG:Debug>:${OPENSSL_ROOT}/lib/VC/x64/MDd>"
     "$<$<CONFIG:Release>:${OPENSSL_ROOT}/lib/VC/x64/MD>"
-    "$<$<CONFIG:RelWithDebInfo>:${OPENSSL_ROOT}/lib/VC/x64/MD>"
-    "$<$<CONFIG:MinSizeRel>:${OPENSSL_ROOT}/lib/VC/x64/MD>"
 )
 
 target_link_libraries(Vaultorix PRIVATE

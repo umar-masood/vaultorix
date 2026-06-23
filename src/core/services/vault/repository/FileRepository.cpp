@@ -112,6 +112,7 @@ FileMetadata FileRepository::mapQueryToFileMetadata(QSqlQuery &query) {
     metadata.status = static_cast<FileStatus>(query.value("status").toInt());
     metadata.encryptedName = query.value("encrypted_name").toString();
     metadata.encyptedPath = query.value("encrypted_path").toString();
+    metadata.decryptedName = query.value("decrypted_name").toString();
     metadata.decryptedPath = query.value("decrypted_path").toString();
 
     return metadata;
@@ -236,7 +237,9 @@ bool FileRepository::insertEncryptedFileData(const Core::Vault::FileMetadata &me
                 encrypted_path  = :encPath,
                 key             = :key,
                 iv              = :iv,
-                tag             = :tag
+                tag             = :tag,
+                decrypted_name  = NULL,
+                decrypted_path  = NULL
             WHERE id = :id
         )"
     );
@@ -284,4 +287,52 @@ std::optional<Core::Crypto::WrappedKey> FileRepository::fetchEncryptedFileSecret
     key.tag          = query.value("tag").toByteArray();
 
     return key;
+}
+
+bool FileRepository::setFileDecryptedNamePath(int fileId, const QString &decryptedPath, const QString &decryptedName) {
+    QSqlQuery query(Database::instance().database());
+    query.prepare(
+        R"(
+            UPDATE files
+            SET 
+                decrypted_path = :dec_path, 
+                decrypted_name = :dec_name,
+                key            = NULL,
+                iv             = NULL,
+                tag            = NULL
+            WHERE id = :id
+        )"
+    );
+
+    query.bindValue(":id",fileId);
+    query.bindValue(":dec_path", decryptedPath);
+    query.bindValue(":dec_name", decryptedName);
+
+    if (!query.exec()) {
+        ERROR_HERE("Failed to insert decrypted file data in database: " + query.lastError().text());
+        return false;
+    }
+
+    return true;
+}
+
+bool FileRepository::removeEncryptedFileNamePath(int fileId) {
+    QSqlQuery query(Database::instance().database());
+    query.prepare(
+        R"(
+            UPDATE files
+            SET encrypted_path = NULL,
+                encrypted_name = NULL
+            WHERE id = :id
+        )"
+    );
+
+    query.bindValue(":id",fileId);
+
+    if (!query.exec()) {
+        ERROR_HERE("Failed to remove encrypted file path and name in database: " + query.lastError().text());
+        return false;
+    }
+
+    return true;
 }

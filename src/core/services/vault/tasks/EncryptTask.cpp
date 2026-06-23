@@ -30,10 +30,20 @@ void EncryptTask::run() {
         return;
 
     // Source File (Imported Temp Files)
-    QFile sourceFile(_metadata.tempPath);
+    QString sourcePath;
+
+    auto status = _metadata.status;
+    if (status == Core::Vault::FileStatus::Decrypted)
+        sourcePath = _metadata.decryptedPath;
+    else
+        sourcePath = _metadata.tempPath;
+
+    QFile sourceFile(sourcePath);
     
     // Destination File
-    QString basePath = VAULT_SECRET_PATH + "/encrypted/" + _metadata.tempName;
+    QString basePath = VAULT_SECRET_PATH + "/encrypted/" + 
+                        (status == Core::Vault::FileStatus::Decrypted ? _metadata.decryptedName : _metadata.tempName);
+                        
     QString tempDestFilePath = basePath  + ".vxenc.vxtemp";
     QString permanentDestFilePath = basePath + ".vxenc";
 
@@ -182,8 +192,12 @@ void EncryptTask::run() {
     // When file is renamed to permanent dest file
     renamed = true;
 
-    // Inserting encrypted file data in current metadata
-    _metadata.encryptedName = _metadata.tempName;
+    // Inserting current metadata
+    if (status == Core::Vault::FileStatus::Decrypted)
+        _metadata.encryptedName = _metadata.decryptedName;
+    else
+        _metadata.encryptedName = _metadata.tempName;
+
     _metadata.encyptedPath  = permanentDestFilePath;
 
     // Encrypting File Key with Master Key
@@ -209,9 +223,12 @@ void EncryptTask::run() {
         return;
     }
     
-    // Removing Imported Temp File Permanently
-    QFile::remove(_metadata.tempPath);
-
+    // Removing Imported Temp or Decrypted File Permanently
+    if (status == Core::Vault::FileStatus::Decrypted)
+        QFile::remove(_metadata.decryptedPath);
+    else
+        QFile::remove(_metadata.tempPath);
+    
     // Finalizing Progress to 100
     emit progressChanged(_fileId, 100);
 

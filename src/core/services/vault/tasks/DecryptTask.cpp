@@ -179,6 +179,20 @@ void DecryptTask::run() {
     // When file is renamed to permanent dest file
     renamed = true;
 
+    // Adding decrypted file path to DB
+    if (!Core::Vault::FileRepository::setFileDecryptedNamePath(_fileId, permanentDestFilePath, _metadata.encryptedName)) {
+        fail(DecryptError::DecryptFailed);
+        return;
+    }
+
+    // Deleting Encrypted File
+    if (!Core::Vault::FileRepository::removeEncryptedFileNamePath(_fileId)) {
+        fail(DecryptError::DecryptFailed);
+        return;
+    }
+    
+    QFile::remove(_metadata.encyptedPath);
+
     // Finalizing Progress to 100
     emit progressChanged(_fileId, 100);
 

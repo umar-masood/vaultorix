@@ -7,6 +7,7 @@
 #include "../tasks/DeleteTask.h"
 #include "../tasks/EncryptTask.h"
 #include "../tasks/DecryptTask.h"
+#include "../tasks/RestoreTask.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -137,5 +138,16 @@ void StorageService::decryptFile(int fileId) {
     auto *task = new Core::Vault::DecryptTask(fileId);
     connect(task, &Core::Vault::DecryptTask::statusChanged, this, &StorageService::decryptStatusChanged);
     connect(task, &Core::Vault::DecryptTask::progressChanged, this, &StorageService::decryptProgressChanged);
+    QThreadPool::globalInstance()->start(task);
+}
+
+void StorageService::restoreFile(int fileId) {
+    // Queue File 
+    emit restoreQueued(fileId);
+
+    // Running in a thread
+    auto *task = new Core::Vault::RestoreTask(fileId);
+    connect(task, &Core::Vault::RestoreTask::statusChanged, this, &StorageService::restoreStatusChanged);
+    connect(task, &Core::Vault::RestoreTask::progressChanged, this, &StorageService::restoreProgressChanged);
     QThreadPool::globalInstance()->start(task);
 }
