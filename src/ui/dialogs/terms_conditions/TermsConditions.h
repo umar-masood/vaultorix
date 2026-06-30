@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QPointer>
 
 class ScrollBar;
 class Label;
@@ -19,7 +20,7 @@ class TermsConditions : public QWidget {
    bool isDarkMode = false;
 
    // ScrollBar
-   ScrollBar *scrollBar = nullptr;
+   QPointer<ScrollBar> scrollBar = nullptr;
 
    // Terms & Conditions HTML Page View Widget
    QTextBrowser *termsConds = nullptr;

@@ -22,7 +22,7 @@ void SigninService::verifyCredentials(const QString &username, const QString &pa
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
         request.setRawHeader("Accept", "application/json");
         request.setRawHeader("api_key", API_KEY.toUtf8());
-        request.setTransferTimeout(REQUEST_TIMEOUT);
+        request.setTransferTimeout(REQUEST_TIMEOUT + 5000);
 
         QJsonObject mainObj {
             {"username", username},
@@ -53,6 +53,9 @@ void SigninService::verifyCredentials(const QString &username, const QString &pa
             QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
             if (parseError.error != QJsonParseError::NoError || !jsonDoc.isObject())
                 return;
+
+            qDebug() << jsonDoc;
+
 
             QJsonObject obj = jsonDoc.object();
             int statusCode = obj["status_code"].toInt();

@@ -42,6 +42,8 @@ namespace Ui {
         // Heading
         QLabel *heading = nullptr;
 
+        bool _isDarkMode = false;
+
         // Name, Password, Username, Email Fields
         Ui::Utils::CustomTextField *_nameField = nullptr;
         Ui::Utils::CustomTextField *_passwordField = nullptr;
@@ -58,9 +60,9 @@ namespace Ui {
         Ui::Utils::PasswordRules *_passwordValidatorWidget = nullptr;
 
         // Terms & Conditions
-        Ui::Utils::CheckWithBtn *_termsConditionsWidget = nullptr;
-        Dialog *termsConditionsDialog = nullptr;
-        TermsConditions *termsConditionsDialogWidget = nullptr;
+        QPointer<Ui::Utils::CheckWithBtn> _termsConditionsWidget = nullptr;
+        // QPointer<Dialog> termsConditionsDialog = nullptr;
+        // QPointer<TermsConditions> termsConditionsDialogWidget = nullptr;
 
         // Create Account Button
         Button *_createAccountBtn = nullptr;

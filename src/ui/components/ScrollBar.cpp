@@ -19,9 +19,7 @@ ScrollBar::ScrollBar(QWidget *parent) : QScrollBar(parent) {
   init();
 }
 
-void ScrollBar::setDarkMode(bool value) {
-  if (!this || !isVisible()) return; 
-  if (isDarkMode == value) return;   
+void ScrollBar::setDarkMode(bool value) {  
   isDarkMode = value;
   update();
 }

@@ -174,6 +174,7 @@ void TokenManager::performRequest(const QString &route,
     auto makeRequest = [this, route, mode, responseCallable, requestCallable, networkRequestFailureCallable, jsonRequest](){
         // Configuring Network Request
         QNetworkRequest request = configureRequest(route, jsonRequest);
+        request.setTransferTimeout(REQUEST_TIMEOUT);
 
         // Applying Access Token
         request.setRawHeader("Authorization", "Bearer " + accessToken());
@@ -205,6 +206,7 @@ void TokenManager::performRequest(const QString &route,
             }
             
             QJsonObject mainObj = doc.value().object();
+            qDebug() << mainObj;
             responseCallable(mainObj); // Calling user provided function
         });
     };

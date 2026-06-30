@@ -140,14 +140,22 @@ Signup::Signup(QWidget *parent, Ui::AuthWindow *authWindow) : QWidget(parent)
     // T&Cs Consent Widget
     _termsConditionsWidget = new CheckWithBtn;
 
-    // Terms & Conditions Popup
-    termsConditionsDialogWidget = new TermsConditions;
-    termsConditionsDialog = new Dialog(termsConditionsDialogWidget, authWindow, true);
     // Signal Slot of T&Cs Dialog
     connect(_termsConditionsWidget, &CheckWithBtn::boxChecked, this, [this](bool checked) {
         signupCore->setTCValidity(checked);
     });
-    connect(_termsConditionsWidget, &CheckWithBtn::onButtonClicked, this, [=]() { termsConditionsDialog->show(); });
+    
+    connect(_termsConditionsWidget, &CheckWithBtn::onButtonClicked, this, [=, this]() { 
+        // Terms & Conditions Popup
+        auto *termsConditionsDialogWidget = new TermsConditions;
+        auto *termsConditionsDialog = new Dialog(termsConditionsDialogWidget, authWindow, true);
+
+        // Terms and Conditions Dialog Box Theme Handling
+        termsConditionsDialog->setDarkMode(_isDarkMode);
+        termsConditionsDialogWidget->setDarkMode(_isDarkMode);
+
+        termsConditionsDialog->show(); 
+    });
 
     // Layout
     auto *layout = new QVBoxLayout;
@@ -226,6 +234,8 @@ Signup::Signup(QWidget *parent, Ui::AuthWindow *authWindow) : QWidget(parent)
 
 /* --------------------  Setters  -----------------  */
 void Signup::setDarkMode(bool isDarkMode) {
+    _isDarkMode = isDarkMode;
+
     // Labels (Email, Username, Password show above each TextField) inside field widgets
     for (auto *label : labels)
         label->setStyleSheet(QString("color: %1;").arg(isDarkMode ? "white" : "black"));
@@ -236,10 +246,6 @@ void Signup::setDarkMode(bool isDarkMode) {
 
     // T&Cs Consent Widget (CheckBox + Button to T&Cs dialog)
     _termsConditionsWidget->setDarkMode(isDarkMode);
-
-    // Terms and Conditions Dialog Box Theme Handling
-    termsConditionsDialogWidget->setDarkMode(isDarkMode);
-    termsConditionsDialog->setDarkMode(isDarkMode);
 
     // Redirect to Sign In page widget
     _redirectToSignInWidget->text()->setStyleSheet(QString("color: %1").arg(isDarkMode ? "white" : "black"));

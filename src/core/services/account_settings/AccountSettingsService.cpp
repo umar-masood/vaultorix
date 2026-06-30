@@ -303,10 +303,7 @@ void AccountSettingsService::update2FAStatus() {
             ERROR_HERE("Response JSON structure is not valid.");
             return;
         }
-
-        qDebug() << "Status:" << obj["status_code"].toInt();
-        qDebug() << "Message:" << obj["message"].toString();
-
+        
         if (obj["status_code"].toInt() == 200) {
             SessionManager::instance().set2FAStatus(new2FAStatus);
             INFO_HERE("2FA status has been updated.");

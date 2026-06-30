@@ -180,12 +180,10 @@ namespace Utils {
         request.setTransferTimeout(5000);
 
         QNetworkReply *reply = manager->get(request);
-        connect(reply, &QNetworkReply::finished, this, [this, reply](){
-            if (reply->error() != QNetworkReply::NoError) {
-                emit connectivityChanged(false);
-            } else {
-                emit connectivityChanged(true);
-            }
+        connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+            bool online = reply->error() == QNetworkReply::NoError;
+            emit connectivityChanged(online);
+            reply->deleteLater();
         });
     }
 }

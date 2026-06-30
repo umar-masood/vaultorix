@@ -195,15 +195,13 @@ add_executable(Vaultorix
     resources/Illustrations.h
     resources/IllustrationManager.cpp
     resources/resources.qrc
+    app.rc
 )
 
 target_compile_options(Vaultorix PRIVATE /EHsc)
 target_link_libraries(Vaultorix PRIVATE Qt6::Core Qt6::Network Qt6::Gui Qt6::Svg Qt6::Widgets Qt6::Sql dwmapi user32)
 set_target_properties(Vaultorix PROPERTIES WIN32_EXECUTABLE TRUE)
 
-if (MSVC)
-    set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_SOURCE_DIR}/app.rc")
-endif()
 
 # ------------------------------------------------------------
 #                        OPENSSL

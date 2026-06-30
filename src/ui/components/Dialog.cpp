@@ -2,7 +2,7 @@
 
 #include <QVBoxLayout>
 
-Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool hasCloseButton) : 
+Dialog::Dialog(QPointer<QWidget> centralWidget, QWidget *parent, bool hasCloseButton) : 
         SubWindow(centralWidget->size(), parent, hasCloseButton, false), 
         contentWidget(centralWidget) 
 {
@@ -18,10 +18,6 @@ Dialog::Dialog(QWidget *centralWidget, QWidget *parent, bool hasCloseButton) :
 }
 
 void Dialog::setDarkMode(bool value) {
-    if (isDarkMode == value)
-        return;
-
     isDarkMode = value;
-
     SubWindow::setDarkMode(isDarkMode);
 }

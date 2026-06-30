@@ -96,6 +96,8 @@ void ImportTask::run() {
 
     destFile.close();
     sourceFile.close();
+    
+    QFile::remove(_metadata.originalPath);
 
     emit statusChanged(_fileId, Core::Vault::FileStatus::Imported);
     Core::Vault::FileRepository::updateFileStatus(_metadata.fileId, Core::Vault::FileStatus::Imported);

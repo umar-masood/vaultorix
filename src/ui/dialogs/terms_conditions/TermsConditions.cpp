@@ -41,10 +41,9 @@ TermsConditions::TermsConditions(QWidget *parent) : QWidget(parent) {
 }
 
 void TermsConditions::setDarkMode(bool value) {
-   if (isDarkMode == value) 
-      return;
-
-   isDarkMode = value;
+ 
+    isDarkMode = value;
    
-   scrollBar->setDarkMode(isDarkMode);
+    if (scrollBar)
+        scrollBar->setDarkMode(isDarkMode);
 }
