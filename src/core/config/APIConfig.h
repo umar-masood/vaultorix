@@ -6,7 +6,7 @@ namespace APIRoutes {
     using T = const char*;
     
     // Base
-    inline constexpr T BASE                     = /*"https://www.umarcreations.site/"*/  "http://127.0.0.1:8000/";
+    inline constexpr T BASE                     = "https://www.umarcreations.site/";
     
     // Auth 
     inline constexpr T SIGNIN                   = "auth/login";
