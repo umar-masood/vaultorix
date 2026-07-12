@@ -41,7 +41,7 @@ namespace Core {
         QNetworkAccessManager *manager = nullptr;
 
         // API Credentials
-        const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
+        const QString API_KEY = "API_KEY";
 
         // Device Information
         DeviceInfo deviceInfo;

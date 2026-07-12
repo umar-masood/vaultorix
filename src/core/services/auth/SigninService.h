@@ -25,7 +25,7 @@ namespace Core {
 
         private:
         // API Key
-        const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
+        const QString API_KEY = "API_KEY";
 
         // Network Manager
         QNetworkAccessManager *manager = nullptr;

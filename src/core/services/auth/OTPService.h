@@ -33,6 +33,6 @@ namespace Core {
         QNetworkRequest configureNetworkRequest(const QString &route);
 
         // API Credentials
-        const QString API_KEY = "hzza20j1cAS0vn74ioi3zjerwqsabn45556";
+        const QString API_KEY = "API_KEY";
     };
 };
