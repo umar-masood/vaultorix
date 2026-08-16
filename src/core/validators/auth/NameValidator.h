@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QRegularExpression>
 #include <QObject>
 
 class NameValidator  : public QObject {
