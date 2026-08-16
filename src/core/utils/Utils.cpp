@@ -1,31 +1,29 @@
 #include "Utils.h"
 #include "../config/Constants.h"
+#include <openssl/crypto.h>
 
 namespace Utils {
     /*---------------------------------------------------------------
                         BLACKLIST MANAGER 
     -----------------------------------------------------------------*/
-    BlacklistManager::BlacklistManager(QObject *parent, const QString &blacklistName) : QObject(parent) {
-        manager = new QNetworkAccessManager(this);
-
-        connect(this, &BlacklistManager::networkError, [this, blacklistName](QNetworkReply::NetworkError err) {
-            qDebug() << "Downloading " << blacklistName << " blacklist failed: " << err << "\n";
-        });
+    BlacklistManager::BlacklistManager(const QString &blacklistName, QObject *parent = nullptr) : QObject(parent), _blacklistName(blacklistName) {
+        _manager = new QNetworkAccessManager(this);
     }
 
-    void BlacklistManager::setFileName(const std::string &filename) {
-        QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Config";
-        QDir().mkpath(path);
-        filePath = path.toStdString() + "/" + filename;
+    void BlacklistManager::setFileName(const QString &name) {
+        const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/config";
+        QDir().mkpath(dir);
+        _filePath = dir + "/" + name;
     }
 
-    bool BlacklistManager::isOlderList() {
-        if (std::filesystem::exists(filePath)) {
-            QFileInfo info(QString::fromStdString(filePath));
-            QDateTime modified = info.lastModified();
+    bool BlacklistManager::isOlderList() const {
+        if (QFile::exists(_filePath)) {
+            const QFileInfo info(_filePath);
+            const QDateTime modified = info.lastModified();
             qint64 secsAgo = modified.secsTo(QDateTime::currentDateTime()); // Difference
             return secsAgo > OLDER_LIST_TIME;
         }
+
         return true;
     }
 
@@ -34,12 +32,21 @@ namespace Utils {
             return false;
 
         QNetworkRequest request(url);
-        QNetworkReply *reply = manager->get(request);
+        QNetworkReply *reply = _manager->get(request);
 
-        connect(reply, &QNetworkReply::finished, this, [this, reply]() { onFinished(reply); });
-        connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError err) { emit networkError (err); });
+        connect(reply, &QNetworkReply::finished, this, [this, reply]() { 
+            onFinished(reply); 
+        });
+        
+        connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError err) { 
+            qDebug() << "Downloading " << _blacklistName << " blacklist failed: " << err << "\n"; 
+        });
 
         return true;
+    }
+
+    const QString BlacklistManager::filePath() const {
+        return _filePath;
     }
 
     void BlacklistManager::onFinished(QNetworkReply *reply) {
@@ -54,7 +61,7 @@ namespace Utils {
 
             reply->deleteLater();
             return;
-        }
+        } 
 
         QByteArray data = reply->readAll();
         reply->deleteLater();
@@ -62,13 +69,17 @@ namespace Utils {
         if (data.isEmpty())
             return;
 
-        QFile file(QString::fromStdString(filePath));
+        QFile file(_filePath);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-            std::cerr << "Could not write to file: " << filePath << "\n";
+            ERROR_HERE("Failed to write to file: " + _filePath);
             return;
         }
 
-        file.write(data);
+        if (file.write(data) != data.size()) {
+            ERROR_HERE("Failed to completely write blacklist file.");
+            return;
+        }
+
         file.close();
 
         emit listDownloaded();  
@@ -78,24 +89,13 @@ namespace Utils {
                         GENERAL HELPERS 
     -----------------------------------------------------------------*/
 
-    void cleanupMemory(std::string &str) {
-        if (str.empty())
-            return;
-
-        volatile char *p = const_cast<char *>(str.data());
-        std::fill(p, p + str.size(), 0);
-
-        str.clear();
-        str.shrink_to_fit();
-    }
-
     void cleanupMemory(QByteArray &bytes) {
         if (bytes.isEmpty())
             return;
 
         bytes.detach();
-        volatile char *p = bytes.data();
-        std::fill(p, p + bytes.size(), 0);
+        
+        OPENSSL_cleanse(bytes.data(), bytes.size());
 
         bytes.clear();
         bytes.squeeze();
@@ -110,17 +110,16 @@ namespace Utils {
     }
 
     InternetConnectivity::InternetConnectivity() {
-        manager = new QNetworkAccessManager(this);
+        _manager = new QNetworkAccessManager(this);
     }
 
     void InternetConnectivity::checkConnectivity() {
         QNetworkRequest request(QUrl("https://www.google.com/generate_204"));
         request.setTransferTimeout(5000);
 
-        QNetworkReply *reply = manager->get(request);
+        QNetworkReply *reply = _manager->get(request);
         connect(reply, &QNetworkReply::finished, this, [this, reply]() {
-            bool online = reply->error() == QNetworkReply::NoError;
-            emit connectivityChanged(online);
+            emit connectivityChanged(reply->error() == QNetworkReply::NoError);
             reply->deleteLater();
         });
     }
@@ -133,7 +132,7 @@ namespace Utils {
        loadData(envName);
     }
 
-    ENV& ENV::global(const QString &envName) {
+    ENV& ENV::instance(const QString &envName) {
         static ENV env(envName);
         return env;
     }
