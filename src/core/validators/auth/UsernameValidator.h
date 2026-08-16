@@ -1,38 +1,31 @@
 #pragma once
 
 #include "../../utils/Utils.h"
-
-#include <unordered_set>
-#include <fstream>
-#include <QRegularExpression>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonParseError>
+#include <QSet>
 
 class UsernameValidator : public QObject {
     Q_OBJECT
     
     public:
     explicit UsernameValidator(QObject *parent = nullptr);
-    void checkUsernameValidityAndAvailability(const QString &username);
+    void checkUsernameValidity(const QString &username);
 
     private:
-    // Validator Utils
-    Utils::BlacklistManager *blacklistManager = nullptr;
+    // BlackList Manager
+    Utils::BlacklistManager *_blacklistManager = nullptr;
 
     // Network Manager
-    QNetworkAccessManager *manager = nullptr;
+    QNetworkAccessManager *_manager = nullptr;
 
-    // Stores temporary usernames
-    std::unordered_set<std::string> tempUsernames;
+    // Unordered Set to store Temp Usernames
+    QSet<QString> _blacklistedUsernames;
 
-    // Helper
+    // Helpers
     void loadUsernamesFromFile();
-    bool isValidUsername(const QString &username);
+    bool isValidUsername(const QString &username) const;
 
     signals:
     void usernameInvalid();
     void usernameAvailable(bool isAvailable);
-    void failedToCheckUsername();
+    void failedToValidateUsername();
 };

@@ -3,74 +3,73 @@
 #include "../../config/Constants.h"
 #include "../../../ui/utils/Utils.h"
 
+#include <QRegularExpression>
+#include <QTextStream>
+#include <QFile>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonParseError>
+
 UsernameValidator::UsernameValidator(QObject *parent) : QObject(parent) {
-    manager = new QNetworkAccessManager(this);
+    _manager = new QNetworkAccessManager(this);
 
-    blacklistManager = new Utils::BlacklistManager(this, "Username");
-    blacklistManager->setFileName(USERNAME_BLACKLIST_FILE);
+    _blacklistManager = new Utils::BlacklistManager("Username", this);
+    _blacklistManager->setFileName(USERNAME_BLACKLIST_FILE);
 
-    if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::USERNAME_BLACKLIST))))
-        INFO_HERE("Username blacklist is being downloaded.");
+    if (_blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::USERNAME_BLACKLIST))))
+        INFO_HERE("Username blacklist is downloading.");
     else
         loadUsernamesFromFile();
 
-    connect(blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
+    connect(_blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
         INFO_HERE("Username blacklist has been downloaded.");
         loadUsernamesFromFile();
     });
 }
 
-bool UsernameValidator::isValidUsername(const QString &username) {
-    if (username.length() < 3 || username.length() > 20)
+bool UsernameValidator::isValidUsername(const QString &username) const {
+    if (username.length() < 3 || username.length() > 20 || !username.at(0).isLetter())
         return false;
 
-    if (!username.at(0).isLetter())
+    if (username.endsWith('-') || username.endsWith('.') || username.endsWith('_'))
         return false;
 
-    if (username.startsWith("-") || username.startsWith(".") || username.startsWith("_") ||
-        username.endsWith("-") || username.endsWith(".") || username.endsWith("_"))
+    static const QRegularExpression regex("^[A-Za-z0-9._-]+$");
+    if (!regex.match(username).hasMatch())
         return false;
 
-    for (QChar c : username)
-        if (c.unicode() > 127)
-            return false;
+    const QString usernameLower(username.toLower());
 
-    static const QRegularExpression pattern("^[A-Za-z0-9._-]+$");
-    if (!pattern.match(username).hasMatch())
-        return false;
-
-    std::string usernameStd = username.toStdString();
-    Utils::lower(usernameStd);
-
-    if (usernameStd.size() > 1) {
-        int count = 1;
-        for (size_t i = 0; i + 1 < usernameStd.size(); i++) {
-            if (usernameStd[i] == usernameStd[i + 1]) {
-                if (++count >= 3)
-                    return false;
-            } else {
-                count = 1;
-            }
+    // Checking consecutives
+    int count = 1;
+    for (auto i = 1; i < usernameLower.size(); i++) {
+        if (usernameLower[i] == usernameLower[i - 1]) {
+            count++;
+            if (count >= 3)
+                return false;
+        } else {
+            count = 1;
         }
     }
 
-    if (tempUsernames.empty()) {
-        ERROR_HERE("Username blacklist is not loaded.");
+    if (_blacklistedUsernames.empty()) {
+        ERROR_HERE("Username blacklist is empty.");
         return false;
     }
 
-    return tempUsernames.find(usernameStd) == tempUsernames.end();
+    return _blacklistedUsernames.find(usernameLower) == _blacklistedUsernames.end();
 }
 
-void UsernameValidator::checkUsernameValidityAndAvailability(const QString &username) {
+void UsernameValidator::checkUsernameValidity(const QString &username) {
     if (!isValidUsername(username)) {
         emit usernameInvalid();
         return;
     }
+
     QNetworkRequest request(QUrl(route(APIRoutes::CHK_USERNAME) + username));
     request.setTransferTimeout(REQUEST_TIMEOUT);
 
-    QNetworkReply *reply = manager->get(request);
+    QNetworkReply *reply = _manager->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply, username]() {
         if (!reply)
             return;
@@ -78,7 +77,7 @@ void UsernameValidator::checkUsernameValidityAndAvailability(const QString &user
         if (reply->error() != QNetworkReply::NoError) {
             ERROR_HERE("Network request failed: " + reply->errorString());
             reply->deleteLater();
-            emit failedToCheckUsername();
+            emit failedToValidateUsername();
             return;
         }
 
@@ -94,8 +93,8 @@ void UsernameValidator::checkUsernameValidityAndAvailability(const QString &user
         if (parseError.error != QJsonParseError::NoError || !doc.isObject())
             return;
 
-        QJsonObject obj = doc.object();
-        int statusCode = obj["status_code"].toInt();
+        const QJsonObject obj = doc.object();
+        const int statusCode = obj["status_code"].toInt();
 
         DEBUG_HERE(QString::number(statusCode) + "   " + obj["message"].toString());
 
@@ -104,25 +103,21 @@ void UsernameValidator::checkUsernameValidityAndAvailability(const QString &user
 }
 
 void UsernameValidator::loadUsernamesFromFile() {
-    std::ifstream file(blacklistManager->filePath);
-    if (!file.is_open()) {
+    QFile file(_blacklistManager->filePath());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         ERROR_HERE("Unable to open username blacklist.");
         return;
     }
 
-    tempUsernames.clear();
-    tempUsernames.reserve(430);
+    _blacklistedUsernames.clear();
+    _blacklistedUsernames.reserve(430);
 
-    std::string line;
-    while (std::getline(file, line)) {
-        while (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
-            line.pop_back();
-
-        Utils::lower(line);
-
-        if (!line.empty())
-            tempUsernames.insert(line);
+    QTextStream stream(&file);
+    while (!stream.atEnd()) {
+        QString line = stream.readLine().trimmed().toLower();
+        if (!line.isEmpty())
+            _blacklistedUsernames.insert(line);
     }
 
-    INFO_HERE("Loaded " + QString::number(tempUsernames.size()) + " usernames.");
+    INFO_HERE("Loaded " + QString::number(_blacklistedUsernames.size()) + " usernames.");
 }
