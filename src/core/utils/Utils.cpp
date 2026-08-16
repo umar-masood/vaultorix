@@ -77,9 +77,6 @@ namespace Utils {
     /*---------------------------------------------------------------
                         GENERAL HELPERS 
     -----------------------------------------------------------------*/
-    void lower(std::string &str) {
-        std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) { return std::tolower(c); });
-    }
 
     void cleanupMemory(std::string &str) {
         if (str.empty())
