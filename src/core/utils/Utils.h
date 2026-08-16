@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
-#include <string>
 #include <expected>
 #include <functional>
 
@@ -20,13 +19,9 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 
-// #include "../../../dependencies/qtkeychain/keychain.h"
-#include "../../ui/dialogs/error_dialog/ErrorDialog.h"
 
 namespace Utils {
     // General Helpers
-    void lower(std::string &str);
-    void cleanupMemory(std::string &str);
     void cleanupMemory(QByteArray &bytes);
 
     // Internet Connectivity Class
@@ -87,7 +82,7 @@ namespace Utils {
 
         private:  
         InternetConnectivity();
-        QNetworkAccessManager *manager = nullptr;        
+        QNetworkAccessManager *_manager = nullptr;        
     };
 
     // BlacklistManager
@@ -95,33 +90,34 @@ namespace Utils {
         Q_OBJECT
 
         public:
-        explicit BlacklistManager(QObject *parent = nullptr, const QString &blacklistName = "");
+        explicit BlacklistManager(const QString &blacklistName, QObject *parent = nullptr);
 
-        std::string filePath;
-
-        void setFileName(const std::string &filename);
+        void setFileName(const QString &name);
         bool downloadList(const QUrl &url);
+
+        const QString filePath() const;
 
         signals:
         void networkError(QNetworkReply::NetworkError err);
         void listDownloaded();
 
         private:
-        // Network Manager
-        QNetworkAccessManager *manager = nullptr;    
+        QString _filePath, _blacklistName;
 
+        // Network Manager
+        QNetworkAccessManager *_manager = nullptr;    
+
+        bool isOlderList() const;
         void onFinished(QNetworkReply *reply);
-        bool isOlderList();
     };
 
     /* ----------------------------------------------------
                     .env Parser
     ------------------------------------------------------- */
-    
     class ENV {
         public:
-        ENV(const QString &envName);
-        static ENV& global(const QString &envName);
+        explicit ENV(const QString &envName);
+        static ENV& instance(const QString &envName);
 
         void load(const QString &envName);
         QString get(const QString &key) const;
