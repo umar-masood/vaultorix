@@ -1,0 +1,30 @@
+#pragma once
+
+#include <QWidget>
+#include <QString>
+
+class QPaintEvent;
+
+class RoundedBox : public QWidget {
+    Q_OBJECT
+
+    public:
+    explicit RoundedBox(bool isToolTip = false, QWidget *parent = nullptr);
+    explicit RoundedBox(QWidget *parent = nullptr);
+    virtual ~RoundedBox() = default;
+
+    void setDarkMode(bool value);
+    void setAsToolTip(bool value);
+    void setText(const QString &text);
+    QSize sizeHint() const;
+
+    protected:
+    void paintEvent(QPaintEvent *event) override;
+
+    private:
+    void updateSizeForText(); 
+
+    bool isDarkMode;
+    bool _isToolTip;
+    QString _text;
+};

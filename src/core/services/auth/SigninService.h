@@ -1,0 +1,42 @@
+#pragma once
+
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QUrl>
+#include <QJsonParseError>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+namespace Core {
+    class SigninService : public QObject {
+        Q_OBJECT
+
+        public:
+        enum class SignInError {
+            InvalidCredentials,
+            MaxAttemptsLimitReached,
+            AccessDenied,
+            SomethingWentWrong
+        };
+
+        explicit SigninService(QObject *parent = nullptr);
+        void verifyCredentials(const QString &username, const QString &password);
+
+        private:
+        // Network Manager
+        QNetworkAccessManager *manager = nullptr;
+
+        QByteArray _password;
+
+        // Signals
+        signals:
+        void verificationRequired(const QString &email, const QString &authType);
+        void failedToSignIn(const SignInError &error);
+        void signedIn(const QJsonObject &obj);
+
+        // Slots
+        private slots:
+        void onSignedIn(const QJsonObject &obj);
+    };
+};
