@@ -34,7 +34,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   
     // Icons
-    searchIcon    = IconManager::icon(Icons::Search);
+    searchIcon = IconManager::icon(Icons::Search);
 
     // Empty State Widget
     empty_state = new Ui::Vault::EmptyState(this);
@@ -65,9 +65,17 @@ View::View(QWidget *parent) : QWidget(parent) {
     wrapper_layout->setContentsMargins(0, 0, 0, 0);
     wrapper_layout->addWidget(search_box, 0, Qt::AlignCenter);
     wrapper_layout->addWidget(view_mode, 0, Qt::AlignRight | Qt::AlignVCenter);
+
+    // Filter Proxy Model
+    proxy_model = new QSortFilterProxyModel(this);
+    proxy_model->setSourceModel(&_model);
+    proxy_model->setFilterRole(ViewItemRoles::FileTitle);
+    proxy_model->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    proxy_model->setDynamicSortFilter(true);
     
     // Items View List
     _list = new QListView;
+    _list->setModel(proxy_model);
 
     // Items View Delegate
     _delegate = new Ui::Vault::ViewDelegate;
@@ -76,7 +84,6 @@ View::View(QWidget *parent) : QWidget(parent) {
     vScroll = new ScrollBar(Qt::Vertical);
 
     // List Properties
-    _list->setModel(&_model);
     _list->setMouseTracking(true);
     _list->setItemDelegate(_delegate);
     _list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -93,14 +100,8 @@ View::View(QWidget *parent) : QWidget(parent) {
     connect(view_mode, &ViewModeToggle::ListViewModeSelected, this, &View::onListViewModeSelected);
     connect(view_mode, &ViewModeToggle::GridViewModeSelected, this, &View::onGridViewModeSelected);
 
-    // Filter Proxy Model
-    proxy_model = new QSortFilterProxyModel(this);
-    proxy_model->setSourceModel(&_model);
-    proxy_model->setFilterRole(ViewItemRoles::FileTitle);
-    proxy_model->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    proxy_model->setDynamicSortFilter(true);
-    _list->setModel(proxy_model);
-    connect(search_box, &TextField::textChanged, this, [this](const QString &text){
+    // Search
+    connect(search_box, &TextField::textChanged, this, [this](const QString &text) {
         proxy_model->setFilterFixedString(text.trimmed());
     });
 
@@ -111,7 +112,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     _layout->addWidget(view_toolbar_wrapper, 0, Qt::AlignTop);
     _layout->addSpacing(10); // IMP : Seperator is used
     _layout->addWidget(_list);
-    
+
     // Model Signal / Slots
     connect(&_model, &QAbstractItemModel::rowsInserted, this, &View::updateEmptyState);
     connect(&_model, &QAbstractItemModel::rowsRemoved, this, &View::updateEmptyState);
