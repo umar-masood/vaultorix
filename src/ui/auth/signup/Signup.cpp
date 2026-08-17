@@ -220,12 +220,12 @@ Signup::Signup(QWidget *parent, Ui::AuthWindow *authWindow) : QWidget(parent)
     usernameValidator = new UsernameValidator(this);
     connect(usernameValidator, &UsernameValidator::usernameAvailable, this, &Signup::onUsernameAvailable);
     connect(usernameValidator, &UsernameValidator::usernameInvalid, this, &Signup::onUsernameInvalid);
-    connect(usernameValidator, &UsernameValidator::failedToCheckUsername, this, &Signup::onFailedToCheckUsername);
+    connect(usernameValidator, &UsernameValidator::failedToValidateUsername, this, &Signup::onFailedToValidateUsername);
 
     emailValidator = new EmailValidator(this);
     connect(emailValidator, &EmailValidator::emailAvailable, this, &Signup::onEmailAvailable);
     connect(emailValidator, &EmailValidator::emailInvalid, this, &Signup::onEmailInvalid);
-    connect(emailValidator, &EmailValidator::failedToCheckEmail, this, &Signup::onFailedToCheckEmail);
+    connect(emailValidator, &EmailValidator::failedToValidateEmail, this, &Signup::onFailedToValidateEmail);
 
     passwordValidator = new PasswordValidator(this);
     connect(passwordValidator, &PasswordValidator::validationUpdated, this, &Signup::onPasswordValidationUpdated);
@@ -329,7 +329,7 @@ void Signup::onUsernameAvailable(bool isAvailable) {
     signupCore->setUsernameValidity(isAvailable);
 }
 
-void Signup::onFailedToCheckUsername() {
+void Signup::onFailedToValidateUsername() {
     if (usernameRetryAttempts < 3) {
         usernameRetryAttempts++;
         usernameValidator->checkUsernameValidityAndAvailability(_usernameField->text());
@@ -366,7 +366,7 @@ void Signup::onEmailAvailable(bool isAvailable) {
     signupCore->setEmailValidity(isAvailable);
 }
 
-void Signup::onFailedToCheckEmail() {
+void Signup::onFailedToValidateEmail() {
     if (emailRetryAttempts < 3) {
         emailRetryAttempts++;
         emailValidator->checkEmailValidityAndAvailability(_emailField->text());

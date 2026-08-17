@@ -110,10 +110,10 @@ namespace Ui {
         void onNameValidated(bool isValid);
         void onUsernameInvalid();
         void onUsernameAvailable(bool isAvailable);
-        void onFailedToCheckUsername();
+        void onFailedToValidateUsername();
         void onEmailInvalid();
         void onEmailAvailable(bool isAvailable);
-        void onFailedToCheckEmail();
+        void onFailedToValidateEmail();
         void onPasswordValidationUpdated(const PasswordValidator::PasswordValidationResult &result);
 
     };
