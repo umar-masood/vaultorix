@@ -8,7 +8,7 @@ class UsernameValidator : public QObject {
     
     public:
     explicit UsernameValidator(QObject *parent = nullptr);
-    void checkUsernameValidity(const QString &username);
+    void checkUsernameValidityAndAvailability(const QString &username);
 
     private:
     // BlackList Manager
