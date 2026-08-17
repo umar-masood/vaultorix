@@ -404,7 +404,7 @@ void VaultWindow::updateModelItemData(int fileId, const QVariant &variant, int r
                 }
             } 
 
-            view->list()->update(index);
+            view->list()->viewport()->update();;
 
             // Refresh toolbar state
             auto currentIndex = view->list()->currentIndex();
