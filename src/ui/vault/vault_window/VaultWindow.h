@@ -57,9 +57,6 @@ namespace Ui::Vault {
         // Settings Button
         Button *preferences_btn  = nullptr;
 
-        // Preferences Settings
-        // Ui::Vault::Preferences *pref = nullptr;
-
         // Updates Download Button
         Button *updates_download_btn = nullptr;
            

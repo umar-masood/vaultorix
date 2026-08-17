@@ -85,11 +85,6 @@ VaultWindow::VaultWindow(QWidget *parent) : Window(parent) {
     updates_download_btn->setToolTip("Vaultorix Updates");
     connect(updates_download_btn, &Button::clicked, this, &VaultWindow::onAppUpdateBtnClicked);
 
-    // // Preferences Button
-    // preferences_btn = createButton(IconManager::icon(Icons::PreferencesLight), IconManager::icon(Icons::PreferencesDark));
-    // preferences_btn->setToolTip("Preferences");
-    // connect(preferences_btn, &Button::clicked, this, &VaultWindow::onPreferencesBtnClicked);
-
     // About Button
     about_btn = createButton(IconManager::icon(Icons::AboutLight), IconManager::icon(Icons::AboutDark));
     about_btn->setToolTip("About Vaultorix");
@@ -220,7 +215,7 @@ void VaultWindow::setDarkMode(bool isDarkMode) {
     isDarkMode ? app_name->setStyleSheet("color: white;") : app_name->setStyleSheet("color: black;");
 
     // Buttons
-    for (auto *btn : {theme_mode_btn, /*preferences_btn,*/ updates_download_btn, about_btn, report_bug_btn})
+    for (auto *btn : {theme_mode_btn, updates_download_btn, about_btn, report_bug_btn})
         btn->setDarkMode(isDarkMode);
 
     isDarkMode ? theme_mode_btn->setIconPaths(LightModeIcon, LightModeIcon) 
