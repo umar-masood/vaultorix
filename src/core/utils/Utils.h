@@ -1,8 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <filesystem>
-#include <iostream>
 #include <expected>
 #include <functional>
 
@@ -18,6 +16,8 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include <QObject>
+
+#include "../../ui/dialogs/error_dialog/ErrorDialog.h"
 
 
 namespace Utils {
