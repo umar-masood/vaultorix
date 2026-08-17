@@ -4,7 +4,7 @@
 #include "../utils/Utils.h"
 
 // API KEY (We'll move to another place in future if we need)
-inline Utils::ENV &env = Utils::ENV::global("C:/Users/umara/Desktop/Vaultorix/.env");
+inline Utils::ENV &env = Utils::ENV::instance("C:/Users/umara/Desktop/Vaultorix/.env");
 
 namespace APIRoutes {
     using T = const char*;
