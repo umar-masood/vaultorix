@@ -5,6 +5,7 @@
 #include "../../../core/config/Constants.h"
 #include "../../../core/session/SessionManager.h"
 #include "../../../core/services/auth/TokenManager.h"
+#include "../../../core/services/vault/repository/FileRepository.h"
 
 #include "../../components/Label.h"
 #include "../../components/Button.h"
@@ -35,7 +36,7 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
 {
     // Window Properties
     setFocusPolicy(Qt::StrongFocus);
-    setModal(true);
+    setModal(false);
 
     // Window Content Area Layout
     auto *win_content_area_layout = new QVBoxLayout(contentArea());
@@ -420,11 +421,13 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
     password_note = new Label("Segoe UI", 10, 
                             QFont::Normal, 
                             true, 
-                            tr("Your new password must be greater than eight characters which contain atleast:\n"
-                            "• One uppercase character\n"
-                            "• One lowercase character\n"
-                            "• One special character\n"
-                            "• One number")
+                            tr("Before changing password, make sure all files inside the vault are decrypted, otherwise after changing password, you can never decrypt them.\n"
+                            "\nYour new password must contains:\n"
+                            "• Atleast eight characters\n"
+                            "• Atleast one uppercase character\n"
+                            "• Atleast one lowercase character\n"
+                            "• Atleast one special character\n"
+                            "• Atleast one digit")
                             , Qt::AlignLeft);
     password_note->setWordWrap(true);
 
@@ -872,7 +875,9 @@ void AccountSettings::onPasswordValidationUpdated(const PasswordValidator::Passw
     if (!change_password_btn || !curr_password_field)
         return;
 
-    const bool canChange = result.isStrong && curr_password_field->text().length() >= 8;
+    const bool canChange = result.isStrong && 
+                           curr_password_field->text().length() >= 8  &&
+                           !Core::Vault::FileRepository::isAnyFileEncrypted();
     change_password_btn->setVisible(canChange);
 }
 
