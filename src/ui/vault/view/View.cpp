@@ -34,45 +34,20 @@ View::View(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   
     // Icons
-    FilterIcon    = IconManager::icon(Icons::Filter);
-    ArrowDownIcon = IconManager::icon(Icons::ArrowDown);
-    SearchIcon    = IconManager::icon(Icons::Search);
+    searchIcon    = IconManager::icon(Icons::Search);
 
     // Empty State Widget
     empty_state = new Ui::Vault::EmptyState(this);
     empty_state->hide();
 
-    // Menu Button (for testing)
-    filterButtonMenu = new ButtonMenu(this);
-    filterButtonMenu->setDisplayMode(Button::IconText);
-    filterButtonMenu->setIconPaths(FilterIcon, FilterIcon);
-    filterButtonMenu->setRightSideIcon(ArrowDownIcon, ArrowDownIcon);
-    filterButtonMenu->setFontProperties("Segoe UI", 10);
-    filterButtonMenu->setText(tr("Filter"));
-    filterButtonMenu->setFontXY(0, -1);
-
-    auto menu = filterButtonMenu->menu();
-    menu->setItemSize(QSize(180, 36));
-    menu->delegate()->setSelectionCheckIndicator(true);
-    menu->setIconic(true);
-    menu->addAction({"All file types",false, "", IconManager::icon(Icons::Files), IconManager::icon(Icons::Files)});
-    menu->addAction({"Document", false, "",  IconManager::icon(Icons::Document), IconManager::icon(Icons::Document)});
-    menu->addAction({"Picture", false, "",  IconManager::icon(Icons::Picture), IconManager::icon(Icons::Picture)});
-    menu->addAction({"Music", false, "",  IconManager::icon(Icons::Music), IconManager::icon(Icons::Music)});
-    menu->addAction({"Video", false, "",  IconManager::icon(Icons::Video), IconManager::icon(Icons::Video)});
-    menu->addAction({"Application", false, "",  IconManager::icon(Icons::Application), IconManager::icon(Icons::Application)});
-    menu->addAction({"Archive", false, "",  IconManager::icon(Icons::Archive), IconManager::icon(Icons::Archive)});
-    menu->addAction({"Other", false, "",  "", ""});
-    menu->delegate()->setActiveIndex(filterButtonMenu->menu()->itemIndex("All file types")); // Setting Default one
-
     // Search Box
     search_box = new TextField;
     search_box->setPlaceholderText(tr("Type to search your files…"));
-    search_box->setFixedSize(QSize(400, 32));
+    search_box->setFixedSize(QSize(500, 32));
     search_box->setClearButton(true);
     search_box->setIconic(true);
     search_box->setIconSize(QSize(18, 18));
-    search_box->setIconPaths(SearchIcon, SearchIcon);
+    search_box->setIconPaths(searchIcon, searchIcon);
 
     // View Mode Toggle 
     view_mode = new ViewModeToggle;
@@ -88,8 +63,7 @@ View::View(QWidget *parent) : QWidget(parent) {
     auto *wrapper_layout = new QHBoxLayout(view_toolbar_wrapper);
     wrapper_layout->setSpacing(0);
     wrapper_layout->setContentsMargins(0, 0, 0, 0);
-    wrapper_layout->addWidget(filterButtonMenu, 0, Qt::AlignLeft | Qt::AlignVCenter);
-    wrapper_layout->addWidget(search_box, 0, Qt::AlignHCenter);
+    wrapper_layout->addWidget(search_box, 0, Qt::AlignCenter);
     wrapper_layout->addWidget(view_mode, 0, Qt::AlignRight | Qt::AlignVCenter);
     
     // Items View List
@@ -248,9 +222,6 @@ void View::paintEvent(QPaintEvent *event) {
 }
 
 void View::setDarkMode(bool isDarkMode) {
-    // Filter Menu Button
-    filterButtonMenu->setDarkMode(isDarkMode);
-
     // Search Box theme
     search_box->setDarkMode(isDarkMode);
 
@@ -274,8 +245,7 @@ void View::setDarkMode(bool isDarkMode) {
 
 QListView* View::list() const { return _list; }
 QStandardItemModel& View::model() { return _model; }
-QSortFilterProxyModel * Ui::Vault::View::proxyModel() const { return proxy_model; }
+QSortFilterProxyModel* Ui::Vault::View::proxyModel() const { return proxy_model; }
 TextField* View::searchBox() const { return search_box; }
-ButtonMenu* View::filterMenu()  const { return filterButtonMenu; }
 ViewModeToggle* View::viewMode() const { return view_mode; }
 Ui::Vault::EmptyState* View::emptyStateWidget() const { return empty_state; }

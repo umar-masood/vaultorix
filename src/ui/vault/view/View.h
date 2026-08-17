@@ -28,7 +28,6 @@ namespace Ui::Vault {
         explicit View(QWidget *parent = nullptr);
 
         TextField* searchBox() const;
-        ButtonMenu* filterMenu() const;
         ViewModeToggle* viewMode() const;
         Ui::Vault::EmptyState* emptyStateWidget() const; 
         QStandardItemModel& model();
@@ -55,11 +54,8 @@ namespace Ui::Vault {
         // View Mode Toggle
         ViewModeToggle *view_mode = nullptr;
 
-        // Filter Button Menu
-        ButtonMenu *filterButtonMenu = nullptr;
-
         // Icons
-        QString FilterIcon, ArrowDownIcon, SearchIcon;   
+        QString searchIcon;   
 
         // Search Box
         TextField *search_box = nullptr;
