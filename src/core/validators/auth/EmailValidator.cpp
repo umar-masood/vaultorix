@@ -98,13 +98,13 @@ bool EmailValidator::isValidEmail(const QString &email) {
     QString domain = parts[1].toLower();
     
     // Check if the domain is blacklisted
-    bool isDisposable = isEmailBlacklisted(domain);
+    bool isBlacklisted = isDomainBlacklisted(domain);
 
     // Return true if email is valid and domain not blacklisted
-    return !isDisposable;
+    return !isBlacklisted;
 }
 
-bool EmailValidator::isEmailBlacklisted(const QString &domain) {
+bool EmailValidator::isDomainBlacklisted(const QString &domain) {
     auto it = _cacheMap.find(domain);
     if (it != _cacheMap.end()) {
         _order.splice(_order.end(), _order, it->second); 
@@ -132,7 +132,7 @@ void EmailValidator::loadDomainsFromFile() {
         ERROR_HERE("Email domains list failed to open.");
         return;
     }
-
+    
     _blacklistedDomains.clear();
     _blacklistedDomains.reserve(71500);
 
