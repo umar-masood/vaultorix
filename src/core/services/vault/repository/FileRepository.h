@@ -29,6 +29,7 @@ namespace Core::Vault {
         static std::optional<Core::Crypto::WrappedKey> fetchEncryptedFileSecrets(int fileId);
         static bool setFileDecryptedNamePath(int fileId, const QString &decryptedPath, const QString &decryptedName);
         static bool removeEncryptedFileNamePath(int fileId);
+        static bool isAnyFileEncrypted();
 
         private:
         static Core::Vault::FileStatus fetchFileStatus(int fileId);

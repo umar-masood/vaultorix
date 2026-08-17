@@ -336,3 +336,27 @@ bool FileRepository::removeEncryptedFileNamePath(int fileId) {
 
     return true;
 }
+
+bool Core::Vault::FileRepository::isAnyFileEncrypted() {
+    QSqlQuery query(Database::instance().database());
+    query.prepare(
+        R"(
+            SELECT * 
+            FROM files
+            WHERE status = 6
+            LIMIT 1
+        )"
+    );
+
+    if (!query.exec()) {
+        ERROR_HERE("Failed to fetch the any file encrypted data from database " + query.lastError().text());
+        return false;
+    }
+
+    
+    if (query.next()) {
+        return true;
+    }
+
+    return false;
+}
