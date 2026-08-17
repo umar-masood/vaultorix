@@ -60,7 +60,7 @@ bool UsernameValidator::isValidUsername(const QString &username) const {
     return _blacklistedUsernames.find(usernameLower) == _blacklistedUsernames.end();
 }
 
-void UsernameValidator::checkUsernameValidity(const QString &username) {
+void UsernameValidator::checkUsernameValidityAndAvailability(const QString &username) {
     if (!isValidUsername(username)) {
         emit usernameInvalid();
         return;
