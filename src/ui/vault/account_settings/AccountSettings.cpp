@@ -36,7 +36,7 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
 {
     // Window Properties
     setFocusPolicy(Qt::StrongFocus);
-    setModal(false);
+    setModal(true);
 
     // Window Content Area Layout
     auto *win_content_area_layout = new QVBoxLayout(contentArea());
