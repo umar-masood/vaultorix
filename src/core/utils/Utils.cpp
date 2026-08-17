@@ -6,7 +6,7 @@ namespace Utils {
     /*---------------------------------------------------------------
                         BLACKLIST MANAGER 
     -----------------------------------------------------------------*/
-    BlacklistManager::BlacklistManager(const QString &blacklistName, QObject *parent = nullptr) : QObject(parent), _blacklistName(blacklistName) {
+    BlacklistManager::BlacklistManager(const QString &blacklistName, QObject *parent) : QObject(parent), _blacklistName(blacklistName) {
         _manager = new QNetworkAccessManager(this);
     }
 
