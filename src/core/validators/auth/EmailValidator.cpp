@@ -2,114 +2,29 @@
 #include "../../config/APIConfig.h"
 #include "../../config/Constants.h"
 
+#include <QRegularExpression>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include <QFile>
+#include <QTextStream>
+#include <QTextStream>
+
 EmailValidator::EmailValidator(QObject *parent) : QObject(parent) {
-    blacklistManager = new Utils::BlacklistManager(this, "Email");
-    manager = new QNetworkAccessManager(this);
-    
-    blacklistManager->setFileName(EMAIL_BLACKLIST_FILE);
-    if (blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::EMAIL_BLACKLIST)))) 
-        INFO_HERE("Email blacklist is being downloaded.");
+    _blacklistManager = new Utils::BlacklistManager("Email", this);    
+    _blacklistManager->setFileName(EMAIL_BLACKLIST_FILE);
+
+    if (_blacklistManager->downloadList(QUrl(QString::fromUtf8(APIRoutes::EMAIL_BLACKLIST)))) 
+        INFO_HERE("Email domains blacklist download started.");
     else
-        loadMailsFromFile();
+        loadDomainsFromFile();
 
-    connect(blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
-        INFO_HERE("Email blacklist has been downloaded.");
-        loadMailsFromFile();
+    connect(_blacklistManager, &Utils::BlacklistManager::listDownloaded, this, [this]() {
+        INFO_HERE("Email domains blacklist has been downloaded.");
+        loadDomainsFromFile();
     });
-}
 
-bool EmailValidator::isValidEmail(const QString &email) {
-    // Basic email validation checks
-    if (email.isEmpty() || !email.contains('@')) 
-        return false;
-
-    if (email.count('@') != 1)
-        return false;
-
-    if (email.contains(' ') || email.contains('\t'))
-        return false;
-    
-    if (email.size() > 254)
-        return false;
-
-    // Split email into local and domain parts
-    int atIndex = email.indexOf('@');
-    QString local = email.left(atIndex);
-    QString domain = email.mid(atIndex + 1);
-
-    if (local.isEmpty() || domain.isEmpty())
-        return false;
-
-    if (local.startsWith('.') || local.endsWith('.') || local.contains(".."))
-        return false;
-
-    if (domain.startsWith('.') || domain.endsWith('.') || domain.contains(".."))
-        return false;
-
-    if (!domain.contains('.'))
-        return false;
-
-    // Check all characters are in valid range - ASCII
-    for (QChar c : email) 
-        if (c.unicode() > 127)
-            return false;
-
-    // Regex patterns for local and domain
-    static const QRegularExpression localRe("^[A-Za-z0-9._%+-]+$");
-    static const QRegularExpression domainRe("^(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,24}$");
-
-    if (!localRe.match(local).hasMatch())
-        return false;
-
-    if (!domainRe.match(domain).hasMatch())
-        return false;
-
-    // Check individual domain labels
-    QList<QString> labels = domain.split('.');
-    for (const QString &label : labels) {
-        if (label.startsWith('-') || label.endsWith('-') || label.isEmpty())
-            return false;
-    }
-
-    // Check if email is disposable
-    if (tempMails.empty()) {
-        ERROR_HERE("Weak email lists cannot be loaded.");
-        return false; // If disposable email list is not loaded, we cannot check
-    }
-
-    // Extract domain part
-    std::string domainStr = domain.toStdString();
-    Utils::lower(domainStr);
-
-    // Check if the domain is disposable
-    bool isDisposable = isEmailBlacklisted(domainStr);
-
-    // Securely wipe temporary std::string and QByteArray
-    Utils::cleanupMemory(domainStr);
-
-    // Return true if email is valid and not disposable
-    return !isDisposable;
-}
-
-bool EmailValidator::isEmailBlacklisted(const std::string &domain) {
-    auto it = cacheMap.find(domain);
-    if (it != cacheMap.end()) {
-        order.splice(order.end(), order, it->second); 
-        return true;
-    }
-
-    bool result = tempMails.find(domain) != tempMails.end();
-    if (result) {
-        order.push_back(domain);
-        cacheMap[domain] = std::prev(order.end()); 
-        if (cacheMap.size() > MAX_CACHE_SIZE) {
-            std::string oldestPwd = order.front();
-            cacheMap.erase(oldestPwd);
-            order.pop_front();
-        }
-    }
-
-    return result;
+    _manager = new QNetworkAccessManager(this);
 }
 
 void EmailValidator::checkEmailValidityAndAvailability(const QString &email) {
@@ -118,63 +33,120 @@ void EmailValidator::checkEmailValidityAndAvailability(const QString &email) {
         return;
     }
 
-    QUrl url(route(APIRoutes::CHK_EMAIL) + email);
-
-    QNetworkRequest request(url);
+    QNetworkRequest request(QUrl(route(APIRoutes::CHK_EMAIL) + email));
     request.setTransferTimeout(REQUEST_TIMEOUT);
     
-    QNetworkReply *reply = manager->get(request);
-    connect(reply, &QNetworkReply::finished, [this, reply, &email](){
-        if (!reply)
-            return;
-
+    QNetworkReply *reply = _manager->get(request);
+    connect(reply, &QNetworkReply::finished, [this, reply](){
         if (reply->error() != QNetworkReply::NoError) {
             reply->deleteLater();
             ERROR_HERE("Network request failed:  " + reply->errorString());
-            emit failedToCheckEmail();
+            emit failedToValidateEmail();
             return;
         }
 
-        QByteArray data = reply->readAll();
+        const QByteArray data = reply->readAll();
         reply->deleteLater();
 
-        if (data.isEmpty())
+        if (data.isEmpty()) {
+            emit failedToValidateEmail();
             return;
+        }
 
         QJsonParseError parseError;
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
+        const QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
 
-        if (parseError.error != QJsonParseError::NoError || !jsonDoc.isObject())
+        if (parseError.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
+            emit failedToValidateEmail();
             return;
+        }
 
-        QJsonObject obj = jsonDoc.object();
+        const QJsonObject obj = jsonDoc.object();
         int statusCode = obj["status_code"].toInt();
+
         DEBUG_HERE(QString::number(statusCode) + "   " + obj["message"].toString());
         
         emit emailAvailable(statusCode == 200);
     });
 }
 
-void EmailValidator::loadMailsFromFile() {
-    std::ifstream file(blacklistManager->filePath);
-    if (!file.is_open()) {
-        ERROR_HERE("Email domains list does not open.");
+bool EmailValidator::isValidEmail(const QString &email) {
+    if (email.isEmpty()) 
+        return false;
+
+    static QRegularExpression regex("^[A-Za-z0-9][A-Za-z0-9._+]*@[A-Za-z0-9]+(-[A-Za-z0-9]+)*(\\.[A-Za-z0-9]+)+$");
+    if (!regex.match(email).hasMatch())
+        return false;
+
+    // Check if email is disposable
+    if (_blacklistedDomains.empty()) {
+        ERROR_HERE("Blacklisted emails was not loaded.");
+        return false;
+    }
+
+    const QStringList parts = email.split('@');
+    // Username
+    QString username = parts[0].toLower();
+
+    // Checking consecutive dots in username part
+    for (auto i = 1; i < username.size(); i++) {
+        if (username[i] == '.' && username[i - 1] == '.')
+            return false;
+    }
+
+    // Domain 
+    QString domain = parts[1].toLower();
+    
+    // Check if the domain is blacklisted
+    bool isDisposable = isEmailBlacklisted(domain);
+
+    // Return true if email is valid and domain not blacklisted
+    return !isDisposable;
+}
+
+bool EmailValidator::isEmailBlacklisted(const QString &domain) {
+    auto it = _cacheMap.find(domain);
+    if (it != _cacheMap.end()) {
+        _order.splice(_order.end(), _order, it->second); 
+        return true;
+    }
+
+    bool result = _blacklistedDomains.find(domain) != _blacklistedDomains.end();
+    if (result) {
+        _order.push_back(domain);
+        _cacheMap[domain] = std::prev(_order.end()); 
+        
+        if (_cacheMap.size() > MAX_CACHE_SIZE) {
+            const QString domain = _order.front();
+            _cacheMap.erase(domain);
+            _order.pop_front();
+        }
+    }
+
+    return result;
+}
+
+void EmailValidator::loadDomainsFromFile() {
+    QFile file(_blacklistManager->filePath());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        ERROR_HERE("Email domains list failed to open.");
         return;
     }
 
-    tempMails.reserve(71500);
-    std::string line;
-    while (std::getline(file, line)) {
-        if (!line.empty() && (line.back() == '\r' || line.back() == '\n'))
-            line.pop_back();
+    _blacklistedDomains.clear();
+    _blacklistedDomains.reserve(71500);
 
-        Utils::lower(line);
-
-        if (!line.empty())
-            tempMails.insert(line);
+    _order.clear();
+    _cacheMap.clear();
+    
+    QTextStream stream(&file);
+    while (!stream.atEnd()) {
+        QString domain = stream.readLine().trimmed().toLower();
+        if (!domain.isEmpty())
+            _blacklistedDomains.insert(domain);
     }
 
     file.close();
 
-    INFO_HERE("Loaded " + QString::number(tempMails.size()) + " domains.");
+    INFO_HERE("Loaded " + QString::number(_blacklistedDomains.size()) + " domains.");
 }
