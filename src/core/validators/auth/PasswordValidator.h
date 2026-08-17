@@ -1,11 +1,10 @@
 #pragma once
 
 #include <QObject>
-#include <unordered_set>
+#include <QSet>
 #include <unordered_map>
 #include <list>
-
-namespace Utils { class BlacklistManager; }
+#include "../../utils/Utils.h"
 
 class PasswordValidator : public QObject {
     Q_OBJECT
@@ -27,19 +26,16 @@ class PasswordValidator : public QObject {
     signals:
     void validationUpdated(const PasswordValidationResult &result);
 
-    private slots:
-    bool isPasswordBlacklisted(const std::string &password);
-    void loadPwdsFromFile();
-
     private:
-    Utils::BlacklistManager *blacklistManager = nullptr;
+    Utils::BlacklistManager *_blacklistManager = nullptr;
 
-    std::unordered_set<std::string> weakPwds;
-    std::list<std::string> order;
-    std::unordered_map<
-        std::string,
-        std::list<std::string>::iterator
-    > cacheMap;
+    QSet<QString> _blacklistedPasswords;
+    std::list<QString> _order;
+    std::unordered_map<QString, std::list<QString>::iterator> _cacheMap;
 
-    static constexpr size_t MAX_CACHE_SIZE = 1000;
+    const size_t MAX_CACHE_SIZE = 1000;
+
+    // Helpers
+    bool isPasswordBlacklisted(const QString &password);
+    void loadBlacklistedPwdsFromFile();
 };
