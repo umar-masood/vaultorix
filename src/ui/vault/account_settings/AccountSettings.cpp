@@ -530,50 +530,7 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
     delete_acc_layout->setAlignment(delete_acc_subLayout, Qt::AlignLeft);
     delete_acc_layout->addStretch();
     delete_acc_layout->addWidget(delete_acc_btn, Qt::AlignRight);
-
-    // ============================ Seperator ========================================
-    sep_6 = new Seperator( 1, width(), Qt::Horizontal);
-
-    /* -----------------------------------------------------------------------------------------
-                            Lock Timeout
-    --------------------------------------------------------------------------------------------*/
-    // Layout
-    auto *lock_timeout_layout = new QHBoxLayout;
-    lock_timeout_layout->setContentsMargins(0, 0, 0, 0);
-    lock_timeout_layout->setSpacing(0);;
-
-    // Sublayout
-    auto *lock_timeout_sublayout = new QVBoxLayout;
-    lock_timeout_sublayout->setContentsMargins(0, 0, 0, 0);
-    lock_timeout_sublayout->setSpacing(0);
-
-    // Header
-    lock_timeout_header = new Label("Segoe UI", 10, QFont::Normal, false, "Auto Lock Timeout", Qt::AlignLeft);
     
-    // Subtext
-    lock_timeout_subText = new Label("Segoe UI", 10, QFont::Normal, false, "Choose how long Vaultorix waits before locking your vault due to inactivity", Qt::AlignLeft);
-    lock_timeout_subText->setWordWrap(true);
-    lock_timeout_subText->setMinimumWidth(360);
-
-    // Adding Header and Subtext to lock_timeout_sublayout
-    lock_timeout_sublayout->addWidget(lock_timeout_header, 0, Qt::AlignLeft);
-    lock_timeout_sublayout->addSpacing(2);
-    lock_timeout_sublayout->addWidget(lock_timeout_subText, 0, Qt::AlignLeft);
-
-    // ComboBox
-    lock_timeout_combobox = new ComboBox;
-    lock_timeout_combobox->setFieldSize(QSize(160, 36));
-    lock_timeout_combobox->addItem("15 Minutes");
-    lock_timeout_combobox->addItem("30 Minutes");
-    lock_timeout_combobox->addItem("45 Minutes");
-    lock_timeout_combobox->addItem("60 Minutes");
-
-    // Adding lock_timeout_sublayout, and combo box to layout
-    lock_timeout_layout->addLayout(lock_timeout_sublayout);
-    lock_timeout_layout->setAlignment(lock_timeout_sublayout, Qt::AlignLeft | Qt::AlignVCenter);
-    lock_timeout_layout->addStretch();
-    lock_timeout_layout->addWidget(lock_timeout_combobox, 0, Qt::AlignVCenter | Qt::AlignRight);
-
     /* -----------------------------------------------------------------------
                         Adding Layouts to contentLayout
        -----------------------------------------------------------------------*/
@@ -606,11 +563,6 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
     contentLayout->addLayout(two_fa_layout);
     contentLayout->addSpacing(8);
     contentLayout->addWidget(sep_5);
-    contentLayout->addSpacing(8);
-
-    contentLayout->addLayout(lock_timeout_layout);
-    contentLayout->addSpacing(8);
-    contentLayout->addWidget(sep_6);
     contentLayout->addSpacing(8);
 
     contentLayout->addLayout(delete_acc_layout);
@@ -650,35 +602,6 @@ AccountSettings::AccountSettings(QWidget *parent) : SubWindow(QSize(600, 600), p
     using ASCore = Core::AccountSettingsService;
     account_settings_core = new ASCore(this);
 
-    // Lock Timeout Combo Box 
-    lockTimer = new QTimer;
-    lockTimer->setSingleShot(true);
-    connect(lockTimer, &QTimer::timeout, this, [this](){
-        Core::TokenManager::instance()->revokeRefreshToken();
-        QApplication::quit();
-    });
-
-    auto lockTimeoutFunction = [this](int index) {
-        if (index == 0) 
-            emit startLockTimeoutTimer(15 * 60 * 100);
-        else if (index == 1)
-            emit startLockTimeoutTimer(30 * 60 * 100);
-        else if (index == 2)
-            emit startLockTimeoutTimer(45 * 60 * 100);
-        else if (index == 3)
-            emit startLockTimeoutTimer(60 * 60 * 100);
-    };
-
-    int index = account_settings_core->fetchLockTimeout();
-    lockTimeoutFunction(index); 
-    lock_timeout_combobox->setCurrentItem(index);
-
-    connect(lock_timeout_combobox, &ComboBox::selectionChanged, this, [this, lockTimeoutFunction](int index, const QString &) {
-        lockTimeoutFunction(index);        
-        account_settings_core->updateLockTimeout(index);
-    });
-
-    connect(this, &AccountSettings::startLockTimeoutTimer, this, &AccountSettings::onStartLockTimeoutTimer);
     connect(account_settings_core, &ASCore::failedToUpdateUsername, this, &AccountSettings::onFailedToUpdateUsername);
     connect(account_settings_core, &ASCore::usernameUpdated, this, &AccountSettings::onUsernameUpdated);
     connect(account_settings_core, &ASCore::failedToUpdateProfilePicture, this, &AccountSettings::onFailedToUpdateProfilePicture);
@@ -931,24 +854,17 @@ void AccountSettings::setUserDetailsFromSessionManager() {
         pic->setPixmap(Ui::Utils::cropToCircle(IconManager::icon(Icons::Avator), 80));
 }
 
-void AccountSettings::onStartLockTimeoutTimer(int msec) {
-    if (lockTimer) {
-        lockTimer->stop();
-        lockTimer->start(msec);
-    }
-}
-
 void AccountSettings::setDarkMode(bool isDarkMode) {
     // Scrollbar
     scrollbar->setDarkMode(isDarkMode);
 
     // -------------------- Subtexts --------------------
-    for (Label* label : { main_header_text, profile_pic_hint, password_text, two_fa_text, delete_acc_text, email_note, password_note, username_note, lock_timeout_subText })
+    for (Label* label : { main_header_text, profile_pic_hint, password_text, two_fa_text, delete_acc_text, email_note, password_note, username_note })
         if (label)
             label->setTextColor(isDarkMode ? "#94A3B8" : "#6B7280");
 
     // -------------------- Headers --------------------
-    for (Label* label : {winTitle, mainHeader, name_header, username_header, email_header, password_header, two_fa_header, delete_acc_header, profile_pic_title, lock_timeout_header })
+    for (Label* label : {winTitle, mainHeader, name_header, username_header, email_header, password_header, two_fa_header, delete_acc_header, profile_pic_title })
         if (label)
             label->setTextColor(isDarkMode ? "#F1F5F9" : "#111827");
 
@@ -972,13 +888,9 @@ void AccountSettings::setDarkMode(bool isDarkMode) {
     if (two_fa_toggle) two_fa_toggle->setDarkMode(isDarkMode);
 
     // -------------------- Seperators --------------------
-    for (Seperator* sep : {sep_1, sep_2, sep_3, sep_4, sep_5, sep_6 })
+    for (Seperator* sep : {sep_1, sep_2, sep_3, sep_4, sep_5 })
         if (sep)
             sep->setColor(isDarkMode ? "#334155" : "#E5E7EB");
-
-    // ---------------- Combo Box -------------------
-    if (lock_timeout_combobox)
-        lock_timeout_combobox->setDarkMode(isDarkMode);
 
     // Base class method
     SubWindow::setDarkMode(isDarkMode);

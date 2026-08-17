@@ -24,8 +24,6 @@ namespace Core {
         void setPassword(const QString &old_pass, const QString &new_pass);
         void deleteProfilePicture();
         void deleteAccount();
-        void updateLockTimeout(int index);
-        int fetchLockTimeout();
 
         private:
         bool isValidResponse(const QJsonObject &obj);

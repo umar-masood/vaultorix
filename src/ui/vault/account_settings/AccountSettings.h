@@ -51,8 +51,6 @@ namespace Ui::Vault {
         void onUsernameAvailable(bool isAvailable);
         void onPasswordValidationUpdated(const PasswordValidator::PasswordValidationResult &result);
         
-        void onStartLockTimeoutTimer(int msec);
-
         void onFailedToUpdatePassword(Core::AccountSettingsService::Error failure);
         void onFailedToDeleteAccount(Core::AccountSettingsService::Error failure);
         void onFailedToUpdateProfilePicture(Core::AccountSettingsService::Error failure);
@@ -61,7 +59,6 @@ namespace Ui::Vault {
 
         signals:
         void accountSettingsClosed();
-        void startLockTimeoutTimer(int msec);
 
         private:
         QString _profilePicturePath;
@@ -71,7 +68,7 @@ namespace Ui::Vault {
         void onProfilePictureUpdated();
 
         Core::AccountSettingsService *account_settings_core = nullptr;
-        QTimer *lockTimer;
+
         // Window Title Label
         Label *winTitle = nullptr;
 
@@ -191,18 +188,5 @@ namespace Ui::Vault {
                 Label *delete_acc_text = nullptr;
             // Delete Account Button
             Button *delete_acc_btn = nullptr;
-        
-        // ------- Seperator ---------------
-        Seperator *sep_6 = nullptr;
-
-        // Lock Timeout Option
-        // Icon
-        Label *lock_timeout_icon = nullptr;
-            // Header
-            Label *lock_timeout_header = nullptr;
-            // Subtext
-            Label *lock_timeout_subText = nullptr;
-        // Combo Box
-        ComboBox *lock_timeout_combobox = nullptr;
     };  
 };
