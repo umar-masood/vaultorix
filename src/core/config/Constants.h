@@ -16,9 +16,9 @@
 #define OLDER_LIST_TIME 172800
 #define REDOWNLOAD_INTERVAL 10000
 
-#define EMAIL_BLACKLIST_FILE "WeakDomains.config"
-#define PWD_BLACKLIST_FILE "WeakPasswords.config"
-#define USERNAME_BLACKLIST_FILE "WeakUsernames.config"
+#define EMAIL_BLACKLIST_FILE "domains.config"
+#define PWD_BLACKLIST_FILE "passwords.config"
+#define USERNAME_BLACKLIST_FILE "usernames.config"
 #define UPDATE_DOWNLOAD_FILE "Vaultorix-Setup-v1.0.0.exe"
 
 #define VAULT_IMPORT_CHUNK_SIZE 4 * 1024 * 1024
